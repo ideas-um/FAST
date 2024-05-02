@@ -1,0 +1,30 @@
+x1=17
+x2=71.36
+TLength=89.2
+SuperEllipseNum=5
+
+supell_1
+0.5 1 0.5 1
+2 2 2 2
+0.5 0.0 -2.0
+NOTFVIEW
+supell_2
+1.9 3 1.9 3
+2 2 2 2
+6.5 0.0 -1.7
+FVIEW
+supell_3
+5 5.5 5 5.5
+2 2 2 2
+17.0 0.0 0.0
+FVIEW
+supell_4
+5 5.5 5.0 5.5
+2 2 2 2
+71.4 0.0 0.0
+NOTFVIEW
+supell_5
+1.0 1.5 1.0 1.5
+2 2 2 2
+89 0.0 4
+NOTFVIEW

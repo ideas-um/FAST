@@ -1,0 +1,15 @@
+x1=15.6
+x2=29.4
+TLength=185
+SuperEllipseNum=2
+
+supell_1
+5 13 5 13
+5 5 5 5
+83.25 0.0 -5.0
+FVIEW
+supell_2
+5 13 5 13
+5 5 5 5
+183 0.0 -5
+NOTFVIEW

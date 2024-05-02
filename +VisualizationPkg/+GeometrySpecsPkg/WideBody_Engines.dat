@@ -1,0 +1,10 @@
+NumberOfEngines=2
+
+engine_1
+70 31 -18
+1 1
+TURBOFAN
+engine_2
+70 -31 -18
+1 1
+TURBOFAN

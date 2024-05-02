@@ -1,0 +1,10 @@
+NumberOfEngines=2
+
+engine_1
+74.5174 +29.3019 -13.9021
+1 1.1
+TURBOFAN
+engine_2
+74.5174 -29.3019 -13.9021
+1 1.1
+TURBOFAN

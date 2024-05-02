@@ -1,0 +1,18 @@
+NumberOfEngines=4
+
+engine_1
+45 24 25
+1 2
+TURBOPROP
+engine_2
+45 -24 25
+1 2
+TURBOPROP
+engine_3
+45 47 25
+1 2
+TURBOPROP
+engine_4
+45 -47 25
+1 2
+TURBOPROP

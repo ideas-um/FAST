@@ -17,6 +17,9 @@ function [EngineObject] = TurbofanOnDesignCycle(EngSpecFun,MDotInput,ElecPower)
 % MDotInput = total mass flow rate of air in the stream tube of the flow.
 %       size: scalar double
 %
+% ElecPower = additional power supplied to the low pressure turbine
+%       size: scalar double
+%
 %
 % OUTPUTS:
 %
@@ -79,7 +82,7 @@ Ri0 = 0;
 
 State0.MDot = MDot0;
 State0.Pt = Pt0;
-State0.Ps =Ps0;
+State0.Ps = Ps0;
 State0.Tt = Tt0;
 State0.Ts = Ts0;
 State0.Mach = M0;
@@ -295,6 +298,7 @@ EngineObject.TSFC_Adj_Lam = EngineObject.TSFC_Imperial / (Lam);
 EngineObject.TSFC_Adj_Thrust = EngineObject.TSFC_Imperial / (ThrustCorr);
 EngineObject.EGT_Celsius = UnitConversionPkg.ConvTemp(State6.Ts,'K','C');
 EngineObject.FanDiam = State1.Ro*2;
+EngineObject.Specs = EngSpecFun;
 
 
 end

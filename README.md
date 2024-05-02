@@ -58,19 +58,19 @@ For additional documentation, see package-specific README files. These READMEs w
 ### (3) Examples
 
 To inspect any package specific documentation, please run either of the following two commands:
-> `>> doc PackageName.README`
+>`>> doc PackageName.README` \
 `>> help PackageName.README`
 
 where "PackageName" is replaced by the specific package a user would like to inspect. For example, to see more information about the engine model, a user would run either:
-> `>> doc EngineModelPkg.README`
+>`>> doc EngineModelPkg.README` \
 `>> help EngineModelPkg.README`
 
 While a user might run either:
-> `>> doc VisualizationPkg.README`
+>`>> doc VisualizationPkg.README` \
 `>> help VisualizationPkg.README`
 
 to see more information on the aircraft visualization software. Additionally, there may be subpackages stored within packages. The same syntax is used to view this documentation. A user may run either:
-> `>> doc EngineModelPkg.EngineSpecsPkg.README`
+>`>> doc EngineModelPkg.EngineSpecsPkg.README` \
 `>> help EngineModelPkg.EngineSpecsPkg.README`
 
 for more information on creating engine specification files for the engine model.

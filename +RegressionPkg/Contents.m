@@ -10,4 +10,4 @@
 % NLGPR                        - RegressionPkg.NLGPR is a function.
 % SearchDB                     - RegressionPkg.SearchDB is a function.
 % SquareExKernel               - RegressionPkg.SquareExKernel is a function.
-% VaryUserInputs               - function [known, unknown] = VaryUserInputs(Aircraft)
+% VaryUserInputs               - RegressionPkg.VaryUserInputs is a function.

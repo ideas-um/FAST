@@ -24,7 +24,3 @@
 % EAP_Databases_Offline      - is an XLSX-File
 % JMPInputSheetFANS          - is an XLSX-File
 % JMPInputSheetProps         - is an XLSX-File
-%
-% Packages
-% -------------------------------------------------------------------------
-% ArchaicDatabasePkg         - DatabasePkg.ArchaicDatabasePkg is a package.

@@ -14,5 +14,4 @@
 % FlyMission                    - MissionSegsPkg.FlyMission is a function.
 % Gravity                       - MissionSegsPkg.Gravity is a function.
 % ProcessProfile                - MissionSegsPkg.ProcessProfile is a function.
-% StandardAtmosphereTest        - MissionSegsPkg.StandardAtmosphereTest is a function.
 % StdAtm                        - MissionSegsPkg.StdAtm is a function.

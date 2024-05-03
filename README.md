@@ -36,12 +36,10 @@ For additional documentation, see package-specific README files. These READMEs w
 
 ### (2) Package List
 
-- **+AircraftModelingPkg**: This package contains information regarding completed aircraft studies. These studies may include large .dat or .mat files with information produced by designing hundreds or thousands of aircraft variants.
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
 - **+DatabasePkg**: This package contains the IDEAS Lab historical database. It also contains functions which help convert the original database format (MS Excel sheet) into the FAST format (Matlab data structures).
 - **+DataStructPkg**: This package contains functions which process aircraft data structures when calling FAST.
-- **+DemoPkg**: This package contains demonstrations that are given to show FAST's capabilities. It does not contain any files necessary to run fast. When the tool is publicly released this package will not be included, however it currently acts as a reference during FAST's development.
 - **+EngineModelPkg**: This package contains the gas turbine engine models used while running FAST. It is one of the largest packages and inspecting additional documentation is recommended if a user has more questions regarding the gas turbine engine models.
 - **+MissionProfilesPkg**: This package is analagous to the AircraftSpecsPkg, as it contains specific mission profiles. The documentation will guide users in calling pre-made mission profiles.
 - **+MissionSegsPkg**: This package is responsible for all aircraft performance-related functionality while performing the mission analysis (i.e., processing and flying the mission).

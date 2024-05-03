@@ -34,7 +34,7 @@ In each function that is shipped with FAST, a specific function header is create
 
 All function headers must be formatted as:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/FunctionHeader.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/FunctionHeader.PNG)
 
 All InArg* and OutArg* names should be replaced with the appropriate input and output variable names, respectively. Additionally, any text enclosed with \<brackets\> needs to be updated by the user.
 
@@ -50,7 +50,7 @@ All input and output arguments must be listed, along with a description of what 
 
 Some examples of input/output descriptions are:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/ExampleIO.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/ExampleIO.PNG)
 
 
 ### Variable Naming
@@ -67,11 +67,11 @@ When writing code in FAST, please note the variable naming conventions that are 
 - When printing any warnings, errors, messages to the command line, etc., please use strings (delineated by " ") not character arrays (delineated by ' ').
 - If multiple equations are on consecutive lines, please try to vertically align them, if appropriate. Two examples are:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/Vertical01.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/Vertical01.PNG)
 
 or
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/Vertical02.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/Vertical02.PNG)
 
 ### Using Sections and Sub-Sections:
 
@@ -79,11 +79,11 @@ Sections and sub-sections are a useful way to divide a function into smaller, mo
 
 Sections are denoted with two percent signs (%%) at the beginning and end of the section name, followed by another line of percent signs matching the length of the line above it. All letters in a section header should be UPPERCASE. An example is:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/Header01.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/Header01.PNG)
 
 Also, there should be two blank lines in-between successive sections. For example:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/Header02.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/Header02.PNG)
 
 When providing a name for a section, try to make it a short, concise summary of what that code block does or what its purpose is.
 
@@ -93,13 +93,13 @@ Sub-sections are used within sections of code to convey a little more detail abo
 
 Sub-sections are formatted as a "block" of percent signs (%) that is always 30 percent signs (%) wide. An example is:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/SubHeader01.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/SubHeader01.PNG)
 
 Notice that the sub-section comment can be multiple lines long, if needed (unlike section comments, which are much more concise). Please make sure to include a line of space between the lines of percent signs (as shown in the example above).
 
 If multiple sub-sections are used within a section, then a divider should be included. A divider is a commented line with many dashes (-) that stop after the 60th character in the line has been reached. An example of this is:
 
-![](https://github.com/ideas-um/FAST/blob/MarkdownFilePreparations/MDScreenshots/SubHeader02.PNG)
+![](https://github.com/ideas-um/FAST/blob/main/MDScreenshots/SubHeader02.PNG)
 
 Both the sub-section headers and dividers should be indented if they are displayed within "for", "if", etc. blocks. Section headers, however, should not be nested (and therefore, never indented).
 

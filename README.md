@@ -58,20 +58,29 @@ For additional documentation, see package-specific README files. These READMEs w
 ### (3) Examples
 
 To inspect any package specific documentation, please run either of the following two commands:
-> `>> doc PackageName.README`
-`>> help PackageName.README`
+
+```matlab
+>> doc  PackageName.README
+>> help PackageName.README
+```
 
 where "PackageName" is replaced by the specific package a user would like to inspect. For example, to see more information about the engine model, a user would run either:
-> `>> doc EngineModelPkg.README`
-`>> help EngineModelPkg.README`
+```matlab
+>> doc  EngineModelPkg.README
+>> help EngineModelPkg.README
+```
 
 While a user might run either:
-> `>> doc VisualizationPkg.README`
-`>> help VisualizationPkg.README`
+```matlab
+>> doc  VisualizationPkg.README
+>> help VisualizationPkg.README
+```
 
 to see more information on the aircraft visualization software. Additionally, there may be subpackages stored within packages. The same syntax is used to view this documentation. A user may run either:
-> `>> doc EngineModelPkg.EngineSpecsPkg.README`
-`>> help EngineModelPkg.EngineSpecsPkg.README`
+```matlab
+>> doc  EngineModelPkg.EngineSpecsPkg.README
+>> help EngineModelPkg.EngineSpecsPkg.README
+```
 
 for more information on creating engine specification files for the engine model.
 
@@ -97,7 +106,9 @@ FAST performs on- and off-design analysis of a user-prescribed aircraft on a use
 
 Once these two functions are created, the main aircraft analysis function can be called via:
 
-> `OutputAircraft = Main(AircraftSpecsPkg.AC, @MissionProfilesPkg.Miss);`
+```matlab
+OutputAircraft = Main(AircraftSpecsPkg.AC, @MissionProfilesPkg.Miss);
+```
 
 To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with the appropriate .m file that was created in the "AircraftSpecsPkg". Also, replace "Miss" in "MissionProfilesPkg.Miss" with the appropriate .m file in the "MissionProfilesPkg". In the function call above, "OutputAircraft" is the analyzed aircraft output and can be replaced with any Matlab-valid variable name. Note that an "@" is required before calling the mission profile, but is not needed for the aircraft specification file (because it should have no input arguments).
 

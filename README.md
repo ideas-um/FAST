@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/ideas-um/FAST/assets/94265270/af0238b2-7463-4d5d-81ec-12d84bf4fc59" width="50%" height="auto">
+</p>
+
 # README
 
 Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Environmentally-friendly Aircraft Systems Laboratory

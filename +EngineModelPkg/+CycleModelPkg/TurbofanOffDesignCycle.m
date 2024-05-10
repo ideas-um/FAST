@@ -1,7 +1,7 @@
 
 
 
-function [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
+function [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,OffParams)
 %
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
@@ -62,8 +62,8 @@ LHVFuel = 43.17e6;
 %% Initialize and  Find Mass Flow Rate from known fan inlet
 
 R = 287;
-M0 = FlightCon.Mach;
-Alt = FlightCon.Alt;
+M0 = OffParams.FlightCon.Mach;
+Alt = OffParams.FlightCon.Alt;
 
 [Ts0,Ps0,rhos0] = MissionSegsPkg.StdAtm(Alt);
 Cp0 = EngineModelPkg.SpecHeatPkg.CpAir(Ts0);

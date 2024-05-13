@@ -140,21 +140,33 @@ fuelpower = LHVFuel*mfuel;
 
 
 
-Tt39 = OnDesignEngine.States.Station39.Tt;
+Tt39old = OnDesignEngine.States.Station39.Tt;
 
-fuelguess = mfuel*1.1;
+fprimex = 1;
 
-while abs(fuelguess - mfuel)/mfuel > 1e-5
+iter = 0;
+while abs(fprimex) > 1e-10
+    
 
-    Tt39 = Tt39*(1-(fuelguess-mfuel)/mfuel);
-    fuelguess = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39));
+    fx = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39old)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39old));
+    fprimex = fprime(Tt3,Tt39old,OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel,m31,mfuel);
+
+    Tt39new = Tt39old - (fx-mfuel)^2/fprimex;
+
+    Tt39old = Tt39new;
+
+%     iter = iter+1;
+%     scatter(iter,fx)
+%     hold on
+
 end
+
+Tt39 = Tt39old;
+
 
 Pt31 = Pt3;
 
 
-Tt39
-OnDesignEngine.States.Station39.Tt
 
 m39 = m31+mfuel;
 Pt39 = Pt31*0.95;
@@ -170,7 +182,7 @@ Pt5 = Pt39*(Tt5/Tt39)^(ghot/(ghot - 1));
 
 %% Calculate work that goes to the fan, extract from flow
 
-fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEngine.Fuel.MDot*LHVFuel));
+fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEngine.Fuel.MDot*LHVFuel))*OnDesignEngine.Specs.EtaPoly.Fan;
 
 Tt13 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt1(Tt1,fanpower/m1);
 
@@ -183,6 +195,10 @@ m6 = m5;
 Tt6 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt5,fanpower/m6/OnDesignEngine.Specs.EtaPoly.Turbines);
 
 Pt6 = Pt5*(Tt6/Tt5)^(ghot/(ghot - 1));
+
+if Tt6 < Ts0
+    error('Power Code Too Low')
+end
 
 
 %% Calculate pre-nozzle core state and get core thrust
@@ -225,11 +241,11 @@ BypassThrust = u19*m19 + (Ps19 - Ps0)*A19;
 
 
 % Outputs
-
-OffDesignEngine.Thrust.Core = CoreThrust;
-OffDesignEngine.Thrust.Bypass = BypassThrust;
-OffDesignEngine.Thrust.RamDrag = -RamDrag;
 OffDesignEngine.Thrust.Net = CoreThrust + BypassThrust - RamDrag;
+OffDesignEngine.Thrust.Bypass = BypassThrust;
+OffDesignEngine.Thrust.Core = CoreThrust;
+OffDesignEngine.Thrust.RamDrag = -RamDrag;
+
 
 
 OffDesignEngine.TSFC = mfuel/OffDesignEngine.Thrust.Net;
@@ -246,7 +262,7 @@ end
 
 
 %% Additional Function
-function [M,Ts,Ps,Rhos] = StateEstimation(Tt,Pt,g,mdot,A)
+function [M,Ts,Ps,Rhos] = StateEstimation(Tt,Pt,g,mtrue,A)
 
 R = 287;
 M = 0.5;
@@ -259,19 +275,30 @@ Ps = Pt*(1+(g-1)/2*M^2)^(-g/(g-1));
 Rhos = Ps/Ts/R;
 
 u = M*sqrt(g*R*Ts);
-mdot_2 = Rhos*u*A;
+mdot = Rhos*u*A;
 
+prime = 1;
 
+iter = 0;
 
-while abs(mdot_2 - mdot)/mdot > 1e-3
-
-    M = M*(1 - (mdot_2 - mdot)/mdot);
+while abs(prime) > 1e-7
 
     Ts = Tt*(1+(g-1)/2*M^2)^(-1);
     Ps = Pt*(1+(g-1)/2*M^2)^(-g/(g-1));
     Rhos = Ps/Ts/R;
     u = M*sqrt(g*R*Ts);
-    mdot_2 = Rhos*u*A;
+    mdot = Rhos*u*A;
+
+    prime = -2*(mtrue - (A*M*Pt*g^(1/2)*((g/2 - 1/2)*M^2 + 1)*(1/((g/2 - 1/2)*M^2 + 1))^(1/2))/(R^(1/2)*Tt^(1/2)*((g/2 - 1/2)*M^2 + 1)^(g/(g - 1))))*((A*Pt*g^(1/2)*((g/2 - 1/2)*M^2 + 1)*(1/((g/2 - 1/2)*M^2 + 1))^(1/2))/(R^(1/2)*Tt^(1/2)*((g/2 - 1/2)*M^2 + 1)^(g/(g - 1))) + (2*A*M^2*Pt*g^(1/2)*(g/2 - 1/2)*(1/((g/2 - 1/2)*M^2 + 1))^(1/2))/(R^(1/2)*Tt^(1/2)*((g/2 - 1/2)*M^2 + 1)^(g/(g - 1))) - (A*M^2*Pt*g^(1/2)*(g/2 - 1/2))/(R^(1/2)*Tt^(1/2)*((g/2 - 1/2)*M^2 + 1)^(g/(g - 1))*((g/2 - 1/2)*M^2 + 1)*(1/((g/2 - 1/2)*M^2 + 1))^(1/2)) - (2*A*M^2*Pt*g^(3/2)*(g/2 - 1/2)*((g/2 - 1/2)*M^2 + 1)*(1/((g/2 - 1/2)*M^2 + 1))^(1/2))/(R^(1/2)*Tt^(1/2)*((g/2 - 1/2)*M^2 + 1)^(g/(g - 1) + 1)*(g - 1)));
+
+    Mnew = M - (mdot - mtrue)^2/prime;
+
+    M = Mnew;
+
+    iter = iter+1;
+    scatter(iter,mdot)
+    hold on
+
 
 end
 
@@ -279,6 +306,22 @@ end
 
 end
 
+
+function [dmdt] = fprime(T_low,T_high,etaH,m31,mtrue)
+
+L1 = 233.0000;
+k1 = 1/210;
+y1 = 875;
+C1 = 993;
+
+L2 = 4600;
+k2 = 1/410;
+y2 = 500;
+C2 = 100;
+
+dmdt = -2*((m31*(C1 + L1 - (L1*exp(-k1*(T_high - y1)))/(exp(-k1*(T_high - y1)) + 1)))/(etaH - T_high*(C2 + L2) + T_low*(C2 + L2) - (L2*log(exp(-k2*(T_high - y2)) + 1))/k2 + (L2*log(exp(-k2*(T_low - y2)) + 1))/k2) + (m31*(C2 + L2 - (L2*exp(-k2*(T_high - y2)))/(exp(-k2*(T_high - y2)) + 1))*(T_high*(C1 + L1) - T_low*(C1 + L1) + (L1*log(exp(-k1*(T_high - y1)) + 1))/k1 - (L1*log(exp(-k1*(T_low - y1)) + 1))/k1))/(etaH - T_high*(C2 + L2) + T_low*(C2 + L2) - (L2*log(exp(-k2*(T_high - y2)) + 1))/k2 + (L2*log(exp(-k2*(T_low - y2)) + 1))/k2)^2)*(mtrue - (m31*(T_high*(C1 + L1) - T_low*(C1 + L1) + (L1*log(exp(-k1*(T_high - y1)) + 1))/k1 - (L1*log(exp(-k1*(T_low - y1)) + 1))/k1))/(etaH - T_high*(C2 + L2) + T_low*(C2 + L2) - (L2*log(exp(-k2*(T_high - y2)) + 1))/k2 + (L2*log(exp(-k2*(T_low - y2)) + 1))/k2));
+
+end
 
 
 

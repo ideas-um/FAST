@@ -57,6 +57,8 @@ function [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,OffParams)
 
 
 LHVFuel = 43.17e6;
+ghot = 1.33;
+gcold = 1.4;
 
 
 %% Initialize and  Find Mass Flow Rate from known fan inlet
@@ -95,8 +97,8 @@ Ps1 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt1,M0,g0);
 % g1 = NEWGAMMA
 
 
-
-
+u0 = M0*sqrt(gcold*R*Ts0);
+RamDrag = m0*u0;
 
 
 %% Increase OPR and BPR models
@@ -115,7 +117,7 @@ FAR = OffParams.PC*OnDesignEngine.Fuel.FAR;
 
 %% Core Flow
 
-m21 = m0/BPR_Cur;
+m21 = m0/(1+BPR_Cur);
 g21 = OnDesignEngine.States.Station21.Gam;
 
 CoreOTR = OPR_Cur^((g21 - 1)/g21);
@@ -123,7 +125,7 @@ CoreOTR = OPR_Cur^((g21 - 1)/g21);
 Tt3 = CoreOTR*Tt1;
 Pt3 = OPR_Cur*Pt1;
 
-CoreWork = EngineModelPkg.SpecHeatPkg.CpAir(Tt1,Tt3)*m21;
+CoreWork = EngineModelPkg.SpecHeatPkg.CpAir(Tt1,Tt3)*m21/OnDesignEngine.Specs.EtaPoly.Compressors;
 
 
 %% Find Combustion Temperature
@@ -134,18 +136,148 @@ m31 = m3*(1 - OnDesignEngine.Specs.CoreFlow.PaxBleed - OnDesignEngine.Specs.Core
 
 mfuel = FAR*m31;
 
-fuelenergy = LHVFuel*mfuel;
+fuelpower = LHVFuel*mfuel;
 
 
-m39 = m31+mfuel;
 
-Tt39 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt1(Tt3,fuelenergy/m39)
+Tt39 = OnDesignEngine.States.Station39.Tt;
+
+fuelguess = mfuel*1.1;
+
+while abs(fuelguess - mfuel)/mfuel > 1e-5
+
+    Tt39 = Tt39*(1-(fuelguess-mfuel)/mfuel);
+    fuelguess = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39));
+end
+
+Pt31 = Pt3;
+
+
+Tt39
 OnDesignEngine.States.Station39.Tt
 
-aaaaaa = 1;
+m39 = m31+mfuel;
+Pt39 = Pt31*0.95;
+
+%% Extract work for compressor turbine
+
+m5 = m39;
+Tt5 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt39,CoreWork/m5/OnDesignEngine.Specs.EtaPoly.Turbines);
+
+Pt5 = Pt39*(Tt5/Tt39)^(ghot/(ghot - 1));
+
+
+
+%% Calculate work that goes to the fan, extract from flow
+
+fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEngine.Fuel.MDot*LHVFuel));
+
+Tt13 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt1(Tt1,fanpower/m1);
+
+TauFan = Tt13/Tt1;
+PiFan = TauFan^(ghot/(ghot - 1));
+
+Pt13 = Pt1*PiFan;
+
+m6 = m5;
+Tt6 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt5,fanpower/m6/OnDesignEngine.Specs.EtaPoly.Turbines);
+
+Pt6 = Pt5*(Tt6/Tt5)^(ghot/(ghot - 1));
+
+
+%% Calculate pre-nozzle core state and get core thrust
+m9 = m6;
+
+A6 = OnDesignEngine.States.Station6.Area;
+[M6,Ts6,Ps6,Rhos6] = StateEstimation(Tt6,Pt6,ghot,m6,A6);
+
+% thrust
+A9 = OnDesignEngine.States.Station9.Area;
+M9 = EngineModelPkg.ComponentOffPkg.Nozzle(A6,A9,M6,ghot);
+
+Ps9 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt6,M9,ghot);
+Ts9 = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt6,M9,ghot);
+
+u9 = M9*sqrt(ghot*R*Ts9)*OnDesignEngine.Specs.EtaPoly.Nozzles;
+
+CoreThrust = u9*m9 + (Ps9 - Ps0)*A9;
+
+%% calculate pre-nozzle bypass State and get bypass thrust
+
+
+m13 = m0*BPR_Cur/(1+BPR_Cur);
+m19 = m13;
+
+A13 = OnDesignEngine.States.Station13.Area;
+[M13,Ts13,Ps13,Rhos13] = StateEstimation(Tt13,Pt13,gcold,m13,A13);
+
+A19 = OnDesignEngine.States.Station19.Area;
+M19 = EngineModelPkg.ComponentOffPkg.Nozzle(A13,A19,M13,gcold);
+
+Ps19 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt13,M19,gcold);
+Ts19 = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt13,M19,gcold);
+
+u19 = M19*sqrt(gcold*R*Ts19)*OnDesignEngine.Specs.EtaPoly.Nozzles;
+
+BypassThrust = u19*m19 + (Ps19 - Ps0)*A19;
+
+%% Nozzles
+
+
+% Outputs
+
+OffDesignEngine.Thrust.Core = CoreThrust;
+OffDesignEngine.Thrust.Bypass = BypassThrust;
+OffDesignEngine.Thrust.RamDrag = -RamDrag;
+OffDesignEngine.Thrust.Net = CoreThrust + BypassThrust - RamDrag;
+
+
+OffDesignEngine.TSFC = mfuel/OffDesignEngine.Thrust.Net;
+
+OffDesignEngine.TSFC_Imperial = UnitConversionPkg.ConvTSFC(OffDesignEngine.TSFC,'SI','Imp');
+
+OffDesignEngine.Fuel.MDot = mfuel;
+OffDesignEngine.Fuel.FAR = FAR;
+
+
+
+
 end
 
 
+%% Additional Function
+function [M,Ts,Ps,Rhos] = StateEstimation(Tt,Pt,g,mdot,A)
+
+R = 287;
+M = 0.5;
+
+Rhot = Pt/Tt/R;
+
+
+Ts = Tt*(1+(g-1)/2*M^2)^(-1);
+Ps = Pt*(1+(g-1)/2*M^2)^(-g/(g-1));
+Rhos = Ps/Ts/R;
+
+u = M*sqrt(g*R*Ts);
+mdot_2 = Rhos*u*A;
+
+
+
+while abs(mdot_2 - mdot)/mdot > 1e-3
+
+    M = M*(1 - (mdot_2 - mdot)/mdot);
+
+    Ts = Tt*(1+(g-1)/2*M^2)^(-1);
+    Ps = Pt*(1+(g-1)/2*M^2)^(-g/(g-1));
+    Rhos = Ps/Ts/R;
+    u = M*sqrt(g*R*Ts);
+    mdot_2 = Rhos*u*A;
+
+end
+
+
+
+end
 
 
 

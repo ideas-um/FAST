@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 mar 2024
+% last updated: 13 may 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -68,8 +68,8 @@ EtaTSPS = Aircraft.Specs.Propulsion.Eta.TSPS;
 EtaPSPS = Aircraft.Specs.Propulsion.Eta.PSPS;
 
 % get the propulsion architecture
-TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
-PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+UpTSPS = Aircraft.Specs.Propulsion.Upstream.TSPS;
+UpPSPS = Aircraft.Specs.Propulsion.Upstream.PSPS;
 
 % get the necessary splits
 LamTS   = Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd);
@@ -82,7 +82,7 @@ OperTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
 OperPSPS = Aircraft.Specs.Propulsion.Oper.PSPS;
 
 % get the number of thrust and power sources
-[nts, nps] = size(TSPS);
+[nts, nps] = size(UpTSPS);
 
 
 %% COMPUTE THE POWER AVAILABLE FOR THE POWER SOURCES %%
@@ -210,7 +210,7 @@ Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = ThrustAv;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % propagate the power available forward along the powertrain
-PowerTS = PowerAv * (PSPS .* EtaPSPS)' * (TSPS .* EtaTSPS)';
+PowerTS = PowerAv * (UpPSPS .* EtaPSPS)' * (UpTSPS .* EtaTSPS)';
 
 % convert the power available to thrust available
 ThrustTS = PowerTS ./ TAS;

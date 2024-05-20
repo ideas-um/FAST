@@ -1,8 +1,8 @@
-function [Engine0] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
+function [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
 %
 % [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,Graphing)
 % Written by Maxfield Arnson
-% Updated 10/5/2023
+% Updated 05/20/2024
 %
 % This function iterates on the design of a turbofan until the desired
 % thrust (specified in EngSpecFun) is reached. The iteration varies mass

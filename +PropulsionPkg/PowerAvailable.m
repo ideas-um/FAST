@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 may 2024
+% last updated: 20 may 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -59,17 +59,13 @@ npnt = length(TAS);
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% get the types of power sources
-Eng = PSType == +1;
-EM  = PSType ==  0;
-
 % get the efficiencies
 EtaTSPS = Aircraft.Specs.Propulsion.Eta.TSPS;
 EtaPSPS = Aircraft.Specs.Propulsion.Eta.PSPS;
 
 % get the propulsion architecture
-UpTSPS = Aircraft.Specs.Propulsion.Upstream.TSPS;
-UpPSPS = Aircraft.Specs.Propulsion.Upstream.PSPS;
+TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
+PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
 
 % get the necessary splits
 LamTS   = Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd);
@@ -82,79 +78,59 @@ OperTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
 OperPSPS = Aircraft.Specs.Propulsion.Oper.PSPS;
 
 % get the number of thrust and power sources
-[nts, nps] = size(UpTSPS);
+[nts, nps] = size(TSPS);
 
 
 %% COMPUTE THE POWER AVAILABLE FOR THE POWER SOURCES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% find the power available   %
-% by lapsing the SLS thrust/ %
-% power for engines (keep    %
-% constant for the electric  %
-% motors)                    %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% repeat this split for the number of points being assessed
+% remember the SLS thrust available in each power source
 ThrustAv = repmat(Aircraft.Specs.Propulsion.SLSThrust, npnt, 1);
  PowerAv = repmat(Aircraft.Specs.Propulsion.SLSPower , npnt, 1);
-
-% check for any engines
-if (any(Eng))
+ 
+% loop through all power sources
+for ips = 1:nps
+    
+    % check for the proper power source
+    if     (PSType(ips) == 1) % engine
         
-    % get power based on the aircraft class
-    if      (strcmpi(aclass, "Turbofan" ) == 1)
+        % get the thrust/power available based on the aircraft class
+        if      (strcmpi(aclass, "Turbofan" ) == 1)
                 
-        % lapse the SLS thrust
-        ThrustAv(:, Eng) = PropulsionPkg.EngineLapse(ThrustAv(:, Eng), aclass, Rho);
-                        
-        % get the available power from the gas-turbine engines
-        PowerAv(:, Eng) = ThrustAv(:, Eng) .* TAS;
+            % lapse the SLS thrust
+            ThrustAv(:, ips) = PropulsionPkg.EngineLapse(ThrustAv(:, ips), aclass, Rho);
+            
+            % get the available power from the gas-turbine engines
+            PowerAv(:, ips) = ThrustAv(:, ips) .* TAS;
+            
+        elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
+                (strcmpi(aclass, "Piston"   ) == 1) )
+            
+            % lapse the SLS power
+            PowerAv(:, ips) = PropulsionPkg.EngineLapse(PowerAv(:, ips), aclass, Rho);
         
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
                 
-        % lapse the power
-        PowerAv(:, Eng) = PropulsionPkg.EngineLapse(PowerAv(:, Eng), aclass, Rho);
+        else
+            
+            % throw error
+            error("ERROR - PowerAvailable: invalid aircraft class.");
+            
+        end
         
-%         % size engines to get equivalent shaft power
-%         for ipnt = 1:npnt
-%             
-%             % input the flight conditions (assume flying very slowly)
-%             Aircraft.Specs.Propulsion.Engine.Mach = 0.05;
-%             Aircraft.Specs.Propulsion.Engine.Alt  = Alt(ipnt);
-%             
-%             % lapse each engine
-%             for ieng = 1:length(HasEng)
-%             
-%                 % input the lapsed thrust
-%                 Aircraft.Specs.Propulsion.Engine.ReqPower = PowerAv(ipnt, HasEng(ieng));
-%                 
-%                 % design the engine
-%                 SizedEngine = EngineModelPkg.TurbopropNonlinearSizing(Aircraft.Specs.Propulsion.Engine, 0);
-%                 
-%                 % compute the equivalent shaft power
-%                 PowerAv(ipnt, HasEng(ieng)) = SizedEngine.Power + SizedEngine.JetThrust * TAS(ipnt) / Aircraft.Specs.Power.Eta.Propeller;
-%                 
-%             end
-%         end
-                
+    elseif (PSType(ips) == 0) % electric motor
+        
+        % once available, input an electric motor model here
+        
+    elseif (PSType(ips) == 2) % fuel cell
+        
+        % once available, input a fuel cell model here
+        
     else
         
-        % throw error
-        error("ERROR - PowerAvailable: invalid aircraft class.");
+        % throw an error
+        error("ERROR - PowerAvailable: invalid power source type in position %d.", ips);
         
     end
-end
-
-% check for an electric motor
-if (any(EM))
-    
-    % input electric motor model, if desired
-        
 end
 
 
@@ -165,8 +141,9 @@ end
 Preq = repmat(1.0e+99, npnt, 1);
 
 % allocate memory for the power required
-PreqTS = zeros(npnt, nts);
-PreqPS = zeros(npnt, nps);
+PreqTS    = zeros(npnt, nts);
+PreqPSUps = zeros(npnt, nps);
+PreqPSDwn = zeros(npnt, nps);
 
 % loop through points to get power outputs by thrust/power sources
 for ipnt = 1:npnt
@@ -177,57 +154,84 @@ for ipnt = 1:npnt
     SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
     
     % get the power output by the thrust sources
-    PreqTS(ipnt, :) = Preq(ipnt) * SplitTS;
+    PreqTS(   ipnt, :) = Preq(     ipnt)    *  SplitTS              ;
     
-    % get the power output by the driven  power sources
-    PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
-    
-    % get the power output by the driving power sources
-    PreqPS(ipnt, :) = PreqPS(ipnt, :) * (SplitPSPS ./ EtaPSPS);
-       
+    % get the power output by the (upstream) driven  power sources
+    PreqPSUps(ipnt, :) = PreqTS(   ipnt, :) * (SplitTSPS ./ EtaTSPS);
+          
+    % get the power output by the (downstream) driving power sources
+    PreqPSDwn(ipnt, :) = PreqPSUps(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+           
 end
 
 % check if the power required exceeds the power available
-irow = find(PreqPS > PowerAv);
+irow = find(PreqPSUps > PowerAv);
+
+% if power required exceeds the power available, return power available
+if (any(irow))
+    PreqPSUps(irow) = PowerAv(irow);
+end
+
+% check if the power required exceeds the power available
+irow = find(PreqPSDwn > PowerAv);
 
 % if power required exceeds the power available, set power available
 if (any(irow))
-    PreqPS(irow) = PowerAv(irow);
+    PreqPSDwn(irow) = PowerAv(irow);
 end
 
-% set the required power as the available power
-PowerAv = PreqPS;
+% set the component-based required power as the available power
+PowerAv = PreqPSDwn;
 
-% compute the thrust available
+% compute the component-based thrust available
 ThrustAv = PowerAv ./ TAS;
-
-% remember the thrust and power available for the power sources
-Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :) = PowerAv ;
-Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = ThrustAv;
-
-
-%% COMPUTE THE POWER AVAILABLE AT THE THRUST SOURCES %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% propagate the power available forward along the powertrain
-PowerTS = PowerAv * (UpPSPS .* EtaPSPS)' * (UpTSPS .* EtaTSPS)';
-
-% convert the power available to thrust available
-ThrustTS = PowerTS ./ TAS;
-
-% remember the thrust and power available for the power sources
-Aircraft.Mission.History.SI.Power.Pav_TS(SegBeg:SegEnd, :) = PowerTS ;
-Aircraft.Mission.History.SI.Power.Tav_TS(SegBeg:SegEnd, :) = ThrustTS;
 
 
 %% COMPUTE THE TOTAL POWER AVAILABLE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% consolidate into a scalar value
-Power = PowerTS * ones(nts, 1);
+% allocate memory for the available thrust source power
+PowerTS = zeros(npnt, nts);
+
+% loop through points to get power outputs by thrust/power sources
+for ipnt = 1:npnt
+    
+    % evaluate the function handles for the current splits
+    SplitTSPS = PropulsionPkg.EvalSplit(OperTSPS, LamTSPS(ipnt, :));
+    SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+    
+    % compute the upstream power-power splits
+    UpTSPS = PropulsionPkg.UpstreamSplit(PreqTS(   ipnt, :), PreqPSUps(ipnt, :), TSPS, SplitTSPS, EtaTSPS, 0);
+    UpPSPS = PropulsionPkg.UpstreamSplit(PreqPSUps(ipnt, :), PreqPSDwn(ipnt, :), PSPS, SplitPSPS, EtaPSPS, 1);
+    
+    % propagate the power available to the driven PS
+    PowerPS          = PowerAv(ipnt, :) * (UpPSPS .* EtaPSPS)';
+    
+    % propagate the power from driven PS to TS
+    PowerTS(ipnt, :) = PowerPS          * (UpTSPS .* EtaTSPS)';
+           
+end
+
+% convert the power available to thrust available
+ThrustTS = PowerTS ./ TAS;
+
+% consolidate power from thrust sources into a scalar value
+TVPower = PowerTS * ones(nts, 1);
+
+
+%% STORE OUTPUTS IN THE AIRCRAFT STRUCTURE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% remember the thrust and power available for the power sources
+Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :) = PowerAv ;
+Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = ThrustAv;
+
+% remember the thrust and power available for the power sources
+Aircraft.Mission.History.SI.Power.Pav_TS(SegBeg:SegEnd, :) = PowerTS ;
+Aircraft.Mission.History.SI.Power.Tav_TS(SegBeg:SegEnd, :) = ThrustTS;
 
 % remember the power available (as a scalar)
-Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd) = Power;
+Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd) = TVPower;
 
 % ----------------------------------------------------------
 

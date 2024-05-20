@@ -117,6 +117,14 @@ if (PSPSFlag)
     % ignore the diagonal when finding driving/driven components
     [~, Driving] = find(Arch - eye(nups));
     
+    % if there are no driving sources, then there are no series connections
+    if (isempty(Driving))
+        
+        % in this case, each power source drives itself
+        [~, Driving] = find(Arch);
+        
+    end
+    
 else
     
     % check all matrix elements

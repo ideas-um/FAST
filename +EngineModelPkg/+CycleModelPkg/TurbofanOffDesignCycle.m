@@ -295,10 +295,15 @@ while abs(prime) > 1e-7
 
     M = Mnew;
 
-    iter = iter+1;
-    scatter(iter,mdot)
-    hold on
+    M(M>1) = 0.99;
 
+    iter = iter+1;
+%     scatter(iter,mdot)
+%     hold on
+    
+    if iter > 150
+        error('Engine Model Off Design; Failure to converge on mach number during state estimation')
+    end
 
 end
 

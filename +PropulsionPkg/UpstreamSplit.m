@@ -2,7 +2,7 @@ function [UpSplit] = UpstreamSplit(Pups, Pdwn, Arch, Oper, Eta, PSPSFlag)
 %
 % [UpSplit] = UpstreamSplit(Pups, Pdwn, Arch, Oper, Eta, PSPSFlag)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 may 2024
+% last updated: 22 may 2024
 %
 % Given a energy-power source, power-power source, or power-thrust source
 % pair, compute the upstream power splits, defined as:
@@ -93,8 +93,23 @@ end
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% initialize a matrix of zeros
-UpSplit = zeros(nups, ndwn);
+% check if a flag was input (otherwise, assume no PS-PS analysis
+if (nargin < 6)
+    PSPSFlag = 0;
+end
+
+% initialize the output matrix
+if (PSPSFlag)
+       
+    % initialize an identity matrix (all PS drive themselves)
+    UpSplit = eye(nups, ndwn);
+    
+else
+    
+    % initialize a matrix of zeros
+    UpSplit = zeros(nups, ndwn);
+    
+end
 
 % ----------------------------------------------------------
 
@@ -105,11 +120,6 @@ UpSplit = zeros(nups, ndwn);
 % architecture               %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% check if a flag was input (otherwise, assume no PS-PS analysis
-if (nargin < 6)
-    PSPSFlag = 0;
-end
 
 % identify the driving components
 if (PSPSFlag)
@@ -157,12 +167,9 @@ for idriving = 1:ndriving
     % loop through each driven source
     for idriven = 1:ndriven
                 
-        % check if it's driving itself
-        if (ips == Driven(idriven))
-            
-            % if it powers itself, its upstream power split is 1
-            UpSplit(ips, ips) = 1;
-            
+        % check if it's driving itself (only for power-power sources)
+        if ((ips == Driven(idriven)) && (PSPSFlag == 1))
+                        
             % continue to the next iteration
             continue;
             

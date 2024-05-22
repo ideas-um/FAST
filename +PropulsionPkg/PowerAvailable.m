@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 may 2024
+% last updated: 22 may 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -62,23 +62,28 @@ npnt = length(TAS);
 % get the efficiencies
 EtaTSPS = Aircraft.Specs.Propulsion.Eta.TSPS;
 EtaPSPS = Aircraft.Specs.Propulsion.Eta.PSPS;
+EtaPSES = Aircraft.Specs.Propulsion.Eta.PSES;
 
 % get the propulsion architecture
 TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
 PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+PSES = Aircraft.Specs.Propulsion.PropArch.PSES;
 
 % get the necessary splits
 LamTS   = Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd);
 LamTSPS = Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd);
 LamPSPS = Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd);
+LamPSES = Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd);
 
 % operation matrices
 OperTS   = Aircraft.Specs.Propulsion.Oper.TS  ;
 OperTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
 OperPSPS = Aircraft.Specs.Propulsion.Oper.PSPS;
+OperPSES = Aircraft.Specs.Propulsion.Oper.PSES;
 
 % get the number of thrust and power sources
 [nts, nps] = size(TSPS);
+[~  , nes] = size(PSES);
 
 
 %% COMPUTE THE POWER AVAILABLE FOR THE POWER SOURCES %%
@@ -108,7 +113,6 @@ for ips = 1:nps
             
             % lapse the SLS power
             PowerAv(:, ips) = PropulsionPkg.EngineLapse(PowerAv(:, ips), aclass, Rho);
-        
                 
         else
             
@@ -137,13 +141,14 @@ end
 %% CHECK WHICH COMPONENTS ARE ON/OFF %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% assume a "very large" power required
+% assume a "very large" pseudo power required
 Preq = repmat(1.0e+99, npnt, 1);
 
 % allocate memory for the power required
 PreqTS    = zeros(npnt, nts);
 PreqPSUps = zeros(npnt, nps);
 PreqPSDwn = zeros(npnt, nps);
+PreqES    = zeros(npnt, nes);
 
 % loop through points to get power outputs by thrust/power sources
 for ipnt = 1:npnt
@@ -152,39 +157,52 @@ for ipnt = 1:npnt
     SplitTS   = PropulsionPkg.EvalSplit(OperTS  , LamTS(  ipnt, :));
     SplitTSPS = PropulsionPkg.EvalSplit(OperTSPS, LamTSPS(ipnt, :));
     SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+    SplitPSES = PropulsionPkg.EvalSplit(OperPSES, LamPSES(ipnt, :));
     
     % get the power output by the thrust sources
-    PreqTS(   ipnt, :) = Preq(     ipnt)    *  SplitTS              ;
+    PreqTS(   ipnt, :) = Preq(     ipnt   ) *  SplitTS              ;
     
     % get the power output by the (upstream) driven  power sources
     PreqPSUps(ipnt, :) = PreqTS(   ipnt, :) * (SplitTSPS ./ EtaTSPS);
           
     % get the power output by the (downstream) driving power sources
     PreqPSDwn(ipnt, :) = PreqPSUps(ipnt, :) * (SplitPSPS ./ EtaPSPS);
-           
+               
+    % get the power output by the energy sources
+    PreqES(   ipnt, :) = PreqPSDwn(ipnt, :) * (SplitPSES ./ EtaPSES);
+    
 end
 
-% check if the power required exceeds the power available
-irow = find(PreqPSUps > PowerAv);
-
-% if power required exceeds the power available, return power available
-if (any(irow))
-    PreqPSUps(irow) = PowerAv(irow);
-end
+% assume the pseudo power required is the power available
+PavPSDwn = PreqPSDwn;
 
 % check if the power required exceeds the power available
-irow = find(PreqPSDwn > PowerAv);
+irow = find(PavPSDwn > PowerAv);
 
 % if power required exceeds the power available, set power available
 if (any(irow))
-    PreqPSDwn(irow) = PowerAv(irow);
+    PavPSDwn(irow) = PowerAv(irow);
 end
 
 % set the component-based required power as the available power
-PowerAv = PreqPSDwn;
+PowerAv = PavPSDwn;
 
 % compute the component-based thrust available
 ThrustAv = PowerAv ./ TAS;
+
+% allocate memory for the actual energy source power required
+PactES = zeros(npnt, nes);
+
+% now that the power has been limited, compute the ES power required
+for ipnt = 1:npnt
+    
+    % evaluate the function handle for the current split
+    SplitPSES = PropulsionPkg.EvalSplit(OperPSES, LamPSES(ipnt, :));
+    
+    % compute the power required by the energy sources
+    PactES(ipnt, :) = PavPSDwn(ipnt, :) * (SplitPSES ./ EtaPSES);
+    
+end
 
 
 %% COMPUTE THE TOTAL POWER AVAILABLE %%
@@ -199,16 +217,21 @@ for ipnt = 1:npnt
     % evaluate the function handles for the current splits
     SplitTSPS = PropulsionPkg.EvalSplit(OperTSPS, LamTSPS(ipnt, :));
     SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+    SplitPSES = PropulsionPkg.EvalSplit(OperPSES, LamPSES(ipnt, :));
     
     % compute the upstream power-power splits
-    UpTSPS = PropulsionPkg.UpstreamSplit(PreqTS(   ipnt, :), PreqPSUps(ipnt, :), TSPS, SplitTSPS, EtaTSPS, 0);
+    UpTSPS = PropulsionPkg.UpstreamSplit(PreqTS(   ipnt, :), PreqPSDwn(ipnt, :), TSPS, SplitTSPS, EtaTSPS, 0);
     UpPSPS = PropulsionPkg.UpstreamSplit(PreqPSUps(ipnt, :), PreqPSDwn(ipnt, :), PSPS, SplitPSPS, EtaPSPS, 1);
+    UpPSES = PropulsionPkg.UpstreamSplit(PreqPSDwn(ipnt, :), PreqES(   ipnt, :), PSES, SplitPSES, EtaPSES, 0);
     
-    % propagate the power available to the driven PS
-    PowerPS          = PowerAv(ipnt, :) * (UpPSPS .* EtaPSPS)';
+    % propagate the power available from the energy sources to driving PS
+    DrivingPower = PactES(ipnt, :) * (UpPSES .* EtaPSES');
     
-    % propagate the power from driven PS to TS
-    PowerTS(ipnt, :) = PowerPS          * (UpTSPS .* EtaTSPS)';
+    % propagate the power available from the driving PS to the driven PS
+    DrivenPower  = DrivingPower    * (UpPSPS .* EtaPSPS)';
+    
+    % propagate the power from driven PS to the TS
+    PowerTS(ipnt, :) = DrivenPower * (UpTSPS .* EtaTSPS)';
            
 end
 

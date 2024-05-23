@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 22 may 2024
+% last updated: 23 may 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -225,7 +225,7 @@ for ipnt = 1:npnt
     UpPSES = PropulsionPkg.UpstreamSplit(PreqPSDwn(ipnt, :), PreqES(   ipnt, :), PSES, SplitPSES, EtaPSES, 0);
     
     % propagate the power available from the energy sources to driving PS
-    DrivingPower = PactES(ipnt, :) * (UpPSES .* EtaPSES');
+    DrivingPower = PactES(ipnt, :) * (UpPSES .* EtaPSES)';
     
     % propagate the power available from the driving PS to the driven PS
     DrivenPower  = DrivingPower    * (UpPSPS .* EtaPSPS)';

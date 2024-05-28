@@ -196,7 +196,7 @@ Tt6 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt5,fanpower/m6/OnDesignEngine
 
 Pt6 = Pt5*(Tt6/Tt5)^(ghot/(ghot - 1));
 
-if Tt6 < Ts0
+if Tt6 < 1.5*Ts0
     error('Power Code Too Low')
 end
 

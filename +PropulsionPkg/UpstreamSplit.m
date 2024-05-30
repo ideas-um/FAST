@@ -180,9 +180,12 @@ for idriving = 1:ndriving
         
         % compute the upstream split
         UpSplit(Driven(idriven), ips) = Psupp / Pdwn(ips);
-        
+                
     end
 end
+
+% check for NaNs, which should be replaced with zeros
+UpSplit(isnan(UpSplit)) = 0;
 
 % ----------------------------------------------------------
 

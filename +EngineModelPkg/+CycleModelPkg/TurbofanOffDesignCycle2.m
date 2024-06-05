@@ -1,4 +1,4 @@
-function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams)
+function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams,EtaPoly)
 %
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
@@ -52,7 +52,9 @@ function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams)
 
 %% Efficiency Stuff
 
+if nargin < 3
 EtaPoly = OnDesignEngine.Specs.EtaPoly;
+end
 
 %% Constants
 LHVFuel = 43.17e6;
@@ -95,7 +97,15 @@ BPR_Cur = (1e-5*alt + 1).*BPR_SLS;
 
 
 
+%% MFP in Turbines
 
+CorrConst.a = 1.0889;
+CorrConst.b = -1.2261;
+CorrConst.c = 4.8277;
+CorrConst.d = -6.9116;
+CorrConst.e = 2.8067;
+
+MFPTurb = @ (r) CorrConst.a + CorrConst.b/r + CorrConst.c/r^2 + CorrConst.d/r^3 + CorrConst.e/r^4;
 
 
 %% Assume PiFT and  corresponding PiCT
@@ -105,9 +115,10 @@ rFTdes = 1/OnDesignEngine.LPTObject.CPR;
 
 rFT = rFTdes*OffParams.PC;
 
-
-
 rCT = rFT*(rCTdes/rFTdes);
+
+
+
 
 %% Calculate Compressor Pressure Ratio
 
@@ -131,13 +142,15 @@ phi = (rComp^((g3-1)/g3) -1)/(rCompdes^((OnDesignEngine.States.Station3.Gam-1)/O
 Tt3 = phi*Tt0*(OnDesignEngine.States.Station39.Tt/OnDesignEngine.States.Station1.Tt);
 
 MFP1des = OnDesignEngine.States.StreamTube.MDot * sqrt(OnDesignEngine.States.StreamTube.Tt)/OnDesignEngine.States.StreamTube.Pt;
-mTotal = (rComp/rCompdes * MFP1des / (phi * sqrt(Tt0)/Pt0) );
+mTotal = (rComp/rCompdes * MFP1des / (sqrt(phi) * sqrt(Tt0)/Pt0) );
 mCore = mTotal*1/(BPR_Cur + 1);
 mBypass = mTotal*BPR_Cur/(BPR_Cur + 1);
 
 Tt4 = Tt3 / rCT^((ghot-1)/ghot);
 
 Tt5 = Tt4 / rFT^((ghot-1)/ghot);
+
+Pt5 = Pt0*rComp/rCT;
 
 rFT2 = (Tt4/Tt5)^(ghot/(ghot-1));
 
@@ -206,7 +219,12 @@ OffDesignEngine.TSFC_Imperial = UnitConversionPkg.ConvTSFC(OffDesignEngine.TSFC,
 
 OffDesignEngine.Fuel.MDot = mfuel;
 
-OffDesignEngine.BSFC = mfuel/FanPower;
+BSFC = mfuel/FanPower;
+BSFCdes = OnDesignEngine.Fuel.MDot/OnDesignEngine.FanSysObject.TotalWork;
+% BSFCdes = OnDesignEngine.Fuel.MDot/OnDesignEngine.FanSysObject.FanObject.ReqWork
+
+OffDesignEngine.ODScale = 1/(1 + (BSFC - BSFCdes)/BSFCdes);
+OffDesignEngine.BSFC = BSFC;
 
 OffDesignEngine.States.Station2.Tt = Tt21;
 

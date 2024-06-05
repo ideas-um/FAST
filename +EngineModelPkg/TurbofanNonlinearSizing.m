@@ -1,4 +1,4 @@
-function [Engine0] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
+function [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
 %
 % [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,Graphing)
 % Written by Maxfield Arnson
@@ -110,6 +110,13 @@ if SizedEngine.States.Station9.Mach > 1
     %warning('Core exhaust is supersonic')
 end
 
+OnParams.FlightCon.Mach = EngSpecFun.Mach;
+OnParams.FlightCon.Alt = EngSpecFun.Alt;
+OnParams.PC = 1;
+
+[OffDesignEngine] = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(SizedEngine,OnParams);
+
+SizedEngine.OffDesignEngine = OffDesignEngine;
 
 %% Graphing
 

@@ -223,6 +223,12 @@ BSFC = mfuel/FanPower;
 BSFCdes = OnDesignEngine.Fuel.MDot/OnDesignEngine.FanSysObject.TotalWork;
 % BSFCdes = OnDesignEngine.Fuel.MDot/OnDesignEngine.FanSysObject.FanObject.ReqWork
 
+T = OffDesignEngine.Thrust.Net;
+Tdes = OnDesignEngine.Thrust.Net;
+
+OffDesignEngine.ThrustScale = 1/(1 + (T - Tdes)/Tdes);
+%OffDesignEngine.ThrustScale = OffDesignEngine.TSFC_Imperial/ThrustScale; 
+
 OffDesignEngine.ODScale = 1/(1 + (BSFC - BSFCdes)/BSFCdes);
 OffDesignEngine.BSFC = BSFC;
 
@@ -233,6 +239,8 @@ OffDesignEngine.MDotAir = mTotal;
 OffDesignEngine.FanPower = FanPower;
 
 OffDesignEngine.PiComp = rComp;
+
+
 
 
 %% Additional Function

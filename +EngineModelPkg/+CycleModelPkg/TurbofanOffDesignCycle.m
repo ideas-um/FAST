@@ -91,23 +91,24 @@ m1 = m0;
 Tt1 = Tt0;
 Pt1 = Pt0*OnDesignEngine.Specs.EtaPoly.Diffusers;
 
-Ts1 = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt1,M0,g0);
-Ps1 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt1,M0,g0);
+[Ts1,~,~,g1] = EngineModelPkg.IsenRelPkg.NewGamma(Tt1,M1,g0);
+Ps1 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt1,M1,g1);
 
 % g1 = NEWGAMMA
 
 
-u0 = M0*sqrt(gcold*R*Ts0);
+u0 = M0*sqrt(g0*R*Ts0);
 RamDrag = m0*u0;
 
 
 %% Increase OPR and BPR models
 OPR_SLS = OnDesignEngine.Specs.OPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
 OPR_Cur = (2e-5*Alt + 1)*OPR_SLS;
+OPR_Cur = OPR_Cur*OffParams.PC;
 
 
 BPR_SLS = OnDesignEngine.Specs.BPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
-BPR_Cur = (1e-5*Alt + 1).*BPR_SLS;
+BPR_Cur = (1e-5*alt + 1).*BPR_SLS;
 
 
 %% Fuel-Air-Ratio FAR based on Power Code
@@ -127,6 +128,10 @@ Pt3 = OPR_Cur*Pt1;
 
 CoreWork = EngineModelPkg.SpecHeatPkg.CpAir(Tt1,Tt3)*m21/OnDesignEngine.Specs.EtaPoly.Compressors;
 
+for ii = 1:10
+[M3,Ts3,Ps3,Rhos3] = StateEstimation(Tt3,Pt3,ghot,m21,OnDesignEngine.States.Station3.Area);
+[Ts3,~,~,g3] = EngineModelPkg.IsenRelPkg.NewGamma(Tt3,M3,ghot);
+end
 
 %% Find Combustion Temperature
 
@@ -176,7 +181,18 @@ Pt39 = Pt31*0.95;
 m5 = m39;
 Tt5 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt39,CoreWork/m5/OnDesignEngine.Specs.EtaPoly.Turbines);
 
-Pt5 = Pt39*(Tt5/Tt39)^(ghot/(ghot - 1));
+for ii = 1:10
+    if ii == 1
+        g5 = ghot;
+    end
+    Pt5 = Pt39*(Tt5/Tt39)^(g5/(g5 - 1));
+[M5,Ts5,Ps5,Rhos5] = StateEstimation(Tt5,Pt5,g5,m5,OnDesignEngine.States.Station5.Area);
+[Ts5,~,~,g5] = EngineModelPkg.IsenRelPkg.NewGamma(Tt5,M5,g5);
+end
+
+
+
+
 
 
 
@@ -187,14 +203,23 @@ fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEng
 Tt13 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt1(Tt1,fanpower/m1);
 
 TauFan = Tt13/Tt1;
-PiFan = TauFan^(ghot/(ghot - 1));
+PiFan = TauFan^(g21/(g21 - 1));
 
 Pt13 = Pt1*PiFan;
 
 m6 = m5;
 Tt6 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt3(Tt5,fanpower/m6/OnDesignEngine.Specs.EtaPoly.Turbines);
 
-Pt6 = Pt5*(Tt6/Tt5)^(ghot/(ghot - 1));
+for ii = 1:10
+    if ii == 1
+        g6 = ghot;
+    end
+Pt6 = Pt5*(Tt6/Tt5)^(g6/(g6 - 1));
+[M6,Ts6,Ps6,Rhos6] = StateEstimation(Tt6,Pt6,g6,m6,OnDesignEngine.States.Station6.Area);
+[Ts6,~,~,g6] = EngineModelPkg.IsenRelPkg.NewGamma(Tt6,M6,g6);
+end
+
+
 
 if Tt6 < 1.5*Ts0
     error('Power Code Too Low')
@@ -205,11 +230,11 @@ end
 m9 = m6;
 
 A6 = OnDesignEngine.States.Station6.Area;
-[M6,Ts6,Ps6,Rhos6] = StateEstimation(Tt6,Pt6,ghot,m6,A6);
+[M6,Ts6,Ps6,Rhos6] = StateEstimation(Tt6,Pt6,g6,m6,A6);
 
 % thrust
 A9 = OnDesignEngine.States.Station9.Area;
-M9 = EngineModelPkg.ComponentOffPkg.Nozzle(A6,A9,M6,ghot);
+M9 = EngineModelPkg.ComponentOffPkg.Nozzle(A6,A9,M6,g6);
 
 Ps9 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt6,M9,ghot);
 Ts9 = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt6,M9,ghot);
@@ -238,7 +263,7 @@ u19 = M19*sqrt(gcold*R*Ts19)*OnDesignEngine.Specs.EtaPoly.Nozzles;
 BypassThrust = u19*m19 + (Ps19 - Ps0)*A19;
 
 %% Nozzles
-
+% OnDesignEngine.States.Station9.Mach
 
 % Outputs
 OffDesignEngine.Thrust.Net = CoreThrust + BypassThrust - RamDrag;

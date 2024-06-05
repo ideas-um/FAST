@@ -24,7 +24,7 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-% README last updated: 03 may 2024
+% README last updated: 05 june 2024
 % 
 % -------------------------------------------------------------------------
 %
@@ -187,9 +187,10 @@ function [] = README()
 % the "Main" function with an aircraft specification function and
 % parametric mission profile. To do so, the user must:
 %  
-%     (1) prescribe their aircraft configuration via a function call. See
-%         any of the examples in the "AircraftSpecsPkg" folder. In the
-%         function, the user should:
+%     (1) prescribe their aircraft configuration via a function call. This
+%         can be achieved by updating the example.m file provided in
+%         "AircraftSpecsPkg". See this package for more instructions and
+%         examples. In the function, the user should:
 %  
 %             (a) Select whether an on-design (+1, sizing and performance)
 %                 analysis or off-design (-1, performance only) analysis

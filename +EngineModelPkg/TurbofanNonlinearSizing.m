@@ -1,4 +1,4 @@
-function [Engine0] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
+function [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,ElecPower)
 %
 % [SizedEngine] = TurbofanNonlinearSizing(EngSpecFun,Graphing)
 % Written by Maxfield Arnson
@@ -108,6 +108,11 @@ end
 
 if SizedEngine.States.Station9.Mach > 1
     %warning('Core exhaust is supersonic')
+end
+
+if ~isfield(EngSpecFun,'Sizing')
+elseif EngSpecFun.Sizing == 1
+SizedEngine.OffDesignMap = EngineModelPkg.TF_OD_MapMaker(SizedEngine);
 end
 
 

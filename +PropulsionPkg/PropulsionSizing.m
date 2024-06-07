@@ -190,6 +190,11 @@ if (any(PSType > 0))
         % run the regression
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
 
+        Aircraft.Specs.Propulsion.Engine.Sizing = 1;
+        Aircraft.Specs.Propulsion.SizedEngine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine);
+        Aircraft.Specs.Propulsion.Engine.Sizing = 0;
+        Aircraft.Specs.Propulsion.SizedEngine.Specs.Sizing = 0;
+        
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
 

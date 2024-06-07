@@ -5,7 +5,7 @@ function [M2] = Nozzle(A1,A2,M1,g)
 
 Astar = EngineModelPkg.IsenRelPkg.Astar_A(A1,M1,g);
 
-M2 = 0.5;
+M2 = M1;
 
 prime = 1;
 
@@ -23,6 +23,13 @@ end
 if M2 > 1
     M2 = 1;
 end
+
+
+if M2 < 0
+    M2 = M1;
+
+end
+
 
 end
 

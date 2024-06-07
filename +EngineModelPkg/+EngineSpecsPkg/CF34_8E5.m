@@ -28,11 +28,11 @@ function [Engine] = CF34_8E5()
 
 % Design point Mach Number 
 % If SLS, enter 0.05
-Engine.Mach = 0.8;
+Engine.Mach = 0.05;
 
 % Design point Altitude [m]
 % If SLS, enter 0
-Engine.Alt = 1e4;
+Engine.Alt = 0;
 
 % Overall Pressure Ratio 
 Engine.OPR = 28.5;
@@ -53,7 +53,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 61320 / 5;
+Engine.DesignThrust = 61320;
 
 
 

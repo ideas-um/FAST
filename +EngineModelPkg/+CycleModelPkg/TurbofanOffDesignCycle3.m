@@ -1,7 +1,7 @@
 
 
 
-function [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,OffParams)
+function [OffDesignEngine] = TurbofanOffDesignCycle3(OnDesignEngine,OffParams)
 %
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
@@ -85,30 +85,34 @@ A1 = OnDesignEngine.States.Station1.Area;
 Astar = EngineModelPkg.IsenRelPkg.Astar_A(A1,M1,g0);
 A0 = EngineModelPkg.IsenRelPkg.A_Astar(Astar,M0,g0);
 
-m0 = A0*rhos0*M0*sqrt(g0*R*Ts0);
-m1 = m0;
+%m0 = A0*rhos0*M0*sqrt(g0*R*Ts0);
+%m1 = m0;
 
 Tt1 = Tt0;
 Pt1 = Pt0*OnDesignEngine.Specs.EtaPoly.Diffusers;
 
-[Ts1,~,~,g1] = EngineModelPkg.IsenRelPkg.NewGamma(Tt1,M1,g0);
-Ps1 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt1,M1,g1);
+%[Ts1,~,~,g1] = EngineModelPkg.IsenRelPkg.NewGamma(Tt1,M1,g0);
+%Ps1 = EngineModelPkg.IsenRelPkg.Ps_Pt(Pt1,M1,g1);
 
 % g1 = NEWGAMMA
 
+InitialGuess = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,OffParams);
+
+m0 = InitialGuess.MDotAir;
+m1 = m0;
 
 u0 = M0*sqrt(g0*R*Ts0);
 RamDrag = m0*u0;
 
 
 %% Increase OPR and BPR models
-OPR_SLS = OnDesignEngine.Specs.OPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
-OPR_Cur = (2e-5*Alt + 1)*OPR_SLS;
-OPR_Cur = OPR_Cur*OffParams.PC;
+% OPR_SLS = OnDesignEngine.Specs.OPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
+% OPR_Cur = (2e-5*Alt + 1)*OPR_SLS;
+OPR_Cur = InitialGuess.PiComp;
 
 
 BPR_SLS = OnDesignEngine.Specs.BPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
-BPR_Cur = (1e-5*alt + 1).*BPR_SLS;
+BPR_Cur = (1e-5*Alt + 1).*BPR_SLS;
 
 
 %% Fuel-Air-Ratio FAR based on Power Code
@@ -136,42 +140,42 @@ end
 %% Find Combustion Temperature
 
 m3 = m21;
-
+% 
 m31 = m3*(1 - OnDesignEngine.Specs.CoreFlow.PaxBleed - OnDesignEngine.Specs.CoreFlow.Leakage);
 
-mfuel = FAR*m31;
+Tt39 = OnDesignEngine.States.Station39.Tt;
+mfuel = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39));
 
-fuelpower = LHVFuel*mfuel;
-
-
-
-Tt39old = OnDesignEngine.States.Station39.Tt;
-
-fprimex = 1;
-
-iter = 0;
-while abs(fprimex) > 1e-10
-    
-
-    fx = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39old)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39old));
-    fprimex = fprime(Tt3,Tt39old,OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel,m31,mfuel);
-
-    Tt39new = Tt39old - (fx-mfuel)^2/fprimex;
-
-    Tt39old = Tt39new;
-
-%     iter = iter+1;
-%     scatter(iter,fx)
-%     hold on
-
-end
-
-Tt39 = Tt39old;
-
+% 
+% mfuel = InitialGuess.Fuel.MDot;%FAR*m31;
+% 
+% fuelpower = LHVFuel*mfuel;
+% 
+% Tt39old = OnDesignEngine.States.Station39.Tt;
+% 
+% fprimex = 1;
+% 
+% iter = 0;
+% while abs(fprimex) > 1e-10
+%     
+% 
+%     fx = m31*EngineModelPkg.SpecHeatPkg.CpAir(Tt3,Tt39old)/(OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel - EngineModelPkg.SpecHeatPkg.CpJetA(Tt3,Tt39old));
+%     fprimex = fprime(Tt3,Tt39old,OnDesignEngine.Specs.EtaPoly.Combustor*LHVFuel,m31,mfuel);
+% 
+%     Tt39new = Tt39old - (fx-mfuel)^2/fprimex;
+% 
+%     Tt39old = Tt39new;
+% 
+% %     iter = iter+1;
+% %     scatter(iter,fx)
+% %     hold on
+% 
+% end
+% 
+% Tt39 = Tt39old;
+% 
 
 Pt31 = Pt3;
-
-
 
 m39 = m31+mfuel;
 Pt39 = Pt31*0.95;
@@ -198,7 +202,9 @@ end
 
 %% Calculate work that goes to the fan, extract from flow
 
-fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEngine.Fuel.MDot*LHVFuel))*OnDesignEngine.Specs.EtaPoly.Fan;
+%fanpower = fuelpower*(OnDesignEngine.FanSysObject.FanObject.ReqWork/(OnDesignEngine.Fuel.MDot*LHVFuel))*OnDesignEngine.Specs.EtaPoly.Fan;
+
+fanpower = InitialGuess.FanPower;
 
 Tt13 = EngineModelPkg.SpecHeatPkg.NewtonRaphsonTt1(Tt1,fanpower/m1);
 
@@ -278,7 +284,12 @@ OffDesignEngine.TSFC = mfuel/OffDesignEngine.Thrust.Net;
 OffDesignEngine.TSFC_Imperial = UnitConversionPkg.ConvTSFC(OffDesignEngine.TSFC,'SI','Imp');
 
 OffDesignEngine.Fuel.MDot = mfuel;
-OffDesignEngine.Fuel.FAR = FAR;
+%OffDesignEngine.Fuel.FAR = FAR;
+
+OffDesignEngine.MDotAir = m0;
+
+
+OffDesignEngine.PiComp = OPR_Cur;
 
 
 
@@ -306,7 +317,7 @@ prime = 1;
 
 iter = 0;
 
-while abs(prime) > 1e-7
+while abs(prime) > 1e-4
 
     Ts = Tt*(1+(g-1)/2*M^2)^(-1);
     Ps = Pt*(1+(g-1)/2*M^2)^(-g/(g-1));

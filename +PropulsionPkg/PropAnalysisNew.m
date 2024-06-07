@@ -408,13 +408,13 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(EngSpec, EMPower) EngineModelPkg.TurbofanNonlinearSizing(EngSpec, EMPower);
+        EngSizeFun = @(ODEng, OffParams) EngineModelPkg.TurbofanOffDesign(ODEng, OffParams);
 
         % get the TSFC from the engine sizing
         GetSFC = @(SizedEngine) SizedEngine.TSFC;
 
         % get the fan diameter from the engine sizing
-        GetDFan = @(SizedEngine) SizedEngine.FanDiam;
+        GetDFan = @(SizedEngine) NaN;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
@@ -495,8 +495,8 @@ if (any(Fuel))
         for ipnt = 1:(npnt-1)
             
             % update the engine performance requirements
-            Aircraft.Specs.Propulsion.Engine.Mach = MTemp(ipnt);
-            Aircraft.Specs.Propulsion.Engine.Alt  = Alt(  ipnt);
+            OffParams.FlightCon.Mach = MTemp(ipnt);
+            OffParams.FlightCon.Alt  = Alt(  ipnt);
             
             % get the required thrust/power
             if      (strcmpi(aclass, "Turbofan" ) == 1)
@@ -509,22 +509,24 @@ if (any(Fuel))
             end
             
             % size the engine at that point
-            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, EMPartPower(ipnt));
+            OffParams.Thrust = TTemp(ipnt);
+            
+            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams);
             
             % get out the SFC (could be TSFC or BSFC)
-            SFC(ipnt, icol) = GetSFC(SizedEngine);
+            SFC(ipnt, icol) = GetSFC(OffDesignEngine);
             
             % get the fuel flow
-            MDotFuel(ipnt, icol) = SizedEngine.Fuel.MDot * Aircraft.Specs.Propulsion.MDotCF;
+            MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;
             
             % Get the engine exit mach number (of each engine)
-            ExitMach(ipnt, icol) = SizedEngine.States.Station9.Mach;
+            ExitMach(ipnt, icol) = NaN;%OffDesignEngine.States.Station9.Mach;
             
             % get the engine fan diamater (single engine)
-            FanDiam(ipnt, icol) = GetDFan(SizedEngine);
+            FanDiam(ipnt, icol) = GetDFan(OffDesignEngine);
             
             % get the air mass flow through (one) of the engines
-            MDotAir(ipnt, icol) = SizedEngine.MDotAir;
+            MDotAir(ipnt, icol) = NaN;%OffDesignEngine.MDotAir;
             
         end                
     end

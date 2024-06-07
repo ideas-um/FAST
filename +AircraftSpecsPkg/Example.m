@@ -220,9 +220,9 @@ Aircraft.Settings.OEW.Tol = NaN;
 Aircraft.Settings.Analysis.MaxIter = NaN;
 
 % on design/off design analysis
-% 1  = on design
-% -2 = off design
-Aircraft.Settings.Analysis.Type = NaN;
+% +1 = on design
+% -1 = off design
+Aircraft.Settings.Analysis.Type = +1;
 
 % plot results
 % 0 = no plotting

@@ -110,13 +110,11 @@ if SizedEngine.States.Station9.Mach > 1
     %warning('Core exhaust is supersonic')
 end
 
-OnParams.FlightCon.Mach = EngSpecFun.Mach;
-OnParams.FlightCon.Alt = EngSpecFun.Alt;
-OnParams.PC = 1;
+if ~isfield(EngSpecFun,'Sizing')
+elseif EngSpecFun.Sizing == 1
+SizedEngine.OffDesignMap = EngineModelPkg.TF_OD_MapMaker(SizedEngine);
+end
 
-[OffDesignEngine] = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(SizedEngine,OnParams);
-
-SizedEngine.OffDesignEngine = OffDesignEngine;
 
 %% Graphing
 

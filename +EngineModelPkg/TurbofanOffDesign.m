@@ -7,7 +7,7 @@ function [OffOutputs] = TurbofanOffDesign(OnDesignEngine,OffParams)
 % OffParams.FlightCon.Mach = Mach Number at which you want to evaluate
 %   engine performance
 % OffParams.FlightCon.Alt = altitude at which you want to evaluate engine
-%   performance. This should be in meters
+%   performance. This should be in [meters]
 % OffParams.Thrust = thrust in Newtons you would like the engine to
 % produce. if you want maximum thrust set this variable not to a value but
 % to OffParams.Thrust = "maximum" (not case sensitive)
@@ -23,12 +23,12 @@ function [OffOutputs] = TurbofanOffDesign(OnDesignEngine,OffParams)
 
 %% Find Maximum Thrust At Current Condition
 
-MaxParams.FlightCon = OffParams.FlightCon;
-MaxParams.PC = 1;
-
-OnParams.FlightCon.Alt = OnDesignEngine.Specs.Alt;
-OnParams.FlightCon.Mach = OnDesignEngine.Specs.Mach;
-OnParams.PC = 1;
+% MaxParams.FlightCon = OffParams.FlightCon;
+% MaxParams.PC = 1;
+% 
+% OnParams.FlightCon.Alt = OnDesignEngine.Specs.Alt;
+% OnParams.FlightCon.Mach = OnDesignEngine.Specs.Mach;
+% OnParams.PC = 1;
 
 %MaxT_Engine = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,MaxParams);
 % OnOffDesign = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,OnParams);
@@ -36,13 +36,17 @@ OnParams.PC = 1;
 
 % MaxT = MaxT_Engine.Thrust.Net*OnOffDesign.ThrustScale;
 
+
+
+
+
 % New maxT model needed
-[TH,~,RhoH] = MissionSegsPkg.StdAtm(OffParams.FlightCon.Alt);
+[~,~,RhoH] = MissionSegsPkg.StdAtm(OffParams.FlightCon.Alt);
 [~,~,RhoSL] = MissionSegsPkg.StdAtm(OnDesignEngine.Specs.Alt);
 
 mexp = 1;
 DesT = OnDesignEngine.Thrust.Net;
-MaxT = (RhoH/RhoSL)^mexp*OnDesignEngine.Thrust.Net;
+MaxT = (RhoH/RhoSL)^mexp*DesT;
 
 %MaxT = MaxT - OffParams.FlightCon.Mach*sqrt(1.4*287*TH)*(RhoH/RhoSL)*OnDesignEngine.MDotAir;
 
@@ -70,8 +74,10 @@ OnDesignAtAlt = EngineModelPkg.TurbofanNonlinearSizing(OnAtAltSpecs);
 
 if OffParams.Thrust > max(Thrusts)
     OffParams.Thrust = max(Thrusts);
+    % or return an error
 elseif OffParams.Thrust < min(Thrusts)
     OffParams.Thrust = min(Thrusts);
+    % or return an error
 end
 
 TSFCSCale = interp1(Thrusts,BSFCs,OffParams.Thrust);
@@ -81,6 +87,9 @@ OutTSFC = OnDesignAtAlt.TSFC*TSFCSCale;
 OutMDot = OutTSFC*OutThrust;
 
 % MDotFuel = OnDesignFuel*    interp1(Thrusts,BSFCs,OffParams.Thrust);
+
+
+
 
 %% Assign Outputs
 OffOutputs.Fuel = OutMDot;

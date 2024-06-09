@@ -32,7 +32,7 @@ For detailed information about FAST's features, visit our website: [IDEAS Lab We
 
 We also offer a series of tutorial videos on YouTube to help you get started with FAST and explore its capabilities. Check out our channel and subscribe for updates: [IDEAS Lab YouTube Channel](https://www.youtube.com/channel/UC5ntmOSA1_YWu1ljQ5hXn0Q).
 
-Stay tuned for a series of papers that will be published soon, providing deeper insights into FAST and its applications.
+To stay informed about upcoming papers, new releases, and news about FAST, please sign up for [our newsletter here](https://forms.gle/b8sPXKnRAfi5ZsARA).
 
 # (I) Additional Documentation
 

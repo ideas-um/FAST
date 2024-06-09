@@ -34,8 +34,9 @@ function [] = README()
 % started with FAST and explore its capabilities. Check out our channel 
 % and subscribe for updates: https://youtube.com/channel/UC5ntmOSA1_YWu1ljQ5hXn0Q
 %
-% Stay tuned for a series of papers that will be published soon, 
-% providing deeper insights into FAST and its applications.
+% To stay informed about upcoming papers, new releases, and news about
+% FAST, please sign up for our newsletter:
+% https://forms.gle/b8sPXKnRAfi5ZsARA
 % 
 % -------------------------------------------------------------------------
 %

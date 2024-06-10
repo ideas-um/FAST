@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 may 2024
+% last updated: 10 jun 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -173,8 +173,33 @@ for ipnt = 1:npnt
     
 end
 
+% assume the pseudo power required from the upstream PS is the power available
+PavPSUps = PreqPSUps;
+
+% check if the power required exceeds the power available
+irow = find(PavPSUps > PowerAv);
+
+% if power required exceeds the power available, set power available
+if (any(irow))
+    PavPSUps(irow) = PowerAv(irow);
+end
+
+% allocate memory for the power required
+PtempPSDwn = zeros(npnt, nps);
+
+% loop through points to get power outputs by all power sources
+for ipnt = 1:npnt
+    
+    % evaluate the function handles for the current splits
+    SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+              
+    % get the power output by the (downstream) driving power sources
+    PtempPSDwn(ipnt, :) = PavPSUps(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+    
+end
+
 % assume the pseudo power required is the power available
-PavPSDwn = PreqPSDwn;
+PavPSDwn = PtempPSDwn;
 
 % check if the power required exceeds the power available
 irow = find(PavPSDwn > PowerAv);

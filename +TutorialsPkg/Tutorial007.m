@@ -50,7 +50,6 @@ EtaTS = 0.45;
 % electric machine efficiencies
 EtaPC = 0.95;
 EtaEM = 0.96;
-EtaEG = 0.96;
 
 % gearbox efficiency
 EtaGB = 0.90;
@@ -102,7 +101,7 @@ Aircraft.Specs.Propulsion.Oper.PSES = @() [1.0, 0.0; 0.0, 0.6];
 Aircraft.Specs.Propulsion.Eta.TSPS  = [EtaGB * EtaProp, EtaGB * EtaProp];
 
 % power -power  source efficiency
-Aircraft.Specs.Propulsion.Eta.PSPS  = [1, 1; EtaEG * EtaEM, 1];
+Aircraft.Specs.Propulsion.Eta.PSPS  = [1, 1; EtaEM, 1];
 
 % power -energy source efficiency
 Aircraft.Specs.Propulsion.Eta.PSES  = [EtaTS, 1; 1, EtaPC * EtaEM];

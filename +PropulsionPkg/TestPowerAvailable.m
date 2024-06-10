@@ -2,7 +2,7 @@ function [Success] = TestPowerAvailable()
 %
 % [Success] = TestPowerAvailable()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 31 may 2024
+% last updated: 10 jun 2024
 %
 % Generate simple test cases to confirm that the power available function
 % is working properly.
@@ -28,7 +28,10 @@ function [Success] = TestPowerAvailable()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(8, 1);
+Pass = ones(9, 1);
+
+% count the tests
+itest = 1;
 
 % ----------------------------------------------------------
 
@@ -112,7 +115,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(1) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 1B: PARALLEL HYBRID, EM OFF %%
@@ -171,7 +177,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(82, 2, 1);
 
 % run the test
-Pass(2) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 2A: SERIES HYBRID, BATTERY ON %%
@@ -230,7 +239,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(3) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 2B: SERIES HYBRID, BATTERY OFF %%
@@ -289,7 +301,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(82, 2, 1);
 
 % run the test
-Pass(4) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 3: SERIES-PARALLEL HYBRID %%
@@ -348,7 +363,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(5) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 4: CONVENTIONAL/ELECTRIC %%
@@ -407,7 +425,10 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(6) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
 %% CASE 5: SERIES WITH TWO DRIVING PS %%
@@ -466,10 +487,13 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(7) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
 
 
-%% CASE 6: TURBOELECTRIC WITH NON-PERFECT EFFICIENCIES %%
+%% CASE 6A: TURBOELECTRIC WITH NON-PERFECT EFFICIENCIES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -525,7 +549,131 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(100, 2, 1);
 
 % run the test
-Pass(8) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+
+%% CASE 6B: TURBOELECTRIC, LIMITED BY DRIVING PS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
+TestIn.Specs.Propulsion.SLSPower  = [60, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,   0];
+
+% create the propulsion architecture
+TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1];
+TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
+TestIn.Specs.Propulsion.PropArch.PSES = [1; 0];
+
+% create the operational matrices
+TestIn.Specs.Propulsion.Oper.TS   = @() 1;
+TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
+TestIn.Specs.Propulsion.Oper.PSPS = @() [1, 0; 1, 1];
+TestIn.Specs.Propulsion.Oper.PSES = @() [1; 0];
+
+% create the efficiency matrices
+TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
+TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
+TestIn.Specs.Propulsion.Eta.PSES = ones(2, 1);
+
+% power split mission history
+TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
+
+% power source types
+TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% compute the power available
+TestOut = PropulsionPkg.PowerAvailable(TestIn);
+
+% get the output to be tested
+TestValue = TestOut.Mission.History.SI.Power.TV;
+
+% list the correct values of the output
+TrueValue = repmat(60, 2, 1);
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+
+%% CASE 6C: TURBOELECTRIC, LIMITED BY DRIVEN PS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
+TestIn.Specs.Propulsion.SLSPower  = [100, 60];
+TestIn.Specs.Propulsion.SLSThrust = [  0,  0];
+
+% create the propulsion architecture
+TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1];
+TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
+TestIn.Specs.Propulsion.PropArch.PSES = [1; 0];
+
+% create the operational matrices
+TestIn.Specs.Propulsion.Oper.TS   = @() 1;
+TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
+TestIn.Specs.Propulsion.Oper.PSPS = @() [1, 0; 1, 1];
+TestIn.Specs.Propulsion.Oper.PSES = @() [1; 0];
+
+% create the efficiency matrices
+TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
+TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
+TestIn.Specs.Propulsion.Eta.PSES = ones(2, 1);
+
+% power split mission history
+TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
+
+% power source types
+TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% compute the power available
+TestOut = PropulsionPkg.PowerAvailable(TestIn);
+
+% get the output to be tested
+TestValue = TestOut.Mission.History.SI.Power.TV;
+
+% list the correct values of the output
+TrueValue = repmat(60, 2, 1);
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 
 %% CHECK THE TEST RESULTS %%

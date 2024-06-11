@@ -1,4 +1,4 @@
-function [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 %
 % [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 % written by Sasha Kryuchkov
@@ -126,6 +126,7 @@ K = (-E_nom + E0 + A * exp(-B * Q_nom) * (Q - Q_nom)) ./ ...
 % Pre-allocate the output vectors depending on the vector length
 Voltage = zeros(ntime,1);
 SOC = zeros(ntime,1);
+Current = zeros(ntime,1);
 Capacity = zeros(ntime,1);
 Pout = zeros(ntime,1);
 
@@ -237,7 +238,7 @@ for frame = 1:ntime
         
     end
 end
-
+Current = current;
 % ----------------------------------------------------------
 
 end

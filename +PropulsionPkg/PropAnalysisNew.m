@@ -423,7 +423,7 @@ if (any(Fuel))
         EngSizeFun = @(EngSpec, EMPower) EngineModelPkg.TurbopropNonlinearSizing(EngSpec, EMPower);
 
         % get the BSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.BSFC;
+        GetSFC = @(SizedEngine) SizedEngine.TSFC_Imperial;
 
         % set the fan diameter to nonexistent
         GetDFan = @(SizedEngine) NaN;
@@ -523,7 +523,7 @@ if (any(Fuel))
             ExitMach(ipnt, icol) = NaN;%OffDesignEngine.States.Station9.Mach;
             
             % get the engine fan diamater (single engine)
-            FanDiam(ipnt, icol) = GetDFan(OffDesignEngine);
+            FanDiam(ipnt, icol) = NaN; %GetDFan(OffDesignEngine);
             
             % get the air mass flow through (one) of the engines
             MDotAir(ipnt, icol) = NaN;%OffDesignEngine.MDotAir;

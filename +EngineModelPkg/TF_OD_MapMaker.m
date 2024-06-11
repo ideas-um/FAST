@@ -15,6 +15,7 @@ PC = linspace(pcLower,1.1,N);
 
 Thrusts = zeros(1,N);
 BSFCs = zeros(1,N);
+OutputPower = zeros(1,N);
 
 for ii = 1:length(PC)
 
@@ -22,6 +23,7 @@ for ii = 1:length(PC)
     OffEngine = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,OffParams);
     Thrusts(ii) = OffEngine.Thrust.Net;
     BSFCs(ii) = OffEngine.BSFC;
+    OutputPower(ii) = OffEngine.FanPower;
 
 end
 
@@ -30,10 +32,11 @@ OffParams.PC = 1;
 OffEngine = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,OffParams);
 ThrustBaseline = OffEngine.Thrust.Net;
 BSFCBaseline = OffEngine.BSFC;
+PowerBaseline =OffEngine.FanPower;
 
 OffDesignInfo.Thrusts = smoothdata(Thrusts./ThrustBaseline);
 OffDesignInfo.BSFCs = smoothdata(BSFCs./BSFCBaseline);
-
+OffDesignInfo.OutputPower = smoothdata(OutputPower./PowerBaseline);
 
 
 

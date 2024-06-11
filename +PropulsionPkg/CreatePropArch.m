@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 mar 2024
+% last updated: 13 may 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system
@@ -103,6 +103,15 @@ if     (strcmpi(ArchName, "C"  ) == 1)
     % power source type (1 = engine, 0 = electric motor)
     PSType = ones(1, NumEng);
     
+    % upstream thrust-power  source contributions
+    UpTSPS = eye(NumEng);
+    
+    % upstream power -power  source contributions
+    UpPSPS = eye(NumEng);
+    
+    % upstream power -energy source contributions
+    UpPSES = ones(NumEng, 1);
+    
 elseif (strcmpi(ArchName, "E"  ) == 1)
         
     % thrust-power source architecture
@@ -152,6 +161,15 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = zeros(1, NumEng);
+    
+    % upstream thrust-power  source contributions
+    UpTSPS = eye(NumEng);
+    
+    % upstream power -power  source contributions
+    UpPSPS = eye(NumEng);
+    
+    % upstream power -energy source contributions
+    UpPSES = ones(NumEng, 1);
         
 elseif (strcmpi(ArchName, "PHE") == 1)
     
@@ -203,6 +221,15 @@ elseif (strcmpi(ArchName, "PHE") == 1)
     % power source type (1 = engine, 0 = electric motor)
     PSType = [ones(1, NumEng), zeros(1, NumEng)];
     
+    % upstream thrust-power  source contributions
+    UpTSPS = repmat(eye(NumEng), 1, 2);
+    
+    % upstream power -power  source contributions
+    UpPSPS = eye(2 * NumEng);
+    
+    % upstream power -energy source contributions
+    UpPSES = [ones(NumEng, 1), zeros(NumEng, 1); zeros(NumEng, 1), ones(NumEng, 1)];
+    
 elseif (strcmpi(ArchName, "O"  ) == 1)
     
     % check for the architectures
@@ -219,6 +246,14 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     % confirm that they're all present
     if (sum(HaveOper) ~= 4)
         error("ERROR - CreatePropArch: check that 'Oper.TS', 'Oper.TSPS', 'Oper.PSPS', and 'Oper.PSES' in 'Specs.Propulsion' are initialized.");
+    end
+    
+    % check for the upstream operational matrices
+    HaveUpOper = isfield(Specs.Propulsion.Oper, ["TSPS"; "PSPS"; "PSES"]);
+    
+    % confirm that they're all present
+    if (sum(HaveUpOper) ~= 3)
+        error("ERROR - CreatePropArch: check that 'Upstream.TSPS', 'Upstream.PSPS', and 'Upstream.PSES' in 'Specs.Propulsion' are initialized.");
     end
     
     % check for the efficiencies
@@ -262,11 +297,16 @@ Aircraft.Specs.Propulsion.PropArch.TSPS = ArchTSPS;
 Aircraft.Specs.Propulsion.PropArch.PSPS = ArchPSPS;
 Aircraft.Specs.Propulsion.PropArch.PSES = ArchPSES;
 
-% remember the operation
+% remember the operation (downstream splits)
 Aircraft.Specs.Propulsion.Oper.TS   = OperTS  ;
 Aircraft.Specs.Propulsion.Oper.TSPS = OperTSPS;
 Aircraft.Specs.Propulsion.Oper.PSPS = OperPSPS;
 Aircraft.Specs.Propulsion.Oper.PSES = OperPSES;
+
+% remember the upstream splits
+Aircraft.Specs.Propulsion.Upstream.TSPS = UpTSPS;
+Aircraft.Specs.Propulsion.Upstream.PSPS = UpPSPS;
+Aircraft.Specs.Propulsion.Upstream.PSES = UpPSES;
 
 % remember the efficiencies
 Aircraft.Specs.Propulsion.Eta.TSPS = EtaTSPS;

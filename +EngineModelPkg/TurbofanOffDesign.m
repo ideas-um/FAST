@@ -48,8 +48,7 @@ AltScale = @(parameter) (RhoH/RhoSL)^mexp*parameter;
 DesT = OnDesignEngine.Thrust.Net;
 MaxT = AltScale(DesT);
 
-switch nargin
-    case 2 % conventional
+if nargin == 2 || ElectricLoad == 0
 
         % New maxT model needed
 
@@ -102,7 +101,7 @@ switch nargin
 
 
 
-    case 3 % hybrid electric case
+else
 
         Thrust_Data = OnDesignEngine.OffDesignMap.Thrusts';
         BSFC_Data = OnDesignEngine.OffDesignMap.BSFCs';

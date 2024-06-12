@@ -511,7 +511,7 @@ if (any(Fuel))
             % size the engine at that point
             OffParams.Thrust = TTemp(ipnt);
             
-            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams,EMPartPower);
+            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams,EMPartPower(ipnt));
             
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine);

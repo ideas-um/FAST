@@ -65,6 +65,10 @@ if nargin == 2 || ElectricLoad == 0
 
             OffParams.Thrust = max(Thrusts);
             OutThrust = max(Thrusts)*MaxT;
+        elseif OffParams.Thrust <= 2
+%             OffParams.Thrust = max(Thrusts);
+            OutThrust = OffParams.Thrust*MaxT;            
+
         else
             OutThrust = OffParams.Thrust;
             OffParams.Thrust = OffParams.Thrust/MaxT;

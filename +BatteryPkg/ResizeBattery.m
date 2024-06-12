@@ -2,14 +2,14 @@ function [Aircraft] = ResizeBattery(Aircraft)
 %
 % [Aircraft] = ResizeBattery(Aircraft)
 % originally written by Sasha Kryuchkov
-% modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 06 mar 2024
+% overhauled by Paul Mokotoff, prmoko@umich.edu
+% last updated: 12 jun 2024
 %
-% After an aircraft flies a mission, update its battery size based on the
-% following:
-%     (1) if the final SOC is < 20%, increase the battery's size.
-%     (2) if the final SOC is < 23%, decrease the battery's size.
-%     (3) if battery discharges too quickly, increase its size.
+% After an aircraft flies a mission, update its battery size. If a "simple"
+% battery model is used (not considering cells in series and parallel),
+% then only the battery weight is updated. If a "detailed" battery model is
+% used (considers cells in series and parallel), the number of cells in the
+% battery is also updated.
 %
 % INPUTS:
 %     Aircraft - aircraft structure containing the mission just flown.
@@ -22,183 +22,187 @@ function [Aircraft] = ResizeBattery(Aircraft)
 %
 
 
-%% INTERNALLY-PRESCRIBED PARAMETERS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% scale factor if SOC must be increased
-ScaleSOC   = 1.01;
-
-% scale factor if c-rate must be increased
-ScaleCRate = 1.10;
-
-% scale factor to downsize the battery
-ScaleDown  = 0.99;
-
-% acceptable SOC threshold
-MinSOC = 20; 
-MaxSOC = 23;
-
-% maximum extracted capacity and voltage
-QMax = 2.6; % Ah
-VMax = 3.6; % V
-
-
-%% INFO FROM THE AIRCRAFT STRUCTURE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% battery parameters         %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% GET INFO FROM THE AIRCRAFT STRUCTURE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % battery specific energy
 ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
 
-% number of cells in series and parallel
-ParCells = Aircraft.Specs.Power.Battery.ParCells;
-SerCells = Aircraft.Specs.Power.Battery.SerCells;
-
 % find index associated with a battery
 Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% mission history            %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% SOC during flight
-SOC = Aircraft.Mission.History.SI.Power.SOC(:, Batt);
-
-% power consumed during flight
-Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
 
 % energy consumed during flight
 Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt);
 
 
-%% CHECK IF SOC IS BELOW MINIMUM THRESHOLD %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% RESIZE THE BATTERY %%
+%%%%%%%%%%%%%%%%%%%%%%%%
 
-% assume no energy needs to be added
-E_add_soc = 0;
+% first, size the battery based on energy demand
+Aircraft.Specs.Weight.Batt = Ebatt(end, :) ./ ebatt;
 
-% find the first SOC that falls below the minimum threshold
-FailSOC = find(SOC < MinSOC, 1);
-
-% check if the SOC is too small
-if (any(FailSOC))
+% check if number of battery cells must be updated
+if (Aircraft.Settings.DetailedBatt == 1)
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % assumed constants          %
+    % (to be enhanced in future) %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % maximum extracted capacity and voltage
+    QMax = 2.6; % Ah
+    VMax = 3.6; % V
+    
+    % acceptable SOC threshold
+    MinSOC = 20;
+    
+    % ------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % get additional information %
+    % from aircraft structure    %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    
+    % get the number of cells in series and in parallel
+    Nser = Aircraft.Specs.Power.Battery.SerCells;
+    Npar = Aircraft.Specs.Power.Battery.ParCells;
+    
+    % SOC during flight
+    SOC = Aircraft.Mission.History.SI.Power.SOC(:, Batt);
+    
+    % ------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % check that the minimum SOC %
+    % threshold is matched (i.e. %
+    % the battery is neither     %
+    % over/under-sized wrt SOC)  %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-    % add the extra energy needed
-    E_add_soc = ScaleSOC * abs(Ebatt(end) - Ebatt(FailSOC));
+    % find the maximum SOC difference for resizing the battery
+    DeltaSOC = max(MinSOC - SOC);
     
-end
-
-
-%% CHECK IF DISCHARGE RATE (C-RATE) IS TOO HIGH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% assume a maximum c-rate
-MaxCRate = 5;
-
-% get the energy consumed by the battery during each segment
-dEbatt = diff(Ebatt);
-
-% compute the C-rate (power in segment / energy consumed in segment)
-C_rate = Pbatt(1:end-1) ./ dEbatt;
-
-% check if the C-rate is exceeded
-ExceedCRate = abs(C_rate) > MaxCRate;
-
-% assume no energy needs to be added
-E_add_crate = 0;
-
-% check if the c-rate exceeds the maximum c-rate
-if  any(ExceedCRate) 
-
-    % find largest power requirement when c-rate is exceeded
-    PbattMax = max(Pbatt(ExceedCRate));
+    % if a value is negative, min. SOC not surpassed - no SOC change needed
+    DeltaSOC(DeltaSOC < 0) = 0;
     
-    % add more energy to the battery
-    E_add_crate = ScaleCRate .* PbattMax ./ MaxCRate;
+    % indices for the number of batteries
+    ibatt = 1:sum(Batt);
     
-end
-
-
-%% UPDATE THE BATTERY'S SIZE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% assume number of cells in parallel remains the same (could change)
-ParCellsNew = ParCells;
-
-% check which case limits the battery's size
-if E_add_soc > E_add_crate
+    % identify if the battery is too large
+    TooLarge = ibatt(DeltaSOC == 0);
     
-    % adjust the charge stored in the battery
-    Q_max_new = ParCells * QMax * (1 + (MinSOC - SOC(end)) / 100) * ScaleSOC;
+    % compute the SOC to reduce the battery size and convert to a fraction
+    DownsizeTo = -(min(SOC) - MinSOC) / 100;
     
-    % adjust the battery's power 
-    ParCellsNew = ceil(ParCells * Q_max_new / (ParCells * QMax));
-    
-elseif  E_add_soc < E_add_crate
-    
-    % adjust the battery's voltage
-    V_new = SerCells * VMax * (max(C_rate) / MaxCRate) * ScaleCRate;
+    % modify the change in SOC needed
+    DeltaSOC(TooLarge) = DownsizeTo(TooLarge);
         
+    % compute the total capacity of the existing battery pack
+    ExistBattCap = QMax * Npar;
+    
+    % update number of cells in parallel (assume 1 cell per module, ./ Qmax is for aged cell capacity in EPASS, ./ 1 is for number of cells in parallel per module)
+    NparNew = ceil(ceil((ExistBattCap + DeltaSOC .* QMax .* Npar) ./ QMax) ./ 1);
+    
+    % ------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % check that the C-rate is   %
+    % not exceeded (i.e., the    %
+    % battery is not discharged  %
+    % too rapidly)               %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % skipping the "check power vs energy limit of battery" temporarily -
+    % need to modify it to check for the C-rate
+    
+    % ------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % get the new battery cell   %
+    % configuration and compute  %
+    % its new weight             %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % remember the new number of cells in parallel
+    Npar = NparNew;
+    
+%     % compute the number of battery cells (from E-PASS)
+%     Ncells = Npar * Nser;
+% 
+%     % compute the required capacity (from E-PASS)
+%     Qreq = Npar * QMax;
+    
+    % compute the mass of the battery (multiply by 3600 to convert from hr to seconds)
+    Wbatt = QMax * Npar * VMax * Nser * 3600 ./ ebatt;
+    
+    % ------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                            %
+    % store the newly sized      %
+    % battery in the aircraft    %
+    % structure                  %
+    %                            %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % remember the new battery size
+    Aircraft.Specs.Weight.Batt = Wbatt;
+
+    % remember the new cell arrangement
+    Aircraft.Specs.Power.Battery.ParCells = Npar;
+    
 end
 
-% figure out how much energy must be added to the battery
-E_add = max(E_add_soc, E_add_crate);
-
-% compute the new battery weight
-WbattNew = VMax * SerCells * QMax * ParCells * 3600 / ebatt;
-
-
-%% CHECK IF THE MAXIMUM SOC THRESHOLD IS EXCEEDED %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% check the final SOC
-if (SOC(end) > MaxSOC)
-    
-    % store less energy in the battery
-    E_new = Ebatt(end) * (1 - ((SOC(end) - MinSOC) / 100)) * ScaleDown;
-    
-    % adjust the battery's power
-    ParCellsNew = ceil(ParCells * E_new / Ebatt(end));
-    
-    % adjust the battery's weight
-    WbattNew = VMax * SerCells * QMax * ParCells * 3600 / ebatt;
-    
-end
-
-
-%% CHECK IF FINAL SOC IS IN ACCEPTABLE THRESHOLD %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% check the final SOC
-if ((SOC(end) < MaxSOC) && ...
-    (SOC(end) > MinSOC) )
-
-    % adjust the battery's weight
-    WbattNew = VMax * SerCells * QMax * ParCells * 3600 / ebatt;
-    
-    % adjust the battery's power
-    ParCellsNew = ParCells;
-    
-end
-
-
-%% REMEMBER THE NEW BATTERY SIZE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% remember the cells in parallel
-Aircraft.Specs.Power.Battery.ParCells = ParCellsNew;
-
-% remember the battery weight
-Aircraft.Specs.Weight.Batt = WbattNew;
+% 
+% % power consumed during flight
+% Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
+% 
+% 
+%     % ------------------------------------------------------
+%     
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     %                            %
+%     % check if the discharge     %
+%     % rate (C-rate) is too high  %
+%     %                            %
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     
+%     % assume a maximum c-rate
+%     MaxCRate = 5;
+%     
+%     % get the energy consumed by the battery during each segment
+%     dEbatt = diff(Ebatt);
+%     
+%     % compute the C-rate (power in segment / energy consumed in segment)
+%     C_rate = Pbatt(1:end-1) ./ dEbatt;
+%     
+%     % check if the C-rate is exceeded
+%     ExceedCRate = abs(C_rate) > MaxCRate;
+%     
+%     % assume no energy needs to be added
+%     E_add_crate = 0;
+%     
+%     % check if the c-rate exceeds the maximum c-rate
+%     if  any(ExceedCRate)
+%         
+%         % find largest power requirement when c-rate is exceeded
+%         PbattMax = max(Pbatt(ExceedCRate));
+%         
+%         % add more energy to the battery
+%         E_add_crate = ScaleCRate .* PbattMax ./ MaxCRate;
+%         
+%     end
+%     
 
 % ----------------------------------------------------------
 

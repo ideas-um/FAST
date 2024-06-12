@@ -1,5 +1,9 @@
 function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams,EtaPoly)
 %
+% this is INTERNAL to the off ddesign. do not call this function directly,
+% ever. the TurbofanOffDesign.m function will call this. you do not need to
+%
+
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
 % Updated 10/5/2023

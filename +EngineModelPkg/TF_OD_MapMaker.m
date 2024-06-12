@@ -1,6 +1,7 @@
 function [OffDesignInfo] = TF_OD_MapMaker(OnDesignEngine)
 % Turbofan Off-Design Map Maker
-
+% you should not be using this function. it is for internal use and is
+% called inside of TurbofanOffDesign
 
 
 OffParams.FlightCon.Mach = OnDesignEngine.Specs.Mach;

@@ -3,6 +3,8 @@
 
 function [OffDesignEngine] = TurbofanOffDesignCycle3(OnDesignEngine,OffParams)
 %
+% DEFUNCT DO NOT USE THIS
+
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
 % Updated 10/5/2023

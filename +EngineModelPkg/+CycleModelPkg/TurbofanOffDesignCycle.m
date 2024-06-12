@@ -108,7 +108,7 @@ OPR_Cur = OPR_Cur*OffParams.PC;
 
 
 BPR_SLS = OnDesignEngine.Specs.BPR/(2e-5*OnDesignEngine.Specs.Alt + 1);
-BPR_Cur = (1e-5*alt + 1).*BPR_SLS;
+BPR_Cur = (1e-5*Alt + 1).*BPR_SLS;
 
 
 %% Fuel-Air-Ratio FAR based on Power Code

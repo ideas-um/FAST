@@ -148,72 +148,72 @@ Pout     = zeros(ntime, 1);
 for itime = 1:ntime
     
     % compute the power required per cell
-    TVreq_es_cell = Preq(itime) ./ ncell
+    TVreq_es_cell = Preq(itime) ./ ncell;
     
     % compute the hot cell voltage
-    VoltageCellHot = -(PolarizedVoTemp ./ (SOC(itime) / 100) + ResistanceTemp)
+    VoltageCellHot = -(PolarizedVoTemp ./ (SOC(itime) / 100) + ResistanceTemp);
     
     % compute the initial discharged capacity
-    DischargedCapacityStart = (1 - (SOC(itime) / 100)) .* Q
+    DischargedCapacityStart = (1 - (SOC(itime) / 100)) .* Q;
     
     % compute the cold cell voltage
-    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp(1) .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart)
+    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp(1) .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart);
     
     % solve the polynomial to find the minimum current
-    CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell]
+    CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell];
     
     % find the root
-    CurrBatt = roots(CurrBattPoly)
+    CurrBatt = roots(CurrBattPoly);
     
     % check if the current is less than 0
-    CurrBatt(CurrBatt < 0) = NaN
+    CurrBatt(CurrBatt < 0) = NaN;
     
     % minimize the current
-    CurrBatt = min(CurrBatt, [], 1)
+    CurrBatt = min(CurrBatt, [], 1);
     
     % check for NaN
-    CurrBatt(isnan(CurrBatt)) = 0
+    CurrBatt(isnan(CurrBatt)) = 0;
     
     % check for any imaginary currents
     if (any(~isreal(CurrBatt)))
         
         % get the 2-norm (magnitude) of the complex current (initial guess)
-        CurrBatt = norm(CurrBatt)
+        CurrBatt = norm(CurrBatt);
         
         % assume a range of currents
-        CurrBattTemp = [CurrBatt - 10 : 0.1 : CurrBatt + 10]
+        CurrBattTemp = [CurrBatt - 10 : 0.1 : CurrBatt + 10];
         
         % compute the cell voltages
-        VoltageCellTemp = VoltageCellCold + VoltageCellHot * CurrBattTemp
+        VoltageCellTemp = VoltageCellCold + VoltageCellHot * CurrBattTemp;
         
         % find the current that maximizes the power produced
-        [~, idx] = min(abs(TVreq_es_cell - VoltageCellTemp .* CurrBattTemp))
+        [~, idx] = min(abs(TVreq_es_cell - VoltageCellTemp .* CurrBattTemp));
         
         % use the minimized current
-        CurrBatt = CurrBattTemp(idx)
+        CurrBatt = CurrBattTemp(idx);
         
     end
     
     % compute the total current
-    Current(itime) = CurrBatt * Parallel
+    Current(itime) = CurrBatt * Parallel;
     
     % compute the cell voltage
-    VoltageCell = VoltageCellCold + VoltageCellHot .* CurrBatt
+    VoltageCell = VoltageCellCold + VoltageCellHot .* CurrBatt;
     
     % compute the pack voltage
-    Voltage(itime) = VoltageCell * Series
+    Voltage(itime) = VoltageCell * Series;
     
     % update the capacity
-    DischargedCapacity = CurrBatt * Time(itime)
+    DischargedCapacity = CurrBatt * Time(itime);
     
     % update the SOC
-    SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q
+    SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q;
     
     % update the capacity
-    Capacity(itime) = Q * SOC(itime) / 100 * Series * Parallel
+    Capacity(itime) = Q * SOC(itime) / 100 * Series * Parallel;
     
     % compute the power output
-    Pout(itime) = Voltage(itime) * Current(itime)
+    Pout(itime) = Voltage(itime) * Current(itime);
     
 end
 

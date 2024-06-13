@@ -343,7 +343,7 @@ if (any(Batt))
         if (DetailedBatt == 1)
             
             % power available from the battery
-            [V(ibeg:iend, icol), I(ibeg:iend, icol), PreqES(ibeg:iend, icol),  Q(ibeg:iend, icol), SOC(2:end, icol)] = BatteryPkg.Model(...
+            [V(ibeg:iend, icol), I(ibeg:iend, icol), PreqES(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
                 PreqES(ibeg:iend, icol), dt, SOC(1    , icol), ParCells, SerCells);
             
             % check if the SOC falls below 20%

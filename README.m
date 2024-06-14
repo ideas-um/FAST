@@ -24,7 +24,7 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-% README last updated: 05 june 2024
+% README last updated: 14 jun 2024
 % 
 % -------------------------------------------------------------------------
 %

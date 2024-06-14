@@ -24,7 +24,7 @@ Additional Contributors:
 - Janki Patel
 - Michael Tsai
  
-README last updated: 04 May 2024
+README last updated: 14 June 2024
 
 # (I) Additional Documentation
 
@@ -91,7 +91,7 @@ for more information on creating engine specification files for the engine model
 
 FAST performs on- and off-design analysis of a user-prescribed aircraft on a user-prescribed mission profile. To run this tool, call the "Main" function with an aircraft specification function and a parametric mission profile. To do so, the user must:
 
-1. Prescribe their aircraft configuration via a function call. See any of the examples in the "AircraftSpecsPkg" folder. In the function, the user should:
+1. Prescribe their aircraft configuration via a function call. This can be achieved  by updating the example.m file provided in “AircraftSpecsPkg”. See this package for more instructions and examples. In the function, the user should:
     - Select whether an on-design (+1, sizing and performance) analysis or off-design (-1, performance only) analysis should be performed, which is the second argument in the call to "EAPAnalysis". This is controlled by the variable: "Aircraft.Settings.Analysis.Type". The default is +1 (sizing and performance) if this value is not provided.
     - Select the maximum number of iterations to be performed during the analysis. The value must be a positive integer and is controlled by the following variable: "Aircraft.Settings.Analysis.MaxIter". The default is 50 iterations.
     - Select whether or not the mission profile should be plotted after the analysis has been completed. This is controlled by the following variable: "Aircraft.Settings.Plotting". The default is 0 (no plotting).

@@ -24,7 +24,7 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-% README last updated: 02 may 2024
+% README last updated: 14 jun 2024
 % 
 % -------------------------------------------------------------------------
 %
@@ -305,7 +305,35 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (IV) Notes:
+% (IV) Reporting Bugs/Issues:
+%
+%     To report any bugs/issues, please use the GitHub Issues feature on
+%     the repository: https://github.com/ideas-um/FAST/issues. Upon
+%     reaching the website, use the "New issue" button to create the issue.
+%     Please provide a written description of the issue encountered along
+%     with any additional scripts/files being ran in FAST. It is important
+%     that any additional scripts/files are uploaded so the FAST developers
+%     and maintainers can replicate the issue encountered.
+%
+%     Additionally, you are welcome to fix any bugs encountered on your
+%     own. After the fix has been made, please submit a pull request and a
+%     FAST developer/maintainer will review your request.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (V) Additional User Support:
+%
+%     Should additional support be needed (beyond reporting bugs or issues
+%     with the software), please email the point of contact at the
+%     beginning of this README file.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (VI) Notes:
 %
 %     (1) In the main sizing/performance analysis function, "EAPAnalysis",
 %         information about the weight of each component being sized is
@@ -334,7 +362,7 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (V) Disclaimers:
+% (VII) Disclaimers:
 %
 %     (1) When defining an aircraft in the "AircraftSpecsPkg" folder, many
 %         of the values will remain as NaN. For any values that remain as

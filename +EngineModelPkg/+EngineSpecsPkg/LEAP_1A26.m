@@ -46,7 +46,7 @@ Engine.BPR = 11;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1597;
+Engine.Tt4Max = 1593;  %previosu data: 1597
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -54,7 +54,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 106760;
+Engine.DesignThrust = 120640;  %Prrvious data: 106760
 
 
 

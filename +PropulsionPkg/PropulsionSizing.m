@@ -189,9 +189,14 @@ if (any(PSType > 0))
 
         % run the regression
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
+        
+        % add specs for engine
+        Aircraft.Specs.Propulsion.Engine.Alt = 0;
+        Aircraft.Specs.Propulsion.Engine.Mach = 0.05;
+        Aircraft.Specs.Propulsion.Engine.DesignThrust = Thrust(1)+Thrust(3);
 
         Aircraft.Specs.Propulsion.Engine.Sizing = 1;
-        Aircraft.Specs.Propulsion.SizedEngine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine);
+        Aircraft.Specs.Propulsion.SizedEngine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Power(3));
         Aircraft.Specs.Propulsion.Engine.Sizing = 0; % unnnecessary
         Aircraft.Specs.Propulsion.SizedEngine.Specs.Sizing = 0;
         

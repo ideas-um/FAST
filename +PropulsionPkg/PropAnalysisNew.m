@@ -413,9 +413,6 @@ if (any(Fuel))
         % get the TSFC from the engine sizing
         GetSFC = @(SizedEngine) SizedEngine.TSFC;
 
-        % get the fan diameter from the engine sizing
-        GetDFan = @(SizedEngine) NaN;
-
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
 
@@ -424,9 +421,6 @@ if (any(Fuel))
 
         % get the BSFC from the engine sizing
         GetSFC = @(SizedEngine) SizedEngine.TSFC_Imperial;
-
-        % set the fan diameter to nonexistent
-        GetDFan = @(SizedEngine) NaN;
 
     end
     

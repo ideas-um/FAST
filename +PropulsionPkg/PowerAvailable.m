@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 mar 2024
+% last updated: 14 jun 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -120,28 +120,6 @@ if (any(Eng))
         % lapse the power
         PowerAv(:, Eng) = PropulsionPkg.EngineLapse(PowerAv(:, Eng), aclass, Rho);
         
-%         % size engines to get equivalent shaft power
-%         for ipnt = 1:npnt
-%             
-%             % input the flight conditions (assume flying very slowly)
-%             Aircraft.Specs.Propulsion.Engine.Mach = 0.05;
-%             Aircraft.Specs.Propulsion.Engine.Alt  = Alt(ipnt);
-%             
-%             % lapse each engine
-%             for ieng = 1:length(HasEng)
-%             
-%                 % input the lapsed thrust
-%                 Aircraft.Specs.Propulsion.Engine.ReqPower = PowerAv(ipnt, HasEng(ieng));
-%                 
-%                 % design the engine
-%                 SizedEngine = EngineModelPkg.TurbopropNonlinearSizing(Aircraft.Specs.Propulsion.Engine, 0);
-%                 
-%                 % compute the equivalent shaft power
-%                 PowerAv(ipnt, HasEng(ieng)) = SizedEngine.Power + SizedEngine.JetThrust * TAS(ipnt) / Aircraft.Specs.Power.Eta.Propeller;
-%                 
-%             end
-%         end
-                
     else
         
         % throw error

@@ -120,12 +120,14 @@ else
         % find maximum power that the gas turbine can produce
         % scale design power required by compressor using altitude method
 
-        switch sign(OnDesignEngine.FanSysObject.ElecWork)
+        if (OnDesignEngine.FanSysObject.ElecWork <= 0)
 
-            case -1
+%             case -1
                 DesP = OnDesignEngine.FanSysObject.ReqWork;
                 MaxP = AltScale(DesP);
-            case +1
+                
+        else
+%             case +1
                 DesP = OnDesignEngine.FanSysObject.TotalWork;
                 MaxP = AltScale(DesP) - OnDesignEngine.FanSysObject.ElecWork;
         end
@@ -153,15 +155,23 @@ else
         % Power Ratio Calculation Relative to Maximum Power
         PowRat = ReqGTP/MaxP;
 
-        if PowRat > 1.2*max(Power_Data)
-           error('Power Requested Exceeds Gas Turbine Capability')
-           PowRat = max(Power_Data);
-        elseif PowRat > max(Power_Data)
+        if     (PowRat > max(Power_Data))
             PowRat = max(Power_Data);
-            % or return an error
-        elseif PowRat < min(Power_Data)
+            
+        elseif (PowRat < min(Power_Data))
             PowRat = min(Power_Data);
+            
         end
+            
+%         if PowRat > 1.2*max(Power_Data)
+%            error('Power Requested Exceeds Gas Turbine Capability')
+%            PowRat = max(Power_Data);
+%         elseif PowRat > max(Power_Data)
+%             PowRat = max(Power_Data);
+%             % or return an error
+%         elseif PowRat < min(Power_Data)
+%             PowRat = min(Power_Data);
+%         end
 
         % interpolate the BSFC scale
         BSFCScale = interp1(Power_Data,BSFC_Data,PowRat);

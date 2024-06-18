@@ -24,7 +24,19 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-% README last updated: 14 jun 2024
+% README last updated: 18 jun 2024
+%
+% Learn More About FAST
+% For detailed information about FAST's features, visit our website: 
+% https://www.gokcincinar.com/software/fast
+% 
+% We also offer a series of tutorial videos on YouTube to help you get 
+% started with FAST and explore its capabilities. Check out our channel 
+% and subscribe for updates: https://youtube.com/channel/UC5ntmOSA1_YWu1ljQ5hXn0Q
+%
+% To stay informed about upcoming papers, new releases, and news about
+% FAST, please sign up for our newsletter:
+% https://forms.gle/b8sPXKnRAfi5ZsARA
 % 
 % -------------------------------------------------------------------------
 %

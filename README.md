@@ -23,8 +23,16 @@ Additional Contributors:
 - Nawa Khailany
 - Janki Patel
 - Michael Tsai
- 
-README last updated: 14 June 2024
+
+README last updated: 14 Jun 2024
+
+## Learn More About FAST
+
+For detailed information about FAST's features, visit our website: [IDEAS Lab Website](https://www.gokcincinar.com/software/fast). 
+
+We also offer a series of tutorial videos on YouTube to help you get started with FAST and explore its capabilities. Check out our channel and subscribe for updates: [IDEAS Lab YouTube Channel](https://www.youtube.com/channel/UC5ntmOSA1_YWu1ljQ5hXn0Q).
+
+To stay informed about upcoming papers, new releases, and news about FAST, please sign up for [our newsletter here](https://forms.gle/b8sPXKnRAfi5ZsARA).
 
 # (I) Additional Documentation
 
@@ -139,4 +147,5 @@ This work is sponsored by the NASA Aeronautics Research Mission Directorate and 
 
 Glenn Engineering and Research Support Contract (GEARS)
 Contract No. 80GRC020D0003
+
 

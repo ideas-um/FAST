@@ -199,16 +199,16 @@ Aircraft.Specs.Power.Battery.BegSOC   = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % points in takeoff segment
-Aircraft.Settings.TkoPoints = NaN;
+Aircraft.Settings.TkoPoints = 3;
 
 % points in climb   segment
-Aircraft.Settings.ClbPoints = NaN;
+Aircraft.Settings.ClbPoints = 5;
 
 % points in cruise  segment
-Aircraft.Settings.CrsPoints = NaN;
+Aircraft.Settings.CrsPoints = 5;
 
 % points in descent  segment
-Aircraft.Settings.DesPoints = NaN;
+Aircraft.Settings.DesPoints = 5;
 
 % maximum iterations when sizing OEW
 Aircraft.Settings.OEW.MaxIter = NaN;

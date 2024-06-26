@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 may 2024
+% last updated: 26 jun 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system
@@ -102,16 +102,7 @@ if     (strcmpi(ArchName, "C"  ) == 1)
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = ones(1, NumEng);
-    
-    % upstream thrust-power  source contributions
-    UpTSPS = eye(NumEng);
-    
-    % upstream power -power  source contributions
-    UpPSPS = eye(NumEng);
-    
-    % upstream power -energy source contributions
-    UpPSES = ones(NumEng, 1);
-    
+        
 elseif (strcmpi(ArchName, "E"  ) == 1)
         
     % thrust-power source architecture
@@ -161,15 +152,6 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = zeros(1, NumEng);
-    
-    % upstream thrust-power  source contributions
-    UpTSPS = eye(NumEng);
-    
-    % upstream power -power  source contributions
-    UpPSPS = eye(NumEng);
-    
-    % upstream power -energy source contributions
-    UpPSES = ones(NumEng, 1);
         
 elseif (strcmpi(ArchName, "PHE") == 1)
     
@@ -220,15 +202,6 @@ elseif (strcmpi(ArchName, "PHE") == 1)
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = [ones(1, NumEng), zeros(1, NumEng)];
-    
-    % upstream thrust-power  source contributions
-    UpTSPS = repmat(eye(NumEng), 1, 2);
-    
-    % upstream power -power  source contributions
-    UpPSPS = eye(2 * NumEng);
-    
-    % upstream power -energy source contributions
-    UpPSES = [ones(NumEng, 1), zeros(NumEng, 1); zeros(NumEng, 1), ones(NumEng, 1)];
     
 elseif (strcmpi(ArchName, "O"  ) == 1)
     
@@ -302,11 +275,6 @@ Aircraft.Specs.Propulsion.Oper.TS   = OperTS  ;
 Aircraft.Specs.Propulsion.Oper.TSPS = OperTSPS;
 Aircraft.Specs.Propulsion.Oper.PSPS = OperPSPS;
 Aircraft.Specs.Propulsion.Oper.PSES = OperPSES;
-
-% remember the upstream splits
-Aircraft.Specs.Propulsion.Upstream.TSPS = UpTSPS;
-Aircraft.Specs.Propulsion.Upstream.PSPS = UpPSPS;
-Aircraft.Specs.Propulsion.Upstream.PSES = UpPSES;
 
 % remember the efficiencies
 Aircraft.Specs.Propulsion.Eta.TSPS = EtaTSPS;

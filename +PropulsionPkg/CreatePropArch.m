@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 jun 2024
+% last updated: 27 jun 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system
@@ -249,6 +249,56 @@ elseif (strcmpi(ArchName, "SHE") == 1)
     
     % energy source type (1 = fuel, 0 = battery)
     ESType = [1, 0];
+    
+    % power source type (1 = engine, 0 = electric motor)
+    PSType = [ones(1, NumEng), zeros(1, NumEng)];
+    
+elseif (strcmpi(ArchName, "TE" ) == 1)
+    
+    % thrust-power source matrix
+    ArchTSPS = [zeros(NumEng), eye(NumEng)];
+    
+    % power-power source matrix
+    ArchPSPS = [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source matrix (first group - fuel; second group - batt)
+    ArchPSES = [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust      source operation
+    OperTS   = @() ones(1, NumEng) ./ NumEng;
+    
+    % thrust-power source operation
+    OperTSPS = @() [zeros(NumEng), eye(NumEng)];
+    
+    % power-power  source operation
+    OperPSPS = @() [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source operation
+    OperPSES = @() [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust-power  source efficiency (assume it's perfect)
+    EtaTSPS = ones(NumEng, 2 * NumEng);
+    
+    % check if a turboprop is being flown
+    if ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1) )
+    
+        % get the propeller efficiency
+        EtaPropeller = Aircraft.Specs.Power.Eta.Propeller;
+        
+        % use the propeller efficiency in the TSPS efficiency
+        EtaTSPS(:, NumEng+1:end) = EtaTSPS(:, NumEng+1:end) + (EtaPropeller - 1) .* eye(NumEng);
+        
+    end
+        
+    % power -power  source efficiency
+    EtaPSPS  = ones(2 * NumEng);
+    
+    % power -energy source efficiency
+    EtaPSES  = ones(2 * NumEng, 1);
+    
+    % energy source type (1 = fuel, 0 = battery)
+    ESType = 1;
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = [ones(1, NumEng), zeros(1, NumEng)];

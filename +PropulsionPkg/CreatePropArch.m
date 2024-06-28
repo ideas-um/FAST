@@ -145,7 +145,7 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
     EtaPSPS = ones(NumEng, NumEng);
     
     % power -energy source efficiency
-    EtaPSES = ones(NumEng, 1);
+    EtaPSES = repmat(EtaEM, NumEng, 1);
     
     % energy source type (1 = fuel, 0 = battery)
     ESType = 0;
@@ -291,8 +291,11 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
         
     end
         
-    % power -power  source efficiency
-    EtaPSPS  = ones(2 * NumEng);
+    % power -power  source efficiency is initialized to all 1
+    EtaPSPS = ones(2 * NumEng);
+    
+    % account for the electric motor efficiency
+    EtaPSPS(NumEng+1:end, 1:NumEng) = EtaPSPS(NumEng+1:end, 1:NumEng) - (1 - EtaEM) .* eye(NumEng);
     
     % power -energy source efficiency
     EtaPSES  = ones(2 * NumEng, 1);
@@ -341,8 +344,11 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
         
     end
         
-    % power -power  source efficiency
-    EtaPSPS  = ones(2 * NumEng);
+    % power -power  source efficiency is initialized to all 1
+    EtaPSPS = ones(2 * NumEng);
+    
+    % account for the electric motor efficiency
+    EtaPSPS(NumEng+1:end, 1:NumEng) = EtaPSPS(NumEng+1:end, 1:NumEng) - (1 - EtaEM) .* eye(NumEng);
     
     % power -energy source efficiency
     EtaPSES  = ones(2 * NumEng, 1);

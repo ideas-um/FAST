@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 jun 2024
+% last updated: 02 jul 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system
@@ -318,7 +318,7 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
     ArchPSES = [ones(NumEng, 1); zeros(NumEng, 1)];
     
     % thrust      source operation
-    OperTS   = @() ones(1, NumEng) ./ NumEng;
+    OperTS   = @() ones(1, 2 * NumEng) ./ 2 * NumEng;
     
     % thrust-power source operation
     OperTSPS = @() eye(2 * NumEng);

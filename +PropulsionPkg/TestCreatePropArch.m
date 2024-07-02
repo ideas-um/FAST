@@ -27,7 +27,7 @@ function [Success] = TestCreatePropArch()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(12, 1);
+Pass = ones(15, 1);
 
 % count the tests
 itest = 1;
@@ -1033,6 +1033,252 @@ FooPass(10) = CheckTest(TestOut.Specs.Propulsion.Eta.PSES, CorrectPSES, EPS06);
 
 % correct energy and power source types
 CorrectESType = [1, 0];
+CorrectPSType = [ones(1, 3), zeros(1, 3)];
+
+% check the energy and power source types
+FooPass(11) = CheckTest(TestOut.Specs.Propulsion.PropArch.ESType, CorrectESType, EPS06);
+FooPass(12) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSType, CorrectPSType, EPS06);
+
+% check that all tests passed
+if (~any(FooPass))
+    
+    % one or more of the tests failed
+    Pass(itest) = 0;
+    
+else
+    
+    % all tests passed
+    Pass(itest) = 1;
+    
+end
+
+% increment the test number
+itest = itest + 1;
+
+
+%% CASE 5A: TURBOELECTRIC, 2 ENGINES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the architecture
+TestIn.Specs.Propulsion.Arch.Type = "TE";
+
+% set the number of engines
+TestIn.Specs.Propulsion.NumEngines = 2;
+
+% reset the aircraft class
+TestIn.Specs.TLAR.Class = "Turboprop";
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% create the propulsion architecture
+TestOut = PropulsionPkg.CreatePropArch(TestIn);
+
+% remember the correct architecture matrices
+CorrectTSPS = [zeros(2), eye(2)];
+CorrectPSPS = [eye(2), zeros(2); repmat(eye(2), 1, 2)];
+CorrectPSES = [ones(2, 1); zeros(2, 1)];
+
+% check the architecture matrices
+FooPass( 1) = CheckTest(TestOut.Specs.Propulsion.PropArch.TSPS, CorrectTSPS, EPS06);
+FooPass( 2) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSPS, CorrectPSPS, EPS06);
+FooPass( 3) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSES, CorrectPSES, EPS06);
+
+% remember the correct operational matrices
+CorrectTS   = repmat(0.5, 1, 2);
+
+% check the operational matrices (same as architecture matrices)
+FooPass( 4) = CheckTest(TestOut.Specs.Propulsion.Oper.TS(  ), CorrectTS  , EPS06);
+FooPass( 5) = CheckTest(TestOut.Specs.Propulsion.Oper.TSPS(), CorrectTSPS, EPS06);
+FooPass( 6) = CheckTest(TestOut.Specs.Propulsion.Oper.PSPS(), CorrectPSPS, EPS06);
+FooPass( 7) = CheckTest(TestOut.Specs.Propulsion.Oper.PSES(), CorrectPSES, EPS06);
+
+% remember the correct efficiency matrices
+CorrectTSPS = ones(2, 4) + [zeros(2), (EtaProp - 1) .* eye(2)];
+CorrectPSPS = ones(4   ) + [zeros(2, 4); (EtaEM - 1) .* eye(2), zeros(2)];
+CorrectPSES = ones(4, 1) ;
+
+% check the efficiency matrices (propeller aircraft)
+FooPass( 8) = CheckTest(TestOut.Specs.Propulsion.Eta.TSPS, CorrectTSPS, EPS06);
+FooPass( 9) = CheckTest(TestOut.Specs.Propulsion.Eta.PSPS, CorrectPSPS, EPS06);
+FooPass(10) = CheckTest(TestOut.Specs.Propulsion.Eta.PSES, CorrectPSES, EPS06);
+
+% correct energy and power source types
+CorrectESType = 1;
+CorrectPSType = [ones(1, 2), zeros(1, 2)];
+
+% check the energy and power source types
+FooPass(11) = CheckTest(TestOut.Specs.Propulsion.PropArch.ESType, CorrectESType, EPS06);
+FooPass(12) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSType, CorrectPSType, EPS06);
+
+% check that all tests passed
+if (~any(FooPass))
+    
+    % one or more of the tests failed
+    Pass(itest) = 0;
+    
+else
+    
+    % all tests passed
+    Pass(itest) = 1;
+    
+end
+
+% increment the test number
+itest = itest + 1;
+
+
+%% CASE 5B: TURBOELECTRIC, 3 ENGINES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the architecture
+TestIn.Specs.Propulsion.Arch.Type = "TE";
+
+% set the number of engines
+TestIn.Specs.Propulsion.NumEngines = 3;
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% create the propulsion architecture
+TestOut = PropulsionPkg.CreatePropArch(TestIn);
+
+% remember the correct architecture matrices
+CorrectTSPS = [zeros(3), eye(3)];
+CorrectPSPS = [eye(3), zeros(3); repmat(eye(3), 1, 2)];
+CorrectPSES = [ones(3, 1); zeros(3, 1)];
+
+% check the architecture matrices
+FooPass( 1) = CheckTest(TestOut.Specs.Propulsion.PropArch.TSPS, CorrectTSPS, EPS06);
+FooPass( 2) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSPS, CorrectPSPS, EPS06);
+FooPass( 3) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSES, CorrectPSES, EPS06);
+
+% remember the correct operational matrix for thrust splits
+CorrectTS   = repmat(1/3, 1, 3);
+
+% check the operational matrices
+FooPass( 4) = CheckTest(TestOut.Specs.Propulsion.Oper.TS(  ), CorrectTS  , EPS06);
+FooPass( 5) = CheckTest(TestOut.Specs.Propulsion.Oper.TSPS(), CorrectTSPS, EPS06);
+FooPass( 6) = CheckTest(TestOut.Specs.Propulsion.Oper.PSPS(), CorrectPSPS, EPS06);
+FooPass( 7) = CheckTest(TestOut.Specs.Propulsion.Oper.PSES(), CorrectPSES, EPS06);
+
+% remember the correct efficiency matrices
+CorrectTSPS = ones(3, 6) + [zeros(3), (EtaProp - 1) .* eye(3)];
+CorrectPSPS = ones(6   ) + [zeros(3, 6); (EtaEM - 1) .* eye(3), zeros(3)];
+CorrectPSES = ones(6, 1) ;
+
+% check the efficiency matrices (propeller aircraft)
+FooPass( 8) = CheckTest(TestOut.Specs.Propulsion.Eta.TSPS, CorrectTSPS, EPS06);
+FooPass( 9) = CheckTest(TestOut.Specs.Propulsion.Eta.PSPS, CorrectPSPS, EPS06);
+FooPass(10) = CheckTest(TestOut.Specs.Propulsion.Eta.PSES, CorrectPSES, EPS06);
+
+% correct energy and power source types
+CorrectESType = 1;
+CorrectPSType = [ones(1, 3), zeros(1, 3)];
+
+% check the energy and power source types
+FooPass(11) = CheckTest(TestOut.Specs.Propulsion.PropArch.ESType, CorrectESType, EPS06);
+FooPass(12) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSType, CorrectPSType, EPS06);
+
+% check that all tests passed
+if (~any(FooPass))
+    
+    % one or more of the tests failed
+    Pass(itest) = 0;
+    
+else
+    
+    % all tests passed
+    Pass(itest) = 1;
+    
+end
+
+% increment the test number
+itest = itest + 1;
+
+
+%% CASE 5C: TURBOELECTRIC, 3 ENGINES, TURBOFAN %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set the architecture
+TestIn.Specs.Propulsion.Arch.Type = "TE";
+
+% set the number of engines
+TestIn.Specs.Propulsion.NumEngines = 3;
+
+% change the aircraft class
+TestIn.Specs.TLAR.Class = "Turbofan";
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% create the propulsion architecture
+TestOut = PropulsionPkg.CreatePropArch(TestIn);
+
+% remember the correct architecture matrices
+CorrectTSPS = [zeros(3), eye(3)];
+CorrectPSPS = [eye(3), zeros(3); repmat(eye(3), 1, 2)];
+CorrectPSES = [ones(3, 1); zeros(3, 1)];
+
+% check the architecture matrices
+FooPass( 1) = CheckTest(TestOut.Specs.Propulsion.PropArch.TSPS, CorrectTSPS, EPS06);
+FooPass( 2) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSPS, CorrectPSPS, EPS06);
+FooPass( 3) = CheckTest(TestOut.Specs.Propulsion.PropArch.PSES, CorrectPSES, EPS06);
+
+% remember the correct operational matrix for thrust splits
+CorrectTS   = repmat(1/3, 1, 3);
+
+% check the operational matrices (same as architecture matrices)
+FooPass( 4) = CheckTest(TestOut.Specs.Propulsion.Oper.TS(  ), CorrectTS  , EPS06);
+FooPass( 5) = CheckTest(TestOut.Specs.Propulsion.Oper.TSPS(), CorrectTSPS, EPS06);
+FooPass( 6) = CheckTest(TestOut.Specs.Propulsion.Oper.PSPS(), CorrectPSPS, EPS06);
+FooPass( 7) = CheckTest(TestOut.Specs.Propulsion.Oper.PSES(), CorrectPSES, EPS06);
+
+% remember the correct efficiency matrices
+CorrectTSPS = ones(3, 6);
+CorrectPSPS = ones(6   ) + [zeros(3, 6); (EtaEM - 1) .* eye(3), zeros(3)];
+CorrectPSES = ones(6, 1);
+
+% check the efficiency matrices (propeller aircraft)
+FooPass( 8) = CheckTest(TestOut.Specs.Propulsion.Eta.TSPS, CorrectTSPS, EPS06);
+FooPass( 9) = CheckTest(TestOut.Specs.Propulsion.Eta.PSPS, CorrectPSPS, EPS06);
+FooPass(10) = CheckTest(TestOut.Specs.Propulsion.Eta.PSES, CorrectPSES, EPS06);
+
+% correct energy and power source types
+CorrectESType = 1;
 CorrectPSType = [ones(1, 3), zeros(1, 3)];
 
 % check the energy and power source types

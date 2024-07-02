@@ -98,7 +98,7 @@ To electrify the LM100J, the outboard propulsors were powered by electric motors
 An example of the propulsion architecture is shown in Fig. \autoref{Fig:LM100J-PropArch}.
 The trade studies explored the fuel burn savings achieved by removing a fraction of the LM100J's payload to accommodate the battery required to power the electric motors.
 
-![Electrified LM100J propulsion architecture \label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.pdf){width = 80%}
+![Electrified LM100J propulsion architecture \label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.png){width = 80%}
 
 Second, work by @wang2025subsonic explores modeling NASA's **SU**bsonic **S**ingle **A**ft E**n**gine (SUSAN) concept and explores how advanced technologies impact the aircraft's performance.
 In addition to modeling SUSAN, more granular aerodynamic and propulsive models are being incorporated into FAST to better assess the benefits of boundary layer ingestion and distributed electric propulsion technologies.
@@ -120,7 +120,7 @@ This work served as a proof-of-concept for understanding how hybrid electric air
 A high-level overview of FAST is illustrated in Fig. \autoref{Fig:HighLevelDSM}.
 The user provided inputs, outputs, and FAST processes are shown by the white, red, and green boxes, respectively.
 
-![High-level overview of FAST's main functionality \label{Fig:HighLevelDSM}](Figures/OnDesign-HighLevel.pdf){width = 80%}
+![High-level overview of FAST's main functionality \label{Fig:HighLevelDSM}](Figures/OnDesign-HighLevel.png){width = 80%}
 
 The user first provides all of the information known about the aircraft, which is assembled into an aircraft model.
 Additionally, the user must provide a mission profile, which informs FAST how to fly the aircraft while sizing it.
@@ -133,12 +133,12 @@ After the aircraft is sized, it is returned to the user as a Matlab `struct` for
 Further post-processing such as viewing the mission history (information about the flight simulated) or visualizing a geometric representation of the sized aircraft is also available.
 An example of the mission history is plotted in Fig. \autoref{Fig:MissionHistory}.
 
-![Example of a mission history \label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.pdf){width = 80%}
+![Example of a mission history \label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.png){width = 80%}
 
 An example of an aircraft geometry visualized in FAST is provided in Fig. \autoref{Fig:GeometryExample}.
 The visualization capability was developed by @khailany2025aircraft and allows users to either prescribe their own aircraft geometry or use one that is shipped with FAST.
 
-![Transport aircraft geometry shipped with FAST \label{Fig:GeometryExample}](Figures/Transport.pdf){width = 80%}
+![Transport aircraft geometry shipped with FAST \label{Fig:GeometryExample}](Figures/Transport.png){width = 80%}
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->

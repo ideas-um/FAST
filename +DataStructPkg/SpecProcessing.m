@@ -559,7 +559,7 @@ for i = 1:length(Settingsfields)
             %                         Settings.(Settingsfields{i}).(subfields{j}).(subsubfields{k}) = DefaultSettings.(Settingsfields{i}).(subfields{j}).(subsubfields{k});
             %                     end
             %                 end
-            if isnan(Settings.(Settingsfields{i}).(subfields{j}))
+            if anynan(Settings.(Settingsfields{i}).(subfields{j}))
                 Settings.(Settingsfields{i}).(subfields{j}) = DefaultSettings.(Settingsfields{i}).(subfields{j});
             end
         end

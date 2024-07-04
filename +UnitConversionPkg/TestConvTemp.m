@@ -4,7 +4,7 @@ function [Success] = TestConvTemp()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 4 jul 2024
 %
-% Generate simple test cases to confirm that the unit conversion package
+% Generate simple test cases to confirm that the temperature conversion script
 % is working properly.
 %
 % INPUTS:
@@ -29,7 +29,7 @@ function [Success] = TestConvTemp()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(9, 1);
+Pass = ones(12, 1);
 
 % count the tests
 itest = 1;

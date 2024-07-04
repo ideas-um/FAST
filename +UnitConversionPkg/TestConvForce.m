@@ -1,10 +1,10 @@
-function [Success] = TestConvVel()
+function [Success] = TestConvForce()
 %
-% [Success] = TestConvVel()
+% [Success] = TestConvForce()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 3 jul 2024
+% last updated: 4 jul 2024
 %
-% Generate simple test cases to confirm that the velocity conversion script
+% Generate simple test cases to confirm that the force conversion script
 % is working properly.
 %
 % INPUTS:
@@ -29,14 +29,14 @@ function [Success] = TestConvVel()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(9, 1);
+Pass = ones(2, 1);
 
 % count the tests
 itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1A: LENGTH CONVERSIONS FOR FT TO M%%
+%% CASE 1: FORCE CONVERSIONS FOR N TO LBF%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,7 +47,42 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=700;
+TestIn=738;
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% compute the force conversion
+TestValue=UnitConversionPkg.ConvForce(TestIn,'N','lbf');
+
+% list the correct values of the output
+TrueValue = 165.909;
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+% ----------------------------------------------------------
+
+%% CASE 2: FORCE CONVERSIONS FOR LBF TO N%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% define the value to be converted
+
+TestIn=23453.829;
 
 % ----------------------------------------------------------
 
@@ -58,16 +93,18 @@ TestIn=700;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'ft','m');
+TestValue=UnitConversionPkg.ConvForce(TestIn,'lbf','N');
 
 % list the correct values of the output
-TrueValue = 213.36;
+TrueValue = 104327.828761;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 % increment the test counter
 itest = itest + 1;
+
+% ----------------------------------------------------------
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

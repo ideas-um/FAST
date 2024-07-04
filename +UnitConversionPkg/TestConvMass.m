@@ -1,10 +1,10 @@
-function [Success] = TestConvTemp()
+function [Success] = TestConvMass()
 %
-% [Success] = TestConvTemp()
+% [Success] = TestConvMass()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 4 jul 2024
 %
-% Generate simple test cases to confirm that the temperature conversion script
+% Generate simple test cases to confirm that the mass conversion script
 % is working properly.
 %
 % INPUTS:
@@ -29,14 +29,14 @@ function [Success] = TestConvTemp()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(12, 1);
+Pass = ones(6, 1);
 
 % count the tests
 itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1A: TEMPERATURE CONVERSIONS FOR K TO C%%
+%% CASE 1A: MASS CONVERSIONS FOR LBM TO KG%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=32.243;
+TestIn=2.8373;
 
 % ----------------------------------------------------------
 
@@ -57,11 +57,11 @@ TestIn=32.243;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','C');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'lbm','kg');
 
 % list the correct values of the output
-TrueValue = -240.907;
+TrueValue = 1.28697763;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -69,7 +69,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1B: TEMPERATURE CONVERSIONS FOR K TO R%%
+%% CASE 1B: MASS CONVERSIONS FOR LBM TO SLUGS%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,7 +80,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=3232.243;
+TestIn=465.7;
 
 % ----------------------------------------------------------
 
@@ -90,44 +90,11 @@ TestIn=3232.243;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','R');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'lbm','slug');
 
 % list the correct values of the output
-TrueValue = 5818.0374;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 1C: TEMPERATURE CONVERSIONS FOR K TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=2380;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','F');
-
-% list the correct values of the output
-TrueValue = 3824.33;
+TrueValue = 14.474398;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -137,7 +104,7 @@ itest = itest + 1;
 
 % ----------------------------------------------------------
 
-%% CASE 2A: TEMPERATURE CONVERSIONS FOR R TO K%%
+%% CASE 2A: MASS CONVERSIONS FOR KG TO LBM%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,7 +115,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=7.3421;
+TestIn=84.2883;
 
 % ----------------------------------------------------------
 
@@ -158,11 +125,11 @@ TestIn=7.3421;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','K');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'kg','lbm');
 
 % list the correct values of the output
-TrueValue = 4.07894444;
+TrueValue = 185.8238929;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -170,7 +137,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2B: TEMPERATURE CONVERSIONS FOR R TO C%%
+%% CASE 2B: MASS CONVERSIONS FOR KG TO SLUGS%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,7 +148,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=679.67;
+TestIn=647.739009;
 
 % ----------------------------------------------------------
 
@@ -191,44 +158,11 @@ TestIn=679.67;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','C');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'kg','slug');
 
 % list the correct values of the output
-TrueValue = 104.444444;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 2C: TEMPERATURE CONVERSIONS FOR R TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=67.786;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','F');
-
-% list the correct values of the output
-TrueValue = -391.884;
+TrueValue = 44.38422052003;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -238,7 +172,7 @@ itest = itest + 1;
 
 % ----------------------------------------------------------
 
-%% CASE 3A: TEMPERATURE CONVERSIONS FOR C TO K%%
+%% CASE 3A: MASS CONVERSIONS FOR SLUGS TO LBM%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,7 +183,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=898;
+TestIn=321.5398;
 
 % ----------------------------------------------------------
 
@@ -259,11 +193,11 @@ TestIn=898;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','K');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'slug','lbm');
 
 % list the correct values of the output
-TrueValue = 1171.15;
+TrueValue = 10345.237183;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -271,7 +205,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3B: TEMPERATURE CONVERSIONS FOR C TO R%%
+%% CASE 3B: MASS CONVERSIONS FOR SLUGS TO KG%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -282,7 +216,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=9.34523;
+TestIn=360.04;
 
 % ----------------------------------------------------------
 
@@ -292,145 +226,11 @@ TestIn=9.34523;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','R');
+% compute the mass conversion
+TestValue=UnitConversionPkg.ConvMass(TestIn,'slug','kg');
 
 % list the correct values of the output
-TrueValue = 508.491414;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 3C: TEMPERATURE CONVERSIONS FOR C TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=3743.2344;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','F');
-
-% list the correct values of the output
-TrueValue = 6769.82192;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-% ----------------------------------------------------------
-
-%% CASE 4A: TEMPERATURE CONVERSIONS FOR F TO K%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=3743.2344;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','K');
-
-% list the correct values of the output
-TrueValue = 2334.94688889;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 4B: TEMPERATURE CONVERSIONS FOR F TO R%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=630;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','R');
-
-% list the correct values of the output
-TrueValue = 1089.67;
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 4C: TEMPERATURE CONVERSIONS FOR F TO C%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be converted
-
-TestIn=638.873;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','C');
-
-% list the correct values of the output
-TrueValue = 337.1516667;
+TrueValue = 5254.38884;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -453,7 +253,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "ConvTemp tests passed!\n");
+    fprintf(1, "ConvMass tests passed!\n");
     
     % return success
     Success = 1;
@@ -461,7 +261,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "ConvTemp tests failed:\n");
+    fprintf(1, "ConvMass tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

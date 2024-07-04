@@ -118,7 +118,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "ConvLength tests passed!\n");
+    fprintf(1, "ConvTSFC tests passed!\n");
     
     % return success
     Success = 1;
@@ -126,7 +126,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "ConvLength tests failed:\n");
+    fprintf(1, "ConvTSFC tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

@@ -80,26 +80,26 @@ Aircraft.Specs.Aero.L_D.Crs = NaN; %18.23 * crLDcf;
 % assume same lift-drag ratio during climb and descent
 Aircraft.Specs.Aero.L_D.Des = Aircraft.Specs.Aero.L_D.Clb;
 
-% wing loading (lbf / ft^2)
+% wing loading (kg / m^2)
 Aircraft.Specs.Aero.W_S.SLS = 79000/126.5;
 
 
 %% WEIGHTS %%
 %%%%%%%%%%%%%
 
-% maximum takeoff weight (lbm)
+% maximum takeoff weight (kg)
 Aircraft.Specs.Weight.MTOW = 79000;
 
-% electric generator weight (lbm)
+% electric generator weight (kg)
 Aircraft.Specs.Weight.EG = NaN;
 
-% electric motor weight (lbm)
+% electric motor weight (kg)
 Aircraft.Specs.Weight.EM = NaN;
 
-% block fuel weight (lbm)
+% block fuel weight (kg)
 Aircraft.Specs.Weight.Fuel = 19000;
 
-% battery weight (lbm), leave NaN for propulsion systems without batteries
+% battery weight (kg), leave NaN for propulsion systems without batteries
 Aircraft.Specs.Weight.Batt = NaN;
 
 
@@ -108,7 +108,7 @@ Aircraft.Specs.Weight.Batt = NaN;
 
 % ** required **
 % propulsion architecture, can be either:
-% 'AC'  = conventional
+% 'C'  = conventional
 % 'E'   = fully electric
 % 'PHE' = parallel hybrid electric
 % 'SHE' = series hybrid electric

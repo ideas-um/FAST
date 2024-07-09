@@ -63,16 +63,16 @@ Mission.ClbRate = [NaN; NaN; NaN; NaN; NaN;
     NaN; NaN; NaN; NaN; NaN];
 
 % define the starting/ending speeds (in m/s or mach)
-Mission.VelBeg  = [0; UnitConversionPkg.ConvVel([250; 250], 'kts', 'm/s'); 0.785; 0.785;
-    UnitConversionPkg.ConvVel([250; 250], 'kts', 'm/s'); 0.785; 0.785; UnitConversionPkg.ConvVel(250, 'kts', 'm/s')];
-Mission.VelEnd  = [UnitConversionPkg.ConvVel([250; 250], 'kts', 'm/s'); 0.785; 0.785; UnitConversionPkg.ConvVel([250; 250], 'kts', 'm/s')
-    0.785; 0.785; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0];
+Mission.VelBeg  = [0; 0.3; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785;
+    0.3; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785; 0.3];
+Mission.VelEnd  = [0.3; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785; 0.3;
+    UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785; 0.3; 0];
 
 % define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["TAS"; "TAS"; "TAS"; "Mach"; "Mach";
-    "TAS"; "TAS"; "Mach"; "Mach"; "TAS"];
-Mission.TypeEnd = ["TAS"; "TAS"; "Mach"; "Mach"; "TAS";
-    "TAS"; "Mach"; "Mach";  "TAS"; "TAS"];
+Mission.TypeBeg = ["EAS"; "Mach"; "EAS"; "Mach"; "Mach";
+    "Mach"; "EAS"; "Mach"; "Mach"; "Mach"];
+Mission.TypeEnd = ["Mach"; "EAS"; "Mach"; "Mach"; "Mach";
+    "EAS"; "Mach"; "Mach";  "Mach"; "EAS"];
 
 
 %% REMEMBER THE MISSION PROFILE %%

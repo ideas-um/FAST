@@ -108,7 +108,7 @@ Aircraft.Specs.Weight.Batt = NaN;
 
 % ** required **
 % propulsion architecture, can be either:
-% 'AC'  = conventional
+% 'C'  = conventional
 % 'E'   = fully electric
 % 'PHE' = parallel hybrid electric
 % 'SHE' = series hybrid electric

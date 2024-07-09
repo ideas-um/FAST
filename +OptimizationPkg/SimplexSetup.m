@@ -63,8 +63,8 @@ Class = Specs.TLAR.Class;
 History = Aircraft.Mission.History.SI;
 
 % power output/available
-Pout = History.Power.Out(ielem);
-Pav  = History.Power.Av( ielem);
+Pout = sum(History.Power.Pout_TS(ielem,:), 2);
+Pav  = sum(History.Power.Pav_TS( ielem, :), 2);
 
 % thrust-specific fuel consumption
 TSFC = History.Propulsion.TSFC(ielem);

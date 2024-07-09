@@ -43,7 +43,8 @@ BasicLoc = cumsum(IsBasic);
 % get the number of basic variables (should be equal to nvar - ncon)
 nbasic = BasicLoc(end);
 
-% perform sanity check
+% perform sanity check % this doesnt seem right, should it be number of
+% rows?
 if ((nvar - nbasic) ~= (nvar - ncon))
     error("ERROR - SimplexSolve: check number of basic variables.");
 end

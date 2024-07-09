@@ -56,7 +56,7 @@ tic;
 while (iter < MaxIter)
     
     % fly the mission
-    Aircraft = MissionSegsPkg.FlyMission(Aircraft, ProfileFxn);
+    Aircraft = MissionSegsPkg.FlyMission(Aircraft);
     
     % reset the power split counter (for the next mission)
     Aircraft.PowerOpt.PhiCount = 1;

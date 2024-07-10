@@ -3,7 +3,7 @@ function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Par
 % [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 % written by Sasha Kryuchkov
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 jun 2024
+% last updated: 10 jul 2024
 %
 % Model (dis)charging for a Lithium-ion battery.
 %
@@ -87,8 +87,8 @@ end
 Time = Time ./ 3600;
 
 
-%% BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%
+%% BATTERY MODEL --- DISCHARGE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % nominal cell voltage [V]
 VoTemp = 4.0880;%3.6;
@@ -150,14 +150,23 @@ for itime = 1:ntime
     % compute the power required per cell
     TVreq_es_cell = Preq(itime) ./ ncell;
     
-    % compute the hot cell voltage
-    VoltageCellHot = -(PolarizedVoTemp ./ (SOC(itime) / 100) + ResistanceTemp);
-    
     % compute the initial discharged capacity
     DischargedCapacityStart = (1 - (SOC(itime) / 100)) .* Q;
-    
+        
+    if (Preq >= 0)
+        
+        % compute the hot cell voltage
+        VoltageCellHot = -(PolarizedVoTemp ./ (SOC(itime) / 100) + ResistanceTemp);
+        
+    else
+        
+        % compute the hot cell voltage
+        VoltageCellHot = PolarizedVoTemp ./ ((DischargedCapacityStart + 0.1 * Q) ./ Q) + ResistanceTemp;
+        
+    end
+        
     % compute the cold cell voltage
-    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp(1) .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart);
+    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart);
     
     % solve the polynomial to find the minimum current
     CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell];
@@ -165,23 +174,44 @@ for itime = 1:ntime
     % find the root
     CurrBatt = roots(CurrBattPoly);
     
-    % check if the current is less than 0
-    CurrBatt(CurrBatt < 0) = NaN;
-    
-    % minimize the current
-    CurrBatt = min(CurrBatt, [], 1);
-    
+    if (Preq >= 0)
+        
+        % check if the current is less than 0
+        CurrBatt(CurrBatt < 0) = NaN;
+        
+        % minimize the current
+        CurrBatt = min(CurrBatt, [], 1);
+        
+    else
+        
+        % check if the current is greater than 0
+        CurrBatt(CurrBatt > 0) = NaN;
+        
+        % maximize the current (because it is negative)
+        CurrBatt = max(CurrBatt, [], 1);
+        
+    end
+        
     % check for NaN
     CurrBatt(isnan(CurrBatt)) = 0;
     
     % check for any imaginary currents
     if (any(~isreal(CurrBatt)))
         
-        % get the 2-norm (magnitude) of the complex current (initial guess)
-        CurrBatt = norm(CurrBatt);
+        if (Preq >= 0)
+            
+            % get the 2-norm (magnitude) of the complex current (initial guess)
+            CurrBatt = norm(CurrBatt);
+            
+        else
+            
+            % get the 2-norm (magnitude) of the complex current (initial guess)
+            CurrBatt = -norm(CurrBatt);
+            
+        end
         
         % assume a range of currents
-        CurrBattTemp = [CurrBatt - 10 : 0.1 : CurrBatt + 10];
+        CurrBattTemp = CurrBatt - 10 : 0.1 : CurrBatt + 10;
         
         % compute the cell voltages
         VoltageCellTemp = VoltageCellCold + VoltageCellHot * CurrBattTemp;

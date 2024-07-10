@@ -1,8 +1,8 @@
 function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 %
 % [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
-% written by Sasha Kryuchkov
-% modified by Paul Mokotoff, prmoko@umich.edu
+% originally written by Sasha Kryuchkov
+% overhauled by Paul Mokotoff, prmoko@umich.edu
 % last updated: 10 jul 2024
 %
 % Model (dis)charging for a Lithium-ion battery.
@@ -87,62 +87,43 @@ end
 Time = Time ./ 3600;
 
 
-%% BATTERY MODEL --- DISCHARGE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BATTERY QUANTITIES FOR A LITHIUM ION CELL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % nominal cell voltage [V]
-VoTemp = 4.0880;%3.6;
-
-% polarization voltage --> currently unknown
+VoTemp = 4.0880;
 
 % internal resistance [Ohm]
-ResistanceTemp = 0.0199;%0.01385;
-
-% SOC Limit --> skip for now, want to omit for sizing
+ResistanceTemp = 0.0199;
 
 % compute the number of cells in the battery pack
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-A = 0.0986;%0.311;
+A = 0.0986;
 
 % exponential capacity [(Ah)^-1]
-B = 30;%3 / 0.1277;
-
-% % constant voltage [V]
-% E0 = 3.889;
-% 
-% % Nominal voltage [V]
-% E_nom = 3.6;
-% 
-% % nominal capacity [Ah]
-% Q_nom = 2.351;
-
-% internal resistance [Ohms]
-R = 0.01385;
+B = 30;
 
 % maximum capacity
-Q = 3;%2.6;
+Q = 3;
 
 % discharge curve slope (taken from E-PASS)
 DischargeCurveSlope = 0.29732;
 
-% Calculate the drawn current [A] - initial guess 
-% current = Preq ./ E0;
-
-% compute the polarization resistance
-% K = (-E_nom + E0 + A * exp(-B * Q_nom) * (Q - Q_nom)) ./ ...
-%     (Q * (Q_nom + abs(current)));
-
 % compute the polarization voltage (taken from E-PASS)
-PolarizedVoTemp = 0.0011;%K .* current;
+PolarizedVoTemp = 0.0011;
+
+
+%% MODEL BATTERY (DIS)CHARGING %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get the SOC
 SOC      = repmat(SOCBeg, ntime, 1);
-Current  = zeros(ntime, 1);
-Capacity = zeros(ntime, 1);
-Voltage  = zeros(ntime, 1);
-Pout     = zeros(ntime, 1);
+Current  = zeros(         ntime, 1);
+Capacity = zeros(         ntime, 1);
+Voltage  = zeros(         ntime, 1);
+Pout     = zeros(         ntime, 1);
 
 % loop through all points
 for itime = 1:ntime
@@ -250,157 +231,6 @@ end
 % remove the first SOC value
 SOC(1) = [];
 
-% %% FAST BATTERY MODEL %%
-% 
-% % exponential voltage [V]
-% A = Series * 0.311;
-% 
-% % exponential capacity [(Ah)^-1]
-% B = Parallel * 3 / 0.1277;
-% 
-% % constant voltage [V]
-% E0 = Series * 3.889;
-% 
-% % Nominal voltage [V]
-% E_nom = Series * 3.6;
-% 
-% % nominal capacity [Ah]
-% Q_nom = Parallel * 2.351;
-% 
-% % internal resistance [Ohms]
-% R = 0.01385;
-% 
-% % maximum capacity
-% Q = Parallel * 2.6;
-% 
-% % Calculate the drawn current [A] - initial guess 
-% current = Preq ./ E0;
-% 
-% % Calculate the extracted capacity [Ah].
-% QExt = Time .* current;
-% 
-% % Calculate the polarization constant/resistance [Ohms] The absolute value 
-% % is there to prevent from Q_act become a negative value when the battery
-% % is charging.
-% K = (-E_nom + E0 + A * exp(-B * Q_nom) * (Q - Q_nom)) ./ ...
-%     (Q * (Q_nom + abs(current)));
-% 
-% % Pre-allocate the output vectors depending on the vector length
-% Voltage = zeros(ntime,1);
-% SOC = zeros(ntime,1);
-% Current = zeros(ntime,1);
-% Capacity = zeros(ntime,1);
-% Pout = zeros(ntime,1);
-% 
-% % remember the initial charge as a function of time
-% Q_act_i = Q - SOCBeg / 100 * Q;
-% 
-% % calculate the initial discharge voltage
-% VInit = E0 - R * current(1) - ...
-%                   K(1) .* Q ./ (Q - Q_act_i) * current(1) - ...
-%                   K(1) .* Q ./ (Q - Q_act_i) * current(1) + ...
-%                   A .* exp(-B .* Q_act_i);
-% 
-% % get a cumulative sum of the charge consumed
-% Q_consumed = cumsum(QExt);
-%               
-% % begin the loop over the length of the vectors
-% for frame = 1:ntime
-%     
-%     % check if charging (current < 0) or discharging (current >= 0)
-%     if current(frame) >= 0
-%         
-%         % calculate the final discharge voltage
-%         Voltage(frame) = E0 - R * current(frame) - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) * current(frame) - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) * current(frame) + ...
-%         A .* exp(-B .* Q_consumed(frame));
-%         
-%         % calculate the final SOC
-%         SOC(frame) = SOCBeg - 100 * Q_consumed(frame) / Q;
-%         
-%         % calculate the capacity left from the discharge
-%         Capacity(frame) = Q - Q_consumed(frame);
-%         
-%         % Calculate the average power
-%         Pavg = (VInit + Voltage(frame)) / ...
-%                     2 * current(frame);
-%         
-%         % calculate the final current with the average power and final
-%         % voltage
-%         current_final = Pavg / Voltage(frame);
-%         
-%         % calculate the final voltage with the new current
-%         Voltage(frame) = E0 - R * current_final - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) * current_final - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) * current_final + ...
-%         A .* exp(-B .* Q_consumed(frame));
-%         
-%         % calculate the required power using the new final voltage and
-%         % the final current
-%         Pav = Voltage(frame) * current_final;
-%         
-%         % Check the required power against the power in the function
-%         % input
-%         if (Pav > Preq(frame))
-%             Pout(frame) = Preq(frame);
-%             
-%         elseif (Pav < Preq(frame))
-%             Pout(frame) = Pav;
-%             
-%         end
-%         
-%         % Calculate what the next inital voltage is
-%         VInit = Voltage(frame);
-%         
-%     elseif current(frame) < 0
-%         
-%         % calculate the charge voltage
-%         Voltage(frame) = E0 + R * current(frame) - ...
-%         K(frame) .* Q ./ (Q_consumed(frame) + 0.1 * Q) * current(frame) - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) .* Q_consumed(frame) + ...
-%         A .* exp(B .* Q_consumed(frame));
-%         
-%         % calculate the final SOC
-%         SOC(frame) = SOCBeg - 100 * Q_consumed(frame) / Q;
-%         
-%         % calculate the capacity left
-%         Capacity(frame) = Q - Q_consumed(frame);
-%         
-%         % Calculate the average power
-%         Pavg = (VInit + Voltage(frame)) / ...
-%                     2 * current(frame);
-%         
-%         % calculate the final current with the average power and final
-%         % voltage
-%         current_final = Pavg / Voltage(frame);
-%         
-%         % calculate the final voltage with the new current
-%         Voltage(frame) = E0 - R * current_final - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) * current_final - ...
-%         K(frame) .* Q ./ (Q - Q_consumed(frame)) + ...
-%         A .* exp(B .* Q_consumed(frame));
-%         
-%         % calculate the required power using the new final voltage and
-%         % the final current
-%         Pav = Voltage(frame) * current_final;
-%         
-%         % Check the required power against the power in the function
-%         % input
-%         if (Pav > Preq(frame))
-%             Pout(frame) = Preq(frame);
-%             
-%         elseif (Pav < Preq(frame))
-%             Pout(frame) = Pav;
-%             
-%         end
-%         
-%         % Calculate what the next inital voltage is
-%         VInit = Voltage(frame);
-%         
-%     end
-% end
-% Current = current;
 % ----------------------------------------------------------
 
 end

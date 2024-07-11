@@ -3,13 +3,15 @@ function [Aircraft] = ResizeBattery(Aircraft)
 % [Aircraft] = ResizeBattery(Aircraft)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 jun 2024
+% last updated: 11 jul 2024
 %
 % After an aircraft flies a mission, update its battery size. If a "simple"
 % battery model is used (not considering cells in series and parallel),
-% then only the battery weight is updated. If a "detailed" battery model is
-% used (considers cells in series and parallel), the number of cells in the
-% battery is also updated.
+% then only the battery weight is updated based on the energy required 
+% during the flight. If a "detailed" battery model is used (considers cells
+% in series and parallel), the number of cells in the battery is also
+% updated based on the final state of charge and the assumed maximum
+% C-rate.
 %
 % INPUTS:
 %     Aircraft - aircraft structure containing the mission just flown.
@@ -58,6 +60,9 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % acceptable SOC threshold
     MinSOC = 20;
     
+    % assume a maximum c-rate
+    MaxAllowCRate = 5;
+    
     % ------------------------------------------------------
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,6 +78,9 @@ if (Aircraft.Settings.DetailedBatt == 1)
     
     % SOC during flight
     SOC = Aircraft.Mission.History.SI.Power.SOC(:, Batt);
+    
+    % power consumed during flight
+    Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
     
     % ------------------------------------------------------
     
@@ -107,7 +115,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     ExistBattCap = QMax * Npar;
     
     % update number of cells in parallel (assume 1 cell per module, ./ Qmax is for aged cell capacity in EPASS, ./ 1 is for number of cells in parallel per module)
-    NparNew = ceil(ceil((ExistBattCap + DeltaSOC .* QMax .* Npar) ./ QMax) ./ 1);
+    NparSOC = ceil(ceil((ExistBattCap + DeltaSOC .* QMax .* Npar) ./ QMax) ./ 1);
     
     % ------------------------------------------------------
     
@@ -120,8 +128,32 @@ if (Aircraft.Settings.DetailedBatt == 1)
     %                            %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % skipping the "check power vs energy limit of battery" temporarily -
-    % need to modify it to check for the C-rate
+    % get the energy consumed by the battery during each segment
+    dEbatt = diff(Ebatt);
+    
+    % compute the C-rate (power in segment / energy consumed in segment)
+    C_rate = Pbatt(1:end-1) ./ dEbatt;
+    
+    % ignore all NaNs (set to 0)
+    C_rate(isnan(C_rate)) = 0;
+    
+    % check if the C-rate is exceeded
+    ExceedCRate = abs(C_rate) > MaxAllowCRate;
+    
+    % resize the battery if the C-rate is exceeded
+    if (any(ExceedCRate))
+        
+        % get the maximum C-rate
+        MaxCrate = max(abs(C_rate));
+        
+        % get the required number of cells in parallel
+        NparCrate = ceil(MaxCrate / MaxAllowCRate) * Npar;
+        
+    else
+        
+        NparCrate = 0;
+        
+    end
     
     % ------------------------------------------------------
     
@@ -134,12 +166,12 @@ if (Aircraft.Settings.DetailedBatt == 1)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % remember the new number of cells in parallel
-    Npar = NparNew;
+    Npar = max(NparSOC, NparCrate);
     
-%     % compute the number of battery cells (from E-PASS)
+%     % compute the number of battery cells (from E-PASS, not used)
 %     Ncells = Npar * Nser;
 % 
-%     % compute the required capacity (from E-PASS)
+%     % compute the required capacity (from E-PASS, not used)
 %     Qreq = Npar * QMax;
     
     % compute the mass of the battery (multiply by 3600 to convert from hr to seconds)
@@ -162,47 +194,6 @@ if (Aircraft.Settings.DetailedBatt == 1)
     Aircraft.Specs.Power.Battery.ParCells = Npar;
     
 end
-
-% 
-% % power consumed during flight
-% Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
-% 
-% 
-%     % ------------------------------------------------------
-%     
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     %                            %
-%     % check if the discharge     %
-%     % rate (C-rate) is too high  %
-%     %                            %
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     
-%     % assume a maximum c-rate
-%     MaxCRate = 5;
-%     
-%     % get the energy consumed by the battery during each segment
-%     dEbatt = diff(Ebatt);
-%     
-%     % compute the C-rate (power in segment / energy consumed in segment)
-%     C_rate = Pbatt(1:end-1) ./ dEbatt;
-%     
-%     % check if the C-rate is exceeded
-%     ExceedCRate = abs(C_rate) > MaxCRate;
-%     
-%     % assume no energy needs to be added
-%     E_add_crate = 0;
-%     
-%     % check if the c-rate exceeds the maximum c-rate
-%     if  any(ExceedCRate)
-%         
-%         % find largest power requirement when c-rate is exceeded
-%         PbattMax = max(Pbatt(ExceedCRate));
-%         
-%         % add more energy to the battery
-%         E_add_crate = ScaleCRate .* PbattMax ./ MaxCRate;
-%         
-%     end
-%     
 
 % ----------------------------------------------------------
 

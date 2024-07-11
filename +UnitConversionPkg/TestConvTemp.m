@@ -2,7 +2,7 @@ function [Success] = TestConvTemp()
 %
 % [Success] = TestConvTemp()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the temperature conversion script
 % is working properly.
@@ -36,8 +36,8 @@ itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1A: TEMPERATURE CONVERSIONS FOR K TO C%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1A: TEMPERATURE CONVERSIONS FOR K TO C %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=32.243;
+TestIn = 32.243;
 
 % ----------------------------------------------------------
 
@@ -58,7 +58,7 @@ TestIn=32.243;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','C');
 
 % list the correct values of the output
 TrueValue = -240.907;
@@ -69,8 +69,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1B: TEMPERATURE CONVERSIONS FOR K TO R%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1B: TEMPERATURE CONVERSIONS FOR K TO R %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -80,7 +80,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=3232.243;
+TestIn = 3232.243;
 
 % ----------------------------------------------------------
 
@@ -91,7 +91,7 @@ TestIn=3232.243;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','R');
 
 % list the correct values of the output
 TrueValue = 5818.0374;
@@ -102,8 +102,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1C: TEMPERATURE CONVERSIONS FOR K TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1C: TEMPERATURE CONVERSIONS FOR K TO F %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -113,7 +113,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=2380;
+TestIn = 2380;
 
 % ----------------------------------------------------------
 
@@ -124,7 +124,7 @@ TestIn=2380;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'K','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','F');
 
 % list the correct values of the output
 TrueValue = 3824.33;
@@ -135,10 +135,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 2A: TEMPERATURE CONVERSIONS FOR R TO K%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2A: TEMPERATURE CONVERSIONS FOR R TO K %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -148,7 +147,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=7.3421;
+TestIn = 7.3421;
 
 % ----------------------------------------------------------
 
@@ -159,7 +158,7 @@ TestIn=7.3421;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','K');
 
 % list the correct values of the output
 TrueValue = 4.07894444;
@@ -170,8 +169,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2B: TEMPERATURE CONVERSIONS FOR R TO C%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2B: TEMPERATURE CONVERSIONS FOR R TO C %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -181,7 +180,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=679.67;
+TestIn = 679.67;
 
 % ----------------------------------------------------------
 
@@ -192,7 +191,7 @@ TestIn=679.67;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','C');
 
 % list the correct values of the output
 TrueValue = 104.444444;
@@ -203,8 +202,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2C: TEMPERATURE CONVERSIONS FOR R TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2C: TEMPERATURE CONVERSIONS FOR R TO F %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -214,7 +213,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=67.786;
+TestIn = 67.786;
 
 % ----------------------------------------------------------
 
@@ -225,7 +224,7 @@ TestIn=67.786;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'R','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','F');
 
 % list the correct values of the output
 TrueValue = -391.884;
@@ -236,10 +235,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 3A: TEMPERATURE CONVERSIONS FOR C TO K%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3A: TEMPERATURE CONVERSIONS FOR C TO K %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -249,7 +247,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=898;
+TestIn = 898;
 
 % ----------------------------------------------------------
 
@@ -260,7 +258,7 @@ TestIn=898;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','K');
 
 % list the correct values of the output
 TrueValue = 1171.15;
@@ -271,8 +269,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3B: TEMPERATURE CONVERSIONS FOR C TO R%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3B: TEMPERATURE CONVERSIONS FOR C TO R %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -282,7 +280,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=9.34523;
+TestIn = 9.34523;
 
 % ----------------------------------------------------------
 
@@ -293,7 +291,7 @@ TestIn=9.34523;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','R');
 
 % list the correct values of the output
 TrueValue = 508.491414;
@@ -304,8 +302,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3C: TEMPERATURE CONVERSIONS FOR C TO F%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3C: TEMPERATURE CONVERSIONS FOR C TO F %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -315,7 +313,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=3743.2344;
+TestIn = 3743.2344;
 
 % ----------------------------------------------------------
 
@@ -326,7 +324,7 @@ TestIn=3743.2344;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'C','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','F');
 
 % list the correct values of the output
 TrueValue = 6769.82192;
@@ -337,10 +335,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 4A: TEMPERATURE CONVERSIONS FOR F TO K%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4A: TEMPERATURE CONVERSIONS FOR F TO K %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -350,7 +347,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=3743.2344;
+TestIn = 3743.2344;
 
 % ----------------------------------------------------------
 
@@ -361,7 +358,7 @@ TestIn=3743.2344;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','K');
 
 % list the correct values of the output
 TrueValue = 2334.94688889;
@@ -372,8 +369,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 4B: TEMPERATURE CONVERSIONS FOR F TO R%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4B: TEMPERATURE CONVERSIONS FOR F TO R %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -383,7 +380,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=630;
+TestIn = 630;
 
 % ----------------------------------------------------------
 
@@ -394,7 +391,7 @@ TestIn=630;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','R');
 
 % list the correct values of the output
 TrueValue = 1089.67;
@@ -405,8 +402,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 4C: TEMPERATURE CONVERSIONS FOR F TO C%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4C: TEMPERATURE CONVERSIONS FOR F TO C %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -416,7 +413,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=638.873;
+TestIn = 638.873;
 
 % ----------------------------------------------------------
 
@@ -427,7 +424,7 @@ TestIn=638.873;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue=UnitConversionPkg.ConvTemp(TestIn,'F','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','C');
 
 % list the correct values of the output
 TrueValue = 337.1516667;

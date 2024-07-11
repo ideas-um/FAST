@@ -2,7 +2,7 @@ function [Success] = TestConvMass()
 %
 % [Success] = TestConvMass()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the mass conversion script
 % is working properly.
@@ -36,8 +36,8 @@ itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1A: MASS CONVERSIONS FOR LBM TO KG%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1A: MASS CONVERSIONS FOR LBM TO KG %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=2.8373;
+TestIn = 2.8373;
 
 % ----------------------------------------------------------
 
@@ -58,7 +58,7 @@ TestIn=2.8373;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'lbm','kg');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'lbm','kg');
 
 % list the correct values of the output
 TrueValue = 1.28697763;
@@ -69,8 +69,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1B: MASS CONVERSIONS FOR LBM TO SLUGS%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1B: MASS CONVERSIONS FOR LBM TO SLUGS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -80,7 +80,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=465.7;
+TestIn = 465.7;
 
 % ----------------------------------------------------------
 
@@ -91,7 +91,7 @@ TestIn=465.7;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'lbm','slug');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'lbm','slug');
 
 % list the correct values of the output
 TrueValue = 14.474398;
@@ -102,10 +102,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 2A: MASS CONVERSIONS FOR KG TO LBM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2A: MASS CONVERSIONS FOR KG TO LBM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -115,7 +114,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=84.2883;
+TestIn = 84.2883;
 
 % ----------------------------------------------------------
 
@@ -126,7 +125,7 @@ TestIn=84.2883;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'kg','lbm');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'kg','lbm');
 
 % list the correct values of the output
 TrueValue = 185.8238929;
@@ -137,8 +136,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2B: MASS CONVERSIONS FOR KG TO SLUGS%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2B: MASS CONVERSIONS FOR KG TO SLUGS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -148,7 +147,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=647.739009;
+TestIn = 647.739009;
 
 % ----------------------------------------------------------
 
@@ -159,7 +158,7 @@ TestIn=647.739009;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'kg','slug');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'kg','slug');
 
 % list the correct values of the output
 TrueValue = 44.38422052003;
@@ -170,10 +169,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 3A: MASS CONVERSIONS FOR SLUGS TO LBM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3A: MASS CONVERSIONS FOR SLUGS TO LBM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -183,7 +181,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=321.5398;
+TestIn = 321.5398;
 
 % ----------------------------------------------------------
 
@@ -194,7 +192,7 @@ TestIn=321.5398;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'slug','lbm');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'slug','lbm');
 
 % list the correct values of the output
 TrueValue = 10345.237183;
@@ -205,8 +203,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3B: MASS CONVERSIONS FOR SLUGS TO KG%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3B: MASS CONVERSIONS FOR SLUGS TO KG %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -216,7 +214,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=360.04;
+TestIn = 360.04;
 
 % ----------------------------------------------------------
 
@@ -227,7 +225,7 @@ TestIn=360.04;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue=UnitConversionPkg.ConvMass(TestIn,'slug','kg');
+TestValue = UnitConversionPkg.ConvMass(TestIn,'slug','kg');
 
 % list the correct values of the output
 TrueValue = 5254.38884;

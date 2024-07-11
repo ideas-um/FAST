@@ -2,7 +2,7 @@ function [Success] = TestConvTSFC()
 %
 % [Success] = TestConvTSFC()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the TSFC conversion script
 % is working properly.
@@ -36,8 +36,8 @@ itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1: TSFC CONVERSIONS FOR SI TO IMP%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1: TSFC CONVERSIONS FOR SI TO IMP %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=1.826;
+TestIn = 1.826;
 
 % ----------------------------------------------------------
 
@@ -58,7 +58,7 @@ TestIn=1.826;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the force conversion
-TestValue=UnitConversionPkg.ConvTSFC(TestIn,'SI','Imp');
+TestValue = UnitConversionPkg.ConvTSFC(TestIn,'SI','Imp');
 
 % list the correct values of the output
 TrueValue = 64464.99444;
@@ -69,10 +69,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 2: TSFC CONVERSIONS FOR IMP TO SI%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2: TSFC CONVERSIONS FOR IMP TO SI %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -82,7 +81,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=1103.245;
+TestIn = 1103.245;
 
 % ----------------------------------------------------------
 
@@ -93,7 +92,7 @@ TestIn=1103.245;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the TSFC conversion
-TestValue=UnitConversionPkg.ConvTSFC(TestIn,'Imp','SI');
+TestValue = UnitConversionPkg.ConvTSFC(TestIn,'Imp','SI');
 
 % list the correct values of the output
 TrueValue = 0.03124991148;

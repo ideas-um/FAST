@@ -2,7 +2,7 @@ function [Success] = TestConvForce()
 %
 % [Success] = TestConvForce()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the force conversion script
 % is working properly.
@@ -36,8 +36,8 @@ itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1: FORCE CONVERSIONS FOR N TO LBF%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1: FORCE CONVERSIONS FOR N TO LBF %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=738;
+TestIn = 738;
 
 % ----------------------------------------------------------
 
@@ -69,10 +69,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 2: FORCE CONVERSIONS FOR LBF TO N%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2: FORCE CONVERSIONS FOR LBF TO N %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -82,7 +81,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=23453.829;
+TestIn = 23453.829;
 
 % ----------------------------------------------------------
 
@@ -93,7 +92,7 @@ TestIn=23453.829;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvForce(TestIn,'lbf','N');
+TestValue = UnitConversionPkg.ConvForce(TestIn,'lbf','N');
 
 % list the correct values of the output
 TrueValue = 104327.828761;
@@ -118,7 +117,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "ConvLength tests passed!\n");
+    fprintf(1, "ConvForce tests passed!\n");
     
     % return success
     Success = 1;
@@ -126,7 +125,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "ConvLength tests failed:\n");
+    fprintf(1, "ConvForce tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

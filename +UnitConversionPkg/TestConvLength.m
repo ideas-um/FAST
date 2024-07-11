@@ -2,7 +2,7 @@ function [Success] = TestConvLength()
 %
 % [Success] = TestConvLength()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the length conversion script
 % is working properly.
@@ -36,8 +36,8 @@ itest = 1;
 
 % ----------------------------------------------------------
 
-%% CASE 1A: LENGTH CONVERSIONS FOR FT TO M%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1A: LENGTH CONVERSIONS FOR FT TO M %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -47,7 +47,7 @@ itest = 1;
 
 % define the value to be converted
 
-TestIn=700;
+TestIn = 700;
 
 % ----------------------------------------------------------
 
@@ -58,7 +58,7 @@ TestIn=700;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'ft','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','m');
 
 % list the correct values of the output
 TrueValue = 213.36;
@@ -69,8 +69,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1B: LENGTH CONVERSIONS FOR FT TO KM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1B: LENGTH CONVERSIONS FOR FT TO KM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -80,7 +80,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=7232.4;
+TestIn = 7232.4;
 
 % ----------------------------------------------------------
 
@@ -91,7 +91,7 @@ TestIn=7232.4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'ft','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','km');
 
 % list the correct values of the output
 TrueValue = 2.20443552;
@@ -102,8 +102,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1C: LENGTH CONVERSIONS FOR FT TO MI%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1C: LENGTH CONVERSIONS FOR FT TO MI %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -113,7 +113,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=836.34;
+TestIn = 836.34;
 
 % ----------------------------------------------------------
 
@@ -124,7 +124,7 @@ TestIn=836.34;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'ft','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','mi');
 
 % list the correct values of the output
 TrueValue = 0.1583971367;
@@ -135,8 +135,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 1D: LENGTH CONVERSIONS FOR FT TO NM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1D: LENGTH CONVERSIONS FOR FT TO NM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -146,7 +146,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=749.234;
+TestIn = 749.234;
 
 % ----------------------------------------------------------
 
@@ -157,7 +157,7 @@ TestIn=749.234;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'ft','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','naut mi');
 
 % list the correct values of the output
 TrueValue = 0.123308;
@@ -168,10 +168,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 2A: LENGTH CONVERSIONS FOR M TO FT%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2A: LENGTH CONVERSIONS FOR M TO FT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -181,7 +180,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=8349.2;
+TestIn = 8349.2;
 
 % ----------------------------------------------------------
 
@@ -192,7 +191,7 @@ TestIn=8349.2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'m','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'m','ft');
 
 % list the correct values of the output
 TrueValue = 27392.388451;
@@ -203,8 +202,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2B: LENGTH CONVERSIONS FOR M TO KM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2B: LENGTH CONVERSIONS FOR M TO KM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -214,7 +213,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=826;
+TestIn = 826;
 
 % ----------------------------------------------------------
 
@@ -225,7 +224,7 @@ TestIn=826;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'m','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'m','km');
 
 % list the correct values of the output
 TrueValue = 0.826;
@@ -236,8 +235,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2C: LENGTH CONVERSIONS FOR M TO MI%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2C: LENGTH CONVERSIONS FOR M TO MI %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -247,7 +246,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=726.9;
+TestIn = 726.9;
 
 % ----------------------------------------------------------
 
@@ -258,7 +257,7 @@ TestIn=726.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'m','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'m','mi');
 
 % list the correct values of the output
 TrueValue = 0.4516730357;
@@ -269,8 +268,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 2D: LENGTH CONVERSIONS FOR M TO NM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2D: LENGTH CONVERSIONS FOR M TO NM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -280,7 +279,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=829.9;
+TestIn = 829.9;
 
 % ----------------------------------------------------------
 
@@ -291,7 +290,7 @@ TestIn=829.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'m','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'m','naut mi');
 
 % list the correct values of the output
 TrueValue = 0.44811;
@@ -302,10 +301,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 3A: LENGTH CONVERSIONS FOR KM TO FT%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3A: LENGTH CONVERSIONS FOR KM TO FT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -315,7 +313,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=4793;
+TestIn = 4793;
 
 % ----------------------------------------------------------
 
@@ -326,7 +324,7 @@ TestIn=4793;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'km','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'km','ft');
 
 % list the correct values of the output
 TrueValue = 15725065.617;
@@ -337,8 +335,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3B: LENGTH CONVERSIONS FOR KM TO M%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3B: LENGTH CONVERSIONS FOR KM TO M %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -348,7 +346,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=233.9;
+TestIn = 233.9;
 
 % ----------------------------------------------------------
 
@@ -359,7 +357,7 @@ TestIn=233.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'km','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'km','m');
 
 % list the correct values of the output
 TrueValue = 233900;
@@ -370,8 +368,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3C: LENGTH CONVERSIONS FOR KM TO MI%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3C: LENGTH CONVERSIONS FOR KM TO MI %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -381,7 +379,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=395;
+TestIn = 395;
 
 % ----------------------------------------------------------
 
@@ -392,7 +390,7 @@ TestIn=395;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'km','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'km','mi');
 
 % list the correct values of the output
 TrueValue = 245.44070588;
@@ -403,8 +401,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3D: LENGTH CONVERSIONS FOR KM TO NM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3D: LENGTH CONVERSIONS FOR KM TO NM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -414,7 +412,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=83;
+TestIn = 83;
 
 % ----------------------------------------------------------
 
@@ -425,7 +423,7 @@ TestIn=83;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'km','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'km','naut mi');
 
 % list the correct values of the output
 TrueValue = 44.81641;
@@ -436,10 +434,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 4A: LENGTH CONVERSIONS FOR MI TO FT%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4A: LENGTH CONVERSIONS FOR MI TO FT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -449,7 +446,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=739.002;
+TestIn = 739.002;
 
 % ----------------------------------------------------------
 
@@ -460,7 +457,7 @@ TestIn=739.002;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'mi','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','ft');
 
 % list the correct values of the output
 TrueValue = 3901945.1073;
@@ -471,8 +468,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 4B: LENGTH CONVERSIONS FOR MI TO M%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4B: LENGTH CONVERSIONS FOR MI TO M %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -482,7 +479,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=19;
+TestIn = 19;
 
 % ----------------------------------------------------------
 
@@ -493,7 +490,7 @@ TestIn=19;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'mi','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','m');
 
 % list the correct values of the output
 TrueValue = 30577.65;
@@ -504,8 +501,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 4C: LENGTH CONVERSIONS FOR MI TO KM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4C: LENGTH CONVERSIONS FOR MI TO KM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -515,7 +512,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=6378;
+TestIn = 6378;
 
 % ----------------------------------------------------------
 
@@ -526,7 +523,7 @@ TestIn=6378;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'mi','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','km');
 
 % list the correct values of the output
 TrueValue = 10264.4343;
@@ -537,8 +534,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 4D: LENGTH CONVERSIONS FOR MI TO NM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 4D: LENGTH CONVERSIONS FOR MI TO NM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -548,7 +545,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=324.453;
+TestIn = 324.453;
 
 % ----------------------------------------------------------
 
@@ -559,7 +556,7 @@ TestIn=324.453;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'mi','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','naut mi');
 
 % list the correct values of the output
 TrueValue = 281.9419;
@@ -570,10 +567,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
-%% CASE 5A: LENGTH CONVERSIONS FOR NM TO FT%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 5A: LENGTH CONVERSIONS FOR NM TO FT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -583,7 +579,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=73;
+TestIn = 73;
 
 % ----------------------------------------------------------
 
@@ -594,7 +590,7 @@ TestIn=73;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'naut mi','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','ft');
 
 % list the correct values of the output
 TrueValue = 443556.4;
@@ -605,8 +601,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 5B: LENGTH CONVERSIONS FOR NM TO M%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 5B: LENGTH CONVERSIONS FOR NM TO M %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -616,7 +612,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=85.3812;
+TestIn = 85.3812;
 
 % ----------------------------------------------------------
 
@@ -627,7 +623,7 @@ TestIn=85.3812;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'naut mi','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','m');
 
 % list the correct values of the output
 TrueValue = 158126;
@@ -638,8 +634,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 5C: LENGTH CONVERSIONS FOR NM TO KM%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 5C: LENGTH CONVERSIONS FOR NM TO KM %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -649,7 +645,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=283;
+TestIn = 283;
 
 % ----------------------------------------------------------
 
@@ -660,7 +656,7 @@ TestIn=283;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'naut mi','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','km');
 
 % list the correct values of the output
 TrueValue = 524.116;
@@ -671,8 +667,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 5D: LENGTH CONVERSIONS FOR NM TO MI%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 5D: LENGTH CONVERSIONS FOR NM TO MI %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -682,7 +678,7 @@ itest = itest + 1;
 
 % define the value to be converted
 
-TestIn=10.264;
+TestIn = 10.264;
 
 % ----------------------------------------------------------
 
@@ -693,7 +689,7 @@ TestIn=10.264;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue=UnitConversionPkg.ConvLength(TestIn,'naut mi','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','mi');
 
 % list the correct values of the output
 TrueValue = 11.8116;

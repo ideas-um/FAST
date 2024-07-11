@@ -2,7 +2,7 @@ function [Success] = TestConvVel()
 %
 % [Success] = TestConvVel()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 4 Jul 2024
+% last updated: 11 jul 2024
 %
 % Generate simple test cases to confirm that the velocity conversion script
 % is working properly.
@@ -37,7 +37,7 @@ itest = 1;
 % ----------------------------------------------------------
 
 %% CASE 1A: VELOCITY CONVERSIONS FOR FT/S TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -70,7 +70,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 1B: VELOCITY CONVERSIONS FOR FT/S TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -103,7 +103,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 1C: VELOCITY CONVERSIONS FOR FT/S TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -136,7 +136,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 1D: VELOCITY CONVERSIONS FOR FT/S TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -169,7 +169,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 1E: VELOCITY CONVERSIONS FOR FT/S TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -202,7 +202,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 1F: VELOCITY CONVERSIONS FOR FT/S TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -234,8 +234,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2A: VELOCITY CONVERSIONS FOR M/S TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -268,7 +269,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 2B: VELOCITY CONVERSIONS FOR M/S TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -301,7 +302,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 2C: VELOCITY CONVERSIONS FOR M/S TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -334,7 +335,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 2D: VELOCITY CONVERSIONS FOR M/S TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -367,7 +368,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 2E: VELOCITY CONVERSIONS FOR M/S TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -400,7 +401,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 2F: VELOCITY CONVERSIONS FOR M/S TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -432,10 +433,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------\
 
 %% CASE 3A: VELOCITY CONVERSIONS FOR KM/S TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -467,7 +467,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3B: VELOCITY CONVERSIONS FOR KM/S TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -499,7 +499,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3C: VELOCITY CONVERSIONS FOR KM/S TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -531,7 +531,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3D: VELOCITY CONVERSIONS FOR KM/S TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -563,7 +563,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3E: VELOCITY CONVERSIONS FOR KM/S TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -595,7 +595,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3F: VELOCITY CONVERSIONS FOR KM/S TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -626,10 +626,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
 %% CASE 4A: VELOCITY CONVERSIONS FOR KM/H TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -661,7 +660,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 4B: VELOCITY CONVERSIONS FOR KM/H TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -693,7 +692,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 4C: VELOCITY CONVERSIONS FOR KM/H TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -725,7 +724,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 4D: VELOCITY CONVERSIONS FOR KM/H TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -757,7 +756,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 4E: VELOCITY CONVERSIONS FOR KM/H TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -789,7 +788,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 4F: VELOCITY CONVERSIONS FOR KM/H TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -820,10 +819,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
 %% CASE 5A: VELOCITY CONVERSIONS FOR MPH TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -855,7 +853,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 5B: VELOCITY CONVERSIONS FOR MPH TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -887,7 +885,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 5C: VELOCITY CONVERSIONS FOR MPH TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -919,7 +917,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 5D: VELOCITY CONVERSIONS FOR MPH TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -951,7 +949,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 5E: VELOCITY CONVERSIONS FOR MPH TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -983,7 +981,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 5F: VELOCITY CONVERSIONS FOR MPH TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1014,10 +1012,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
 %% CASE 6A: VELOCITY CONVERSIONS FOR KTS TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1049,7 +1046,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 6B: VELOCITY CONVERSIONS FOR KTS TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1081,7 +1078,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 6C: VELOCITY CONVERSIONS FOR KTS TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1113,7 +1110,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 6D: VELOCITY CONVERSIONS FOR KTS TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1145,7 +1142,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 6E: VELOCITY CONVERSIONS FOR KTS TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1177,7 +1174,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 6F: VELOCITY CONVERSIONS FOR KTS TO FT/MIN %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1208,10 +1205,9 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-% ----------------------------------------------------------
 
 %% CASE 7A: VELOCITY CONVERSIONS FOR FT/MIN TO FT/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1243,7 +1239,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 7B: VELOCITY CONVERSIONS FOR FT/MIN TO M/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1275,7 +1271,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 7C: VELOCITY CONVERSIONS FOR FT/MIN TO KM/S %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1307,7 +1303,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 7D: VELOCITY CONVERSIONS FOR FT/MIN TO KM/H %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1339,7 +1335,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 7E: VELOCITY CONVERSIONS FOR FT/MIN TO MPH %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -1371,7 +1367,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 7F: VELOCITY CONVERSIONS FOR FT/MIN TO KTS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %

@@ -2,8 +2,8 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 %
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
-% modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 04 apr 2024
+% modified by Nawa Khailany, prmoko@umich.edu
+% last modified: 10 Jul 2024
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
 % acceleration and maximum thrust/power from all power sources.
@@ -28,8 +28,17 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% gravitational acceleration------[scalar]
+g = 9.81;
+
 % weight: get the maximum takeoff weight
 MTOW = Aircraft.Specs.Weight.MTOW; 
+
+% wing loading: get the wing loading
+W_S = Aircraft.Specs.Aero.W_S.SLS;
+
+% area: get the wing area
+S = (1/W_S)*MTOW;
 
 % ----------------------------------------------------------
 
@@ -73,9 +82,6 @@ vtype = Aircraft.Mission.Profile.TypeEnd(SegsID);
 % gravitational acceleration------[scalar]
 g = 9.81;
 
-% ground rolling second------[scalar-second]
-TOffTime = 60; 
-
 % initial velocity is zero------[scalar]
 V_i = 0;
 
@@ -91,9 +97,6 @@ dISA = 0;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% time point------[npoint x 1]
-Time = linspace(0, TOffTime, npoint)';
-
 % rate of climb------[npoint x 1]
 dh_dt = zeros(npoint,1);
 
@@ -108,6 +111,9 @@ Mass = repmat(MTOW, npoint, 1);
 
 % memory for the fuel and battery energy remaining
 Eleft_ES = zeros(npoint, 1);
+
+% memory for Lift over Drag Ratio
+L_D = zeros(npoint,1);
 
 % get the energy source types
 Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
@@ -167,22 +173,164 @@ Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% convert the takeoff velocity to TAS
-[~, V_to, ~, ~, ~, ~, ~] = MissionSegsPkg.ComputeFltCon( ...
+% convert the takeoff velocity to TAS, and find Rho
+[~, V_to, ~, ~, ~, Rho, ~] = MissionSegsPkg.ComputeFltCon( ...
                            AltEnd, dISA, vtype, V_to);
 
-% assume acceleration is constant during ground rolling-------[scalar]
-dv_dt = (V_to - V_i) / TOffTime;
+% compute the CLmax
+CL_max = (2*MTOW*g)/(Rho(1)*((V_to/1.1)^2)*S);
 
-% the distance traveled in each time point------[npoint x 1]
-Dist = 0.5 .* dv_dt .* Time .^ 2;
+% compute the CDO
+CD0 = 0.0017; % hardcoded for now
 
-% instantenous velocity for each time------[npoint x 1]
-V_ins = dv_dt .* Time;
+% Compute the delta CD0 based on flaps and landing gear
+ % hardcode flaps
+flaps = 1;
+if (flaps == 1)
+    k_uc = 3.16e-5;
+else
+    k_uc = 5.81e-5;
+end
+dCD0 = W_S*k_uc*(MTOW^-0.215);
+
+% k1 and k3 estimations (hardcoded for now, incorporate geometry later)
+k1 = 0.02;
+k3 = 1/(pi*0.9*10);
+
+% G estimation (hardcoded for now, incorporate geometry later)
+G = 0.6;
+
+% compute the CD
+CD = CD0 + dCD0 + (k1 + G*k3)*(CL_max^2);
+
+% Pre-allocate Velocity Array
+VelArray = zeros(npoint,1);
+
+% Fill out Velocity Array
+for i = 1:npoint
+
+    VelSpacing = V_to/(npoint - 1);
+
+    VelArray(i) = (i - 1)*VelSpacing;
+
+end
+
+% Pre-allocate Acceleration Array
+AccArray = zeros(npoint,1);
+
+% Pre-allocate Thrust Array
+ThrArray = zeros(npoint,1);
+
+% Pre-allocate Drag Array
+DragArray = zeros(npoint,1);
+
+% Pre-allocate Distance Array
+DisArray = zeros(npoint,1);
+
+% Pre-allocate Time Array
+TimeArray = zeros(npoint,1);
+
+% Compute above Array values based on the time step (the first node is at 0
+% velocity). The acceleration at each node is computing the acceleration of
+% the segment between the previous node and the current node.
+for i = 1:npoint
+
+    if i == 1
+
+        % Thrust to NaN
+        ThrArray(i) = NaN;
+
+        % Compute Drag
+        DragArray(i) = 0.5.*Rho(1).*((VelArray(i)).^2).*CD.*S;
+    
+        % Compute Acceleration
+        AccArray(i) = 0;
+    
+        % Compute Distance
+        DisArray(i) = 0;
+
+        % Compute Time
+        TimeArray(i) = 0;
+
+
+    else
+
+        % Find Thrust based on aircraft class
+        switch Aircraft.Specs.TLAR.Class
+            case "Turbofan"
+                ThrArray(i) = Aircraft.Specs.Propulsion.Thrust.SLS;
+            case "Turboprop"
+                T_W = (Aircraft.Specs.Power.P_W.SLS/VelArray(i));
+                % thrust: Get the thrust
+                ThrArray(i) = T_W*(MTOW); 
+        end
+
+        % Compute Drag
+        DragArray(i) = 0.5.*Rho(1).*((VelArray(i)).^2).*CD.*S;
+    
+        % Compute Acceleration
+        AccArray(i) = (ThrArray(i) - DragArray(i))./MTOW;
+    
+        % Compute Distance
+        DisArray(i) = (VelArray(i).^2 - VelArray(i - 1).^2)./(2.*AccArray(i));
+    
+        % Compute Time between nodes
+        TimeArray(i) = (VelArray(i) - VelArray(i - 1))./AccArray(i);
+
+    end
+
+
+end
+
+% acceleration
+dv_dt = AccArray;
+
+% Allocate memory for Time
+Time = zeros(npoint,1)';
+
+% Find the global elapsed time at each node and store it at the Time array
+for i = 1:npoint
+    if i == 1
+        
+        Time(i) = 0;
+        TotalTime = 0;
+
+    else
+
+        TotalTime = TotalTime + TimeArray(i);
+        Time(i) = TotalTime;
+
+    end
+end
+
+% Compute Drag
+D = DragArray;
+
+% Compute L/D ratio
+L_D = repmat(CL_max/CD,npoint,1);
+
+% Allocate memory for Distance
+Dist = zeros(npoint,1);
+
+% Find the global elapsed distance at each node and store it in the Dist
+% array
+for i = 1:npoint
+    if i == 1
+        
+        Dist(i) = 0;
+        TotalDist = 0;
+
+    else
+
+        TotalDist = TotalDist + DisArray(i);
+        Dist(i) = TotalDist;
+
+    end
+end
 
 % get the flight conditions------[npoint x 1]      
 [EAS, TAS, Mach, ~, ~, Rho, ~] = MissionSegsPkg.ComputeFltCon(...
-                                 Alt, dISA, "TAS", V_ins);
+                                 Alt, dISA, "TAS", VelArray);
 
 % remember the flight conditions
 Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
@@ -194,20 +342,38 @@ Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-% for full throttle, recompute the operational power splits
-Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+% get the power available
+Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
 
-% assume all available power is for flying
-Preq = Inf(npoint, 1);
+% compute power to overcome drag --- new (ncases)
+DV = D .* TAS;
 
-% compute the specific excess power (will be 0 - did this b/c we don't know drag at takeoff)
-Ps = zeros(npoint, 1);
+% compute the specific excess power (ncases)
+Ps = (Pav - DV) ./ (Mass .* g);
 
-% kinetic Energy------[npoint x 1]
+% ------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        %
+% energy analysis        %
+%                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% potential energy (ncases)
+PE = Mass .* g .* Alt;
+
+% kinetic energy (ncases)
 KE = 0.5 .* Mass .* TAS .^ 2;
 
-% potential energy------[npoint x 1]
-PE = Mass .* g .* Alt;
+% power overcame (ncases)
+dPE_dt = Mass .* g   .* dh_dt;
+dKE_dt = Mass .* TAS .* AccArray;
+
+% power required (ncases)
+Preq = dPE_dt + dKE_dt + DV;
+
+% thrust required
+Treq = Preq ./ TAS;
 
 % ----------------------------------------------------------
 
@@ -240,6 +406,10 @@ Aircraft.Mission.History.SI.Performance.RC(  SegBeg:SegEnd) = dh_dt; % m/s
 Aircraft.Mission.History.SI.Performance.Acc( SegBeg:SegEnd) = dv_dt; % m / s^2
 Aircraft.Mission.History.SI.Performance.FPA( SegBeg:SegEnd) = FPA  ; % deg
 Aircraft.Mission.History.SI.Performance.Ps(  SegBeg:SegEnd) = Ps   ; % m/s
+Aircraft.Mission.History.SI.Performance.LD(  SegBeg:SegEnd) = L_D  ;
+
+% propulsion system quantities
+Aircraft.Mission.History.SI.Propulsion.Treq(SegBeg:SegEnd) = Treq;
 
 % energy quantities
 Aircraft.Mission.History.SI.Energy.PE(SegBeg:SegEnd) = PE; % J

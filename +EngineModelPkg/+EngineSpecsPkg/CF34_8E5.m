@@ -117,6 +117,9 @@ Engine.EtaPoly.Mixing = 0.0;
 %% Electric Supplement
 Engine.PerElec = 0;
 
+% calibration factors
+Engine.Cal.c1 = 0.58847;
+Engine.Cal.c2 = 0.17213;
 
 end
 

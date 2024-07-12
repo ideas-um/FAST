@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 24 apr 2024
+% last updated: 12 jul 2024
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -190,13 +190,21 @@ if (any(PSType > 0))
         % run the regression
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
         
-        % add specs for engine
+        % assume sea level static conditions for sizing
         Aircraft.Specs.Propulsion.Engine.Alt = 0;
         Aircraft.Specs.Propulsion.Engine.Mach = 0.05;
-        Aircraft.Specs.Propulsion.Engine.DesignThrust = Thrust(1)+Thrust(3);
+        
+        % get thrust contribution from engine (FIX FOR PHEs)
+        Aircraft.Specs.Propulsion.Engine.DesignThrust = Thrust(1);
 
+        % set a flag for sizing the engine
         Aircraft.Specs.Propulsion.Engine.Sizing = 1;
-        Aircraft.Specs.Propulsion.SizedEngine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Power(3));
+        
+        % size the engine based on the required thrust and conditions
+        % (FIX THIS FOR EM POWER CONTRIBUTIONS)
+        Aircraft.Specs.Propulsion.SizedEngine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, 0);
+        
+        % this engine will no longer be sized
         Aircraft.Specs.Propulsion.Engine.Sizing = 0; % unnnecessary
         Aircraft.Specs.Propulsion.SizedEngine.Specs.Sizing = 0;
         

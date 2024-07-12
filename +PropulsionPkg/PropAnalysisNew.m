@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 25 mar 2024
+% last updated: 12 jul 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -408,10 +408,10 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(ODEng, OffParams,ElecPower) EngineModelPkg.TurbofanOffDesign(ODEng, OffParams,ElecPower);
+        EngSizeFun = @(ODEng, OffParams,ElecPower) EngineModelPkg.SimpleOffDesign(ODEng, OffParams,ElecPower);
 
-        % get the TSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.TSFC;
+        % get the TSFC from the engine performance
+        GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )

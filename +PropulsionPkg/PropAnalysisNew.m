@@ -107,6 +107,7 @@ Time = Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd);
 TAS  = Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd);
 Mach = Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd);
 Alt  = Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd);
+Seg  = Aircraft.Mission.History.Segment(            SegBeg:SegEnd);
 
 % compute the time to travel between control points
 dt = diff(Time);
@@ -408,7 +409,7 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(ODEng, OffParams,ElecPower) EngineModelPkg.SimpleOffDesign(ODEng, OffParams,ElecPower);
+        EngSizeFun = @(ODEng, OffParams, ElecPower, CurSeg) EngineModelPkg.SimpleOffDesign(ODEng, OffParams,ElecPower, CurSeg);
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
@@ -484,6 +485,9 @@ if (any(Fuel))
         
         % get altitudes
         Alt = Alt(ibeg:iend);
+        
+        % get the segment
+        Segment = Seg(ibeg:iend);
                 
         % compute the SFC as a function of thrust required
         for ipnt = 1:(npnt-1)
@@ -505,7 +509,7 @@ if (any(Fuel))
             % size the engine at that point
             OffParams.Thrust = TTemp(ipnt);
             
-            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams,EMPartPower(ipnt));
+            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt), Segment);
             
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine);

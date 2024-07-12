@@ -1,4 +1,4 @@
-function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
+function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad, Segment)
 %
 % [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu
@@ -56,15 +56,25 @@ MDotSLS = OnDesignEngine.Fuel.MDot;
 % compute the fuel flow at full throttle
 MDotFull = MDotSLS / (Theta ^ 3.8 / Delta * exp(0.2 * Mach ^ 2));
 
-% get the SLS thrust produced by the engine
-ThrustSLS = OnDesignEngine.Specs.DesignThrust;
-
-% get the calibration factors
-c1 = OnDesignEngine.Cal.c1;
-c2 = OnDesignEngine.Cal.c2;
-
-% calibrate for a partially open throttle
-MDotAct = MDotFull * c1  * ThrustReq / (ThrustSLS * c2);
+% check for the cruise segment
+if (strcmpi(Segment, "Cruise") == 1)
+    
+    % get the SLS thrust produced by the engine
+    ThrustSLS = OnDesignEngine.Specs.DesignThrust;
+    
+    % get the calibration factors
+    c1 = OnDesignEngine.Cal.c1;
+    c2 = OnDesignEngine.Cal.c2;
+    
+    % calibrate for a partially open throttle
+    MDotAct = MDotFull * c1  * ThrustReq / (ThrustSLS * c2);
+    
+else
+    
+    % use the fuel flow rate at full throttle
+    MDotAct = MDotFull;
+    
+end
 
 % compute the TSFC
 TSFC = MDotAct / ThrustReq;

@@ -3,23 +3,21 @@ function [Aircraft] = SUSAN_DesignMission(Aircraft)
 % [Aircraft] = NotionalMission00(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % updated for SUSAN by Miranda Stockhausen, mstockha@umich.edu
-% last updated: 8 Jul 2024
+% last updated: 15 Jul 2024
 %
-% Define a typical mission with a design mission only (no reserves, see
-% below). Note that this mission is not very detailed and could impact
-% the energy source weights required to fly.
+% % Define the design mission (without reserves) for the SUSAN electrofan
+% aircraft concept. The mission is similar to that for a Boeing 737-8Max
+% with a 2500 nmi range.
 %
-% mission 1: fly at the design range
+% mission 1: takeoff and fly to accelerated cruise at 10000 ft
+% mission 2: climb to cruise altitude and complete cruise flight
 %
-% mission range, velocities, and altitudes are parameterized by the input
-% aircraft specification file
-%
-%        _____________________________       
-%       /                             \      
-%      /                               \     
-%     /                                 \    
-%    /     Design Range: 2500 nmi        \
-% __/                                     \__
+%            |   _____________________________       
+%            |  /                             \      
+%            | /                               \     
+%     _______|/                                 \    
+%    /       |                                   \
+% __/   1    |           mission 2                \__
 %
 %
 % INPUTS:
@@ -34,37 +32,45 @@ function [Aircraft] = SUSAN_DesignMission(Aircraft)
 
 %% DEFINE THE MISSION TARGETS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % define the targets (in m or min)
-Mission.Target.Valu = Aircraft.Specs.Performance.Range;
+Mission.Target.Valu = [9; UnitConversionPkg.ConvLength(2470, "naut mi", "m")];
 
 % define the target types ("Dist" or "Time")
-Mission.Target.Type = "Dist";
+Mission.Target.Type = ["Time"; "Dist"];
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Climb"; "Cruise"; "Descent"; "Landing"];
+Mission.Segs = ["Takeoff"; "Climb"; "Climb"; "Cruise"; 
+    "Climb"; "Cruise"; "Descent"; "Descent"; "Landing"];
 
 % define the mission id (segments in same mission must be consecutive)
-Mission.ID   = ones(length(Mission.Segs), 1);
-
-% define the starting/ending altitudes (in m)
-Mission.AltBeg = UnitConversionPkg.ConvLength([0 ; 1500; 10000; 37000; 37000; 1500], 'ft', 'm');
-Mission.AltEnd = UnitConversionPkg.ConvLength([1500 ; 10000; 37000; 37000; 1500; 0], 'ft', 'm');
+Mission.ID   = [1; 1; 1; 1;
+    2; 2; 2; 2; 2];
 
 % define the climb rate (in m/s)
-Mission.ClbRate = [NaN; NaN; NaN; NaN; NaN; NaN];
+Mission.ClbRate = UnitConversionPkg.ConvVel([0; 3000; 2000; 0; ...
+    1828.7; 0; -2200; -1500; 0], 'ft/min', 'm/s');
+
+% define the starting/ending altitudes (in m)
+Mission.AltBeg = UnitConversionPkg.ConvLength([0 ; 0; 1500; 10000; ...
+    10000; 37000; 37000; 10000; 0], 'ft', 'm');
+Mission.AltEnd = UnitConversionPkg.ConvLength([0; 1500; 10000; 10000; ...
+    37000; 37000; 10000; 0; 0], 'ft', 'm');
 
 % define the starting/ending speeds (in m/s or mach)
-Mission.VelBeg  = [0; 0.3; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785; 0.3];
-Mission.VelEnd  = [0.3; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); 0.785; 0.785; 0.3; 0];
+Mission.VelBeg  = [0; UnitConversionPkg.ConvVel([150; 250; 250; ...
+    300], 'kts', 'm/s'); 0.785; 0.785; UnitConversionPkg.ConvVel([250; 150], 'kts', 'm/s')];
+Mission.VelEnd  = [UnitConversionPkg.ConvVel([150; 250; 250; 300], 'kts', 'm/s'); 
+    0.785; 0.785; UnitConversionPkg.ConvVel([250; 150], 'kts', 'm/s'); 0];
 
 % define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["EAS"; "Mach"; "EAS"; "Mach"; "Mach"; "Mach"];
-Mission.TypeEnd = ["Mach"; "EAS"; "Mach"; "Mach"; "Mach"; "EAS"];
+Mission.TypeBeg = ["Mach"; "EAS"; "EAS"; "EAS";
+    "EAS"; "Mach"; "Mach"; "EAS"; "EAS"];
+Mission.TypeEnd = ["EAS"; "EAS"; "EAS"; "EAS"; ...
+    "Mach"; "Mach"; "EAS"; "EAS"; "Mach"];
 
 
 %% REMEMBER THE MISSION PROFILE %%

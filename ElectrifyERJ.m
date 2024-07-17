@@ -42,6 +42,8 @@ Wbatt = zeros(nsplit, 1);
 Wfuel = zeros(nsplit, 1);
 Wem   = zeros(nsplit, 1);
 Weng  = zeros(nsplit, 1);
+TSLS  = zeros(nsplit, 1);
+TTOC  = zeros(nsplit, 1);
 
 
 %% SIZE THE AIRCRAFT %%
@@ -76,13 +78,17 @@ for isplit = 1:nsplit
         
     end
     
-    % remember the aircraft weights
+    % remember the weights
     MTOW( isplit) = SizedERJ.Specs.Weight.MTOW   ;
     OEW(  isplit) = SizedERJ.Specs.Weight.OEW    ;
     Wfuel(isplit) = SizedERJ.Specs.Weight.Fuel   ;
     Wbatt(isplit) = SizedERJ.Specs.Weight.Batt   ;
     Wem(  isplit) = SizedERJ.Specs.Weight.EM     ;
     Weng( isplit) = SizedERJ.Specs.Weight.Engines;
+    
+    % remember the thrust results
+    TSLS( isplit) = SizedERJ.Specs.Propulsion.Thrust.SLS            ;
+    TTOC( isplit) = SizedERJ.Mission.History.SI.Power.Tout_PS(37, 1);
     
 end
 
@@ -95,6 +101,8 @@ PercDiffMTOW  = 100 .* ( MTOW(2:end) -  MTOW(1)) ./  MTOW(1);
 PercDiffOEW   = 100 .* (  OEW(2:end) -   OEW(1)) ./   OEW(1);
 PercDiffWfuel = 100 .* (Wfuel(2:end) - Wfuel(1)) ./ Wfuel(1);
 PercDiffWeng  = 100 .* ( Weng(2:end) -  Weng(1)) ./  Weng(1);
+PercDiffTSLS  = 100 .* ( TSLS(2:end) -  TSLS(1)) ./  TSLS(1);
+PercDiffTTOC  = 100 .* ( TTOC(2:end) -  TTOC(1)) ./  TTOC(1);
 
 % plot the MTOW results
 figure;
@@ -167,6 +175,51 @@ ylabel("Electric Motor Weight (kg)");
 
 % format plot
 title("Electrified ERJ - Electrical Components");
+xlabel("Power Split (%)");
+set(gca, "FontSize", 18);
+grid on
+
+% plot the SLS thrust results
+figure;
+yyaxis left
+plot(LambdaTko, TSLS ./ 1000, "-o", "LineWidth", 2);
+ylabel("SLS Thrust (kN)");
+yyaxis right
+plot(LambdaTko(2:end), PercDiffTSLS, "-o", "LineWidth", 2);
+ylabel("Percent Difference (%)");
+
+% format plot
+title("Electrified ERJ - SLS Thrust");
+xlabel("Power Split (%)");
+set(gca, "FontSize", 18);
+grid on
+
+% plot the TOC thrust results
+figure;
+yyaxis left
+plot(LambdaTko, TTOC ./ 1000, "-o", "LineWidth", 2);
+ylabel("Top of Climb Thrust (kN)");
+yyaxis right
+plot(LambdaTko(2:end), PercDiffTTOC, "-o", "LineWidth", 2);
+ylabel("Percent Difference (%)");
+
+% format plot
+title("Electrified ERJ - Top of Climb Thrust");
+xlabel("Power Split (%)");
+set(gca, "FontSize", 18);
+grid on
+
+% ratio of TOC thrust to SLS thrust
+figure;
+yyaxis left
+plot(LambdaTko, TTOC ./ TSLS, "-o", "LineWidth", 2);
+ylabel("T_{TOC} / T_{SLS}");
+yyaxis right
+plot(LambdaTko(2:end), 100 .* (TTOC(2:end) ./ TSLS(2:end) - TTOC(1) / TSLS(1)) / (TTOC(1) / TSLS(1)), "-o", "LineWidth", 2);
+ylabel("Percent Difference (%)");
+
+% format plot
+title("Electrified ERJ - Ratio of Top of Climb to SLS Thrust");
 xlabel("Power Split (%)");
 set(gca, "FontSize", 18);
 grid on

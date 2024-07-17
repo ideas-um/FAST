@@ -40,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios (old ones commented)
-Aircraft.Specs.Aero.L_D.ClbCF = 1.100;%1.005;
-Aircraft.Specs.Aero.L_D.CrsCF = 1.150;%1.012;
+Aircraft.Specs.Aero.L_D.ClbCF = 1.016;%1.100;%1.005;
+Aircraft.Specs.Aero.L_D.CrsCF = 1.029;%1.150;%1.012;
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 0.760;%0.907;
+Aircraft.Specs.Propulsion.MDotCF = 1;%0.760;%0.907;
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.022;%1.018;
+Aircraft.Specs.Weight.WairfCF = 0.996;%1.022;%1.018;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -226,7 +226,7 @@ Aircraft.Settings.Analysis.Type = +1;
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off
-Aircraft.Settings.Plotting = 0;
+Aircraft.Settings.Plotting = 1;
 
 % make a tble of mission history
 %     1 for make table

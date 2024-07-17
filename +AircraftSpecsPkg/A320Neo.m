@@ -224,12 +224,12 @@ Aircraft.Settings.Analysis.MaxIter = 50;
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)
 %     -1 for off-design mode (aircraft performance           )
-Aircraft.Settings.Analysis.Type = +1;
+Aircraft.Settings.Analysis.Type = 1;
 
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off
-Aircraft.Settings.Plotting = 0;
+Aircraft.Settings.Plotting = 1;
 
 Aircraft.Settings.Table = 0;
 

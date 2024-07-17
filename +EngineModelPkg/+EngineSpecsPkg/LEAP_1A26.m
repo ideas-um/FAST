@@ -118,7 +118,6 @@ Engine.EtaPoly.Mixing = 0.0;
 % calibration factors
 Engine.Cal.c1 = 0.59629;
 Engine.Cal.c2 = 0.16501;
-
 end
 
 

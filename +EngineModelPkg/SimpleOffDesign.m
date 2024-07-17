@@ -56,25 +56,22 @@ MDotSLS = OnDesignEngine.Fuel.MDot;
 % compute the fuel flow at full throttle
 MDotFull = MDotSLS / (Theta ^ 3.8 / Delta * exp(0.2 * Mach ^ 2));
 
-% check for the cruise segment
-if (strcmpi(Segment, "Cruise") == 1)
+% apply the new off-design method to estimate the fuel mass flow rate for all segments
     
     % get the SLS thrust produced by the engine
     ThrustSLS = OnDesignEngine.Specs.DesignThrust;
     
     % get the calibration factors
+    CruiseAlt = UnitConversionPkg.ConvLength(35000,'ft','m');
     c1 = OnDesignEngine.Cal.c1;
     c2 = OnDesignEngine.Cal.c2;
+    a2 = 1 - c1;
+    a1 = 1 - a2 * Alt/CruiseAlt;
+    b2 = 1 - c2;
+    b1 = 1 - b2 * Alt/CruiseAlt;
     
     % calibrate for a partially open throttle
-    MDotAct = MDotFull * c1  * ThrustReq / (ThrustSLS * c2);
-    
-else
-    
-    % use the fuel flow rate at full throttle
-    MDotAct = MDotFull;
-    
-end
+    MDotAct = a1 * MDotFull * (1/b1) * (ThrustReq / ThrustSLS);
 
 % compute the TSFC
 TSFC = MDotAct / ThrustReq;

@@ -323,6 +323,9 @@ MDotFuel = zeros(npnt, nps);
 MDotAir  = zeros(npnt, nps);
 FanDiam  = zeros(npnt, nps);
 ExitMach = zeros(npnt, nps);
+V        = zeros(npnt, nes);
+I        = zeros(npnt, nes);
+Q        = zeros(npnt, nes);
 
 % check for a battery
 if (any(Batt))   
@@ -340,7 +343,7 @@ if (any(Batt))
         if (DetailedBatt == 1)
             
             % power available from the battery
-            [~, PreqES(ibeg:iend, icol),  ~, SOC(2:end, icol)] = BatteryPkg.Model(...
+            [V(ibeg:iend, icol), I(ibeg:iend, icol), PreqES(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
                 PreqES(ibeg:iend, icol), dt, SOC(1    , icol), ParCells, SerCells);
             
             % check if the SOC falls below 20%
@@ -584,7 +587,10 @@ Aircraft.Mission.History.SI.Propulsion.FanDiam( SegBeg:SegEnd, :) = FanDiam ;
 Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
 
 % power quantities
-Aircraft.Mission.History.SI.Power.SOC( SegBeg:SegEnd, :) = SOC  ;
+Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;
+Aircraft.Mission.History.SI.Power.Voltage( SegBeg:SegEnd, :) = V  ;
+Aircraft.Mission.History.SI.Power.Current( SegBeg:SegEnd, :) = I  ;
+Aircraft.Mission.History.SI.Power.Capacity(SegBeg:SegEnd, :) = Q  ;
 
 % splits
 Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;

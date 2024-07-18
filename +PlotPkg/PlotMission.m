@@ -2,7 +2,7 @@ function [] = PlotMission(Aircraft)
 %
 % [] = PlotMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% last updated: 18 jul 2024
 %
 % Obtain the mission history from the aircraft structure, convert necessary
 % values from SI to English units, and plot them.
@@ -61,7 +61,7 @@ TreqVector = Aircraft.Mission.History.SI.Power.Treq_PS ./ 1000;
  TavVector = Aircraft.Mission.History.SI.Power.Tav_PS  ./ 1000;
 ToutVector = Aircraft.Mission.History.SI.Power.Tout_PS ./ 1000;
 
-% SFC (then convert to lbm/hp/hr)
+% SFC (then convert to lbm/lbf/hr)
 if (strcmpi(Aircraft.Specs.TLAR.Class, "Turbofan") == 1)
     
     % convert to english units (taken from TurbofanOnDesignCycle)
@@ -198,7 +198,7 @@ PlotPkg.PlotPerfParam(Time, MDotFuel, "Flight Time (min)", "Fuel Flow (kg/s)", "
 
 % plot the sfc
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time, SFC, "Flight Time (min)", "SFC (lbm/hp/hr)", "SFC");
+PlotPkg.PlotPerfParam(Time, SFC, "Flight Time (min)", "SFC (lbm/lbf/hr)", "SFC");
 
 % ----------------------------------------------------------
 
@@ -239,7 +239,7 @@ PlotPkg.PlotPerfParam(Time, TreqVector, "Flight Time (min)", "Thrust (kN)", "Thr
 
 % plot thrust output against time
 subplot(3, 3, 8);
-PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), "Flight Time (min)", "Thrust Output (N)", "Thrust Output");
+PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), "Flight Time (min)", "Thrust Output (kN)", "Thrust Output");
 
 % plot power output against time
 subplot(3, 3, 9);

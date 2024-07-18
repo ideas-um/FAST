@@ -41,6 +41,10 @@ W_S = Aircraft.Specs.Aero.W_S.SLS;
 % get the aircraft weights
 Wfuel = Aircraft.Specs.Weight.Fuel   ;
 Wbatt = Aircraft.Specs.Weight.Batt   ;
+
+if isempty(Wbatt)
+    Wbatt = 0;
+end
 Weg   = Aircraft.Specs.Weight.EG     ;
 Wem   = Aircraft.Specs.Weight.EM     ;
 Wpax  = Aircraft.Specs.Weight.Payload;

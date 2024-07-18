@@ -37,7 +37,7 @@ Mission.Target.Type = "Dist";
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Cruise"];
+Mission.Segs = ["DetailedTakeoff"; "Climb"; "Cruise"];
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [        1;       1;        1];

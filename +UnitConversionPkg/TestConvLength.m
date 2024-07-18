@@ -58,7 +58,7 @@ TestIn = 700;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'm');
 
 % list the correct values of the output
 TrueValue = 213.36;
@@ -91,7 +91,7 @@ TestIn = 7232.4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'km');
 
 % list the correct values of the output
 TrueValue = 2.20443552;
@@ -124,7 +124,7 @@ TestIn = 836.34;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'mi');
 
 % list the correct values of the output
 TrueValue = 0.1583971367;
@@ -157,7 +157,7 @@ TestIn = 749.234;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'ft','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'naut mi');
 
 % list the correct values of the output
 TrueValue = 0.123308;
@@ -191,7 +191,7 @@ TestIn = 8349.2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'m','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'ft');
 
 % list the correct values of the output
 TrueValue = 27392.388451;
@@ -224,7 +224,7 @@ TestIn = 826;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'m','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'km');
 
 % list the correct values of the output
 TrueValue = 0.826;
@@ -257,7 +257,7 @@ TestIn = 726.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'m','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'mi');
 
 % list the correct values of the output
 TrueValue = 0.4516730357;
@@ -290,7 +290,7 @@ TestIn = 829.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'m','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'naut mi');
 
 % list the correct values of the output
 TrueValue = 0.44811;
@@ -324,7 +324,7 @@ TestIn = 4793;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'km','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'ft');
 
 % list the correct values of the output
 TrueValue = 15725065.617;
@@ -357,7 +357,7 @@ TestIn = 233.9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'km','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'm');
 
 % list the correct values of the output
 TrueValue = 233900;
@@ -390,7 +390,7 @@ TestIn = 395;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'km','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'mi');
 
 % list the correct values of the output
 TrueValue = 245.44070588;
@@ -423,7 +423,7 @@ TestIn = 83;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'km','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'naut mi');
 
 % list the correct values of the output
 TrueValue = 44.81641;
@@ -457,7 +457,7 @@ TestIn = 739.002;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'ft');
 
 % list the correct values of the output
 TrueValue = 3901945.1073;
@@ -490,7 +490,7 @@ TestIn = 19;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'm');
 
 % list the correct values of the output
 TrueValue = 30577.65;
@@ -523,7 +523,7 @@ TestIn = 6378;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'km');
 
 % list the correct values of the output
 TrueValue = 10264.4343;
@@ -556,7 +556,7 @@ TestIn = 324.453;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'mi','naut mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'naut mi');
 
 % list the correct values of the output
 TrueValue = 281.9419;
@@ -590,7 +590,7 @@ TestIn = 73;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','ft');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'ft');
 
 % list the correct values of the output
 TrueValue = 443556.4;
@@ -623,7 +623,7 @@ TestIn = 85.3812;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','m');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'm');
 
 % list the correct values of the output
 TrueValue = 158126;
@@ -656,7 +656,7 @@ TestIn = 283;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','km');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'km');
 
 % list the correct values of the output
 TrueValue = 524.116;
@@ -689,7 +689,7 @@ TestIn = 10.264;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvLength(TestIn,'naut mi','mi');
+TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'mi');
 
 % list the correct values of the output
 TrueValue = 11.8116;

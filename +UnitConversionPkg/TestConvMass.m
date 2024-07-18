@@ -58,7 +58,7 @@ TestIn = 2.8373;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'lbm','kg');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'lbm', 'kg');
 
 % list the correct values of the output
 TrueValue = 1.28697763;
@@ -91,7 +91,7 @@ TestIn = 465.7;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'lbm','slug');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'lbm', 'slug');
 
 % list the correct values of the output
 TrueValue = 14.474398;
@@ -125,7 +125,7 @@ TestIn = 84.2883;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'kg','lbm');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'kg', 'lbm');
 
 % list the correct values of the output
 TrueValue = 185.8238929;
@@ -158,7 +158,7 @@ TestIn = 647.739009;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'kg','slug');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'kg', 'slug');
 
 % list the correct values of the output
 TrueValue = 44.38422052003;
@@ -192,7 +192,7 @@ TestIn = 321.5398;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'slug','lbm');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'slug', 'lbm');
 
 % list the correct values of the output
 TrueValue = 10345.237183;
@@ -225,7 +225,7 @@ TestIn = 360.04;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the mass conversion
-TestValue = UnitConversionPkg.ConvMass(TestIn,'slug','kg');
+TestValue = UnitConversionPkg.ConvMass(TestIn, 'slug', 'kg');
 
 % list the correct values of the output
 TrueValue = 5254.38884;

@@ -58,7 +58,7 @@ TestIn = 738;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the force conversion
-TestValue=UnitConversionPkg.ConvForce(TestIn,'N','lbf');
+TestValue=UnitConversionPkg.ConvForce(TestIn, 'N', 'lbf');
 
 % list the correct values of the output
 TrueValue = 165.909;
@@ -92,7 +92,7 @@ TestIn = 23453.829;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the length conversion
-TestValue = UnitConversionPkg.ConvForce(TestIn,'lbf','N');
+TestValue = UnitConversionPkg.ConvForce(TestIn, 'lbf', 'N');
 
 % list the correct values of the output
 TrueValue = 104327.828761;

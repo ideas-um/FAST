@@ -58,7 +58,7 @@ TestIn = 32.243;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'K', 'C');
 
 % list the correct values of the output
 TrueValue = -240.907;
@@ -91,7 +91,7 @@ TestIn = 3232.243;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'K', 'R');
 
 % list the correct values of the output
 TrueValue = 5818.0374;
@@ -124,7 +124,7 @@ TestIn = 2380;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'K','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'K', 'F');
 
 % list the correct values of the output
 TrueValue = 3824.33;
@@ -158,7 +158,7 @@ TestIn = 7.3421;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'R', 'K');
 
 % list the correct values of the output
 TrueValue = 4.07894444;
@@ -191,7 +191,7 @@ TestIn = 679.67;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'R', 'C');
 
 % list the correct values of the output
 TrueValue = 104.444444;
@@ -224,7 +224,7 @@ TestIn = 67.786;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'R','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'R', 'F');
 
 % list the correct values of the output
 TrueValue = -391.884;
@@ -258,7 +258,7 @@ TestIn = 898;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'C', 'K');
 
 % list the correct values of the output
 TrueValue = 1171.15;
@@ -291,7 +291,7 @@ TestIn = 9.34523;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'C', 'R');
 
 % list the correct values of the output
 TrueValue = 508.491414;
@@ -324,7 +324,7 @@ TestIn = 3743.2344;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'C','F');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'C', 'F');
 
 % list the correct values of the output
 TrueValue = 6769.82192;
@@ -358,7 +358,7 @@ TestIn = 3743.2344;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','K');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'F', 'K');
 
 % list the correct values of the output
 TrueValue = 2334.94688889;
@@ -391,7 +391,7 @@ TestIn = 630;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','R');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'F', 'R');
 
 % list the correct values of the output
 TrueValue = 1089.67;
@@ -424,7 +424,7 @@ TestIn = 638.873;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the temperature conversion
-TestValue = UnitConversionPkg.ConvTemp(TestIn,'F','C');
+TestValue = UnitConversionPkg.ConvTemp(TestIn, 'F', 'C');
 
 % list the correct values of the output
 TrueValue = 337.1516667;

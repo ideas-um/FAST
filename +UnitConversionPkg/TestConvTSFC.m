@@ -58,7 +58,7 @@ TestIn = 1.826;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the force conversion
-TestValue = UnitConversionPkg.ConvTSFC(TestIn,'SI','Imp');
+TestValue = UnitConversionPkg.ConvTSFC(TestIn, 'SI', 'Imp');
 
 % list the correct values of the output
 TrueValue = 64464.99444;
@@ -92,7 +92,7 @@ TestIn = 1103.245;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the TSFC conversion
-TestValue = UnitConversionPkg.ConvTSFC(TestIn,'Imp','SI');
+TestValue = UnitConversionPkg.ConvTSFC(TestIn, 'Imp', 'SI');
 
 % list the correct values of the output
 TrueValue = 0.03124991148;

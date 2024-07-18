@@ -401,7 +401,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
+% define the value to be converted  
 TestIn = 638.873;
 
 % ----------------------------------------------------------

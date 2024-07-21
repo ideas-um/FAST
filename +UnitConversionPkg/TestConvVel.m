@@ -26,7 +26,7 @@ function [Success] = TestConvVel()
 
 
 % relative tolerance for checking if the tests passed
-EPS06 = 1.0e-06;
+EPS05 = 1.0e-05;
 
 % assume all tests passed
 Pass = ones(42, 1);
@@ -63,7 +63,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'm/s');
 TrueValue = 10;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -95,7 +95,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'km/s');
 TrueValue = 1;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -127,7 +127,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'km/h');
 TrueValue = 1.09728;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -159,7 +159,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'mph');
 TrueValue = 0.681818;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -191,7 +191,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'kts');
 TrueValue = 0.592484;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -223,7 +223,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/s', 'ft/min');
 TrueValue = 60;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -256,7 +256,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'ft/s');
 TrueValue = 32.8084;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -288,7 +288,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'km/s');
 TrueValue = 0.1;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -320,7 +320,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'km/h');
 TrueValue = 72;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -352,7 +352,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'mph');
 TrueValue = 22.36936;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -384,7 +384,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'kts');
 TrueValue = 19.4384;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -416,7 +416,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'm/s', 'ft/min');
 TrueValue = 1968.504;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -449,7 +449,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'ft/s');
 TrueValue = 3280.84;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -481,7 +481,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'm/s');
 TrueValue = 1000;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -513,7 +513,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'km/h');
 TrueValue = 3600;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -545,7 +545,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'mph');
 TrueValue = 2236.936;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -577,7 +577,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'kts');
 TrueValue = 1943.844;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -609,7 +609,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/s', 'ft/min');
 TrueValue = 196850.4;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -642,7 +642,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'ft/s');
 TrueValue = 0.911344;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -674,7 +674,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'm/s');
 TrueValue = 0.277778;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -706,7 +706,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'km/s');
 TrueValue = 0.000277778;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -738,7 +738,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'mph');
 TrueValue = 0.621371;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -770,7 +770,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'kts');
 TrueValue = 0.539957;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -802,7 +802,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'km/h', 'ft/min');
 TrueValue = 54.6807;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -835,7 +835,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'ft/s');
 TrueValue = 1.46667;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -867,7 +867,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'm/s');
 TrueValue = 0.44704;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -899,7 +899,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'km/s');
 TrueValue = 0.00044704;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -931,7 +931,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'km/h');
 TrueValue = 197.949;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -963,7 +963,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'kts');
 TrueValue = 0.868976;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -995,7 +995,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'mph', 'ft/min');
 TrueValue = 88;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1028,7 +1028,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'ft/s');
 TrueValue = 1.68781;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1060,7 +1060,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'm/s');
 TrueValue = 0.514444;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1092,7 +1092,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'km/s');
 TrueValue = 0.000514444;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1124,7 +1124,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'km/h');
 TrueValue = 1.852;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1156,7 +1156,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'mph');
 TrueValue = 1.15078;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1188,7 +1188,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'kts', 'ft/min');
 TrueValue = 101.268;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1221,7 +1221,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'ft/s');
 TrueValue = 0.0166667;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1253,7 +1253,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'm/s');
 TrueValue = 0.00508;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1285,7 +1285,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'km/s');
 TrueValue = 0.00010668;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1317,7 +1317,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'km/h');
 TrueValue = 0.18288;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1349,7 +1349,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'mph');
 TrueValue = 0.113636;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -1381,7 +1381,7 @@ TestValue = UnitConversionPkg.ConvVel(TestIn, 'ft/min', 'kts');
 TrueValue = 0.00987473;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;

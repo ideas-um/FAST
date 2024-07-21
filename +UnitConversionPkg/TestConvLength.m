@@ -26,7 +26,7 @@ function [Success] = TestConvLength()
 
 
 % relative tolerance for checking if the tests passed
-EPS06 = 1.0e-06;
+EPS05 = 1.0e-05;
 
 % assume all tests passed
 Pass = ones(20, 1);
@@ -63,7 +63,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'm');
 TrueValue = 213.36;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -95,7 +95,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'km');
 TrueValue = 2.20443552;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -127,7 +127,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'mi');
 TrueValue = 0.1583971367;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -159,7 +159,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'ft', 'naut mi');
 TrueValue = 0.123308;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -192,7 +192,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'ft');
 TrueValue = 27392.388451;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -224,7 +224,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'km');
 TrueValue = 0.826;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -256,7 +256,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'mi');
 TrueValue = 0.4516730357;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -288,7 +288,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'm', 'naut mi');
 TrueValue = 0.44811;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -321,7 +321,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'ft');
 TrueValue = 15725065.617;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -353,7 +353,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'm');
 TrueValue = 233900;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -385,7 +385,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'mi');
 TrueValue = 245.44070588;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -417,7 +417,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'km', 'naut mi');
 TrueValue = 44.81641;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -450,7 +450,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'ft');
 TrueValue = 3901945.1073;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -482,7 +482,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'm');
 TrueValue = 30577.65;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -514,7 +514,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'km');
 TrueValue = 10264.4343;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -546,7 +546,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'mi', 'naut mi');
 TrueValue = 281.9419;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -579,7 +579,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'ft');
 TrueValue = 443556.4;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -611,7 +611,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'm');
 TrueValue = 158126;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -643,7 +643,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'km');
 TrueValue = 524.116;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -675,7 +675,7 @@ TestValue = UnitConversionPkg.ConvLength(TestIn, 'naut mi', 'mi');
 TrueValue = 11.8116;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;

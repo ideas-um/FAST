@@ -1,4 +1,4 @@
-function [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
+function [Aircraft] = OpsOptimize(Aircraft)
 %
 % [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu

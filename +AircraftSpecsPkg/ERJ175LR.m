@@ -120,7 +120,7 @@ Aircraft.Specs.Weight.Batt = 0;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.Arch.Type = "PHE";
 
 % get the engine
 Aircraft.Specs.Propulsion.Engine = EngineModelPkg.EngineSpecsPkg.CF34_8E5;
@@ -168,7 +168,7 @@ Aircraft.Specs.Power.LamTS.Lnd = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Tko = 0;
+Aircraft.Specs.Power.LamTSPS.Tko = .05;
 Aircraft.Specs.Power.LamTSPS.Clb = 0;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;

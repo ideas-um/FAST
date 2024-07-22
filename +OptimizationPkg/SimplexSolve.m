@@ -45,7 +45,7 @@ nbasic = BasicLoc(end);
 
 % perform sanity check % this doesnt seem right, should it be number of
 % rows?
-if ((nvar - nbasic) ~= (nvar - ncon))
+if (nbasic ~= ncon)
     error("ERROR - SimplexSolve: check number of basic variables.");
 end
 

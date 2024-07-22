@@ -83,9 +83,9 @@ switch oldunit
     case 'F'
         switch newunit
             case 'K'
-                newval = (oldval - 459.67)./1.8;
+                newval = ((oldval - 32)./9).*5 + 273.15;
             case 'C'
-                newval = (oldval - 459.67)./1.8 + 273.15;
+                newval = ((oldval - 32)./9).*5;
             case 'R'
                 newval = oldval + 459.67;
             case 'F'

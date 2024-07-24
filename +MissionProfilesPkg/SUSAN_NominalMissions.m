@@ -73,7 +73,7 @@ Mission.AltEnd = UnitConversionPkg.ConvLength([0; 1500 ; 10000; 10000; ...
 
 % define the climb rate (in m/s)
 Mission.ClbRate = [UnitConversionPkg.ConvVel([0; 3000; 2000; 0; ...
-    1828.7; 0; -2200], 'ft/min', 'm/s');
+    1800; 0; -2200], 'ft/min', 'm/s');
     0; NaN;
     0; NaN; 0];
 

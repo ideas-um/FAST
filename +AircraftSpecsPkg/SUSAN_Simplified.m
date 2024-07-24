@@ -105,10 +105,10 @@ Aircraft.Specs.Aero.W_S.SLS = (UnitConversionPkg.ConvForce(190890, 'lbf','N') / 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
 % maximum takeoff weight (kg)
-Aircraft.Specs.Weight.MTOW = UnitConversionPkg.ConvForce(190890, 'lbf','N') / 9.81;
+Aircraft.Specs.Weight.MTOW = 86586;
 
 % block fuel (kg)
-Aircraft.Specs.Weight.Fuel = UnitConversionPkg.ConvForce(33240, 'lbf','N') / 9.81;
+Aircraft.Specs.Weight.Fuel = 15077;
 
 % landing weight (kg)
 Aircraft.Specs.Weight.MLW = NaN;

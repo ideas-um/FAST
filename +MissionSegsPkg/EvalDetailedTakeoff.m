@@ -3,7 +3,7 @@ function [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % written by Nawa Khailany, nawakhai@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 18 jul 2024
+% last modified: 24 jul 2024
 %
 % Evaluate the takeoff segment. Assume maximum thrust/power from all
 % components in the propulsion system. In the detailed takeoff segment, the
@@ -251,17 +251,26 @@ T = Pav ./ V;
 % the first point will have a divide by 0 error, leave it as NaN
 T(1) = NaN;
 
+% compute the lift (assume takeoff is flown at CLmax)
+L = 0.5 .* Rho .* V(2:end) .^ 2 .* CL_max .* S;
+
+% compute the friction force (assume coefficient of friction)
+F = 0.02 .* (MTOW * g - L);
+
+% as liftoff occurs, L > W, so the frictional force is < 0 --- set it to 0
+F(F < 0) = 0;
+
 % compute the drag
 D(2:end) = 0.5 .* Rho .* V(2:end) .^ 2 .* CD .* S;
     
 % compute the acceleration (assume constant mass for now)
-dV_dt(2:end) = (T(2:end) - D(2:end)) ./ MTOW;
+dV_dt(2:end) = (T(2:end) - D(2:end) - F) ./ MTOW;
     
-% compute the distance travelled
-ddist(2:end) = diff(V .^ 2) ./ (2 .* dV_dt(2:end));
-
 % compute the time between control points
 dtime(2:end) = diff(V) ./ dV_dt(2:end);
+
+% compute the distance travelled
+ddist(2:end) = diff(V .^ 2) ./ (2 .* dV_dt(2:end));
 
 % compute power to overcome drag
 DV = D .* V;

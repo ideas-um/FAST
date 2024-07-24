@@ -1,9 +1,9 @@
-function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad, Segment)
+function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 %
 % [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu
 % thanks to Swapnil Jagtap for the equation
-% last updated: 12 jul 2024
+% last updated: 17 jul 2024
 %
 % Simple off-design engine model using Boeing's fuel flow calculations
 % calibrated for flight conditions requiring less than 100% thrust.

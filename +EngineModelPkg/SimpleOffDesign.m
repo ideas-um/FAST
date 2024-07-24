@@ -1,11 +1,12 @@
 function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 %
 % [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
-% written by Paul Mokotoff, prmoko@umich.edu
+% written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
+% ycwangd@umich.edu
 % thanks to Swapnil Jagtap for the equation
-% last updated: 17 jul 2024
+% last updated: 24 jul 2024
 %
-% Simple off-design engine model using Boeing's fuel flow calculations
+% Simple off-design engine model using modified Boeing's fuel flow calculations
 % calibrated for flight conditions requiring less than 100% thrust.
 %
 % INPUTS:
@@ -54,7 +55,7 @@ ThrustReq = ThrustReq - ElectricLoad / TAS;
 MDotSLS = OnDesignEngine.Fuel.MDot;
 
 % compute the fuel flow at full throttle
-MDotFull = MDotSLS / (Theta ^ 3.8 / Delta * exp(0.2 * Mach ^ 2));
+MDotFull = MDotSLS / (((Theta ^ 3.8) / Delta) * exp(0.2 * Mach ^ 2));
 
 % apply the new off-design method to estimate the fuel mass flow rate for all segments
     
@@ -63,13 +64,18 @@ MDotFull = MDotSLS / (Theta ^ 3.8 / Delta * exp(0.2 * Mach ^ 2));
     
     % get the calibration factors
     CruiseAlt = UnitConversionPkg.ConvLength(35000,'ft','m');
-    c1 = OnDesignEngine.Cal.c1;
-    c2 = OnDesignEngine.Cal.c2;
-    a2 = 1 - c1;
-    a1 = 1 - a2 * Alt/CruiseAlt;
-    b2 = 1 - c2;
-    b1 = 1 - b2 * Alt/CruiseAlt;
-    
+    if Alt <= CruiseAlt
+        c1 = OnDesignEngine.Cal.c1;
+        c2 = OnDesignEngine.Cal.c2;
+        a2 = 1 - c1;
+        a1 = 1 - a2 * Alt/CruiseAlt;
+        b2 = 1 - c2;
+        b1 = 1 - b2 * Alt/CruiseAlt;
+    else
+        a1 = OnDesignEngine.Cal.c1;
+        b1 = OnDesignEngine.Cal.c2;
+    end
+
     % calibrate for a partially open throttle
     MDotAct = a1 * MDotFull * (1/b1) * (ThrustReq / ThrustSLS);
 

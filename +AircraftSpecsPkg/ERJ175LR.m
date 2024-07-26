@@ -3,7 +3,7 @@ function [Aircraft] = ERJ175LR()
 % [Aircraft] = ERJ175LR()
 % originally written for E175 by Nawa Khailany
 % modified to E175LR by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 apr 2024
+% last updated: 26 jul 2024
 % 
 % Create a baseline model of the ERJ 175, long-range version (also known as
 % an ERJ 170-200). This version uses a conventional propulsion
@@ -39,15 +39,15 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %% MODEL CALIBRATION FACTORS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios (old ones commented)
-Aircraft.Specs.Aero.L_D.ClbCF = 0.985; %1.016; %1%1.100;%1.005;
-Aircraft.Specs.Aero.L_D.CrsCF = 0.985; %1.029; %1.006;%1.150;%1.012;
+% calibration factors for lift-drag ratios
+Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % formerly 0.985
+Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % formerly 0.985
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1;%0.760;%0.907;
+Aircraft.Specs.Propulsion.MDotCF = 1.042; % formerly 1.000
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.0333; %0.996;%1.022;%1.018;
+Aircraft.Specs.Weight.WairfCF = 1.018; % formerly 1.0333
  
 
 %% VEHICLE PERFORMANCE %%
@@ -103,7 +103,7 @@ Aircraft.Specs.Weight.EG = NaN;
 Aircraft.Specs.Weight.EM = 0;
 
 % block fuel weight (kg)
-Aircraft.Specs.Weight.Fuel = 9496; %UnitConversionPkg.ConvMass(20785, "lbm", "kg");
+Aircraft.Specs.Weight.Fuel = UnitConversionPkg.ConvMass(20785, "lbm", "kg");
 
 % battery weight (kg), leave NaN for propulsion systems without batteries
 Aircraft.Specs.Weight.Batt = 0;

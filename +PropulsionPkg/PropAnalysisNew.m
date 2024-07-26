@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 jul 2024
+% last updated: 26 jul 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -508,7 +508,7 @@ if (any(Fuel))
             OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt));
             
             % get out the SFC (could be TSFC or BSFC)
-            SFC(ipnt, icol) = GetSFC(OffDesignEngine);
+            SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the fuel flow
             MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;

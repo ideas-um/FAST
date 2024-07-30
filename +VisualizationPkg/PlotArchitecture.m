@@ -1,11 +1,11 @@
 function [] = PlotArchitecture(Architecture)
 %
-% [] = PlotArchitecture(Architecture)
+% PlotArchitecture.m
 % written by Nawa Khailany, nawakhai@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 22 mar 2024
+% last updated: 29 feb 2024
 %
-% Plot a user-prescribed propulsion architecture.
+% plot a user-prescribed propulsion architecture.
 %
 % INPUTS:
 %     Architecture - data structure with the propulsion architecture to be
@@ -14,7 +14,6 @@ function [] = PlotArchitecture(Architecture)
 %
 % OUTPUTS:
 %     none
-%
 
 
 %% PRE-PROCESSING %%
@@ -34,6 +33,16 @@ CNums    = length(  CNames);
 
 % allow for multiple plots (new figure created previously)
 hold on
+
+% set background color to white
+set(gcf,'color',[1 1 1]);
+
+% format the axes
+yticks([])
+xticks([])
+ax = gca;
+ax.XAxis.Visible = 'off';
+ax.YAxis.Visible = 'off';
 
 % loop through each source
 for i = 1:IdxNums

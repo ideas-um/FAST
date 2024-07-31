@@ -1,10 +1,10 @@
-function [Success] = TestResizeBattery()
+function [Success] = TestModel()
 %
-% [Success] = TestResizeBattery()
+% [Success] = TestModel()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 31 jul 2024
 %
-% Generate simple test cases to confirm that the resize battery script
+% Generate simple test cases to confirm that the battery model script 
 % is working properly.
 %
 % INPUTS:
@@ -29,29 +29,12 @@ function [Success] = TestResizeBattery()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(2, 1);
+Pass = ones(3, 1);
 
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup aircraft structure   %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% aircraft class
-TestIn.Specs.TLAR.Class = "Turboprop";
-
-% assume the specific energy of a battery
-SpcEnergy = 1;
-
-% TV power
-TestIn.Specs.Power.SpecEnergy.Batt = SpcEnergy;
-
-%% CASE 1: SIMPLE BATTERY MODEL %%
+%% CASE 1: SINGLE CELL BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,7 +44,11 @@ TestIn.Specs.Power.SpecEnergy.Batt = SpcEnergy;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the value to be converted
-TestIn = 1.826;
+TestIn.Preq = 1000;
+TestIn.Time = 89;
+TestIn.SOCi = 85;
+TestIn.Parallel = 1;
+TestIn.Series = 1;
 
 % ----------------------------------------------------------
 
@@ -71,14 +58,15 @@ TestIn = 1.826;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the battery resize
-TestOut = BatteryPkg.ResizeBattery(TestIn);
+% complete the model
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+    TestIn.Parallel,TestIn.Series);
 
-% get the output to be tested
-TestValue = TestOut.Specs.Weight.Batt;
+% store resulting values
+TestValue = [Voltage, Pout, Capacity, SOC];
 
 % list the correct values of the output
-TrueValue = 64464.99444;
+TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -87,7 +75,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 
-%% CASE 2: DETAILED BATTERY MODEL %%
+%% CASE 2: MULTIPLE CELL, SINGLE SERIES BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +85,11 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the value to be converted
-TestIn = 1103.245;
+TestIn.Preq = 1000;
+TestIn.Time = 89;
+TestIn.SOCi = 85;
+TestIn.Parallel = 1;
+TestIn.Series = 1;
 
 % ----------------------------------------------------------
 
@@ -107,11 +99,55 @@ TestIn = 1103.245;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the TSFC conversion
-%TestOut = UnitConversionPkg.ResizeBattery(TestIn);
+% complete the model
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+    TestIn.Parallel,TestIn.Series);
+
+% store resulting values
+TestValue = [Voltage, Pout, Capacity, SOC];
 
 % list the correct values of the output
-TrueValue = 0.03124991148;
+TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+%% CASE 3: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% define the value to be converted
+TestIn.Preq = 1000;
+TestIn.Time = 89;
+TestIn.SOCi = 85;
+TestIn.Parallel = 1;
+TestIn.Series = 1;
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% complete the model
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+    TestIn.Parallel,TestIn.Series);
+
+% store resulting values
+TestValue = [Voltage, Pout, Capacity, SOC];
+
+% list the correct values of the output
+TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -133,7 +169,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "TestResizeBattery tests passed!\n");
+    fprintf(1, "TestModel tests passed!\n");
     
     % return success
     Success = 1;
@@ -141,7 +177,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "TestResizeBattery tests failed:\n");
+    fprintf(1, "TestModel tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

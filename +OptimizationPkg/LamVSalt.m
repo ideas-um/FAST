@@ -1,4 +1,4 @@
-function [Aircraft] = Lambda(Aircraft)
+function [Aircraft] = LamVSalt(Aircraft)
 
 % lamtsps example = {[5, 1], {"Takeoff", [0, 500]}} 
 % means: tko 5% battery all the way through, then 1% up to 500 feet

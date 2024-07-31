@@ -193,11 +193,11 @@ Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
-Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
+Aircraft.Specs.Power.Battery.ParCells = 100;%100;
+Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
+Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

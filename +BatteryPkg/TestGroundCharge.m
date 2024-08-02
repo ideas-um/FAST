@@ -4,8 +4,8 @@ function [Success] = TestGroundCharge()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 31 jul 2024
 %
-% Generate simple test cases to confirm that the battery model script 
-% is working properly.
+% Generate simple test cases to confirm that the battery ground charge
+% script is working properly.
 %
 % INPUTS:
 %     none
@@ -35,7 +35,7 @@ Pass = ones(3, 1);
 itest = 1;
 
 %% CASE 1: SINGLE CELL BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -43,12 +43,10 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
-TestIn.Parallel = 1;
-TestIn.Series = 1;
+% define the value to be charged
+TestIn.Mission.History.SI.Power.SOC = 30;
+TestIn.Specs.Power.Battery.SerCells = 1;
+TestIn.Specs.Power.Battery.ParCells = 1;
 
 % ----------------------------------------------------------
 
@@ -58,12 +56,8 @@ TestIn.Series = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the ground charge
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
-
-% store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+% complete the ground charge and store resulting value
+TestValue = BatteryPkg.GroundCharge(TestIn, 6, 2340)
 
 % list the correct values of the output
 TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
@@ -76,7 +70,7 @@ itest = itest + 1;
 
 
 %% CASE 2: MULTIPLE CELL, SINGLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -84,12 +78,10 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
-TestIn.Parallel = 1;
-TestIn.Series = 1;
+% define the value to be charged
+TestIn.Mission.History.SI.Power.SOC = 23;
+TestIn.Specs.Power.Battery.SerCells = 1;
+TestIn.Specs.Power.Battery.ParCells = 3;
 
 % ----------------------------------------------------------
 
@@ -99,12 +91,8 @@ TestIn.Series = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the ground charge
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
-
-% store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+% complete the ground charge and store resulting value
+TestValue = BatteryPkg.GroundCharge(TestIn, 400, 300)
 
 % list the correct values of the output
 TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
@@ -116,7 +104,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 %% CASE 3: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -124,12 +112,10 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
-TestIn.Parallel = 1;
-TestIn.Series = 1;
+% define the value to be charged
+TestIn.Mission.History.SI.Power.SOC = 2;
+TestIn.Specs.Power.Battery.SerCells = 1;
+TestIn.Specs.Power.Battery.ParCells = 1;
 
 % ----------------------------------------------------------
 
@@ -139,12 +125,8 @@ TestIn.Series = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the ground charge
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
-
-% store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+% complete the ground charge and store resulting value
+TestValue = BatteryPkg.GroundCharge(TestIn, 600, 2300);
 
 % list the correct values of the output
 TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];

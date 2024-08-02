@@ -34,25 +34,8 @@ Pass = ones(2, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup aircraft structure   %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% aircraft class
-TestIn.Specs.TLAR.Class = "Turboprop";
-
-% assume the specific energy of a battery
-SpcEnergy = 1;
-
-% TV power
-TestIn.Specs.Power.SpecEnergy.Batt = SpcEnergy;
-
 %% CASE 1: SIMPLE BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -60,8 +43,11 @@ TestIn.Specs.Power.SpecEnergy.Batt = SpcEnergy;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn = 1.826;
+% define the values to be resized
+TestIn.Specs.Propulsion.PropArch.ESType = 0;
+TestIn.Specs.Power.SpecEnergy.Batt = 0.4;
+TestIn.Mission.History.SI.Energy.E_ES = 10000;
+TestIn.Settings.DetailedBatt = 0;
 
 % ----------------------------------------------------------
 
@@ -88,7 +74,7 @@ itest = itest + 1;
 
 
 %% CASE 2: DETAILED BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -97,7 +83,15 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the value to be converted
-TestIn = 1103.245;
+% define the values to be resized
+TestIn.Specs.Propulsion.PropArch.ESType = 0;
+TestIn.Specs.Power.SpecEnergy.Batt = 0.3;
+TestIn.Mission.History.SI.Energy.E_ES = 12348;
+TestIn.Settings.DetailedBatt = 1;
+TestIn.Specs.Power.Battery.SerCells = 3;
+TestIn.Specs.Power.Battery.ParCells = 2;
+TestIn.Mission.History.SI.Power.SOC = 30;
+TestIn.Mission.History.SI.Power.P_ES = 2000;
 
 % ----------------------------------------------------------
 
@@ -107,11 +101,14 @@ TestIn = 1103.245;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% compute the TSFC conversion
-%TestOut = UnitConversionPkg.ResizeBattery(TestIn);
+% complete the battery resize
+TestOut = BatteryPkg.ResizeBattery(TestIn);
+
+% get the output to be tested
+TestValue = TestOut.Specs.Weight.Batt;
 
 % list the correct values of the output
-TrueValue = 0.03124991148;
+TrueValue = 64464.99444;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);

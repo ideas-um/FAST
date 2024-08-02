@@ -26,7 +26,7 @@ function [Success] = TestModel()
 
 
 % relative tolerance for checking if the tests passed
-EPS06 = 1.0e-06;
+EPS03 = 1.0e-03;
 
 % assume all tests passed
 Pass = ones(3, 1);
@@ -35,7 +35,7 @@ Pass = ones(3, 1);
 itest = 1;
 
 %% CASE 1: SINGLE CELL BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -43,10 +43,10 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
+% define the value to be modeled
+TestIn.PreSOC = 100;
+TestIn.Time = 100;
+TestIn.SOCi = 90;
 TestIn.Parallel = 1;
 TestIn.Series = 1;
 
@@ -59,24 +59,24 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, SOC];
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = [3.3702, 29.6720, 100.0000, 2.7000];
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 
 % increment the test counter
 itest = itest + 1;
 
 
-%% CASE 2: MULTIPLE CELL, SINGLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -84,11 +84,11 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
-TestIn.Parallel = 1;
+% define the value to be modeled
+TestIn.PreSOC = 100;
+TestIn.Time = 56;
+TestIn.SOCi = 72;
+TestIn.Parallel = 3;
 TestIn.Series = 1;
 
 % ----------------------------------------------------------
@@ -100,23 +100,23 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, SOC];
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = [3.6403, 27.4707, 100, 6.48];
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -124,12 +124,12 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be converted
-TestIn.Preq = 1000;
-TestIn.Time = 89;
-TestIn.SOCi = 85;
+% define the value to be modeled
+TestIn.PreSOC = 72;
+TestIn.Time = 9;
+TestIn.SOCi = 50;
 TestIn.Parallel = 1;
-TestIn.Series = 1;
+TestIn.Series = 3;
 
 % ----------------------------------------------------------
 
@@ -140,17 +140,57 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.Preq,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, SOC];
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = [10.4583, 6.8844, 72.0000, 4.5000];
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
+
+% increment the test counter
+itest = itest + 1;
+
+%% CASE 3: MULTIPLE PARALLEL, MULTIPLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% define the value to be modeled
+TestIn.PreSOC = 500;
+TestIn.Time = 90;
+TestIn.SOCi = 70;
+TestIn.Parallel = 5;
+TestIn.Series = 3;
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% complete the model
+[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
+    TestIn.Parallel,TestIn.Series);
+
+% store resulting values
+TestValue = [Voltage, Pout, Capacity, SOC];
+
+% list the correct values of the output
+TrueValue = [10.8624, 46.0300, 499.9950, 31.5000];
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 
 % increment the test counter
 itest = itest + 1;

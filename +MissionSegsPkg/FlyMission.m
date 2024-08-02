@@ -160,6 +160,9 @@ for imiss = 1:nmiss
             
             % define the function call
             FunName = strcat("MissionSegsPkg.Eval", SegName);
+
+            % get the power splits initilized
+            Aircraft = OptimizationPkg.LamVSalt(Aircraft);
             
             % fly the segment
             Aircraft = feval(FunName, Aircraft);

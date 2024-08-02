@@ -21,7 +21,7 @@ end
 lams = ["LamTS", "LamTSPS", "LamPSPS", "LamPSES"];
 for i = 1:4
    % get lambda type from ac struct
-   lam = Aircraft.Specs.Power.(lams(i));
+   lam = Aircraft.Specs.Power.(lams(i)).Split;
    Alt = Aircraft.Mission.History.SI.Performance.Alt;
 
    % initialize power split array

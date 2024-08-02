@@ -528,6 +528,8 @@ end
 % error('update propulsion substruct finder')
 
 % Overwrite NaNs in Power structure
+%{ 
+fix this defualt power struct later
 Powerfields = fieldnames(Power);
 for i = 1:length(Powerfields)
     if isstruct(Power.(Powerfields{i}))
@@ -541,6 +543,7 @@ for i = 1:length(Powerfields)
         Power.(Powerfields{i}) = DefaultPower.(Powerfields{i});
     end
 end
+%}
 
 
 % Overwrite NaNs in Settings structure

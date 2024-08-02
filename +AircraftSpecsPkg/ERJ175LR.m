@@ -160,35 +160,19 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % thrust splits (thrust / total thrust)
-Aircraft.Specs.Power.LamTS.Tko = 0;
-Aircraft.Specs.Power.LamTS.Clb = 0;
-Aircraft.Specs.Power.LamTS.Crs = 0;
-Aircraft.Specs.Power.LamTS.Des = 0;
-Aircraft.Specs.Power.LamTS.Lnd = 0;
+Aircraft.Specs.Power.LamTS.Split = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Tko = .05;
-Aircraft.Specs.Power.LamTSPS.Clb = 0;
-Aircraft.Specs.Power.LamTSPS.Crs = 0;
-Aircraft.Specs.Power.LamTSPS.Des = 0;
-Aircraft.Specs.Power.LamTSPS.Lnd = 0;
+Aircraft.Specs.Power.LamTSPS.Split = {5, "Takeoff"};
 Aircraft.Specs.Power.LamTSPS.SLS = 0.05;
 
 % power splits between power/power sources (electric power / total power)
-Aircraft.Specs.Power.LamPSPS.Tko = 0;
-Aircraft.Specs.Power.LamPSPS.Clb = 0;
-Aircraft.Specs.Power.LamPSPS.Crs = 0;
-Aircraft.Specs.Power.LamPSPS.Des = 0;
-Aircraft.Specs.Power.LamPSPS.Lnd = 0;
+Aircraft.Specs.Power.LamPSPS.Split = 0;
 Aircraft.Specs.Power.LamPSPS.SLS = 0;
 
 % power splits between energy/power sources (electric power / total power)
-Aircraft.Specs.Power.LamPSES.Tko = 0;
-Aircraft.Specs.Power.LamPSES.Clb = 0;
-Aircraft.Specs.Power.LamPSES.Crs = 0;
-Aircraft.Specs.Power.LamPSES.Des = 0;
-Aircraft.Specs.Power.LamPSES.Lnd = 0;
+Aircraft.Specs.Power.LamPSES.Split = 0;
 Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel

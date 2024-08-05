@@ -112,10 +112,10 @@ while (iter < MaxIter)
     Tableau = OptimizationPkg.SimplexSetup(Aircraft, ielem);
     
     % solve the tableau
-    PhiOpt = OptimizationPkg.SimplexSolve(Tableau);
+    LamOpt = OptimizationPkg.SimplexSolve(Tableau);
     
     % post-process the result
-    Aircraft = OptimizationPkg.SimplexPost(Aircraft, ielem, PhiOpt);
+    Aircraft = OptimizationPkg.SimplexPost(Aircraft, ielem, LamOpt);
 
     % get the objective function
     ObjFun = Aircraft.PowerOpt.ObjFun;
@@ -148,19 +148,19 @@ while (iter < MaxIter)
     fprintf(1, "Objective Function Value: %.8e\n", Obj);
     
     % get the power splits from the optimization
-    CurPhi = Aircraft.Mission.History.SI.Power.Phi(ielem(1:nphi));
+    CurLam = Aircraft.Mission.History.SI.Power.LamTSPS(ielem(1:nphi));
     
     % check convergence after the first update
     if (iter > 0)
                 
         % compute the relative error between iterates
-        RelErr = abs(CurPhi - OldPhi) ./ OldPhi;
+        RelErr = abs(CurLam - OldLam) ./ OldLam;
         
         % check convergence
         if (~any(RelErr > Tol))
             
             % the power split history no longer needs to be saved
-            Aircraft.PowerOpt = rmfield(Aircraft.PowerOpt, "PhiHist");
+            Aircraft.PowerOpt = rmfield(Aircraft.PowerOpt, "LamHist");
             
             % break out of the loop
             break;
@@ -172,7 +172,7 @@ while (iter < MaxIter)
     iter = iter + 1;
     
     % remember the last iterate
-    OldPhi = CurPhi;
+    OldLam = CurLam;
     
     % remember the entire power split history (gets cleared in next iter.)
     Aircraft.PowerOpt.LamHist = Aircraft.Mission.History.SI.Power.LamTSPS;

@@ -38,7 +38,7 @@ EtaProp = Specs.Propulsion.Eta.Prop;
 EtaEM = Specs.Power.Eta.EM;
 
 % design power split
-PhiDesign = Specs.Power.Phi.SLS;
+LamDesign = Specs.Power.LamTSPS.SLS;
 
 % electric motor power-weight ratio
 P_Wem = Specs.Power.P_W.EM;
@@ -176,7 +176,7 @@ for iphi = 1:nphi
     % constrain the maximum power split
     Tableau(irow, iphi) = 1              ;
     Tableau(irow, icol) = 1              ;
-    Tableau(irow,  end) = 0.9 * PhiDesign;
+    Tableau(irow,  end) = 0.9 * LamDesign;
     
 end
 

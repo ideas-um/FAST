@@ -2,9 +2,11 @@ function [Aircraft] = OpsOptimize(Aircraft)
 %
 % [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 mar 2024
+% updated by Emma Cassidy
+% last updated: 2 aug 2024
 %
 % Operational power split optimization package driver.
+% only works for PHE with LamTSPS right now
 %
 % INPUTS:
 %     Aircraft   - structure containing aircraft specifications, mission
@@ -27,24 +29,20 @@ function [Aircraft] = OpsOptimize(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % zero the operations power splits
-Aircraft.Specs.Power.Phi.Tko = 0;
-Aircraft.Specs.Power.Phi.Clb = 0;
-Aircraft.Specs.Power.Phi.Crs = 0;
-Aircraft.Specs.Power.Phi.Des = 0;
-Aircraft.Specs.Power.Phi.Lnd = 0;
+Aircraft.Specs.Power.LamTSPS.Split = 0;
 
 % maximum number of iterations
-MaxIter = Aircraft.PowerOpt.MaxIter;
+MaxIter = Aircraft.Settings.Analysis.MaxIter;
 
 % convergence tolerance
-Tol = Aircraft.PowerOpt.Tol;
+Tol = .001;
 
 % count the iterations
 iter = 0;
 
 % flag for using prescribed power splits (or power split history)
-Aircraft.PowerOpt.PhiCount = 0;
-
+%Aircraft.PowerOpt.PhiCount = 0;
+%what was thi ssupoosed to be?
 
 %% OPTIMIZE THE POWER SPLITS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,7 +57,7 @@ while (iter < MaxIter)
     Aircraft = MissionSegsPkg.FlyMission(Aircraft);
     
     % reset the power split counter (for the next mission)
-    Aircraft.PowerOpt.PhiCount = 1;
+    %Aircraft.PowerOpt.PhiCount = 1;
     
     % post-processing after first iteration
     if (iter < 1)
@@ -177,7 +175,7 @@ while (iter < MaxIter)
     OldPhi = CurPhi;
     
     % remember the entire power split history (gets cleared in next iter.)
-    Aircraft.PowerOpt.PhiHist = Aircraft.Mission.History.SI.Power.Phi;
+    Aircraft.PowerOpt.LamHist = Aircraft.Mission.History.SI.Power.LamTSPS;
         
 end
 

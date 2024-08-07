@@ -1,6 +1,6 @@
 function [Aircraft] = LamVSalt(Aircraft)
 
-% lamtsps example = {[5, 1], {"Takeoff", [0, 500]}} 
+% lamtsps example = {[.05, .01], {"Takeoff", [0, 500]}} 
 % means: tko 5% battery all the way through, then 1% up to 500 feet
 
 % adaptive power management
@@ -13,8 +13,10 @@ for i = 1 : length(Profile.Segs)
     % get altitude distribution over each segement
     SegAlt = linspace(Profile.AltBeg(i), Profile.AltEnd(i), Profile.SegPts(i));
     % fill altitude in mission history 
-    Aircraft.Mission.History.SI.Performance.Alt(Profile.SegBeg(i):Profile.SegEnd(i)) = SegAlt;
+    Aircraft.Mission.History.SI.Performance.Alt(Profile.SegBeg(i):Profile.SegEnd(i), 1) = SegAlt;
 end
+
+Alt = Aircraft.Mission.History.SI.Performance.Alt;
 
 % fill lambda split vector
 % what type of splits is ac struct asking for 
@@ -22,20 +24,22 @@ lams = ["LamTS", "LamTSPS", "LamPSPS", "LamPSES"];
 for i = 1:4
    % get lambda type from ac struct
    lam = Aircraft.Specs.Power.(lams(i)).Split;
-   Alt = Aircraft.Mission.History.SI.Performance.Alt;
 
    % initialize power split array
    npoints = length(Alt);
    Aircraft.Mission.History.SI.Power.(lams(i)) = zeros(npoints,1);
+   
+   if length(Aircraft.Specs.Power.(lams(i)).Split) == npoints
+       Aircraft.Mission.History.SI.Power.(lams(i)) = Aircraft.Specs.Power.(lams(i)).Split;
 
    % check if a power split is designated
-   if iscell(lam)
+   elseif iscell(lam)
 
        % iterate through number of split segements
        for j = 1:length(lam{1})
 
            % power split values inputed by user
-           split = lam{1}(j)/100;
+           split = lam{1}(j);
            % segements to put power splits over
            seg = lam{2}{j};
 
@@ -72,6 +76,7 @@ for i = 1:4
            end
        end
    end
+   Aircraft.Specs.Power.(lams(i)).Split = Aircraft.Mission.History.SI.Power.(lams(i));
 end
 
 end

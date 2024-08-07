@@ -163,7 +163,7 @@ for imiss = 1:nmiss
 
             % get the power splits initilized
             Aircraft = OptimizationPkg.LamVSalt(Aircraft);
-            
+
             % fly the segment
             Aircraft = feval(FunName, Aircraft);
 

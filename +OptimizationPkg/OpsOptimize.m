@@ -31,6 +31,9 @@ function [Aircraft] = OpsOptimize(Aircraft)
 % zero the operations power splits
 Aircraft.Specs.Power.LamTSPS.Split = 0;
 
+% Reset the Altitude
+Aircraft.Mission.History.SI.Performance.Alt = 0;
+
 % maximum number of iterations
 MaxIter = Aircraft.Settings.Analysis.MaxIter;
 

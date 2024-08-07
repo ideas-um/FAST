@@ -42,6 +42,8 @@ Lam = LamOpt(1:nphi);
 % fill the aircraft structure's mission history
 Aircraft.Mission.History.SI.Power.LamTSPS(ielem(1:nphi)) = Lam;
 
+Aircraft.Specs.Power.LamTSPS.Split = Aircraft.Mission.History.SI.Power.LamTSPS;
+
 % ----------------------------------------------------------
 
 end

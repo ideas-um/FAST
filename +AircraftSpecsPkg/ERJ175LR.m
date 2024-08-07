@@ -164,7 +164,7 @@ Aircraft.Specs.Power.LamTS.Split = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = {5, "Takeoff"};
+Aircraft.Specs.Power.LamTSPS.Split = {.05, {"Takeoff"}} ;
 Aircraft.Specs.Power.LamTSPS.SLS = 0.05;
 
 % power splits between power/power sources (electric power / total power)
@@ -188,7 +188,7 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of control points in each segment
-Aircraft.Settings.TkoPoints = NaN;
+Aircraft.Settings.TkoPoints = 3;
 Aircraft.Settings.ClbPoints = NaN;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;

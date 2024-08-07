@@ -157,14 +157,14 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 % power-weight ratio for the electric motor and generator (kW/kg)
 % leave as NaN if an electric motor or generator isn't in the powertrain
 Aircraft.Specs.Power.P_W.EM = 10;
-Aircraft.Specs.Power.P_W.EG = NaN;
+Aircraft.Specs.Power.P_W.EG = 10;
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = {.05, {"Takeoff"}} ;
+Aircraft.Specs.Power.LamTSPS.Split =  {.05, "Takeoff"};
 Aircraft.Specs.Power.LamTSPS.SLS = 0.05;
 
 % power splits between power/power sources (electric power / total power)
@@ -188,7 +188,7 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of control points in each segment
-Aircraft.Settings.TkoPoints = 3;
+Aircraft.Settings.TkoPoints = NaN;
 Aircraft.Settings.ClbPoints = NaN;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;

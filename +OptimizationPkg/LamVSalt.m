@@ -46,15 +46,11 @@ for i = 1:4
            % if gave alt range, fill inbetween
            if isnumeric(seg)
                % find beginning and ending index of altitude vector
-               BegDif = abs(Alt - seg(1));
-               EndDif = abs(Alt - seg(2));
-               [~, SegBeg] = min(BegDif);
-               [~, SegEnd] = min(EndDif);
+               BegDif = ((seg(1) - Alt) < 0);
+               EndDif = ((seg(2) - Alt) < 0);
+               SegBeg = find(BegDif, 1) - 1;
+               SegEnd = find(EndDif, 1) - 1;
 
-               % if alt = 0 start at end of tko
-               if seg(1) == 0
-                   SegBeg = Aircraft.Mission.Profile.SegEnd(1);
-               end
                % eventually change that if the new segement index is lower
                % than the last one, dont override start at the next
                % biggest index that pasts the alt requirement
@@ -77,8 +73,10 @@ for i = 1:4
        end
    end
    Aircraft.Specs.Power.(lams(i)).Split = Aircraft.Mission.History.SI.Power.(lams(i));
+   if max(Aircraft.Mission.History.SI.Power.(lams(i))) > Aircraft.Specs.Power.(lams(i)).SLS
+        error("ERROR - a %s power split is greater than given %s SLS", lams(i), lams(i));
+   end
 end
-
 end
 
 

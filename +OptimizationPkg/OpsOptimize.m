@@ -29,10 +29,10 @@ function [Aircraft] = OpsOptimize(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % zero the operations power splits
-Aircraft.Specs.Power.LamTSPS.Split = 0;
+%Aircraft.Specs.Power.LamTSPS.Split = 0;
 
-% Reset the Altitude
-Aircraft.Mission.History.SI.Performance.Alt = 0;
+Aircraft.PowerOpt.Segments = "Takeoff";
+Aircraft.PowerOpt.ObjFun = "FuelBurn";
 
 % maximum number of iterations
 MaxIter = Aircraft.Settings.Analysis.MaxIter;

@@ -4,10 +4,10 @@ function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
 % thanks to Swapnil Jagtap for the equation
-% last updated: 24 jul 2024
+% last updated: 08 aug 2024
 %
-% Simple off-design engine model using modified Boeing's fuel flow calculations
-% calibrated for flight conditions requiring less than 100% thrust.
+% Simple off-design engine model using a fuel flow equation from the BADA
+% Database.
 %
 % INPUTS:
 %     OnDesignEngine - the sized engine onboard the aircraft.
@@ -33,13 +33,8 @@ function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 Alt  = OffParams.FlightCon.Alt ;
 Mach = OffParams.FlightCon.Mach;
 
-% compute the temperature and pressure at altitude and sea-level
-[~,   ~, ~, T0, P0] = MissionSegsPkg.ComputeFltCon(  0, 0, "Mach",    0);
-[~, TAS, ~, T1, P1] = MissionSegsPkg.ComputeFltCon(Alt, 0, "Mach", Mach);
-
-% compute the temperature and pressure ratios
-Theta = T1 / T0;
-Delta = P1 / P0;
+% compute the true airspeed at altitude
+[~, TAS] = MissionSegsPkg.ComputeFltCon(Alt, 0, "Mach", Mach);
 
 % get the thrust required
 ThrustReq = OffParams.Thrust;
@@ -47,40 +42,33 @@ ThrustReq = OffParams.Thrust;
 % subtract the thrust provided by the electric motor
 ThrustReq = ThrustReq - ElectricLoad / TAS;
 
+% convert to kN
+ThrustReq = ThrustReq / 1000;
+
 
 %% FUEL FLOW CALCULATIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% get the fuel flow of the designed engine at SLS
-MDotSLS = OnDesignEngine.Fuel.MDot;
+% define constants (only for the CF34-8E5 engine)
+Cff3  =  0.299;
+Cff2  = -0.346;
+Cff1  =  0.701;
+Cffch =  8.e-7;
 
-% compute the fuel flow at full throttle
-MDotFull = MDotSLS / (((Theta ^ 3.8) / Delta) * exp(0.2 * Mach ^ 2));
+% get the engine's SLS thrust (in kN)
+SLSThrust = OnDesignEngine.Thrust.Net / 1000;
 
-% apply the new off-design method to estimate the fuel mass flow rate for all segments
-    
-    % get the SLS thrust produced by the engine
-    ThrustSLS = OnDesignEngine.Specs.DesignThrust;
-    
-    % get the calibration factors
-    CruiseAlt = UnitConversionPkg.ConvLength(35000,'ft','m');
-    if Alt <= CruiseAlt
-        c1 = OnDesignEngine.Cal.c1;
-        c2 = OnDesignEngine.Cal.c2;
-        a2 = 1 - c1;
-        a1 = 1 - a2 * Alt/CruiseAlt;
-        b2 = 1 - c2;
-        b1 = 1 - b2 * Alt/CruiseAlt;
-    else
-        a1 = OnDesignEngine.Cal.c1;
-        b1 = OnDesignEngine.Cal.c2;
-    end
+% compute the fraction of thrust required to SLS thrust
+ThrustFrac = ThrustReq / SLSThrust;
 
-    % calibrate for a partially open throttle
-    MDotAct = a1 * MDotFull * (1/b1) * (ThrustReq / ThrustSLS);
+% get the fuel flow
+MDotAct = Cff3  * ThrustFrac ^ 3   + ...
+          Cff2  * ThrustFrac ^ 2   + ...
+          Cff1  * ThrustFrac       + ...
+          Cffch * ThrustReq  * Alt ;
 
-% compute the TSFC
-TSFC = MDotAct / ThrustReq;
+% compute the TSFC (convert thrust from kN to N)
+TSFC = MDotAct / (ThrustReq * 1000);
 
 
 %% FORMULATE OUTPUT STRUCTURE %%
@@ -89,8 +77,8 @@ TSFC = MDotAct / ThrustReq;
 % remember the fuel flow
 OffOutputs.Fuel = MDotAct;
 
-% remember the thrust output
-OffOutputs.Thrust = ThrustReq;
+% remember the thrust output (convert to N from kN)
+OffOutputs.Thrust = ThrustReq * 1000;
 
 % remember the TSFCs (in both units)
 OffOutputs.TSFC          =                            TSFC              ;

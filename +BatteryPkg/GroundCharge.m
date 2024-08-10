@@ -16,7 +16,7 @@ function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 %                  size/type/units: 1-by-1 / double / [s]
 %
 %     ChrgRate   - airport charging rate.
-%                  size/type/units: 1-by-1 / double / [kW/h]
+%                  size/type/units: 1-by-1 / double / [kW]
 %
 % OUTPUTS:
 %     SOCEnd     - state of charge after the ground turn.

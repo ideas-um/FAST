@@ -1,11 +1,11 @@
-function [Success] = TestGroundCharge()
+function [Success] = TestUpstreamSplit()
 %battery resize
-% [Success] = TestGroundCharge()
+% [Success] = TestUpstreamSplit()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 31 jul 2024
+% last updated: 3 aug 2024
 %
-% Generate simple test cases to confirm that the battery ground charge
-% script is working properly.
+% Generate simple test cases to confirm that the upstream power script
+% is working properly.
 %
 % INPUTS:
 %     none
@@ -29,13 +29,13 @@ function [Success] = TestGroundCharge()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(3, 1);
+Pass = ones(2, 1);
 
 % count the tests
 itest = 1;
 
-%% CASE 1: SINGLE CELL BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 1: SINGLE ENGINE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -43,10 +43,12 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
-TestIn.Mission.History.SI.Power.SOC = 40;
-TestIn.Specs.Power.Battery.SerCells = 1;
-TestIn.Specs.Power.Battery.ParCells = 1;
+% define constants for the split
+TestIn.Pups = [5000, 3000];
+TestIn.Pdwn = [4000, 4000];
+TestIn.Arch = [1, 1; 1, 1]; 
+TestIn.Oper = [23, 44; 18, 48];
+TestIn.Eff = [90, 85; 88, 92];
 
 % ----------------------------------------------------------
 
@@ -56,11 +58,12 @@ TestIn.Specs.Power.Battery.ParCells = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 220, 0.043)
+% complete the power split
+TestValue = PropulsionPkg.UpstreamSplit(TestIn.Pups, TestIn.Pdwn, ...
+    TestIn.Arch, TestIn.Oper, TestIn.Eff)
 
 % list the correct values of the output
-TrueValue = 66.8269;
+TrueValue = 1;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -68,9 +71,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-
-%% CASE 2: MULTIPLE CELL, SINGLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2: MULTIPLE ENGINES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -78,10 +80,12 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
-TestIn.Mission.History.SI.Power.SOC = 23;
-TestIn.Specs.Power.Battery.SerCells = 1;
-TestIn.Specs.Power.Battery.ParCells = 3;
+% define constants for the split
+TestIn.Pups = [800000, 800000, 400000, 300000];
+TestIn.Pdwn = [600000, 300000, 200000];
+TestIn.Arch = [1, 0, 0; 1, 0, 0; 0, 1, 0; 0, 0, 1]; 
+TestIn.Oper = [25, 15, 10; 25, 15, 10; 25, 15, 10; 25, 15, 10];
+TestIn.Eff = [95, 90, 85; 95, 90, 85; 95, 90, 85; 95, 90, 85];
 
 % ----------------------------------------------------------
 
@@ -91,45 +95,12 @@ TestIn.Specs.Power.Battery.ParCells = 3;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 400, 300)
+% complete the power split
+TestValue = PropulsionPkg.UpstreamSplit(TestIn.Pups, TestIn.Pdwn, ...
+    TestIn.Arch, TestIn.Oper, TestIn.Eff)
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
-
-% run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
-
-%% CASE 3: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% setup the inputs           %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% define the value to be charged
-TestIn.Mission.History.SI.Power.SOC = 2;
-TestIn.Specs.Power.Battery.SerCells = 1;
-TestIn.Specs.Power.Battery.ParCells = 1;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% run the test               %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 600, 2300);
-
-% list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = 1;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -151,7 +122,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "TestGroundCharge tests passed!\n");
+    fprintf(1, "TestUpstreamSplit tests passed!\n");
     
     % return success
     Success = 1;
@@ -159,7 +130,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "TestGroundCharge tests failed:\n");
+    fprintf(1, "TestUpstreamSplit tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

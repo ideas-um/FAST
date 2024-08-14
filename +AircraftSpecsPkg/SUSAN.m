@@ -3,7 +3,7 @@ function [Aircraft] = SUSAN()
 % [Aircraft] = Example()
 % written by Paul Mokotoff, prmoko@umich.edu
 % updated for SUSAN by Miranda Stockhausen, mstockha@umich.edu
-% last updated: 3 Jul 2024
+% last updated: 14 Aug 2024
 %
 % Provide an initial SUSAN electrofan aircraft definition for the user. 
 % This version is defined from the most recent update from NASA 
@@ -45,7 +45,7 @@ Aircraft.Specs.TLAR.EIS = 2040;
 Aircraft.Specs.TLAR.Class = "Turbofan";
             
 % ** REQUIRED ** number of passengers
-Aircraft.Specs.TLAR.MaxPax = 189;
+Aircraft.Specs.TLAR.MaxPax = 250;
 
 % ----------------------------------------------------------
 
@@ -56,7 +56,7 @@ Aircraft.Specs.TLAR.MaxPax = 189;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
 % takeoff speed (m/s)
-Aircraft.Specs.Performance.Vels.Tko = NaN;
+Aircraft.Specs.Performance.Vels.Tko = 77.2;
 
 % cruise  speed (mach)
 Aircraft.Specs.Performance.Vels.Crs = 0.785;
@@ -91,7 +91,7 @@ Aircraft.Specs.Aero.L_D.Crs = 19.7;
 Aircraft.Specs.Aero.L_D.Des = NaN;
 
 % maximum wing loading (kg/m^2)
-Aircraft.Specs.Aero.W_S.SLS = (UnitConversionPkg.ConvForce(190890, 'lbf','N') / 9.81) / 136.57;
+Aircraft.Specs.Aero.W_S.SLS = UnitConversionPkg.ConvMass(190890, 'lbm','kg') / 136.57;
 
 % ----------------------------------------------------------
 
@@ -102,10 +102,10 @@ Aircraft.Specs.Aero.W_S.SLS = (UnitConversionPkg.ConvForce(190890, 'lbf','N') / 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
 % maximum takeoff weight (kg)
-Aircraft.Specs.Weight.MTOW = UnitConversionPkg.ConvForce(190890, 'lbf','N') / 9.81;
+Aircraft.Specs.Weight.MTOW = UnitConversionPkg.ConvMass(190890, 'lbm','kg');
 
 % block fuel (kg)
-Aircraft.Specs.Weight.Fuel = UnitConversionPkg.ConvForce(33240, 'lbf','N') / 9.81;
+Aircraft.Specs.Weight.Fuel = 4722;
 
 % landing weight (kg)
 Aircraft.Specs.Weight.MLW = NaN;
@@ -255,7 +255,7 @@ Aircraft.Specs.Propulsion.PropArch.PSType = [1, zeros(1,33)];
 Aircraft.Specs.Propulsion.T_W.SLS = 0.298;
 
 % total sea level static thrust (N)
-Aircraft.Specs.Propulsion.Thrust.SLS = UnitConversionPkg.ConvForce(54000, "lbf", "N");
+Aircraft.Specs.Propulsion.Thrust.SLS = NaN;
 
 % engine propulSive efficiency
 Aircraft.Specs.Propulsion.Eta.Prop = 0.9;

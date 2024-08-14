@@ -3,16 +3,13 @@ function [Aircraft] = SUSAN_Simplified()
 % [Aircraft] = Example()
 % written by Paul Mokotoff, prmoko@umich.edu
 % updated for SUSAN by Miranda Stockhausen, mstockha@umich.edu
-% last updated: 8 Jul 2024
+% last updated: 14 Aug 2024
 %
 % Provide an initial SUSAN electrofan aircraft definition for the user. 
 % This version is defined from the most recent update from NASA 
 % (url: https://arc.aiaa.org/doi/abs/10.2514/6.2024-1326), and is used for
-% aircraft sizing/performance analysis. This is the second model design
-% iteration with a simplified propulsion architecture. The electric 
-% generators and motors are represented as combined "electric propulsors" 
-% because FAST only allows 2 consecutive power sources in a propulsion 
-% architecture. 
+% aircraft sizing/performance analysis. This is the second major model
+% diesng iteration. 
 %
 % Anything with a "** REQUIRED **" is an input that the user must provde.
 % All other inputs can remain NaN, and a regression function will fill in
@@ -48,7 +45,7 @@ Aircraft.Specs.TLAR.EIS = 2040;
 Aircraft.Specs.TLAR.Class = "Turbofan";
             
 % ** REQUIRED ** number of passengers
-Aircraft.Specs.TLAR.MaxPax = 189;
+Aircraft.Specs.TLAR.MaxPax = 250;
 
 % ----------------------------------------------------------
 
@@ -59,7 +56,7 @@ Aircraft.Specs.TLAR.MaxPax = 189;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
 % takeoff speed (m/s)
-Aircraft.Specs.Performance.Vels.Tko = NaN;
+Aircraft.Specs.Performance.Vels.Tko = 77.2;
 
 % cruise  speed (mach)
 Aircraft.Specs.Performance.Vels.Crs = 0.785;
@@ -94,7 +91,7 @@ Aircraft.Specs.Aero.L_D.Crs = 19.7;
 Aircraft.Specs.Aero.L_D.Des = NaN;
 
 % maximum wing loading (kg/m^2)
-Aircraft.Specs.Aero.W_S.SLS = (UnitConversionPkg.ConvForce(190890, 'lbf','N') / 9.81) / 136.57;
+Aircraft.Specs.Aero.W_S.SLS = UnitConversionPkg.ConvMass(190890, 'lbm','kg') / 136.57;
 
 % ----------------------------------------------------------
 
@@ -105,10 +102,10 @@ Aircraft.Specs.Aero.W_S.SLS = (UnitConversionPkg.ConvForce(190890, 'lbf','N') / 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
 % maximum takeoff weight (kg)
-Aircraft.Specs.Weight.MTOW = 86586;
+Aircraft.Specs.Weight.MTOW = UnitConversionPkg.ConvMass(190890, 'lbm','kg');
 
 % block fuel (kg)
-Aircraft.Specs.Weight.Fuel = 15077;
+Aircraft.Specs.Weight.Fuel = 4722;
 
 % landing weight (kg)
 Aircraft.Specs.Weight.MLW = NaN;
@@ -206,7 +203,7 @@ Aircraft.Specs.Propulsion.PropArch.PSType = [1, zeros(1,32)];
 Aircraft.Specs.Propulsion.T_W.SLS = 0.298;
 
 % total sea level static thrust (N)
-Aircraft.Specs.Propulsion.Thrust.SLS = UnitConversionPkg.ConvForce(54000, "lbf", "N");
+Aircraft.Specs.Propulsion.Thrust.SLS = NaN;
 
 % engine propulSive efficiency
 Aircraft.Specs.Propulsion.Eta.Prop = 0.9;

@@ -3,7 +3,7 @@ function [Aircraft] = SUSAN_NominalMissions(Aircraft)
 % [Aircraft] = NotionalMission00(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % updated for SUSAN by Miranda Stockhausen, mstockha@umich.edu
-% last updated: 15 Jul 2024
+% last updated: 14 Aug 2024
 %
 % Define the design mission (including reserves) for the SUSAN electrofan
 % aircraft concept. The mission includes a 2500 nmi design range, a 100 nmi
@@ -40,60 +40,51 @@ function [Aircraft] = SUSAN_NominalMissions(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the targets (in m or min)
-Mission.Target.Valu = [9; UnitConversionPkg.ConvLength(2470, "naut mi", "m"); UnitConversionPkg.ConvLength(100, "naut mi", "m"); 45];
+Mission.Target.Valu = [UnitConversionPkg.ConvLength(2500, "naut mi", "m"); UnitConversionPkg.ConvLength(100, "naut mi", "m"); 45];
 
 % define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Time"; "Dist"; "Dist"; "Time"];
+Mission.Target.Type = ["Dist"; "Dist"; "Time"];
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Climb"; "Cruise";
-    "Climb"; "Cruise"; "Descent";
+Mission.Segs = ["Takeoff"; "Climb"; "Cruise"; "Descent";
     "Cruise"; "Descent"; 
     "Cruise"; "Descent"; "Landing"];
 
 % define the mission id (segments in same mission must be consecutive)
-Mission.ID   = [ 1; 1; 1; 1;
-    2; 2; 2;
-    3; 3;
-    4; 4; 4];
+Mission.ID  = [ 1; 1; 1; 1; 
+    2; 2;
+    3; 3; 3;]
 
 % define the starting/ending altitudes (in m)
-Mission.AltBeg = UnitConversionPkg.ConvLength([0; 0; 1500; 10000; ...
-    10000; 37000; 37000;
+Mission.AltBeg = UnitConversionPkg.ConvLength([0; 0; 35000; 35000; ...
     10000; 10000;
     1500; 1500; 0], 'ft', 'm');
-Mission.AltEnd = UnitConversionPkg.ConvLength([0; 1500 ; 10000; 10000; ...
-    37000; 37000; 10000;
+Mission.AltEnd = UnitConversionPkg.ConvLength([0; 35000; 35000; 10000; ...
     10000; 1500;
     1500; 0; 0], 'ft', 'm');
 
 % define the climb rate (in m/s)
-Mission.ClbRate = [UnitConversionPkg.ConvVel([0; 3000; 2000; 0; ...
-    1800; 0; -2200], 'ft/min', 'm/s');
+Mission.ClbRate = [0; NaN; 0; NaN; ...
     0; NaN;
     0; NaN; 0];
 
 % define the starting/ending speeds (in m/s or mach)
-Mission.VelBeg  = [0; UnitConversionPkg.ConvVel([150; 250; 250; ...
-    300], 'kts', 'm/s'); 0.785; 0.785; 
+Mission.VelBeg  = [0; UnitConversionPkg.ConvVel(150,'kts', 'm/s'); 0.785; 0.785; 
     UnitConversionPkg.ConvVel([250; 250; ...
     165; 165; 150], 'kts', 'm/s')];
-Mission.VelEnd  = [UnitConversionPkg.ConvVel([150; 250; 250; 300], 'kts', 'm/s'); 
-    0.785; 0.785; UnitConversionPkg.ConvVel([250; ...
-    250; 165; ...
+Mission.VelEnd  = [UnitConversionPkg.ConvVel(150, 'kts', 'm/s'); 0.785; 0.785; UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); ...
+    UnitConversionPkg.ConvVel([250; 165; ...
     165; 150], 'kts', 'm/s'); 0];
 
 % define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["Mach"; "EAS"; "EAS"; "EAS";
-    "EAS"; "Mach"; "Mach"; 
+Mission.TypeBeg = ["Mach"; "EAS"; "Mach"; "Mach"; ...
     "EAS"; "EAS";
     "EAS"; "EAS"; "EAS"];
-Mission.TypeEnd = ["EAS"; "EAS"; "EAS"; "EAS";
-    "Mach"; "Mach"; "EAS"; 
+Mission.TypeEnd = ["EAS"; "Mach"; "Mach"; "EAS";
     "EAS"; "EAS";
     "EAS"; "EAS"; "Mach"];
 

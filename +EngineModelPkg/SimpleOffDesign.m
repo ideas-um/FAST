@@ -1,4 +1,4 @@
-function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
+function [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad, Aircraft)
 %
 % [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
@@ -56,10 +56,29 @@ Cff1  =  0.701;
 Cffch =  8.e-7;
 
 % get the engine's SLS thrust (in kN)
-SLSThrust = OnDesignEngine.Thrust.Net / 1000;
+if Aircraft.Specs.Power.LamTSPS.Tko == 0
+    SLSThrust_conv = OnDesignEngine.Thrust.Net / 1000;
+    c = 1;
+else
+    % The thrust_SLS_HE would be only calculated by
+    % thrust_SLS_Conv - (ElectricLoad in takeoff / TAS) / 1000
+    % The electricload for calculating thrust_SLS_HE is fixed per iteration
+    % , which is ElectricLoad in takeoff. It should not change in different
+    % mission segments like 0 in cruise. Once the thrust_SLS_HE is
+    % obtained, the value should be used for all mission segments. It
+    % doesn't change until next sizing iteration.
+    SLSThrust_HE = 61.02 - ( ElectricLoad / TAS) / 1000;  
 
+    % The thrust_SLS_Conv is the designed thrust obtained by running 
+    % non-electrification case
+    SLSThrust_conv = 61.02;
+
+    c = 2 - SLSThrust_HE / SLSThrust_conv;
+
+end
 % compute the fraction of thrust required to SLS thrust
-ThrustFrac = ThrustReq / SLSThrust;
+
+ThrustFrac = ThrustReq / (c * SLSThrust_conv);
 
 % get the fuel flow
 MDotAct = Cff3  * ThrustFrac ^ 3   + ...
@@ -83,6 +102,7 @@ OffOutputs.Thrust = ThrustReq * 1000;
 % remember the TSFCs (in both units)
 OffOutputs.TSFC          =                            TSFC              ;
 OffOutputs.TSFC_Imperial = UnitConversionPkg.ConvTSFC(TSFC, "SI", "Imp");
+
 
 % ----------------------------------------------------------
 

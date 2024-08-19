@@ -2,7 +2,7 @@ function [] = PlotPerfParam(x, y, lx, ly, name)
 %
 % [] = PlotPerfParam(x, y, lx, ly, name)
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 07 mar 2024
+% updated 19 aug 2024
 %
 % Plot a given parameter from the mission analysis.
 %
@@ -45,8 +45,10 @@ plot(x, y, '-', 'LineWidth', 2);
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set title
-title(sprintf("%s Profile", name));
+% set title, if one is given
+if (nargin >= 5)
+    title(sprintf("%s Profile", name));
+end
 
 % set axis labels
 xlabel(lx);
@@ -56,7 +58,7 @@ ylabel(ly);
 grid on
 
 % larger font size
-set(gca, 'FontSize', 16);
+set(gca, 'FontSize', 14);
 
 % ----------------------------------------------------------
 

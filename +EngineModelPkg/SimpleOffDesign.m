@@ -56,6 +56,8 @@ Cff1  =  0.701;
 Cffch =  8.e-7;
 
 % get the engine's SLS thrust (in kN)
+% if there is no electrification in takeoff, it will run
+% non-electrification case, which c = 1 (SLSThrust_HE = SLSThrust_Conv)
 if Aircraft.Specs.Power.LamTSPS.Tko == 0
     SLSThrust_conv = OnDesignEngine.Thrust.Net / 1000;
     c = 1;

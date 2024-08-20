@@ -1,4 +1,4 @@
-function [] = ElectrifyERJ(RunCases)
+function [] = ElectrifyERJ(RunCases, ValidateBADA)
 %
 % [] = ElectrifyERJ(RunCases)
 % written by Paul Mokotoff, prmoko@umich.edu
@@ -20,6 +20,11 @@ clc, close all
 % assume cases must be run
 if (nargin < 1)
     RunCases = 1;
+end
+
+% assume engine won't be validated
+if (nargin < 2)
+    ValidateBADA = 0;
 end
 
 
@@ -97,6 +102,17 @@ for isplit = 1:nsplit
     SFCs(isplit, 3) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 45, 1);
     SFCs(isplit, 4) = SizedERJ.Mission.History.SI.Propulsion.TSFC(100, 1);
     SFCs(isplit, 5) = SizedERJ.Mission.History.SI.Propulsion.TSFC(117, 1);
+    
+    % use the sized engine at a 0% and 4% split for BADA validation
+    if ((ValidateBADA == 1) && ((isplit == 1) || (isplit == 5)))
+        
+        % get the sized engine
+        SizedEngine = SizedERJ.Specs.Propulsion.SizedEngine;
+        
+        % validate the engine
+        BADAValidation(SizedEngine, isplit-1);
+                
+    end
     
 end
 

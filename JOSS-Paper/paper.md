@@ -140,7 +140,7 @@ PM to GC: Done! See the beginning of the above paragraph.
 
 Figure \autoref{Fig:HighLevelDSM} provides a high-level overview of FAST's main functionality, showing user inputs, outputs, and internal processes through white, red, and green boxes, respectively.
 
-![High-level overview of FAST's main functionality \label{Fig:HighLevelDSM}](Figures/OnDesign-HighLevel.PNG){width = 80%}
+![High-level overview of FAST's main functionality \label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG){width = 80%}
 
 The workflow begins with the user inputting all known aircraft information, which FAST assembles into an aircraft model. 
 The user also provides a mission profile, which informs FAST how to fly the aircraft while sizing it.

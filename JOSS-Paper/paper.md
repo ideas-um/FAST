@@ -138,23 +138,31 @@ PM to GC: Done! See the beginning of the above paragraph.
 
 # FAST Workflow Overview
 
-Figure \autoref{Fig:HighLevelDSM} provides a high-level overview of FAST's main functionality, showing user inputs, outputs, and internal processes through white, red, and green boxes, respectively.
+Figure \autoref{Fig:HighLevelDSM} provides a high-level overview of FAST's main functionality, showing user inputs and the modules in the workflow.
+Information that is fed forward and backward is shown by red and green arrows, respectively.
 
-![High-level overview of FAST's main functionality \label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG){width = 80%}
+![High-level overview of FAST's main functionality (produced via [@gray2019openmdao]) \label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG){width = 80%}
 
-The workflow begins with the user inputting all known aircraft information, which FAST assembles into an aircraft model. 
-The user also provides a mission profile, which informs FAST how to fly the aircraft while sizing it.
+First, the user inputs the Aircraft Specifications and a Mission Profile, which informs FAST how to fly the aircraft while sizing it.
+Then, FAST's Initialization module assembles the user-provided information into an aircraft model.
+If any design parameters are unknown, FAST utilizes its historical database [@arnson2025predicting] to generate regressions that predict these values.
+Once the model is complete, FAST generates mathematical representations of the aircraft's propulsion architecture and its operation during flight (adapted from @cinar2020framework).
+Before analyzing the aircraft, FAST checks to ensure that the mission profile provided by the user is valid.
+
 <!-- GC: don't we have default mission profiles loaded as well?
 
 PM to GC: We provide many mission profiles for the user to choose from, but FAST does not automatically select a default mission profile to be flown. The user must select from the mission profiles shipped with FAST, or come up with their own. In the future, we could add an enhancement that automatically flies a mission profile based on the aircraft class and payload.
 
 -->
-If any design parameters are unknown, FAST utilizes its historical database [@arnson2025predicting] to generate regressions that predict these values.
 
-Once the model is complete, FAST generates mathematical representations of the aircraft's propulsion architecture and its operation during flight (adapted from @cinar2020framework).
-Before analyzing the aircraft, FAST checks to ensure that the mission profile provided by the user is valid.
-Upon passing these checks, the aircraft is sized using a fixed-point iteration [@ascher2011first] to converge on a design.
-The sizing process employs an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodology] to calculate the energy required for the mission and allocate it among available energy sources. (e.g., jet fuel, hydrogen, battery).
+After initialization, the aircraft is sized using a fixed-point iteration [@ascher2011first].
+First, there is an iteration between the aircraft's point performance parameters (thrust- or power-weight ratio and wing loading) and operating empty weight (OEW, which consists of the airframe, propulsion system, and crew weights).
+As the OEW changes, the point performance parameters impact the airframe and propulsion system size.
+After this iteration, an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodology] is employed to calculate the energy required for the mission and allocate it among available energy sources. (e.g., jet fuel, hydrogen, battery).
+The energy required found in the mission analysis informs the energy source sizing about how much of each energy source must be carried on the aircraft.
+After the energy source weights are updated, a new maximum takeoff weight (MTOW) is computed and returned to the aircraft model.
+The iteration continues until converging on MTOW.
+
 Upon completion of the sizing process, the aircraft model is returned to the user as a Matlab `struct`, allowing for further analysis or integration into other studies.
 FAST also offers post-processing options, such as mission history visualization (i.e., information about the flight simulated, see Fig. \autoref{Fig:MissionHistory}.
 }) and geometric visualization of the sized aircraft (see Fig. \autoref{Fig:GeometryExample}).

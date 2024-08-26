@@ -1,4 +1,4 @@
-function [] = ElectrifyERJ(RunCases)
+function [SizedERJ] = ElectrifyERJ(RunCases)
 %
 % [] = ElectrifyERJ(RunCases)
 % written by Paul Mokotoff, prmoko@umich.edu
@@ -30,10 +30,10 @@ end
 ERJ = AircraftSpecsPkg.ERJ175LR;
 
 % number of power splits
-nsplit = 11;
+nsplit = 16;
 
 % assume a set of takeoff power splits
-LambdaTko = linspace(0, 10, nsplit);
+LambdaTko = linspace(0, 15, nsplit);
 
 % remember the results
 MTOW  = zeros(nsplit, 1);
@@ -44,8 +44,8 @@ Wem   = zeros(nsplit, 1);
 Weng  = zeros(nsplit, 1);
 TSLS  = zeros(nsplit, 1);
 TTOC  = zeros(nsplit, 1);
-SFCs  = zeros(nsplit, 5);
-
+SFCs  = zeros(nsplit, 7);
+TSLS_per_engine = zeros(nsplit, 1);
 
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -88,15 +88,18 @@ for isplit = 1:nsplit
     Weng( isplit) = SizedERJ.Specs.Weight.Engines;
     
     % remember the thrust results
-    TSLS(isplit) = SizedERJ.Specs.Propulsion.Thrust.SLS            ;
-    TTOC(isplit) = SizedERJ.Mission.History.SI.Power.Tout_PS(37, 1);
+    TSLS(isplit)            = SizedERJ.Specs.Propulsion.Thrust.SLS            ;
+    TSLS_per_engine(isplit) = SizedERJ.Specs.Propulsion.SLSThrust(1)
+    TTOC(isplit)            = SizedERJ.Mission.History.SI.Power.Tout_PS(37, 1);
     
     % remember SFCs at specific points in the mission
-    SFCs(isplit, 1) = SizedERJ.Mission.History.SI.Propulsion.TSFC(  1, 1);
-    SFCs(isplit, 2) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 37, 1);
-    SFCs(isplit, 3) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 45, 1);
-    SFCs(isplit, 4) = SizedERJ.Mission.History.SI.Propulsion.TSFC(100, 1);
-    SFCs(isplit, 5) = SizedERJ.Mission.History.SI.Propulsion.TSFC(117, 1);
+    SFCs(isplit, 1) = SizedERJ.Mission.History.SI.Propulsion.TSFC(  2, 1); %TkoSFC
+    SFCs(isplit, 2) = SizedERJ.Mission.History.SI.Propulsion.TSFC_EMT(  2, 1); %TkoSFC_EMT
+    SFCs(isplit, 3) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 37, 1); %TOCSFC
+    SFCs(isplit, 4) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 39, 1); %Beginning_of_CruiseSFC
+    SFCs(isplit, 5) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 45, 1); %TODSFC
+    SFCs(isplit, 6) = SizedERJ.Mission.History.SI.Propulsion.TSFC(100, 1); %BegSFC
+    SFCs(isplit, 7) = SizedERJ.Mission.History.SI.Propulsion.TSFC(117, 1); %EndSFC
     
 end
 
@@ -108,19 +111,22 @@ end
 SFCs = UnitConversionPkg.ConvTSFC(SFCs, "SI", "Imp");
 
 % retrieve the important SFCs for plotting
-TkoSFC = SFCs([1, 6, 8, 11], 1)';
-TOCSFC = SFCs([1, 6, 8, 11], 2)';
-TODSFC = SFCs([1, 6, 8, 11], 3)';
-BegSFC = SFCs([1, 6, 8, 11], 4)';
-EndSFC = SFCs([1, 6, 8, 11], 5)';
+TkoSFC       = SFCs([1, 6, 8, 11], 1)';
+TkoSFC_EMT   = SFCs([1, 6, 8, 11], 2)';
+TOCSFC       = SFCs([1, 6, 8, 11], 3)';
+BegCruiseSFC = SFCs([1, 6, 8, 11], 4)';
+TODSFC       = SFCs([1, 6, 8, 11], 5)';
+BegSFC       = SFCs([1, 6, 8, 11], 6)';
+EndSFC       = SFCs([1, 6, 8, 11], 7)';
 
 % compute the percent difference in MTOW, OEW, and fuel
-PercDiffMTOW  = 100 .* ( MTOW(2:end) -  MTOW(1)) ./  MTOW(1);
-PercDiffOEW   = 100 .* (  OEW(2:end) -   OEW(1)) ./   OEW(1);
-PercDiffWfuel = 100 .* (Wfuel(2:end) - Wfuel(1)) ./ Wfuel(1);
-PercDiffWeng  = 100 .* ( Weng(2:end) -  Weng(1)) ./  Weng(1);
-PercDiffTSLS  = 100 .* ( TSLS(2:end) -  TSLS(1)) ./  TSLS(1);
-PercDiffTTOC  = 100 .* ( TTOC(2:end) -  TTOC(1)) ./  TTOC(1);
+PercDiffMTOW      = 100 .* ( MTOW(2:end) -  MTOW(1)) ./  MTOW(1);
+PercDiffOEW       = 100 .* (  OEW(2:end) -   OEW(1)) ./   OEW(1);
+PercDiffWfuel     = 100 .* (Wfuel(2:end) - Wfuel(1)) ./ Wfuel(1);
+PercDiffWeng      = 100 .* ( Weng(2:end) -  Weng(1)) ./  Weng(1);
+PercDiffTSLS      = 100 .* ( TSLS(2:end) -  TSLS(1)) ./  TSLS(1);
+PercDiffTTOC      = 100 .* ( TTOC(2:end) -  TTOC(1)) ./  TTOC(1);
+PercDiffSLSThrust = 100 .* ( TSLS_per_engine(2:end) - TSLS_per_engine(1)) ./ TSLS_per_engine(1); 
 
 % plot the MTOW results
 figure;
@@ -245,7 +251,7 @@ grid on
 % plot the important SFCs
 figure;
 hold on;
-b = bar([TkoSFC; TOCSFC; TODSFC; BegSFC; EndSFC]);
+b = bar([TkoSFC; TkoSFC_EMT; TOCSFC; BegCruiseSFC; TODSFC; BegSFC; EndSFC]);
 
 % add labels to the bars
 for i = 1:4
@@ -261,10 +267,25 @@ xlabel("Flight Phase");
 ylabel("SFC (lbm/lbf/hr)");
 grid on
 legend("Conventional", "5% PHE", "7% PHE", "10% PHE");
-xticks(1:5);
-xticklabels(["Takeoff", "Top of Climb", "Top of Descent", "Start of Reserve", "End of Reserve"]);
+xticks(1:7);
+xticklabels(["Takeoff", "Takeoff with EM thrust", "Top of Climb", "Beginning of Cruise", "Top of Descent", "Start of Reserve", "End of Reserve"]);
 set(gca, "FontSize", 18);
 ylim([0, 0.9]);
+
+% plot the fuel burn results
+figure;
+yyaxis left
+plot(LambdaTko, TSLS_per_engine, "-o", "LineWidth", 2);
+ylabel("SLS Thrust per engine");
+yyaxis right
+plot(LambdaTko(2:end), PercDiffSLSThrust, "-o", "LineWidth", 2);
+ylabel("Percent Difference (%)");
+
+% format plot
+title("Electrified ERJ - SLS Thrust per engine");
+xlabel("Power Split (%)");
+set(gca, "FontSize", 18);
+grid on
 
 % ----------------------------------------------------------
 

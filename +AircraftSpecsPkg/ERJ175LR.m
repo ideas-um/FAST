@@ -40,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % formerly 0.985
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % formerly 0.985
+Aircraft.Specs.Aero.L_D.ClbCF = 1.002; %1.000; % formerly 0.985
+Aircraft.Specs.Aero.L_D.CrsCF = 1.000; %1.000; % formerly 0.985
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.042; % formerly 1.000
+Aircraft.Specs.Propulsion.MDotCF = 1.029; %1.042; % formerly 1.000
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.018; % formerly 1.0333
+Aircraft.Specs.Weight.WairfCF = 1.018; %1.018; % formerly 1.0333
  
 
 %% VEHICLE PERFORMANCE %%

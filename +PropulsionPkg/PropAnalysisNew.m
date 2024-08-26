@@ -323,7 +323,7 @@ MDotFuel = zeros(npnt, nps);
 MDotAir  = zeros(npnt, nps);
 FanDiam  = zeros(npnt, nps);
 ExitMach = zeros(npnt, nps);
-
+SFC_EMT  = zeros(npnt, nps);
 % check for a battery
 if (any(Batt))   
     
@@ -408,10 +408,12 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(ODEng, OffParams, ElecPower, Aircraft) EngineModelPkg.SimpleOffDesign(ODEng, OffParams, ElecPower,Aircraft);
+
+            EngSizeFun = @(ODEng, OffParams, ElecPower, Aircraft) EngineModelPkg.SimpleOffDesign(ODEng, OffParams, ElecPower, Aircraft);
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
+        GetSFC_EMT = @(OffDesignEng) OffDesignEng.TSFC_with_EMT;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
@@ -506,10 +508,10 @@ if (any(Fuel))
             OffParams.Thrust = TTemp(ipnt);
             
             OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt),Aircraft);
-            
+
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
-            
+            SFC_EMT(ipnt, icol) = GetSFC_EMT(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             % get the fuel flow
             MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;
             
@@ -578,6 +580,7 @@ Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
 Aircraft.Mission.History.SI.Propulsion.MDotAir( SegBeg:SegEnd, :) = MDotAir ; 
 Aircraft.Mission.History.SI.Propulsion.FanDiam( SegBeg:SegEnd, :) = FanDiam ;
 Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
+Aircraft.Mission.History.SI.Propulsion.TSFC_EMT(SegBeg:SegEnd, :) = SFC_EMT;
 
 % power quantities
 Aircraft.Mission.History.SI.Power.SOC( SegBeg:SegEnd, :) = SOC  ;

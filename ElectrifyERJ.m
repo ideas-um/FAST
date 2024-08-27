@@ -89,7 +89,7 @@ for isplit = 1:nsplit
     
     % remember the thrust results
     TSLS(isplit)            = SizedERJ.Specs.Propulsion.Thrust.SLS            ;
-    TSLS_per_engine(isplit) = SizedERJ.Specs.Propulsion.SLSThrust(1)
+    TSLS_per_engine(isplit) = SizedERJ.Specs.Propulsion.SLSThrust(1)          ;
     TTOC(isplit)            = SizedERJ.Mission.History.SI.Power.Tout_PS(37, 1);
     
     % remember SFCs at specific points in the mission

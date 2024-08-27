@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 jul 2024
+% last updated: 27 aug 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -324,6 +324,7 @@ MDotAir  = zeros(npnt, nps);
 FanDiam  = zeros(npnt, nps);
 ExitMach = zeros(npnt, nps);
 SFC_EMT  = zeros(npnt, nps);
+
 % check for a battery
 if (any(Batt))   
     
@@ -408,8 +409,7 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-
-            EngSizeFun = @(ODEng, OffParams, ElecPower, Aircraft) EngineModelPkg.SimpleOffDesign(ODEng, OffParams, ElecPower, Aircraft);
+        EngSizeFun = @(ODEng, OffParams, ElecPower, Aircraft) EngineModelPkg.SimpleOffDesign(ODEng, OffParams, ElecPower, Aircraft);
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
@@ -434,8 +434,8 @@ if (any(Fuel))
         
         % get the column index
         icol = HasEng(ieng);
-                
-        % compute the thrust output from the engine
+        
+        % compute the thrust output from the engine (account for fan)
         TEng = PoutTS(ibeg:iend, icol) ./ TAS(ibeg:iend);
     
         % check for an electric motor connection
@@ -463,10 +463,7 @@ if (any(Fuel))
             
             % any required thrust < 1 must be rounded up to 5% SLS thrust
             TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
-            
-            % divide the electric motor power by the fan efficiency
-            EMPartPower = EMPartPower ./ Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-            
+                        
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
@@ -477,22 +474,17 @@ if (any(Fuel))
             PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
             
         end
-    
-        % temporary mach number
-        MTemp = Mach(ibeg:iend);
         
-        % any mach number < 0.05 must be rounded up to 0.05
-        MTemp(Mach < 0.05) = 0.05;
-        
-        % get altitudes
-        Alt = Alt(ibeg:iend);
+        % get altitudes and mach number
+        Alt  = Alt( ibeg:iend);
+        Mach = Mach(ibeg:iend);
                         
         % compute the SFC as a function of thrust required
         for ipnt = 1:(npnt-1)
             
             % update the engine performance requirements
-            OffParams.FlightCon.Mach = MTemp(ipnt);
-            OffParams.FlightCon.Alt  = Alt(  ipnt);
+            OffParams.FlightCon.Mach = Mach(ipnt);
+            OffParams.FlightCon.Alt  = Alt( ipnt);
             
             % get the required thrust/power
             if      (strcmpi(aclass, "Turbofan" ) == 1)
@@ -504,14 +496,16 @@ if (any(Fuel))
                 
             end
             
-            % size the engine at that point
+            % get the off-design thrust
             OffParams.Thrust = TTemp(ipnt);
             
-            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt),Aircraft);
+            % run the engine model
+            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt), Aircraft);
 
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             SFC_EMT(ipnt, icol) = GetSFC_EMT(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+            
             % get the fuel flow
             MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;
             

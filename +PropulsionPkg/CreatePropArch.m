@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 mar 2024
+% last updated: 27 aug 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system
@@ -89,6 +89,11 @@ if     (strcmpi(ArchName, "C"  ) == 1)
         % use the propeller efficiency in the TSPS efficiency
         EtaTSPS = EtaTSPS + (EtaPropeller - 1) .* eye(NumEng);
         
+    elseif (strcmpi(aclass, "Turbofan") == 1)
+        
+        % account for the fan efficiency
+        EtaTSPS = EtaTSPS + (Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan - 1) .* eye(NumEng);
+        
     end
     
     % power -power  source efficiency
@@ -139,6 +144,11 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
         % use the propeller efficiency in the TSPS efficiency
         EtaTSPS = EtaTSPS + (EtaPropeller - 1) .* eye(NumEng);
         
+    elseif (strcmpi(aclass, "Turbofan") == 1)
+        
+        % account for the fan efficiency
+        EtaTSPS = EtaTSPS + (Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan - 1) .* eye(NumEng);
+        
     end
     
     % power -power  source efficiency
@@ -188,6 +198,11 @@ elseif (strcmpi(ArchName, "PHE") == 1)
         
         % use the propeller efficiency in the TSPS efficiency
         EtaTSPS = EtaTSPS + (EtaPropeller - 1) .* repmat(eye(NumEng), 1, 2);
+        
+    elseif (strcmpi(aclass, "Turbofan") == 1)
+        
+        % account for the fan efficiency
+        EtaTSPS = EtaTSPS + (Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan - 1) .* repmat(eye(NumEng), 1, 2);
         
     end
         

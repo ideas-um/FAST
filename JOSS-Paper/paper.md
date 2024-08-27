@@ -102,7 +102,7 @@ This is particularly challenging for novel aircraft designs, where key parameter
 
 FAST addresses these challenges by leveraging historical data from over 450 aircraft and 200 engines to create predictive regressions [@arnson2025predicting].
 These regressions are employed to estimate any design parameters that the user may not have, such as engine weight based on required thrust or power.
-Combined with physics-based models, FAST rapidly analyzes an aircraft configuration, converging on a design in under a minute (typically under 30 seconds). 
+Combined with physics-based models, FAST rapidly analyzes an aircraft configuration, converging on a design faster than existing detailed design tools.
 This rapid sizing is achieved through an energy-based mission analysis, where the aircraft is approximated as a point mass to evaluate the aircraft dynamics, forces, and energy required for a given mission [@anderson1999aircraft; @cinar2018methodology].
 Additionally, FAST can analyze any propulsion architecture, including conventional, electric, and hybrid systems, using a graph theory-inspired approach that represents propulsion connections and in-flight operations as matrices [@cinar2020framework].
 

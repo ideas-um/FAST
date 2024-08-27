@@ -39,11 +39,19 @@ Mach = OffParams.FlightCon.Mach;
 % get the thrust required
 ThrustReq = OffParams.Thrust;
 
+% compute the thrust from the electric motor
+T_EM = ElectricLoad * Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan / TAS;
+
+% check that it is a number
+if (isnan(T_EM))
+    T_EM = 0;
+end
+
 % subtract the thrust provided by the electric motor
-ThrustReq = ThrustReq - ElectricLoad * Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan / TAS;
+ThrustReq = ThrustReq - T_EM;
 
 % negative thrust required indicates the electric motor produces all power
-if (ThrustReq < 1.0e-06)
+if (ThrustReq < -1.0e-06)
     
     % therefore, no thrust from the engine is needed
     ThrustReq = 0;

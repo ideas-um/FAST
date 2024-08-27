@@ -409,7 +409,7 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(ODEng, OffParams, ElecPower, Aircraft) EngineModelPkg.SimpleOffDesign(ODEng, OffParams, ElecPower, Aircraft);
+        EngSizeFun = @(Aircraft, OffParams, ElecPower) EngineModelPkg.SimpleOffDesign(Aircraft, OffParams, ElecPower);
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
@@ -500,7 +500,7 @@ if (any(Fuel))
             OffParams.Thrust = TTemp(ipnt);
             
             % run the engine model
-            OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.SizedEngine, OffParams, EMPartPower(ipnt), Aircraft);
+            OffDesignEngine = EngSizeFun(Aircraft, OffParams, EMPartPower(ipnt));
 
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;

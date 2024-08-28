@@ -155,11 +155,11 @@ PM to GC: We provide many mission profiles for the user to choose from, but FAST
 -->
 
 After initialization, the aircraft is sized using a fixed-point iteration [@ascher2011first].
-First, there is an iteration between the aircraft's point performance parameters (thrust- or power-weight ratio and wing loading, which remain fixed) and operating empty weight (OEW, which consists of the airframe, propulsion system, and crew weights).
-After this iteration, an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodology] and propulsion system component models are employed to calculate the energy required for the mission and allocate it amongst the available energy sources (e.g., jet fuel, hydrogen, battery), respectively.
-The energy required from the mission analysis informs the energy source sizing, thus allowing a new maximum takeoff weight (MTOW) to be computed.
+Note that FAST does not perform a constraint analysis and assumes that the point performance parameters input (thrust- or power-weight ratio and wing loading, which remain fixed) are feasible.
+First, there is an iteration between the aircraft's point performance parameters and operating empty weight (OEW, which consists of the airframe, propulsion system, and crew weights).
+Second, an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodology] is employed to calculate the energy required for the mission and allocate it amongst the available energy sources (e.g., jet fuel, hydrogen, battery).
+Lastly, the energy required from the mission analysis informs the energy source sizing, which then returns a new maximum takeoff weight (MTOW).
 The iteration continues until converging on MTOW.
-Note that for rapid convergence, the initial MTOW should reasonably approximate the expected MTOW of the sized aircraft.
 
 Upon completion of the sizing process, the aircraft model is returned to the user as a Matlab `struct`, allowing for further analysis or integration into other studies.
 FAST also offers post-processing options, such as mission history visualization (i.e., information about the flight simulated, see Fig. \autoref{Fig:MissionHistory}.

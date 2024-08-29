@@ -161,27 +161,31 @@ Aircraft.Specs.Power.P_W.EG = 10;
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
+Aircraft.Specs.Power.LamTS.Alt = NaN;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split =  {.05, "Takeoff"};
-Aircraft.Specs.Power.LamTSPS.SLS = 0.05;
+Aircraft.Specs.Power.LamTSPS.Split =  0;
+Aircraft.Specs.Power.LamTSPS.Alt = NaN;
+Aircraft.Specs.Power.LamTSPS.SLS = 0;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
+Aircraft.Specs.Power.LamPSPS.Alt = NaN;
 Aircraft.Specs.Power.LamPSPS.SLS = 0;
 
 % power splits between energy/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSES.Split = 0;
+Aircraft.Specs.Power.LamPSES.Alt = NaN;
 Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = 100;%100;
-Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
+Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

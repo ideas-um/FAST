@@ -1,7 +1,8 @@
 function [Aircraft] = LamVSalt(Aircraft)
 
-% lamtsps example = {[.05, .01], {"Takeoff", [0, 500]}} 
-% means: tko 5% battery all the way through, then 1% up to 500 feet
+% lamtsps example = Aircraft.Specs.Power.LamTSPS.Split = .05
+%                   Aircraft.SPecs.Power.LamTSPS.Alt = [0,5000]
+% means: 5% split from 0 to 5000 ft
 
 % adaptive power management
 
@@ -25,53 +26,71 @@ for i = 1:4
    % get lambda type from ac struct
    lam = Aircraft.Specs.Power.(lams(i)).Split;
 
+   % get alt range
+   altLam = Aircraft.Specs.Power.(lams(i)).Alt;
+
    % initialize power split array
    npoints = length(Alt);
    Aircraft.Mission.History.SI.Power.(lams(i)) = zeros(npoints,1);
    
+   % if split is already an array make mission hist equal to it
    if length(Aircraft.Specs.Power.(lams(i)).Split) == npoints
        Aircraft.Mission.History.SI.Power.(lams(i)) = Aircraft.Specs.Power.(lams(i)).Split;
 
-   % check if a power split is designated
-   elseif iscell(lam)
+   % check if a power split v alt is designated
+   elseif lam ~= 0
+        
+       % check to see if designated multiple splits
+       if iscell(lam)
 
-       % iterate through number of split segements
-       for j = 1:length(lam{1})
+           % iterate through number of split segements
+           for j = 1:length(lam)
 
-           % power split values inputed by user
-           split = lam{1}(j);
-           % segements to put power splits over
-           seg = lam{2}{j};
+               % power split values inputed by user
+               split = lam{j};
 
-           % if gave alt range, fill inbetween
-           if isnumeric(seg)
+               % segements to put power splits over
+               seg = altLam{j};
+
+               % convert feet to meters
+               seg = UnitConversionPkg.ConvLength(seg, 'ft', 'm');
+    
                % find beginning and ending index of altitude vector
                BegDif = ((seg(1) - Alt) < 0);
                EndDif = ((seg(2) - Alt) < 0);
                SegBeg = find(BegDif, 1) - 1;
                SegEnd = find(EndDif, 1) - 1;
+    
+                   % eventually change that if the new segement index is lower
+                   % than the last one, dont override start at the next
+                   % biggest index that pasts the alt requirement
+    
+               npoints = SegEnd - SegBeg + 1;
+               Aircraft.Mission.History.SI.Power.(lams(i))(SegBeg:SegEnd) = linspace(split, split, npoints);
+           end
 
-               % eventually change that if the new segement index is lower
-               % than the last one, dont override start at the next
-               % biggest index that pasts the alt requirement
-               
-           % otherwise find end or beginning of segement
-           else
-               SegID = find(strcmp(Profile.Segs, seg));
-               SegBeg = Profile.SegBeg(SegID);
-               SegEnd = Profile.SegEnd(SegID);
-           end
-        
-           % if split is an integer: segement is constant, if 2 values : linear
-           splitType = length(split);
+       % only one split designated 
+       else
+         % power split values inputed by user
+           split = lam;
+
+           % segements to put power splits over
+           seg = altLam;
+
+           % convert feet to meters
+           seg = UnitConversionPkg.ConvLength(seg, 'ft', 'm');
+
+           % find beginning and ending index of altitude vector
+           BegDif = ((seg(1) - Alt) < 0);
+           EndDif = ((seg(2) - Alt) < 0);
+           SegBeg = find(BegDif, 1) - 1;
+           SegEnd = find(EndDif, 1) - 1;
+
            npoints = SegEnd - SegBeg + 1;
-           if splitType == 1
-                Aircraft.Mission.History.SI.Power.(lams(i))(SegBeg:SegEnd) = linspace(split, split, npoints);
-           else
-                Aircraft.Mission.History.SI.Power.(lams(i))(SegBeg:SegEnd) = linspace(split(1), split(2), npoints);
-           end
+           Aircraft.Mission.History.SI.Power.(lams(i))(SegBeg:SegEnd) = linspace(split, split, npoints);
        end
    end
+
    Aircraft.Specs.Power.(lams(i)).Split = Aircraft.Mission.History.SI.Power.(lams(i));
    if max(Aircraft.Mission.History.SI.Power.(lams(i))) > Aircraft.Specs.Power.(lams(i)).SLS
         error("ERROR - a %s power split is greater than given %s SLS", lams(i), lams(i));

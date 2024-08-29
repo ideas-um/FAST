@@ -194,7 +194,7 @@ PlotPkg.PlotPerfParam(Time, PoutVector, 0, "Flight Time (min)", "Power Output (M
 
 % plot the fuel flow
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, MDotFuel, 0, "Flight Time (min)", "Fuel Flow (kg/s)", "Fuel Flow");
+PlotPkg.PlotPerfParam(Time, MDotFuel, 1, "Flight Time (min)", "Fuel Flow (kg/s)", "Fuel Flow");
 
 % plot the sfc
 subplot(2, 2, 4);

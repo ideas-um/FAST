@@ -41,15 +41,32 @@ function [] = PlotPerfParam(x, y, inst, lx, ly, name)
 % check if the variable is instantaneous
 if (inst == 1)
     
-    % create a "step-like" function
+    % create a "step-like" function by reshaping the inputs arrays
     %
     %             |------------
     %             |
     % ------------|
     %
-    % by reshaping the input arrays
-    x = [reshape([x(1:end-1)'; x(2:end  )'], [], 1); x(end)];
-    y = [reshape([y(1:end-1)'; y(1:end-1)'], [], 1); y(end)];
+    
+    % get the matrix size
+    [nrow, ncol] = size(x);
+    
+    % allocate memory
+    xnew = zeros(2*(nrow-1)+1, ncol);
+    ynew = zeros(2*(nrow-1)+1, ncol);
+    
+    % loop through each column
+    for icol = 1:ncol
+        
+        % transform data into a "step-like" function
+        xnew(:, icol) = [reshape([x(1:end-1, icol)'; x(2:end  , icol)'], [], 1); x(end, icol)];
+        ynew(:, icol) = [reshape([y(1:end-1, icol)'; y(1:end-1, icol)'], [], 1); y(end, icol)];
+        
+    end
+    
+    % remember the new result
+    x = xnew;
+    y = ynew;
     
 end
 

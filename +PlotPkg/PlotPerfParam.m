@@ -1,8 +1,8 @@
-function [] = PlotPerfParam(x, y, lx, ly, name)
+function [] = PlotPerfParam(x, y, inst, lx, ly, name)
 %
-% [] = PlotPerfParam(x, y, lx, ly, name)
+% [] = PlotPerfParam(x, y, inst, lx, ly, name)
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 07 mar 2024
+% updated 29 aug 2024
 %
 % Plot a given parameter from the mission analysis.
 %
@@ -12,6 +12,10 @@ function [] = PlotPerfParam(x, y, lx, ly, name)
 %
 %     y    -   dependent variable.
 %            size/type/units: 1-by-1 / double / []
+%
+%     inst - flag to indicate whether the dependent variable is an
+%            instantaneous quantity (1) or a state variable (0)
+%            size/type/units: 1-by-1 / int / []
 %
 %     lx   - x-axis label.
 %            size/type/units: 1-by-1 / string / []
@@ -25,6 +29,29 @@ function [] = PlotPerfParam(x, y, lx, ly, name)
 % OUTPUTS:
 %     none
 %
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% data formatting            %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% check if the variable is instantaneous
+if (inst == 1)
+    
+    % create a "step-like" function
+    %
+    %             |------------
+    %             |
+    % ------------|
+    %
+    % by reshaping the input arrays
+    x = [reshape([x(1:end-1)'; x(2:end  )'], [], 1); x(end)];
+    y = [reshape([y(1:end-1)'; y(1:end-1)'], [], 1); y(end)];
+    
+end
 
 % ----------------------------------------------------------
 

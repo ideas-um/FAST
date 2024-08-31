@@ -59,14 +59,14 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+TestValue = [Voltage, Pout, Capacity, Q, SOC];
 
 % list the correct values of the output
-TrueValue = [3.3702, 29.6720, 100.0000, 2.7000];
+TrueValue = [3.3702, 29.6720, 100.0000, 2.7000, 62.5412];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
@@ -100,14 +100,14 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+TestValue = [Voltage, Pout, Capacity, Q, SOC];
 
 % list the correct values of the output
-TrueValue = [3.6403, 27.4707, 100, 6.48];
+TrueValue = [3.6403, 27.4707, 100, 6.48, 67.2527];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
@@ -140,14 +140,14 @@ TestIn.Series = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+TestValue = [Voltage, Pout, Capacity, Q, SOC];
 
 % list the correct values of the output
-TrueValue = [10.4583, 6.8844, 72.0000, 4.5000];
+TrueValue = [10.4583, 6.8844, 72.0000, 4.5000, 49.4264];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
@@ -180,14 +180,14 @@ TestIn.Series = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
     TestIn.Parallel,TestIn.Series);
 
 % store resulting values
-TestValue = [Voltage, Pout, Capacity, SOC];
+TestValue = [Voltage, Pout, Capacity, Q, SOC];
 
 % list the correct values of the output
-TrueValue = [10.8624, 46.0300, 499.9950, 31.5000];
+TrueValue = [10.8624, 46.0300, 499.9950, 31.5000, 62.3295];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);

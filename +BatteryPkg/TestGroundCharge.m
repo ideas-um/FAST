@@ -69,8 +69,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 itest = itest + 1;
 
 
-%% CASE 2: MULTIPLE CELL, SINGLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 2: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -81,7 +81,7 @@ itest = itest + 1;
 % define the value to be charged
 TestIn.Mission.History.SI.Power.SOC = 23;
 TestIn.Specs.Power.Battery.SerCells = 1;
-TestIn.Specs.Power.Battery.ParCells = 3;
+TestIn.Specs.Power.Battery.ParCells = 5;
 
 % ----------------------------------------------------------
 
@@ -92,10 +92,10 @@ TestIn.Specs.Power.Battery.ParCells = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 400, 300)
+TestValue = BatteryPkg.GroundCharge(TestIn, 60, 1.5);
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = 83.5877;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -103,8 +103,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CASE 3: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -113,8 +113,8 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the value to be charged
-TestIn.Mission.History.SI.Power.SOC = 2;
-TestIn.Specs.Power.Battery.SerCells = 1;
+TestIn.Mission.History.SI.Power.SOC = 45;
+TestIn.Specs.Power.Battery.SerCells = 2;
 TestIn.Specs.Power.Battery.ParCells = 1;
 
 % ----------------------------------------------------------
@@ -126,10 +126,44 @@ TestIn.Specs.Power.Battery.ParCells = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 600, 2300);
+TestValue = BatteryPkg.GroundCharge(TestIn, 300, 0.097);
 
 % list the correct values of the output
-TrueValue = [-0.4381, 207.2163, -90.7901, 2.550];
+TrueValue = 86.1557;
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+%% CASE 4: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% define the value to be charged
+TestIn.Mission.History.SI.Power.SOC = 50;
+TestIn.Specs.Power.Battery.SerCells = 3;
+TestIn.Specs.Power.Battery.ParCells = 3;
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% complete the ground charge and store resulting value
+TestValue = BatteryPkg.GroundCharge(TestIn, 600, 1);
+
+% list the correct values of the output
+TrueValue = 100;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);

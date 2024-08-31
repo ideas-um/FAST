@@ -64,7 +64,7 @@ TestOut = BatteryPkg.ResizeBattery(TestIn);
 TestValue = TestOut.Specs.Weight.Batt
 
 % list the correct values of the output
-TrueValue = 64464.99444;
+TrueValue = 1;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -108,7 +108,7 @@ TestOut = BatteryPkg.ResizeBattery(TestIn);
 TestValue = TestOut.Specs.Weight.Batt
 
 % list the correct values of the output
-TrueValue = 64464.99444;
+TrueValue = 1;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);

@@ -57,7 +57,7 @@ TestIn.Specs.Power.Battery.ParCells = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 220, 0.043)
+TestValue = BatteryPkg.GroundCharge(TestIn, 220, 0.043);
 
 % list the correct values of the output
 TrueValue = 66.8269;

@@ -61,7 +61,7 @@ TestIn.Settings.DetailedBatt = 0;
 TestOut = BatteryPkg.ResizeBattery(TestIn);
 
 % get the output to be tested
-TestValue = TestOut.Specs.Weight.Batt;
+TestValue = TestOut.Specs.Weight.Batt
 
 % list the correct values of the output
 TrueValue = 64464.99444;
@@ -105,7 +105,7 @@ TestIn.Mission.History.SI.Power.P_ES = 2000;
 TestOut = BatteryPkg.ResizeBattery(TestIn);
 
 % get the output to be tested
-TestValue = TestOut.Specs.Weight.Batt;
+TestValue = TestOut.Specs.Weight.Batt
 
 % list the correct values of the output
 TrueValue = 64464.99444;

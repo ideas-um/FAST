@@ -2,7 +2,7 @@ function [Success] = TestUpstreamSplit()
 %battery resize
 % [Success] = TestUpstreamSplit()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 3 aug 2024
+% last updated: 27 aug 2024
 %
 % Generate simple test cases to confirm that the upstream power script
 % is working properly.
@@ -26,10 +26,10 @@ function [Success] = TestUpstreamSplit()
 
 
 % relative tolerance for checking if the tests passed
-EPS06 = 1.0e-06;
+EPS04 = 1.0e-04;
 
 % assume all tests passed
-Pass = ones(2, 1);
+Pass = ones(3, 1);
 
 % count the tests
 itest = 1;
@@ -45,10 +45,10 @@ itest = 1;
 
 % define constants for the split
 TestIn.Pups = [5000, 3000];
-TestIn.Pdwn = [4000, 4000];
-TestIn.Arch = [1, 1; 1, 1]; 
-TestIn.Oper = [23, 44; 18, 48];
-TestIn.Eff = [90, 85; 88, 92];
+TestIn.Pdwn = 1.0e+03 * [6.1557, 2.2105];
+TestIn.Arch = [1, 0; 1, 1]; 
+TestIn.Oper = [1, 0; 0.3, 0.7];
+TestIn.Eff = [0.96, 1; 0.95, 0.95];
 
 % ----------------------------------------------------------
 
@@ -60,13 +60,13 @@ TestIn.Eff = [90, 85; 88, 92];
 
 % complete the power split
 TestValue = PropulsionPkg.UpstreamSplit(TestIn.Pups, TestIn.Pdwn, ...
-    TestIn.Arch, TestIn.Oper, TestIn.Eff)
+    TestIn.Arch, TestIn.Oper, TestIn.Eff, 1);
 
 % list the correct values of the output
-TrueValue = 1;
+TrueValue = [0.8461, 0.0000; 0.1539, 1.0000];
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS04);
 
 % increment the test counter
 itest = itest + 1;
@@ -82,10 +82,10 @@ itest = itest + 1;
 
 % define constants for the split
 TestIn.Pups = [800000, 800000, 400000, 300000];
-TestIn.Pdwn = [600000, 300000, 200000];
-TestIn.Arch = [1, 0, 0; 1, 0, 0; 0, 1, 0; 0, 0, 1]; 
-TestIn.Oper = [25, 15, 10; 25, 15, 10; 25, 15, 10; 25, 15, 10];
-TestIn.Eff = [95, 90, 85; 95, 90, 85; 95, 90, 85; 95, 90, 85];
+TestIn.Pdwn = 1.0e+06 * [2.6018, 0.7629, 0.3214];
+TestIn.Arch = [1, 0, 0; 1, 0, 0; 0, 1, 0; 0, 1, 1]; 
+TestIn.Oper = [1, 0, 0; 1, 0, 0; 0, 1, 0; 0, 0.25, 0.75];
+TestIn.Eff = [0.61, 1, 1; 0.62, 1, 1; 1, 0.61, 1; 1, 0.7, 0.7];
 
 % ----------------------------------------------------------
 
@@ -97,13 +97,57 @@ TestIn.Eff = [95, 90, 85; 95, 90, 85; 95, 90, 85; 95, 90, 85];
 
 % complete the power split
 TestValue = PropulsionPkg.UpstreamSplit(TestIn.Pups, TestIn.Pdwn, ...
-    TestIn.Arch, TestIn.Oper, TestIn.Eff)
+    TestIn.Arch, TestIn.Oper, TestIn.Eff);
 
 % list the correct values of the output
-TrueValue = 1;
+TrueValue = [0.5041, 0.0000, 0.0000; 0.4959, 0.0000, 0.0000; 
+    0.0000, 0.8595, 0.0000; 0.0000, 0.1404, 1.0000];
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS04);
+
+% increment the test counter
+itest = itest + 1;
+
+%% CASE 3: MULTIPLE ENGINES WISK %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% setup the inputs           %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% define constants for the split
+TestIn.Pups = [800000, 800000, 400000, 300000, 300000, 500000, 350000];
+TestIn.Pdwn = 1.0e+06 * [1.6368, 0.8134, 0.0928, 0.9907];
+TestIn.Arch = [1, 0, 0, 0; 1, 0, 0, 0; 0, 1, 0, 0; 0, 1, 0, 0; 
+    0, 1, 1, 1; 0, 0, 0, 1; 0, 0, 0, 1]; 
+TestIn.Oper = [1, 0, 0, 0; 1, 0, 0, 0; 0, 1, 0, 0; 0, 1, 0, 0; 
+    0, 0.3, 0.3, 0.4; 0, 0, 0, 1; 0, 0, 0, 1];
+TestIn.Eff = [0.98, 1, 1, 1; 0.975, 1, 1, 1; 1, 0.98, 1, 1; 1, 0.96, 1, 1; 
+    1, 0.97, 0.97, 0.97; 1, 1, 1, 0.99; 1, 1, 1, 0.967];
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% run the test               %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% complete the power split
+TestValue = PropulsionPkg.UpstreamSplit(TestIn.Pups, TestIn.Pdwn, ...
+    TestIn.Arch, TestIn.Oper, TestIn.Eff);
+
+% list the correct values of the output
+TrueValue = [0.4987, 0.0000, 0.0000, 0.0000; 0.5013, 0.0000, 0.0000, 0.0000;
+    0.0000, 0.5018, 0.0000, 0.0000; 0.0000, 0.3842, 0.0000, 0.0000;
+    0.0000, 0.1141, 1.0000, 0.1249; 0.0000, 0.0000, 0.0000, 0.5098;
+    0.0000, 0.0000, 0.0000, 0.3653];
+
+% run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS04);
 
 % increment the test counter
 itest = itest + 1;

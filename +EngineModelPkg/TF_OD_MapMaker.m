@@ -33,11 +33,25 @@ OffParams.PC = 1;
 OffEngine = EngineModelPkg.CycleModelPkg.TurbofanOffDesignCycle2(OnDesignEngine,OffParams);
 ThrustBaseline = OffEngine.Thrust.Net;
 BSFCBaseline = OffEngine.BSFC;
-PowerBaseline =OffEngine.FanPower;
+PowerBaseline = OffEngine.FanPower;
 
-OffDesignInfo.Thrusts = smoothdata(Thrusts./ThrustBaseline);
-OffDesignInfo.BSFCs = smoothdata(BSFCs./BSFCBaseline);
-OffDesignInfo.OutputPower = smoothdata(OutputPower./PowerBaseline);
+OffDesignInfo.Thrusts = sgolayfilt(Thrusts./ThrustBaseline,3,7);
+OffDesignInfo.BSFCs = sgolayfilt(BSFCs./BSFCBaseline,3,7);
+OffDesignInfo.OutputPower = sgolayfilt(OutputPower./PowerBaseline,3,7);
+
+% figure(1)
+% 
+% subplot(1,2,1)
+% plot(Thrusts./ThrustBaseline,BSFCs./BSFCBaseline)
+% xlabel('Thrust Scale')
+% ylabel('BSFC Scale')
+% title('Unfiltered')
+% 
+% subplot(1,2,2)
+% plot(OffDesignInfo.Thrusts,OffDesignInfo.BSFCs)
+% xlabel('Thrust Scale')
+% ylabel('BSFC Scale')
+% title('Filtered')
 
 
 

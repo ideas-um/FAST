@@ -107,7 +107,7 @@ if     (strcmpi(ArchName, "C"  ) == 1)
     
     % power source type (1 = engine, 0 = electric motor)
     PSType = ones(1, NumEng);
-    
+        
 elseif (strcmpi(ArchName, "E"  ) == 1)
         
     % thrust-power source architecture
@@ -155,7 +155,7 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
     EtaPSPS = ones(NumEng, NumEng);
     
     % power -energy source efficiency
-    EtaPSES = ones(NumEng, 1);
+    EtaPSES = repmat(EtaEM, NumEng, 1);
     
     % energy source type (1 = fuel, 0 = battery)
     ESType = 0;
@@ -218,6 +218,162 @@ elseif (strcmpi(ArchName, "PHE") == 1)
     % power source type (1 = engine, 0 = electric motor)
     PSType = [ones(1, NumEng), zeros(1, NumEng)];
     
+elseif (strcmpi(ArchName, "SHE") == 1)
+    
+    % thrust-power source matrix
+    ArchTSPS = [zeros(NumEng), eye(NumEng)];
+    
+    % power-power source matrix
+    ArchPSPS = [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source matrix (first group - fuel; second group - batt)
+    ArchPSES = [ones(NumEng, 1), zeros(NumEng, 1); zeros(NumEng, 1), ones(NumEng, 1)];
+    
+    % thrust      source operation
+    OperTS   = @() ones(1, NumEng) ./ NumEng;
+    
+    % thrust-power source operation
+    OperTSPS = @() [zeros(NumEng), eye(NumEng)];
+    
+    % power-power  source operation
+    OperPSPS = @(lambda) [eye(NumEng), zeros(NumEng); (1 - lambda) .* eye(NumEng), eye(NumEng)];
+    
+    % power-energy source operation
+    OperPSES = @(lambda) [ones(NumEng, 1), zeros(NumEng, 1); zeros(NumEng, 1), lambda .* ones(NumEng, 1)];
+    
+    % thrust-power  source efficiency (assume it's perfect)
+    EtaTSPS = ones(NumEng, 2 * NumEng);
+    
+    % check if a turboprop is being flown
+    if ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1) )
+    
+        % get the propeller efficiency
+        EtaPropeller = Aircraft.Specs.Power.Eta.Propeller;
+        
+        % use the propeller efficiency in the TSPS efficiency
+        EtaTSPS(:, NumEng+1:end) = EtaTSPS(:, NumEng+1:end) + (EtaPropeller - 1) .* eye(NumEng);
+        
+    end
+        
+    % power -power  source efficiency
+    EtaPSPS  = ones(2 * NumEng);
+    
+    % power -energy source efficiency
+    EtaPSES  = [ones(NumEng, 2); ones(NumEng, 1), repmat(EtaEM, NumEng, 1)];
+    
+    % energy source type (1 = fuel, 0 = battery)
+    ESType = [1, 0];
+    
+    % power source type (1 = engine, 0 = electric motor)
+    PSType = [ones(1, NumEng), zeros(1, NumEng)];
+    
+elseif (strcmpi(ArchName, "TE" ) == 1)
+    
+    % thrust-power source matrix
+    ArchTSPS = [zeros(NumEng), eye(NumEng)];
+    
+    % power-power source matrix
+    ArchPSPS = [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source matrix (first group - fuel; second group - batt)
+    ArchPSES = [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust      source operation
+    OperTS   = @() ones(1, NumEng) ./ NumEng;
+    
+    % thrust-power source operation
+    OperTSPS = @() [zeros(NumEng), eye(NumEng)];
+    
+    % power-power  source operation
+    OperPSPS = @() [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source operation
+    OperPSES = @() [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust-power  source efficiency (assume it's perfect)
+    EtaTSPS = ones(NumEng, 2 * NumEng);
+    
+    % check if a turboprop is being flown
+    if ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1) )
+    
+        % get the propeller efficiency
+        EtaPropeller = Aircraft.Specs.Power.Eta.Propeller;
+        
+        % use the propeller efficiency in the TSPS efficiency
+        EtaTSPS(:, NumEng+1:end) = EtaTSPS(:, NumEng+1:end) + (EtaPropeller - 1) .* eye(NumEng);
+        
+    end
+        
+    % power -power  source efficiency is initialized to all 1
+    EtaPSPS = ones(2 * NumEng);
+    
+    % account for the electric motor efficiency
+    EtaPSPS(NumEng+1:end, 1:NumEng) = EtaPSPS(NumEng+1:end, 1:NumEng) - (1 - EtaEM) .* eye(NumEng);
+    
+    % power -energy source efficiency
+    EtaPSES  = ones(2 * NumEng, 1);
+    
+    % energy source type (1 = fuel, 0 = battery)
+    ESType = 1;
+    
+    % power source type (1 = engine, 0 = electric motor)
+    PSType = [ones(1, NumEng), zeros(1, NumEng)];
+    
+elseif (strcmpi(ArchName, "PE" ) == 1)
+    
+    % thrust-power source matrix
+    ArchTSPS = eye(2 * NumEng);
+    
+    % power-power source matrix
+    ArchPSPS = [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source matrix (first group - fuel; second group - batt)
+    ArchPSES = [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust      source operation
+    OperTS   = @() ones(1, 2 * NumEng) ./ 2 * NumEng;
+    
+    % thrust-power source operation
+    OperTSPS = @() eye(2 * NumEng);
+    
+    % power-power  source operation
+    OperPSPS = @() [eye(NumEng), zeros(NumEng); eye(NumEng), eye(NumEng)];
+    
+    % power-energy source operation
+    OperPSES = @() [ones(NumEng, 1); zeros(NumEng, 1)];
+    
+    % thrust-power  source efficiency (assume it's perfect)
+    EtaTSPS = ones(2 * NumEng);
+    
+    % check if a turboprop is being flown
+    if ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1) )
+    
+        % get the propeller efficiency
+        EtaPropeller = Aircraft.Specs.Power.Eta.Propeller;
+        
+        % use the propeller efficiency in the TSPS efficiency
+        EtaTSPS = EtaTSPS + (EtaPropeller - 1) .* eye(2 * NumEng);
+        
+    end
+        
+    % power -power  source efficiency is initialized to all 1
+    EtaPSPS = ones(2 * NumEng);
+    
+    % account for the electric motor efficiency
+    EtaPSPS(NumEng+1:end, 1:NumEng) = EtaPSPS(NumEng+1:end, 1:NumEng) - (1 - EtaEM) .* eye(NumEng);
+    
+    % power -energy source efficiency
+    EtaPSES  = ones(2 * NumEng, 1);
+    
+    % energy source type (1 = fuel, 0 = battery)
+    ESType = 1;
+    
+    % power source type (1 = engine, 0 = electric motor)
+    PSType = [ones(1, NumEng), zeros(1, NumEng)];
+    
 elseif (strcmpi(ArchName, "O"  ) == 1)
     
     % check for the architectures
@@ -234,6 +390,14 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     % confirm that they're all present
     if (sum(HaveOper) ~= 4)
         error("ERROR - CreatePropArch: check that 'Oper.TS', 'Oper.TSPS', 'Oper.PSPS', and 'Oper.PSES' in 'Specs.Propulsion' are initialized.");
+    end
+    
+    % check for the upstream operational matrices
+    HaveUpOper = isfield(Specs.Propulsion.Oper, ["TSPS"; "PSPS"; "PSES"]);
+    
+    % confirm that they're all present
+    if (sum(HaveUpOper) ~= 3)
+        error("ERROR - CreatePropArch: check that 'Upstream.TSPS', 'Upstream.PSPS', and 'Upstream.PSES' in 'Specs.Propulsion' are initialized.");
     end
     
     % check for the efficiencies
@@ -277,7 +441,7 @@ Aircraft.Specs.Propulsion.PropArch.TSPS = ArchTSPS;
 Aircraft.Specs.Propulsion.PropArch.PSPS = ArchPSPS;
 Aircraft.Specs.Propulsion.PropArch.PSES = ArchPSES;
 
-% remember the operation
+% remember the operation (downstream splits)
 Aircraft.Specs.Propulsion.Oper.TS   = OperTS  ;
 Aircraft.Specs.Propulsion.Oper.TSPS = OperTSPS;
 Aircraft.Specs.Propulsion.Oper.PSPS = OperPSPS;

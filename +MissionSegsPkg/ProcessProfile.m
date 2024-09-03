@@ -51,28 +51,29 @@ for isegs = 1:nsegs
     SegName = Mission.Segs(isegs);
     
     % check for a valid segment name
-    if      (strcmpi(SegName, "Takeoff"  ) == 1)
+    if     ((strcmpi(SegName,         "Takeoff") == 1) || ...
+            (strcmpi(SegName, "DetailedTakeoff") == 1))
         
         % get number of points in takeoff
         SegPts(isegs) = Aircraft.Settings.TkoPoints;
                 
-    elseif  (strcmpi(SegName, "Climb"    ) == 1)
+    elseif  (strcmpi(SegName, "Climb"          ) == 1)
         
         % get number of points in climb
         SegPts(isegs) = Aircraft.Settings.ClbPoints;
         
-    elseif ((strcmpi(SegName, "Cruise"   ) == 1) || ...
-            (strcmpi(SegName, "CruiseBRE") == 1) )
+    elseif ((strcmpi(SegName, "Cruise"         ) == 1) || ...
+            (strcmpi(SegName, "CruiseBRE"      ) == 1) )
         
         % get number of points in cruise
         SegPts(isegs) = Aircraft.Settings.CrsPoints;
         
-    elseif  (strcmpi(SegName, "Descent"  ) == 1)
+    elseif  (strcmpi(SegName, "Descent"        ) == 1)
         
         % get number of points in descent
         SegPts(isegs) = Aircraft.Settings.DesPoints;
         
-    elseif  (strcmpi(SegName, "Landing"  ) == 1)
+    elseif  (strcmpi(SegName, "Landing"        ) == 1)
         
         % only two points in landing
         SegPts(isegs) = 2;

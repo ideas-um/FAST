@@ -3,7 +3,7 @@ function [Aircraft] = EvalDescent(Aircraft)
 % [Aircraft] = EvalDescent(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 07 mar 2024
+% last updated: 03 sep 2024
 %
 % Evaluate a descent segment by iterating over the rate of climb and
 % instantaneous acceleration at each control point in the mission.
@@ -255,6 +255,9 @@ while (iter < MaxIter)
     % compute the power available
     Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
     
+    % get the power available
+    Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
+    
     % ------------------------------------------------------
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,11 +281,14 @@ while (iter < MaxIter)
     % compute power to overcome drag
     DV = D .* TAS;
     
-    % compute the specific excess power (idle engine while gliding)
-    Ps = -DV ./ (Mass .* g);
+    % compute the specific excess power
+    Ps = (Pav - DV) ./ (Mass .* g);
+    
+    % compute the gliding flight assumptions for now
+    MyPs = -DV ./ (Mass .* g);
 
     % compute time to fly (negate quotient for a dTime > 0)
-    dTime = diff(EnHt) ./ Ps(1:end-1);
+    dTime = diff(EnHt) ./ MyPs(1:end-1);
 
     % update the rate of climb
     dh_dt = [diff(Alt) ./ dTime; 0];

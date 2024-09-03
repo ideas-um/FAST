@@ -3,7 +3,7 @@ function [Aircraft] = ERJ175LR()
 % [Aircraft] = ERJ175LR()
 % originally written for E175 by Nawa Khailany
 % modified to E175LR by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 apr 2024
+% last updated: 26 jul 2024
 % 
 % Create a baseline model of the ERJ 175, long-range version (also known as
 % an ERJ 170-200). This version uses a conventional propulsion
@@ -40,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.005;
-Aircraft.Specs.Aero.L_D.CrsCF = 1.012;
+Aircraft.Specs.Aero.L_D.ClbCF = 1.002; %1.000; % formerly 0.985
+Aircraft.Specs.Aero.L_D.CrsCF = 1.000; %1.000; % formerly 0.985
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 0.907;
+Aircraft.Specs.Propulsion.MDotCF = 1.029; %1.042; % formerly 1.000
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.018;
+Aircraft.Specs.Weight.WairfCF = 1.018; %1.018; % formerly 1.0333
  
 
 %% VEHICLE PERFORMANCE %%
@@ -57,7 +57,7 @@ Aircraft.Specs.Weight.WairfCF = 1.018;
 Aircraft.Specs.Performance.Vels.Tko = UnitConversionPkg.ConvVel(135, "kts", "m/s");
 
 % cruise  speed (mach)
-Aircraft.Specs.Performance.Vels.Crs = 0.78; % at 35,000 ft, Mach 0.78
+Aircraft.Specs.Performance.Vels.Crs = 0.78; %0.8; % at 35,000 ft, Mach 0.78
 
 % takeoff altitude (m)
 Aircraft.Specs.Performance.Alts.Tko =     0;
@@ -120,7 +120,7 @@ Aircraft.Specs.Weight.Batt = 0;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.Arch.Type = "PHE";
 
 % get the engine
 Aircraft.Specs.Propulsion.Engine = EngineModelPkg.EngineSpecsPkg.CF34_8E5;
@@ -226,7 +226,7 @@ Aircraft.Settings.Analysis.Type = +1;
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off
-Aircraft.Settings.Plotting = 1;
+Aircraft.Settings.Plotting = 0;
 
 % make a tble of mission history
 %     1 for make table

@@ -1,9 +1,9 @@
-function [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 %
 % [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
-% written by Sasha Kryuchkov
-% modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% originally written by Sasha Kryuchkov
+% overhauled by Paul Mokotoff, prmoko@umich.edu
+% last updated: 10 jul 2024
 %
 % Model (dis)charging for a Lithium-ion battery.
 %
@@ -87,156 +87,149 @@ end
 Time = Time ./ 3600;
 
 
-%% BATTERY MODEL %%
-%%%%%%%%%%%%%%%%%%%
+%% BATTERY QUANTITIES FOR A LITHIUM ION CELL %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% nominal cell voltage [V]
+VoTemp = 4.0880;
+
+% internal resistance [Ohm]
+ResistanceTemp = 0.0199;
+
+% compute the number of cells in the battery pack
+ncell = Series * Parallel;
 
 % exponential voltage [V]
-A = Series * 0.311;
+A = 0.0986;
 
 % exponential capacity [(Ah)^-1]
-B = Parallel * 3 / 0.1277;
-
-% constant voltage [V]
-E0 = Series * 3.889;
-
-% Nominal voltage [V]
-E_nom = Series * 3.6;
-
-% nominal capacity [Ah]
-Q_nom = Parallel * 2.351;
-
-% internal resistance [Ohms]
-R = 0.01385;
+B = 30;
 
 % maximum capacity
-Q = Parallel * 2.6;
+Q = 3;
 
-% Calculate the drawn current [A] - initial guess 
-current = Preq ./ E0;
+% discharge curve slope (taken from E-PASS)
+DischargeCurveSlope = 0.29732;
 
-% Calculate the extracted capacity [Ah].
-QExt = Time .* current;
+% compute the polarization voltage (taken from E-PASS)
+PolarizedVoTemp = 0.0011;
 
-% Calculate the polarization constant/resistance [Ohms] The absolute value 
-% is there to prevent from Q_act become a negative value when the battery
-% is charging.
-K = (-E_nom + E0 + A * exp(-B * Q_nom) * (Q - Q_nom)) ./ ...
-    (Q * (Q_nom + abs(current)));
 
-% Pre-allocate the output vectors depending on the vector length
-Voltage = zeros(ntime,1);
-SOC = zeros(ntime,1);
-Capacity = zeros(ntime,1);
-Pout = zeros(ntime,1);
+%% MODEL BATTERY (DIS)CHARGING %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% remember the initial charge as a function of time
-Q_act_i = Q - SOCBeg / 100 * Q;
+% get the SOC
+SOC      = repmat(SOCBeg, ntime, 1);
+Current  = zeros(         ntime, 1);
+Capacity = zeros(         ntime, 1);
+Voltage  = zeros(         ntime, 1);
+Pout     = zeros(         ntime, 1);
 
-% calculate the initial discharge voltage
-VInit = E0 - R * current(1) - ...
-                  K(1) .* Q ./ (Q - Q_act_i) * current(1) - ...
-                  K(1) .* Q ./ (Q - Q_act_i) + ...
-                  A .* exp(-B .* Q_act_i);
-
-% get a cumulative sum of the charge consumed
-Q_consumed = cumsum(QExt);
-              
-% begin the loop over the length of the vectors
-for frame = 1:ntime
+% loop through all points
+for itime = 1:ntime
     
-    % check if charging (current < 0) or discharging (current >= 0)
-    if current(frame) >= 0
+    % compute the power required per cell
+    TVreq_es_cell = Preq(itime) ./ ncell;
+    
+    % compute the initial discharged capacity
+    DischargedCapacityStart = (1 - (SOC(itime) / 100)) .* Q;
         
-        % calculate the final discharge voltage
-        Voltage(frame) = E0 - R * current(frame) - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) * current(frame) - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) + ...
-        A .* exp(-B .* Q_consumed(frame));
+    if (Preq >= 0)
         
-        % calculate the final SOC
-        SOC(frame) = SOCBeg - 100 * Q_consumed(frame) / Q;
+        % compute the hot cell voltage
+        VoltageCellHot = -(PolarizedVoTemp ./ (SOC(itime) / 100) + ResistanceTemp);
         
-        % calculate the capacity left from the discharge
-        Capacity(frame) = Q - Q_consumed(frame);
+    else
         
-        % Calculate the average power
-        Pavg = (VInit + Voltage(frame)) / ...
-                    2 * current(frame);
-        
-        % calculate the final current with the average power and final
-        % voltage
-        current_final = Pavg / Voltage(frame);
-        
-        % calculate the final voltage with the new current
-        Voltage(frame) = E0 - R * current_final - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) * current_final - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) + ...
-        A .* exp(-B .* Q_consumed(frame));
-        
-        % calculate the required power using the new final voltage and
-        % the final current
-        Pav = Voltage(frame) * current_final;
-        
-        % Check the required power against the power in the function
-        % input
-        if (Pav > Preq(frame))
-            Pout(frame) = Preq(frame);
-            
-        elseif (Pav < Preq(frame))
-            Pout(frame) = Pav;
-            
-        end
-        
-        % Calculate what the next inital voltage is
-        VInit = Voltage(frame);
-        
-    elseif current(frame) < 0
-        
-        % calculate the charge voltage
-        Voltage(frame) = E0 + R * current(frame) - ...
-        K(frame) .* Q ./ (Q_consumed(frame) + 0.1 * Q) * current(frame) - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) .* Q_consumed(frame) + ...
-        A .* exp(B .* Q_consumed(frame));
-        
-        % calculate the final SOC
-        SOC(frame) = SOCBeg - 100 * Q_consumed(frame) / Q;
-        
-        % calculate the capacity left
-        Capacity(frame) = Q - Q_consumed(frame);
-        
-        % Calculate the average power
-        Pavg = (VInit + Voltage(frame)) / ...
-                    2 * current(frame);
-        
-        % calculate the final current with the average power and final
-        % voltage
-        current_final = Pavg / Voltage(frame);
-        
-        % calculate the final voltage with the new current
-        Voltage(frame) = E0 - R * current_final - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) * current_final - ...
-        K(frame) .* Q ./ (Q - Q_consumed(frame)) + ...
-        A .* exp(B .* Q_consumed(frame));
-        
-        % calculate the required power using the new final voltage and
-        % the final current
-        Pav = Voltage(frame) * current_final;
-        
-        % Check the required power against the power in the function
-        % input
-        if (Pav > Preq(frame))
-            Pout(frame) = Preq(frame);
-            
-        elseif (Pav < Preq(frame))
-            Pout(frame) = Pav;
-            
-        end
-        
-        % Calculate what the next inital voltage is
-        VInit = Voltage(frame);
+        % compute the hot cell voltage
+        VoltageCellHot = PolarizedVoTemp ./ ((DischargedCapacityStart + 0.1 * Q) ./ Q) + ResistanceTemp;
         
     end
+        
+    % compute the cold cell voltage
+    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart);
+    
+    % solve the polynomial to find the minimum current
+    CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell];
+    
+    % find the root
+    CurrBatt = roots(CurrBattPoly);
+    
+    if (Preq >= 0)
+        
+        % check if the current is less than 0
+        CurrBatt(CurrBatt < 0) = NaN;
+        
+        % minimize the current
+        CurrBatt = min(CurrBatt, [], 1);
+        
+    else
+        
+        % check if the current is greater than 0
+        CurrBatt(CurrBatt > 0) = NaN;
+        
+        % maximize the current (because it is negative)
+        CurrBatt = max(CurrBatt, [], 1);
+        
+    end
+        
+    % check for NaN
+    CurrBatt(isnan(CurrBatt)) = 0;
+    
+    % check for any imaginary currents
+    if (any(~isreal(CurrBatt)))
+        
+        if (Preq >= 0)
+            
+            % get the 2-norm (magnitude) of the complex current (initial guess)
+            CurrBatt = norm(CurrBatt);
+            
+        else
+            
+            % get the 2-norm (magnitude) of the complex current (initial guess)
+            CurrBatt = -norm(CurrBatt);
+            
+        end
+        
+        % assume a range of currents
+        CurrBattTemp = CurrBatt - 10 : 0.1 : CurrBatt + 10;
+        
+        % compute the cell voltages
+        VoltageCellTemp = VoltageCellCold + VoltageCellHot * CurrBattTemp;
+        
+        % find the current that maximizes the power produced
+        [~, idx] = min(abs(TVreq_es_cell - VoltageCellTemp .* CurrBattTemp));
+        
+        % use the minimized current
+        CurrBatt = CurrBattTemp(idx);
+        
+    end
+    
+    % compute the total current
+    Current(itime) = CurrBatt * Parallel;
+    
+    % compute the cell voltage
+    VoltageCell = VoltageCellCold + VoltageCellHot .* CurrBatt;
+    
+    % compute the pack voltage
+    Voltage(itime) = VoltageCell * Series;
+    
+    % update the capacity
+    DischargedCapacity = CurrBatt * Time(itime);
+    
+    % update the SOC
+    SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q;
+    
+    % update the capacity
+    Capacity(itime) = Q * SOC(itime) / 100 * Series * Parallel;
+    
+    % compute the power output
+    Pout(itime) = Voltage(itime) * Current(itime);
+    
 end
+
+% remove the first SOC value
+SOC(1) = [];
 
 % ----------------------------------------------------------
 

@@ -22,31 +22,7 @@ function [RetrofitAC] = Retrofit(ConvAC,Options)
 %                          RetrofitPkg.OptionsList.ExampleOptions for more
 %                          information
 %                          size: 1x1 struct
-%                          fields:
-%                            - .NumMotors = 1x1 double outlining the numer of
-%                            electric motors to be added on to the existing
-%                            aircraft. this number must be 0 or positive
-%                            - .ThrustSplit = PAUL, input a matrix?
-%                            - .PayDecrease = the percentage of the payload
-%                            that is being allocated to batteries. e.g a
-%                            value of 0.3 corresponds to a 30% decrease in
-%                            payload leaving 70% original payload capacity
-%                            size: 1x1 double
-%                            - .BattSpecEnergy = 1x1 value outlining the
-%                            specific energy of the batteries that will be
-%                            used for the retrofit. units should be in
-%                            kWh/kg. values will typically range from 0.2
-%                            (present day) to 1.5 (optimistic future)
-%                            size: 1x1 double
-%                            - .SavingsType = variable describing where
-%                            extra energy should be allocated.
-%                            i.e. do you want to minimize fuel burn,
-%                            maximize range, or reduce payload losses?
-%                            size: 1x1 string
-%                               Options are:
-%                                   {"Fuel"        }
-%                                   {"Range"       }
-%                                   {"Payload"     }
+%
 %
 % OUTPUTS: RetrofitAC      - a structure containing information about the
 %                          aircraft after it has been retrofit with an

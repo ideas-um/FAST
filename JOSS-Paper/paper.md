@@ -1,10 +1,6 @@
 ---
 
 title: 'FAST: A **F**uture **A**ircraft **S**izing **T**ool for Advanced Aircraft and Propulsion System Design'
-<!-- GC: FAST can handle other types of fuels, not just electrified propulsion. That's why I changed the title a bit, but feel free to suggest another.
-
-PM to GC: I made a slight change to the title. Let me know what you think about it.
--->
 
 tags:
   - Matlab
@@ -30,26 +26,11 @@ affiliations:
  - name: Department of Aerospace Engineering, University of Michigan
    index: 1
 
-date: 30 August 2024
+date: 05 September 2024
 
 bibliography: paper.bib
 
 ---
-
-<!--------------------------------------------------------->
-<!--------------------------------------------------------->
-<!--------------------------------------------------------->
-
-<!----------------------------
-|                            |
-| LINK TO THE JOSS REVIEW    |
-| CRITERIA AND GUIDELINES:   |
-|                            |
------------------------------>
-
-<!---
-[Link to the JOSS Review Criteria and Guidelines](https://joss.readthedocs.io/en/latest/paper.html)
--->
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->
@@ -68,14 +49,11 @@ To reduce aviation-related emissions, innovative aircraft designs, including ele
 For instance, NASA's Electrified Powertrain Flight Demonstration (EPFD) Project is advancing these technologies with industry partners [@nasa2022epfd].
 However, current aircraft sizing tools require detailed design information that may not be available early in the development process, particularly for novel technologies.
 This can yield suboptimal designs and inhibits innovation.
-Thus, there is a need for a computational tool to rapdily size an aircraft configuration and allow the designer to explore the vast design space, examine tradeoffs, and evaluate alternative designs.
+Thus, there is a need for a computational tool to rapidly size an aircraft configuration and allow the designer to explore the vast design space, examine tradeoffs, and evaluate alternative designs.
 
 The **F**uture **A**ircraft **S**izing **T**ool (**FAST**) addresses this challenge by rapidly sizing aircraft with *any* propulsion architecture, including conventional, electric, and hybrid-electric systems, even with limited initial data. 
 FAST enables engineers to explore various aircraft configurations, evaluate design alternatives, assess performance across the flight envelope, and visualize concepts during the sizing process.
 By supporting early-stage design, FAST aids in developing sustainable aviation technologies crucial for reducing the industry's carbon footprint.
-<!-- GC: I've shortened the summary quite a bit, you can use the extra space to explain other critical things if like.
-PM to GC: Thank you!!
--->
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->
@@ -120,11 +98,6 @@ Another application of FAST includes modeling NASA's **SU**bsonic **S**ingle **A
 More granular aerodynamic and propulsive models are currently being incorporated into FAST to better assess the benefits of boundary layer ingestion and distributed electric propulsion technologies.
 Furthermore, FAST was used in a feasibility study to size a fleet of hybrid electric aircraft and operate them on routes currently flown by regional jets [@deng2023sizing].
 This work served as a proof-of-concept for understanding how hybrid electric aircraft can be seamlessly integrated into a regional airline's fleet while maintaining the same operational capabilities as existing aircraft in the fleet.
-<!-- GC: Minor edits. Also, please add Max's Aviation 2024 paper to this list, where he sized a battery operated electric aircraft, and a hydrogen fuel cell electric aircraft.
-
-PM to GC: Done! See the beginning of the above paragraph.
-
--->
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->
@@ -146,13 +119,7 @@ Data is fed forwards and backwards as shown by red and green arrows, respectivel
 First, the user inputs the Aircraft Specifications and a Mission Profile, which informs FAST how to fly the aircraft while sizing it.
 Then, FAST's Initialization module assembles the user-provided information into an aircraft model.
 If any parameters are unknown, FAST utilizes its historical database [@arnson2025predicting] to generate regressions that predict these values.
-Once the model is complete, FAST generates mathematical representations of the aircraft's propulsion architecture and its operation during flight (from @cinar2020framework), and checks that the mission profile provided by the user is valid.
-
-<!-- GC: don't we have default mission profiles loaded as well?
-
-PM to GC: We provide many mission profiles for the user to choose from, but FAST does not automatically select a default mission profile to be flown. The user must select from the mission profiles shipped with FAST, or come up with their own. In the future, we could add an enhancement that automatically flies a mission profile based on the aircraft class and payload.
-
--->
+Once the model is complete, FAST generates mathematical representations of the aircraft's propulsion architecture and its operation during flight (from [@cinar2020framework]), and checks that the mission profile provided by the user is valid.
 
 After initialization, the aircraft is sized using a fixed-point iteration [@ascher2011first].
 Note that FAST does not perform a constraint analysis and assumes that the point performance parameters input (thrust- or power-weight ratio and wing loading, which remain fixed) are feasible.
@@ -162,8 +129,7 @@ Lastly, the energy required from the mission analysis informs the energy source 
 The iteration continues until converging on MTOW.
 
 Upon completion of the sizing process, the aircraft model is returned to the user as a Matlab `struct`, allowing for further analysis or integration into other studies.
-FAST also offers post-processing options, such as mission history visualization (i.e., information about the flight simulated, see Fig. \autoref{Fig:MissionHistory}.
-}) and geometric visualization of the sized aircraft (see Fig. \autoref{Fig:GeometryExample}).
+FAST also offers post-processing options, such as mission history visualization (i.e., information about the flight simulated, see Fig. \autoref{Fig:MissionHistory}) and geometric visualization of the sized aircraft (see Fig. \autoref{Fig:GeometryExample}).
 To visualize an aircraft concept, users may either prescribe their own aircraft geometry or use one that is shipped with FAST [@khailany2025aircraft].
 
 ![Example of a mission history \label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}

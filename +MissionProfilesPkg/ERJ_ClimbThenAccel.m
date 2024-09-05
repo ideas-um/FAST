@@ -1,7 +1,7 @@
 function [Aircraft] = ERJ_ClimbThenAccel(Aircraft)
 %
 % [Aircraft] = ERJ_ClimbThenAccel(Aircraft)
-% written by Emma Smith, emmasmit@umich.edu
+% written by Emma Cassidy, emmasmit@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
 % last updated: 26 mar 2023
 %

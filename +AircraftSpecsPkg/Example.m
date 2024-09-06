@@ -2,7 +2,7 @@ function [Aircraft] = Example()
 %
 % [Aircraft] = Example()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 28 mar 2024
+% last updated: 31 may 2024
 %
 % Provide an example aircraft definition for the user. Here, the Embraer 
 % E190-E2 is defined from "Advanced 2030 Single Aisle Aircraft Modeling for
@@ -130,7 +130,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % ** REQUIRED ** propulsion system architecture, either:
-%     (1) "AC"  = conventional
+%     (1) "C"  = conventional
 %     (2) "E"   = fully electric
 %     (3) "TE"  = fully turboelectric
 %     (4) "PE"  = partially turboelectric

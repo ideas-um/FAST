@@ -11,9 +11,4 @@
 % ERJ190_FE                     - AircraftSpecsPkg.ERJ190_FE is a function.
 % Example                       - AircraftSpecsPkg.Example is a function.
 % LM100J_Conventional           - AircraftSpecsPkg.LM100J_Conventional is a function.
-% LM100J_Conventional_15Pax     - AircraftSpecsPkg.LM100J_Conventional_15Pax is a function.
 % LM100J_Hybrid                 - AircraftSpecsPkg.LM100J_Hybrid is a function.
-%
-% MAT-Files
-% -------------------------------------------------------------------------
-% SpecDatabase.mat              - is a MAT-File.

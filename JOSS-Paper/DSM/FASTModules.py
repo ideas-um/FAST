@@ -2,7 +2,7 @@
 
 FASTModules.py
 written by Paul Mokotoff, prmoko@umich.edu
-last updated: 30 Aug 2024
+last updated: 06 sep 2024
 
 Provide the components for an N2 diagram to be made.
 
@@ -119,11 +119,73 @@ class OEWIteration(om.ExplicitComponent):
 
 ##############################
 #                            #
+# Battery Sizing CLASS       #
+#                            #
+##############################
+
+class BatterySizing(om.ExplicitComponent):
+    """
+    
+    Battery Sizing:
+    
+    Show how the battery is re-sized.
+    
+    """
+
+    def setup(self):
+
+        # add inputs and outputs
+        self.add_input("Battery_Energy_Expended")
+        self.add_input("Final_SOC")
+        self.add_input("Minimum_SOC")
+        self.add_input("System_Voltage")
+        self.add_input("Gravimetric_Specific_Energy")
+        self.add_output("Battery_Weight")
+        self.add_output("Cells_in_Series/Parallel")
+
+    # end setup
+# end BatterySizing
+
+
+# ----------------------------------------------------------
+
+
+##############################
+#                            #
+# Fuel Sizing CLASS          #
+#                            #
+##############################
+
+class FuelSizing(om.ExplicitComponent):
+    """
+    
+    Fuel Sizing:
+    
+    Show how much fuel should be carried.
+    
+    """
+
+    def setup(self):
+
+        # add inputs and oututs
+        self.add_input("Fuel_Energy_Expended")
+        self.add_input("Gravimetric_Specific_Energy")
+        self.add_output("Fuel_Weight")
+
+    # end setup
+# end FuelSizing
+
+
+# ----------------------------------------------------------
+
+
+##############################
+#                            #
 # ENERGY SOURCE SIZING CLASS #
 #                            #
 ##############################
 
-class EnergySourceSizing(om.ExplicitComponent):
+class EnergySourceSizing(om.Group):
     """
     
     Energy Source Sizing:
@@ -133,8 +195,10 @@ class EnergySourceSizing(om.ExplicitComponent):
     """
 
     def setup(self):
-        self.add_input("Mission_History")
-        self.add_output("ES_Weights")
+
+        # add subsystems
+        self.add_subsystem("Fuel_Sizing", FuelSizing(), promotes_inputs=[("Fuel_Energy_Expended"), ("Gravimetric_Specific_Energy")], promotes_outputs=[("Fuel_Weight")])
+        self.add_subsystem("Battery_Sizing", BatterySizing(), promotes_inputs=[("Battery_Energy_Expended"), ("Final_SOC"), ("Minimum_SOC"), ("System_Voltage"), ("Gravimetric_Specific_Energy")], promotes_outputs=[("Battery_Weight")])
 
     # end setup
 # end EnergySourceSizing
@@ -159,12 +223,53 @@ class MTOWIteration(om.ExplicitComponent):
     """
 
     def setup(self):
-        self.add_input("ES_Weights")
+        self.add_input("Fuel_Weight")
+        self.add_input("Battery_Weight")
         self.add_input("A/C_Weights")
         self.add_output("MTOW")
 
     # end setup
 # end MTOWIteration
+
+
+# ----------------------------------------------------------
+
+
+##############################
+#                            #
+# Aircraft Sizing CLASS      #
+#                            #
+##############################
+
+class AircraftSizing(om.Group):
+    """
+    
+    Aircraft Sizing:
+    
+    Show how the aircraft is sized (outer MTOW iteration)
+    
+    """
+
+    def setup(self):
+
+        # add the subsystems
+        self.add_subsystem("Airframe_Propulsion_System_Sizing", PointPerformance(), promotes_inputs=[("T/W_or_P/W", "T/W_or_P/W"), ("W/S", "W/S")])
+        self.add_subsystem("OEW_Iteration", OEWIteration())
+        self.add_subsystem("Mission_Analysis", EvaluateMission(), promotes_inputs=[("Mission_Profile", "Mission_Profile"), ("Mission_Targets", "Mission_Targets")])
+        self.add_subsystem("ES_Sizing", EnergySourceSizing(), promotes_inputs=[("Gravimetric_Specific_Energy", "Gravimetric_Specific_Energy"), ("Minimum_SOC", "Minimum_SOC"), ("System_Voltage", "System_Voltage")])
+        self.add_subsystem("MTOW_Update", MTOWIteration(), promotes_outputs=[("MTOW", "MTOW")])
+
+        # make connections
+        self.connect("Airframe_Propulsion_System_Sizing.T_or_P", "OEW_Iteration.T_or_P")
+        self.connect("Airframe_Propulsion_System_Sizing.S", "OEW_Iteration.S")
+        self.connect("OEW_Iteration.Updated_MTOW", "Airframe_Propulsion_System_Sizing.MTOW")
+        self.connect("OEW_Iteration.Sized_A/C", ["Mission_Analysis.A/C", "MTOW_Update.A/C_Weights"])
+        self.connect("Mission_Analysis.Mission_History", ["ES_Sizing.Fuel_Energy_Expended", "ES_Sizing.Battery_Energy_Expended", "ES_Sizing.Final_SOC"])
+        self.connect("ES_Sizing.Fuel_Weight", "MTOW_Update.Fuel_Weight")
+        self.connect("ES_Sizing.Battery_Weight", "MTOW_Update.Battery_Weight")
+
+    # end setup
+# end AircraftSizing
 
 
 # ----------------------------------------------------------
@@ -373,11 +478,11 @@ class EvaluateMission(om.Group):
 
         # add subsystems
         self.add_subsystem("Mission_Iteration", MissionIteration(), promotes_inputs=[("A/C", "A/C"), ("Mission_Profile", "Mission_Profile"), ("Mission_Targets", "Mission_Targets")], promotes_outputs=[("Mission_History", "Mission_History")])
-        self.add_subsystem("Mission_Analysis", MissionAnalysis())
+        self.add_subsystem("Segment_Analysis", MissionAnalysis())
 
         # establish connections
-        self.connect("Mission_Analysis.Distance/Time_Flown", "Mission_Iteration.Distance/Time_Flown")
-        self.connect("Mission_Iteration.Mission_Segment_To_Fly", "Mission_Analysis.Flight_Conditions")
+        self.connect("Segment_Analysis.Distance/Time_Flown", "Mission_Iteration.Distance/Time_Flown")
+        self.connect("Mission_Iteration.Mission_Segment_To_Fly", "Segment_Analysis.Flight_Conditions")
 
     # end setup
 # end EvaluateMission

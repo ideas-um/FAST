@@ -1,4 +1,4 @@
-function [K] = SquareExKernel(x,y,hyperparams)
+function [K] = SquareExKernel(x,y,hyperparams,GAMMA)
 % 
 % [K] = SquareExKernel(x,y,hyperparams)
 % Covariance Kernel Function
@@ -23,5 +23,5 @@ function [K] = SquareExKernel(x,y,hyperparams)
 % K = covariance between data set 1 and data set 2
 %   This output is normalized by the magnitude of hyperparams(N+1)
 
-K = hyperparams(end)*exp(-0.3*sum((x-y).^2./hyperparams(1:end-1)));
+K = hyperparams(end)*exp(-GAMMA*sum((x-y).^2./hyperparams(1:end-1)));
 end

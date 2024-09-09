@@ -1,4 +1,4 @@
-function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,weights,prior)
+function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,GAMMA,weights,prior)
 %
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target)
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target,weights)
@@ -54,13 +54,13 @@ function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,weights,prior)
 % and tune hyperparameters. If weights are prescribed, pass them into the
 % function
 switch nargin
-    case 5
+    case 6
 [DataMatrix,Prior,hypers] = ...
     RegressionPkg.BuildData(datastruct,IOspace,target,weights,prior);
-    case 4
+    case 5
 [DataMatrix,Prior,hypers] = ...
     RegressionPkg.BuildData(datastruct,IOspace,target,weights);
-    case 3
+    case 4
 [DataMatrix,Prior,hypers] = ...
     RegressionPkg.BuildData(datastruct,IOspace,target);
 end
@@ -70,5 +70,5 @@ end
 % Calculate posterior mean and variance for each requested target
 [PostMu,PostVar] =...
     RegressionPkg.CreatePosterior(DataMatrix,...
-    Prior,target,hypers);
+    Prior,target,hypers,GAMMA);
 end

@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 aug 2024
+% last updated: 04 sep 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -323,9 +323,6 @@ MDotFuel = zeros(npnt, nps);
 MDotAir  = zeros(npnt, nps);
 FanDiam  = zeros(npnt, nps);
 ExitMach = zeros(npnt, nps);
-V        = zeros(npnt, nes);
-I        = zeros(npnt, nes);
-Q        = zeros(npnt, nes);
 
 % check for a battery
 if (any(Batt))   

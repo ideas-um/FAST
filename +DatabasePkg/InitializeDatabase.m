@@ -169,7 +169,7 @@ end
 
 % validation vs training
 
-PropEngineFields = fieldnames(TurbofanEngines);
+PropEngineFields = fieldnames(TurbopropEngines);
 
 for ii = 1:length(PropEngineFields)
     DTindex = randi(100,1,1);

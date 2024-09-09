@@ -3,6 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
+% modified by Emma Cassidy
 % last modified: 04 apr 2024
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
@@ -129,21 +130,6 @@ if (any(Batt))
     
 end
 
-
-% check if the power optimization structure is available
-%{
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
-%}
 
 %% FLY TAKEOFF %%
 %%%%%%%%%%%%%%%%%

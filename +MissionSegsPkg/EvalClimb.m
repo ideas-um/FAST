@@ -3,7 +3,7 @@ function [Aircraft] = EvalClimb(Aircraft)
 % [Aircraft] = EvalClimb(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 04 apr 2024
+% last updated: 09 sep 2024
 %
 % Evaluate a climb segment by iterating over the power required. While
 % iterating over the power required, the drag and specific excess power
@@ -429,7 +429,7 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd) = Time;
     
     % perform the propulsion analysis
-    Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+    Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
     
     % extract updated mass from aircraft structure
     Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);

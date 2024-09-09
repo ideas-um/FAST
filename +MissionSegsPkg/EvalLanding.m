@@ -2,7 +2,7 @@ function [Aircraft] = EvalLanding(Aircraft)
 %
 % [Aircraft] = EvalLanding(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% last updated: 09 sep 2024
 %
 % Evaluate the landing segment. The landing segment only uses two control
 % points (treats it as a single segment) and cannot be changed by the user.
@@ -252,7 +252,7 @@ Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
 Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
 
 % perform the propulsion analysis
-Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
 
 
 %% FILL THE STRUCTURE %%

@@ -3,7 +3,7 @@ function [Aircraft] = EvalDescent(Aircraft)
 % [Aircraft] = EvalDescent(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 06 sep 2024
+% last updated: 09 sep 2024
 %
 % Evaluate a descent segment by iterating over the rate of climb and
 % instantaneous acceleration at each control point in the mission.
@@ -404,7 +404,7 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd) = Time;
     
     % perform the propulsion analysis
-    Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+    Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
     
     % extract updated mass from aircraft structure
     Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);

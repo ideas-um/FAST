@@ -3,7 +3,7 @@ function [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % written by Nawa Khailany, nawakhai@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 24 jul 2024
+% last modified: 09 sep 2024
 %
 % Evaluate the takeoff segment. Assume maximum thrust/power from all
 % components in the propulsion system. In the detailed takeoff segment, the
@@ -328,7 +328,7 @@ Aircraft.Mission.History.SI.Power.Req(       SegBeg:SegEnd) = Preq;
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 
 % perform the propulsion analysis
-Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
 
 
 %% FILL THE AIRCRAFT STRUCTURE %%

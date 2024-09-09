@@ -2,7 +2,7 @@ function [Aircraft] = EvalCruise(Aircraft)
 %
 % [Aircraft] = EvalCruise(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% last updated: 09 sep 2024
 %
 % Evaluate a cruise segment by iterating over the aircraft's mass. Climb/
 % descent and accelerations are allowed in the segment.
@@ -365,7 +365,7 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd) = Time;
     
     % perform the propulsion analysis
-    Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+    Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
     
     % extract updated mass from the aircraft structure
     Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);

@@ -3,7 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 04 apr 2024
+% last modified: 09 sep 2024
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
 % acceleration and maximum thrust/power from all power sources.
@@ -227,7 +227,7 @@ Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
 
 % perform the propulsion analysis
-Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
 
 
 %% FILL THE AIRCRAFT STRUCTURE %%

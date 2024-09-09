@@ -576,7 +576,6 @@ Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
 Aircraft.Mission.History.SI.Propulsion.MDotAir( SegBeg:SegEnd, :) = MDotAir ; 
 Aircraft.Mission.History.SI.Propulsion.FanDiam( SegBeg:SegEnd, :) = FanDiam ;
 Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
-Aircraft.Mission.History.SI.Propulsion.TSFC_EMT(SegBeg:SegEnd, :) = SFC_EMT;
 
 % power quantities
 Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;

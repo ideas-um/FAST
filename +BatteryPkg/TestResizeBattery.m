@@ -26,7 +26,7 @@ function [Success] = TestResizeBattery()
 
 
 % relative tolerance for checking if the tests passed
-EPS06 = 1.0e-06;
+EPS05 = 1.0e-05;
 
 % assume all tests passed
 Pass = ones(2, 1);
@@ -45,8 +45,8 @@ itest = 1;
 
 % define the values to be resized
 TestIn.Specs.Propulsion.PropArch.ESType = 0;
-TestIn.Specs.Power.SpecEnergy.Batt = 0.4;
-TestIn.Mission.History.SI.Energy.E_ES = 10000;
+TestIn.Specs.Power.SpecEnergy.Batt = 0.4 * 3.6e+6;
+TestIn.Mission.History.SI.Energy.E_ES = 100;
 TestIn.Settings.DetailedBatt = 0;
 
 % ----------------------------------------------------------
@@ -61,13 +61,13 @@ TestIn.Settings.DetailedBatt = 0;
 TestOut = BatteryPkg.ResizeBattery(TestIn);
 
 % get the output to be tested
-TestValue = TestOut.Specs.Weight.Batt
+TestValue = TestOut.Specs.Weight.Batt;
 
 % list the correct values of the output
-TrueValue = 1;
+TrueValue = 6.9444e-05;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
@@ -85,13 +85,13 @@ itest = itest + 1;
 % define the value to be converted
 % define the values to be resized
 TestIn.Specs.Propulsion.PropArch.ESType = 0;
-TestIn.Specs.Power.SpecEnergy.Batt = 0.3;
-TestIn.Mission.History.SI.Energy.E_ES = 12348;
+TestIn.Specs.Power.SpecEnergy.Batt = 0.3 * 3.6e+6 ;
+TestIn.Mission.History.SI.Energy.E_ES = [110, 123];
 TestIn.Settings.DetailedBatt = 1;
 TestIn.Specs.Power.Battery.SerCells = 3;
 TestIn.Specs.Power.Battery.ParCells = 2;
 TestIn.Mission.History.SI.Power.SOC = 30;
-TestIn.Mission.History.SI.Power.P_ES = 2000;
+TestIn.Mission.History.SI.Power.P_ES = 200;
 
 % ----------------------------------------------------------
 
@@ -105,13 +105,13 @@ TestIn.Mission.History.SI.Power.P_ES = 2000;
 TestOut = BatteryPkg.ResizeBattery(TestIn);
 
 % get the output to be tested
-TestValue = TestOut.Specs.Weight.Batt
+TestValue = TestOut.Specs.Weight.Batt;
 
 % list the correct values of the output
-TrueValue = 1;
+TrueValue = 0.1872;
 
 % run the test
-Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;

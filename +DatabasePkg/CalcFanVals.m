@@ -344,7 +344,9 @@ switch unitsflag
         Plane.Settings.Analysis.MaxIter = "count";
         Plane.Settings.Analysis.Type = "flag";
         Plane.Settings.Plotting = "flag";
+        
         Plane.Settings.DataTypeValidation = "data type";
+        Plane.Specs.Propulsion.Engine.DataTypeValidation = "data type";
 
         Plane.Overview = rmfield(Plane.Overview,"KeyWords");
 

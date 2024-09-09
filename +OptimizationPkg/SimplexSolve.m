@@ -34,17 +34,19 @@ ncon = nrow - 1;
 % define a tolerance
 EPS06 = 1.0e-06;
 
-% find the basic variables
-IsBasic = abs(A(end, 1:nvar)) < EPS06;
+% find the basic variables, starting at second location because 1 is always
+% 0
+IsBasic = abs(A(end, 2:nvar)) < EPS06;
 
 % identify the location of the basic variables
-BasicLoc = cumsum(IsBasic);
+BasicLoc = [0, cumsum(IsBasic)];
 
 % get the number of basic variables (should be equal to nvar - ncon)
 nbasic = BasicLoc(end);
 
-% perform sanity check
-if ((nvar - nbasic) ~= (nvar - ncon))
+% perform sanity check % this doesnt seem right, should it be number of
+% rows?
+if (nbasic ~= ncon)
     error("ERROR - SimplexSolve: check number of basic variables.");
 end
 

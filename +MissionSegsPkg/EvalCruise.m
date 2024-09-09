@@ -118,7 +118,7 @@ MaxIter = 10;
                              AltEnd, dISA, TypeEnd, VelEnd);
 
 % vector of equally spaced altitudes and velocities
-Alt = linspace(AltBeg, AltEnd, npoint)'; % m
+Alt = Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd); % m
 TAS = linspace(TASBeg, TASEnd, npoint)'; % m/s
 
 % initialize arrays that accumulate (and start at 0)
@@ -167,33 +167,6 @@ else
     end
     
 end
-
-% assume thrust split comes from the aircraft specifications
-LamTS = repmat(Aircraft.Specs.Power.LamTS.Crs, npoint, 1);
-
-% assume energy/power/thrust splits come from the aircraft specifications
-LamTSPS = repmat(Aircraft.Specs.Power.LamTSPS.Crs, npoint, 1);
-LamPSPS = repmat(Aircraft.Specs.Power.LamPSPS.Crs, npoint, 1);
-LamPSES = repmat(Aircraft.Specs.Power.LamPSES.Crs, npoint, 1);
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
-
-% remember the splits
-Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
-Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
 
 % remember initial quantities in the mission history
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
@@ -260,7 +233,6 @@ FPA = asind(dh_dt ./ TAS);
 Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
 Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
 Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
 
 % ----------------------------------------------------------
 

@@ -160,7 +160,7 @@ for imiss = 1:nmiss
             
             % define the function call
             FunName = strcat("MissionSegsPkg.Eval", SegName);
-            
+
             % fly the segment
             Aircraft = feval(FunName, Aircraft);
 

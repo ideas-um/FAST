@@ -3,6 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
+% modified by Emma Cassidy
 % last modified: 04 apr 2024
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
@@ -101,7 +102,7 @@ dh_dt = zeros(npoint,1);
 FPA = zeros(npoint, 1);
 
 % altitude------[npoint x 1]
-Alt = repmat(Aircraft.Specs.Performance.Alts.Tko, npoint, 1);
+Alt = Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd);
 
 % total mass in each time------[npoint x 1]
 Mass = repmat(MTOW, npoint, 1);
@@ -128,33 +129,6 @@ if (any(Batt))
     Eleft_ES(:, Batt) = Aircraft.Specs.Power.SpecEnergy.Batt * Aircraft.Specs.Weight.Batt;
     
 end
-
-% assume thrust split comes from the aircraft specifications
-LamTS = repmat(Aircraft.Specs.Power.LamTS.Tko, npoint, 1);
-
-% assume energy/power/thrust splits come from the aircraft specifications
-LamTSPS = repmat(Aircraft.Specs.Power.LamTSPS.Tko, npoint, 1);
-LamPSPS = repmat(Aircraft.Specs.Power.LamPSPS.Tko, npoint, 1);
-LamPSES = repmat(Aircraft.Specs.Power.LamPSES.Tko, npoint, 1);
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
-
-% remember the splits
-Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
-Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
 
 
 %% FLY TAKEOFF %%
@@ -189,7 +163,6 @@ Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
 Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
 Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd) = Time;
 Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
                              
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);

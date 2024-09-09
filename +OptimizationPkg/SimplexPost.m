@@ -1,4 +1,4 @@
-function [Aircraft] = SimplexPost(Aircraft, ielem, PhiOpt)
+function [Aircraft] = SimplexPost(Aircraft, ielem, LamOpt)
 %
 % [Aircraft] = SimplexPost(Aircraft, ielem, PhiOpt)
 % written by Paul Mokotoff, prmoko@umich.edu
@@ -14,7 +14,7 @@ function [Aircraft] = SimplexPost(Aircraft, ielem, PhiOpt)
 %     ielem    - array with control point indices to be hybridized.
 %                size/type/units: n-by-1 / int / []
 %
-%     PhiOpt   - optimum power split and slack variables.
+%     LamOpt   - optimum power split and slack variables.
 %                size/type/units: m-by-1 / int / []
 %
 % OUTPUTS:
@@ -37,10 +37,12 @@ nphi = npnt - 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get the appropriate power splits
-Phi = PhiOpt(1:nphi);
+Lam = LamOpt(1:nphi);
 
 % fill the aircraft structure's mission history
-Aircraft.Mission.History.SI.Power.Phi(ielem(1:nphi)) = Phi;
+Aircraft.Mission.History.SI.Power.LamTSPS(ielem(1:nphi)) = Lam;
+
+Aircraft.Specs.Power.LamTSPS.Split = Aircraft.Mission.History.SI.Power.LamTSPS;
 
 % ----------------------------------------------------------
 

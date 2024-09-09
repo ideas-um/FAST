@@ -112,7 +112,7 @@ MaxIter = 10;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % vector of equally spaced altitudes
-Alt = linspace(AltBeg, AltEnd, npoint)'; % m
+Alt = Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd);% m
                          
 % convert the ending velocity to match the beginning one
 % *** suppress warning that EASEnd and MachEnd may not be used ... they
@@ -185,36 +185,10 @@ else
     
 end
 
-% assume thrust split comes from the aircraft specifications
-LamTS = repmat(Aircraft.Specs.Power.LamTS.Clb, npoint, 1);
-
-% assume energy/power/thrust splits come from the aircraft specifications
-LamTSPS = repmat(Aircraft.Specs.Power.LamTSPS.Clb, npoint, 1);
-LamPSPS = repmat(Aircraft.Specs.Power.LamPSPS.Clb, npoint, 1);
-LamPSES = repmat(Aircraft.Specs.Power.LamPSES.Clb, npoint, 1);
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
 
 % update the mission history
 Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
-
-% remember the splits
-Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
-Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
 
 % remember the fuel and battery energy remaining
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
@@ -285,7 +259,6 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
     Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
     Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-    Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
     
     % ------------------------------------------------------
     
@@ -303,7 +276,7 @@ while (iter < MaxIter)
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
     
     % for full throttle, recompute the operational power splits
-    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    %Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
     % ------------------------------------------------------
 

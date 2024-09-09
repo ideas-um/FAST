@@ -1,10 +1,12 @@
-function [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
+function [Aircraft] = OpsOptimize(Aircraft)
 %
 % [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 mar 2024
+% updated by Emma Cassidy
+% last updated: 2 aug 2024
 %
 % Operational power split optimization package driver.
+% only works for PHE with LamTSPS right now
 %
 % INPUTS:
 %     Aircraft   - structure containing aircraft specifications, mission
@@ -27,24 +29,32 @@ function [Aircraft] = OpsOptimize(Aircraft, ProfileFxn)
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % zero the operations power splits
-Aircraft.Specs.Power.Phi.Tko = 0;
-Aircraft.Specs.Power.Phi.Clb = 0;
-Aircraft.Specs.Power.Phi.Crs = 0;
-Aircraft.Specs.Power.Phi.Des = 0;
-Aircraft.Specs.Power.Phi.Lnd = 0;
+Aircraft.Specs.Power.LamTSPS.Split = 0;
+
+Aircraft.PowerOpt.Segments = ["Takeoff", "Climb"];
+Aircraft.PowerOpt.ObjFun = "FuelBurn";
 
 % maximum number of iterations
-MaxIter = Aircraft.PowerOpt.MaxIter;
+MaxIter = Aircraft.Settings.Analysis.MaxIter;
 
 % convergence tolerance
-Tol = Aircraft.PowerOpt.Tol;
+Tol = .001;
 
 % count the iterations
 iter = 0;
 
-% flag for using prescribed power splits (or power split history)
-Aircraft.PowerOpt.PhiCount = 0;
+% inilialize objective function history
+ObjHist = [];
 
+% initialize power split history
+LamHist = [];
+
+% Initialize power split error history
+LamErrHist = [];
+
+% flag for using prescribed power splits (or power split history)
+%Aircraft.PowerOpt.PhiCount = 0;
+%what was thi ssupoosed to be?
 
 %% OPTIMIZE THE POWER SPLITS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,10 +66,10 @@ tic;
 while (iter < MaxIter)
     
     % fly the mission
-    Aircraft = MissionSegsPkg.FlyMission(Aircraft, ProfileFxn);
+    Aircraft = MissionSegsPkg.FlyMission(Aircraft);
     
     % reset the power split counter (for the next mission)
-    Aircraft.PowerOpt.PhiCount = 1;
+    %Aircraft.PowerOpt.PhiCount = 1;
     
     % post-processing after first iteration
     if (iter < 1)
@@ -114,10 +124,10 @@ while (iter < MaxIter)
     Tableau = OptimizationPkg.SimplexSetup(Aircraft, ielem);
     
     % solve the tableau
-    PhiOpt = OptimizationPkg.SimplexSolve(Tableau);
+    LamOpt = OptimizationPkg.SimplexSolve(Tableau);
     
     % post-process the result
-    Aircraft = OptimizationPkg.SimplexPost(Aircraft, ielem, PhiOpt);
+    Aircraft = OptimizationPkg.SimplexPost(Aircraft, ielem, LamOpt);
 
     % get the objective function
     ObjFun = Aircraft.PowerOpt.ObjFun;
@@ -149,20 +159,27 @@ while (iter < MaxIter)
     % print the result
     fprintf(1, "Objective Function Value: %.8e\n", Obj);
     
+    
+    ObjHist = [ObjHist; Obj];
+
     % get the power splits from the optimization
-    CurPhi = Aircraft.Mission.History.SI.Power.Phi(ielem(1:nphi));
+    CurLam = Aircraft.Mission.History.SI.Power.LamTSPS(ielem(1:nphi));
+
+    LamHist = [LamHist, CurLam];
     
     % check convergence after the first update
     if (iter > 0)
                 
         % compute the relative error between iterates
-        RelErr = abs(CurPhi - OldPhi) ./ OldPhi;
+        RelErr = abs(CurLam - OldLam) ./ OldLam;
+
+        LamErrHist = [LamErrHist; sum(RelErr)];
         
         % check convergence
         if (~any(RelErr > Tol))
             
             % the power split history no longer needs to be saved
-            Aircraft.PowerOpt = rmfield(Aircraft.PowerOpt, "PhiHist");
+            Aircraft.PowerOpt = rmfield(Aircraft.PowerOpt, "LamHist");
             
             % break out of the loop
             break;
@@ -174,10 +191,12 @@ while (iter < MaxIter)
     iter = iter + 1;
     
     % remember the last iterate
-    OldPhi = CurPhi;
+    OldLam = CurLam;
+
+    %ObjOld = Obj;
     
     % remember the entire power split history (gets cleared in next iter.)
-    Aircraft.PowerOpt.PhiHist = Aircraft.Mission.History.SI.Power.Phi;
+    Aircraft.PowerOpt.LamHist = Aircraft.Mission.History.SI.Power.LamTSPS;
         
 end
 
@@ -187,6 +206,14 @@ Aircraft.PowerOpt.WallTime = toc;
 % return the number of iterations run
 Aircraft.PowerOpt.Iter = iter;
 
+% save power split iteration results
+Aircraft.PowerOpt.LamHist = LamHist;
+
+% power split errors
+Aircraft.PowerOpt.LamErrHist = LamErrHist;
+
+% save the objective function iteration results
+Aircraft.PowerOpt.ObjHist = ObjHist;
 % ----------------------------------------------------------
 
 end

@@ -2,7 +2,9 @@ function [Tableau] = SimplexSetup(Aircraft, ielem)
 %
 % [Tableau] = SimplexSetup(Aircraft, ielem)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% taken over by Emma Cassidy, emmasmit@umich.edu
+% last updated: 6 aug 2024
+% NO RECHARGE RN
 %
 % Setup the tableau required for the Simplex Method. In the inputs/outputs
 % below, nx and ng represent the number of design variables and
@@ -38,7 +40,7 @@ EtaProp = Specs.Propulsion.Eta.Prop;
 EtaEM = Specs.Power.Eta.EM;
 
 % design power split
-PhiDesign = Specs.Power.Phi.SLS;
+LamDesign = Specs.Power.LamTSPS.SLS;
 
 % electric motor power-weight ratio
 P_Wem = Specs.Power.P_W.EM;
@@ -63,8 +65,8 @@ Class = Specs.TLAR.Class;
 History = Aircraft.Mission.History.SI;
 
 % power output/available
-Pout = History.Power.Out(ielem);
-Pav  = History.Power.Av( ielem);
+Pout = sum(History.Power.Pout_TS(ielem,:), 2);
+Pav  = sum(History.Power.Pav_TS( ielem, :), 2);
 
 % thrust-specific fuel consumption
 TSFC = History.Propulsion.TSFC(ielem);
@@ -103,7 +105,7 @@ else
 end
 
 % compute the coefficient to obtain electric motor power
-PemCoeff = Pout ./ EtaProp ./ EtaEM;
+PemCoeff = Pout(1:end-1) ./ EtaProp ./ EtaEM;
 
 % get the maximum electric motor power
 PemMax = P_Wem * Wem;
@@ -139,12 +141,12 @@ if (any(contains(Segments, "Takeoff")))
 end
 
 % number of total constraints and design variables (per power split)
-ncon = 4;
-nvar = 5;
+ncon = 2;
+nvar = 3;
 
 % number of total constraints using all power splits
-acon = 2;
-avar = 2;
+acon = 1;
+avar = 1;
 
 % allocate memory for the tableau
 Tableau = zeros(ncon * nphi + acon + 1, nvar * nphi + avar + 1);
@@ -155,9 +157,9 @@ Tableau = zeros(ncon * nphi + acon + 1, nvar * nphi + avar + 1);
 %                            %
 % constrain the minimum and  %
 % maximum power split        %
-%                            %
+%         with recharge                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%{
 % bound the power split
 for iphi = 1:nphi
     
@@ -176,12 +178,35 @@ for iphi = 1:nphi
     % constrain the maximum power split
     Tableau(irow, iphi) = 1              ;
     Tableau(irow, icol) = 1              ;
-    Tableau(irow,  end) = 0.9 * PhiDesign;
+    Tableau(irow,  end) = 0.9 * LamDesign;
     
 end
+%}
+% ----------------------------------------------------------
 
 % ----------------------------------------------------------
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% constrain the minimum and  %
+% maximum power split        %
+%     no recharge %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bound the power split
+for iphi = 1:nphi
+    
+    % row/col for the slack variable (lower power split limit)
+    irow = iphi;
+    icol = iphi + nphi;
+    
+    % constrain the power split
+    Tableau(irow, iphi) = 1;
+    Tableau(irow, icol) = 1;
+    Tableau(irow,  end) = 0.9 * LamDesign;
+    
+end
+% ----------------------------------------------------------
+%{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
 % constrain the electric     %
@@ -210,7 +235,30 @@ for iphi = 1:nphi
     Tableau(irow,  end) = PemMax        ;
     
 end
+%}
 
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% constrain the electric     %
+% motor power used per point %
+%            no recharge     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% loop through the power splits
+for iphi = 1:nphi
+    
+    % row/col for the slack variable (lower power split limit)
+    irow = iphi + nphi;
+    icol = iphi + nphi + ncon;
+    
+    % constrain the minimum electric motor power (keep as 0 for now)
+    Tableau(irow, iphi) = PemCoeff(iphi);
+    Tableau(irow, icol) =               1;
+    Tableau(irow,  end) = PemMax        ;
+    
+end
 % ----------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,20 +308,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % row/col for the slack variable (minimum battery energy)
-irow = ncon * nphi + 1;
-icol = nvar * nphi + 1;
+irow = ncon * nphi + acon;
+icol = nvar * nphi + avar;
 
 % input the coefficients (RHS remains 0)
-Tableau(irow, 1:nphi) = -EbattCoeff(1:nphi);
-Tableau(irow,   icol) =             1      ;
-
-% row/col for the slack variable (maximum battery energy)
-irow = irow + 1;
-icol = icol + 1;
-
-% input the coefficients and RHS
 Tableau(irow, 1:nphi) = EbattCoeff(1:nphi);
-Tableau(irow,   icol) =            1      ;
+Tableau(irow,   icol) =             1     ;
 Tableau(irow,    end) = EbattMax          ;
 
 % ----------------------------------------------------------

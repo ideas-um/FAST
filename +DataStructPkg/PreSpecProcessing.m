@@ -223,7 +223,6 @@ else
 
 
     % Power
-
     if ~isfield(Aircraft.Specs,"Power")
         Aircraft.Specs.Power.SLS = NaN;
         Aircraft.Specs.Power.SpecEnergy.Fuel = NaN;
@@ -235,12 +234,16 @@ else
         Aircraft.Specs.Power.P_W.EM = NaN;
         Aircraft.Specs.Power.P_W.EG = NaN;
         Aircraft.Specs.Power.LamTS.Split = NaN;
+        Aircraft.Specs.Power.LamTS.Alt = NaN;
         Aircraft.Specs.Power.LamTS.SLS = NaN;
         Aircraft.Specs.Power.LamTSPS.Split = NaN;
+        Aircraft.Specs.Power.LamTSPS.Alt = NaN;
         Aircraft.Specs.Power.LamTSPS.SLS = NaN;
         Aircraft.Specs.Power.LamPSES.Split = NaN;
+        Aircraft.Specs.Power.LamPSES.Alt = NaN;
         Aircraft.Specs.Power.LamPSES.SLS = NaN;
         Aircraft.Specs.Power.LamPSPS.Split = NaN;
+        Aircraft.Specs.Power.LamPSPS.Alt = NaN;
         Aircraft.Specs.Power.LamPSPS.SLS = NaN;
         Aircraft.Specs.Power.Battery.ParCells = NaN;
         Aircraft.Specs.Power.Battery.SerCells =  NaN;
@@ -294,11 +297,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamTS")
+            Aircraft.Specs.Power.LamTS.Alt = NaN;
+            Aircraft.Specs.Power.LamTS.SLS = NaN;
             Aircraft.Specs.Power.LamTS.Split = NaN;
-             Aircraft.Specs.Power.LamTS.SLS = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamTS,"Split")
                 Aircraft.Specs.Power.LamTS.Split = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamTS,"Alt")
+                Aircraft.Specs.Power.LamTS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamTS,"SLS")
                 Aircraft.Specs.Power.LamTS.SLS = NaN;
@@ -306,11 +313,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamTSPS")
+            Aircraft.Specs.Power.LamTSPS.Alt = NaN;
+            Aircraft.Specs.Power.LamTSPS.SLS = NaN;
             Aircraft.Specs.Power.LamTSPS.Split = NaN;
-             Aircraft.Specs.Power.LamTSPS.SLS = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamTSPS,"Split")
                 Aircraft.Specs.Power.LamTSPS.Split = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Alt")
+                Aircraft.Specs.Power.LamTSPS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamTSPS,"SLS")
                 Aircraft.Specs.Power.LamTSPS.SLS = NaN;
@@ -318,11 +329,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamPSPS")
+            Aircraft.Specs.Power.LamPSPS.Alt = NaN;
+            Aircraft.Specs.Power.LamPSPS.SLS = NaN;
             Aircraft.Specs.Power.LamPSPS.Split = NaN;
-             Aircraft.Specs.Power.LamPSPS.SLS = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamPSPS,"Split")
                 Aircraft.Specs.Power.LamPSPS.Split = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Alt")
+                Aircraft.Specs.Power.LamPSPS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamPSPS,"SLS")
                 Aircraft.Specs.Power.LamPSPS.SLS = NaN;
@@ -330,11 +345,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamPSES")
+            Aircraft.Specs.Power.LamPSES.Alt = NaN;
+            Aircraft.Specs.Power.LamPSES.SLS = NaN;
             Aircraft.Specs.Power.LamPSES.Split = NaN;
-             Aircraft.Specs.Power.LamPSES.SLS = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamPSES,"Split")
                 Aircraft.Specs.Power.LamPSES.Split = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamPSES,"Alt")
+                Aircraft.Specs.Power.LamPSES.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamPSES,"SLS")
                 Aircraft.Specs.Power.LamPSES.SLS = NaN;

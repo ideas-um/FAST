@@ -37,14 +37,14 @@ for i = 1:4
 
    % initialize power split array
    npoints = length(Alt);
-   Aircraft.Mission.History.SI.Power.(lams(i)) = zeros(npoints,1);
+   %Aircraft.Mission.History.SI.Power.(lams(i)) = zeros(npoints,1);
    
    % if split is already an array make mission hist equal to it
    if length(Aircraft.Specs.Power.(lams(i)).Split) == npoints
        Aircraft.Mission.History.SI.Power.(lams(i)) = Aircraft.Specs.Power.(lams(i)).Split;
 
    % check if a power split v alt is designated
-   elseif lam ~= 0
+   elseif lam ~= 0 && ~isnan(lam)
 
        % iterate through number of split segements
        for j = 1:length(lam)
@@ -80,6 +80,8 @@ for i = 1:4
      Aircraft.Specs.Power.(lams(i)).Split = Aircraft.Mission.History.SI.Power.(lams(i));
    end
 
+   % add some check if power required excceeds power avaliable
+   
 end
 end
 

@@ -96,7 +96,6 @@ Aircraft = ProfileFxn(Aircraft);
 % process the mission profile
 Aircraft = MissionSegsPkg.ProcessProfile(Aircraft);
 
-
 %% AIRCRAFT ANALYSIS %%
 %%%%%%%%%%%%%%%%%%%%%%%
 

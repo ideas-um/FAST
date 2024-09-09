@@ -182,6 +182,9 @@ end
 % initialize the mission history
 Aircraft = DataStructPkg.InitMissionHistory(Aircraft);
 
+% power split versus altitude for mission
+Aircraft = DataStructPkg.Lam_v_Alt(Aircraft);
+
 % print initial size
 fprintf(1, "Initial Size:          \n"                                                    );
 fprintf(1, "    MTOW  = %.6e lbm   \n",     UnitConversionPkg.ConvMass(MTOW , "kg", "lbm"));

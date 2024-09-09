@@ -5,7 +5,7 @@ function [] = InitializeDatabase(AssumedM)
 % Last updated 11/20/2023
 %
 % This function reads in the IDEAS Lab database and writes the data to the
-% aircraft structures that are used in the FAST sizing code. These are 
+% aircraft structures that are used in the FAST sizing code. These are
 % stored in the DatabasesV2 package in IDEAS_DB.mat. In addition, it
 % calculates useful ratios for the aircraft structures such as thrust to
 % weight and wingloading for each of the aircraft. It has no inputs and no
@@ -48,7 +48,7 @@ for ii = 8:size(RawTF,2) % change upper value later on
             case 2
                 TurbofanAC.(RawTF{2,ii}).(RawTF{jj,3}).(RawTF{jj,4}) = RawTF{jj,ii};
         end
-        
+
     end
 end
 
@@ -72,7 +72,7 @@ for ii = 8:size(RawTP,2) % change upper value later on
             case 2
                 TurbopropAC.(RawTP{2,ii}).(RawTP{jj,3}).(RawTP{jj,4}) = RawTP{jj,ii};
         end
-        
+
     end
 end
 
@@ -132,13 +132,22 @@ for ii = 5:size(RawTFE,2)
     end
 end
 
-% Add pressure per stage
+% Add pressure per stage and validation vs training
 
 FanEngineFields = fieldnames(TurbofanEngines);
 
 for ii = 1:length(FanEngineFields)
-TurbofanEngines.(FanEngineFields{ii}).PresPerStage = ...
-    TurbofanEngines.(FanEngineFields{ii}).OPR_SLS^(1/(TurbofanEngines.(FanEngineFields{ii}).FanStages+TurbofanEngines.(FanEngineFields{ii}).LPCStages+TurbofanEngines.(FanEngineFields{ii}).IPCStages+TurbofanEngines.(FanEngineFields{ii}).HPCStages+TurbofanEngines.(FanEngineFields{ii}).RCStages));
+    TurbofanEngines.(FanEngineFields{ii}).PresPerStage = ...
+        TurbofanEngines.(FanEngineFields{ii}).OPR_SLS^(1/(TurbofanEngines.(FanEngineFields{ii}).FanStages+TurbofanEngines.(FanEngineFields{ii}).LPCStages+TurbofanEngines.(FanEngineFields{ii}).IPCStages+TurbofanEngines.(FanEngineFields{ii}).HPCStages+TurbofanEngines.(FanEngineFields{ii}).RCStages));
+
+    DTindex = randi(100,1,1);
+
+    if DTindex > 95
+        TurbofanEngines.(FanEngineFields{ii}).DataTypeValidation = "Validation";
+    else
+        TurbofanEngines.(FanEngineFields{ii}).DataTypeValidation = "Training";
+    end
+
 end
 
 % Props
@@ -156,6 +165,21 @@ for ii = 5:size(RawTPE,2)
         end
         TurbopropEngines.(RawTPE{2,ii}).(RawTPE{jj,3}) = RawTPE{jj,ii};
     end
+end
+
+% validation vs training
+
+PropEngineFields = fieldnames(TurbofanEngines);
+
+for ii = 1:length(PropEngineFields)
+    DTindex = randi(100,1,1);
+
+    if DTindex > 95
+        TurbopropEngines.(PropEngineFields{ii}).DataTypeValidation = "Validation";
+    else
+        TurbopropEngines.(PropEngineFields{ii}).DataTypeValidation = "Training";
+    end
+
 end
 
 
@@ -183,7 +207,7 @@ for ii = 4:60
     if isnan(RawTFE{ii,3})
         continue
     end
-FanEngineUnits.(RawTFE{ii,3}) = RawTFE{ii,2};
+    FanEngineUnits.(RawTFE{ii,3}) = RawTFE{ii,2};
 end
 FanEngineUnits.PresPerStage = "ratio";
 
@@ -194,7 +218,7 @@ for ii = 4:66
     if isnan(RawTPE{ii,3})
         continue
     end
-PropEngineUnits.(RawTPE{ii,3}) = RawTPE{ii,2};
+    PropEngineUnits.(RawTPE{ii,3}) = RawTPE{ii,2};
 end
 
 %% Manual Touch ups
@@ -230,7 +254,7 @@ PropUnitsReference = DatabasePkg.CalcPropVals(PropUnitsReference,"Units");
 
 
 %% Create JMP Files
-% these are excel sheets 
+% these are excel sheets
 
 
 % Fans

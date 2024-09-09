@@ -29,9 +29,9 @@ function [Aircraft] = OpsOptimize(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % zero the operations power splits
-%Aircraft.Specs.Power.LamTSPS.Split = 0;
+Aircraft.Specs.Power.LamTSPS.Split = 0;
 
-Aircraft.PowerOpt.Segments = "Takeoff";
+Aircraft.PowerOpt.Segments = ["Takeoff", "Climb"];
 Aircraft.PowerOpt.ObjFun = "FuelBurn";
 
 % maximum number of iterations
@@ -42,6 +42,15 @@ Tol = .001;
 
 % count the iterations
 iter = 0;
+
+% inilialize objective function history
+ObjHist = [];
+
+% initialize power split history
+LamHist = [];
+
+% Initialize power split error history
+LamErrHist = [];
 
 % flag for using prescribed power splits (or power split history)
 %Aircraft.PowerOpt.PhiCount = 0;
@@ -150,14 +159,21 @@ while (iter < MaxIter)
     % print the result
     fprintf(1, "Objective Function Value: %.8e\n", Obj);
     
+    
+    ObjHist = [ObjHist; Obj];
+
     % get the power splits from the optimization
     CurLam = Aircraft.Mission.History.SI.Power.LamTSPS(ielem(1:nphi));
+
+    LamHist = [LamHist, CurLam];
     
     % check convergence after the first update
     if (iter > 0)
                 
         % compute the relative error between iterates
         RelErr = abs(CurLam - OldLam) ./ OldLam;
+
+        LamErrHist = [LamErrHist; sum(RelErr)];
         
         % check convergence
         if (~any(RelErr > Tol))
@@ -176,6 +192,8 @@ while (iter < MaxIter)
     
     % remember the last iterate
     OldLam = CurLam;
+
+    %ObjOld = Obj;
     
     % remember the entire power split history (gets cleared in next iter.)
     Aircraft.PowerOpt.LamHist = Aircraft.Mission.History.SI.Power.LamTSPS;
@@ -188,6 +206,14 @@ Aircraft.PowerOpt.WallTime = toc;
 % return the number of iterations run
 Aircraft.PowerOpt.Iter = iter;
 
+% save power split iteration results
+Aircraft.PowerOpt.LamHist = LamHist;
+
+% power split errors
+Aircraft.PowerOpt.LamErrHist = LamErrHist;
+
+% save the objective function iteration results
+Aircraft.PowerOpt.ObjHist = ObjHist;
 % ----------------------------------------------------------
 
 end

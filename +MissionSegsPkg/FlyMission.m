@@ -157,6 +157,9 @@ for imiss = 1:nmiss
             
             % get the last point in the segment
             SegEnd = Mission.SegEnd(isegs);
+
+            % power split versus altitude for mission
+            Aircraft = DataStructPkg.Lam_v_Alt(Aircraft);
             
             % define the function call
             FunName = strcat("MissionSegsPkg.Eval", SegName);

@@ -49,7 +49,7 @@ Pav_PS = Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % don't re-compute if there aren't any splits
-if (npar < 1)
+if (Aircraft.Specs.Power.LamTSPS.Split == 0)
     return
 end
 

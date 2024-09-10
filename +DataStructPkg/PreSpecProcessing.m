@@ -55,30 +55,18 @@ if ~ isfield(Aircraft,"Specs")
     Aircraft.Specs.Power.P_W.SLS = NaN;
     Aircraft.Specs.Power.P_W.EM = NaN;
     Aircraft.Specs.Power.P_W.EG = NaN;
-    Aircraft.Specs.Power.LamTS.Tko = NaN;
-    Aircraft.Specs.Power.LamTS.Clb = NaN;
-    Aircraft.Specs.Power.LamTS.Crs = NaN;
-    Aircraft.Specs.Power.LamTS.Des = NaN;
-    Aircraft.Specs.Power.LamTS.Lnd = NaN;
+    Aircraft.Specs.Power.LamTS.Split = NaN;
+    Aircraft.Specs.Power.LamTS.Alt = NaN;
     Aircraft.Specs.Power.LamTS.SLS = NaN;
-    Aircraft.Specs.Power.LamTSPS.Tko = NaN;
-    Aircraft.Specs.Power.LamTSPS.Clb = NaN;
-    Aircraft.Specs.Power.LamTSPS.Crs = NaN;
-    Aircraft.Specs.Power.LamTSPS.Des = NaN;
-    Aircraft.Specs.Power.LamTSPS.Lnd = NaN;
+    Aircraft.Specs.Power.LamTSPS.Split = NaN;
+    Aircraft.Specs.Power.LamTSPS.Alt = NaN;
     Aircraft.Specs.Power.LamTSPS.SLS = NaN;
-    Aircraft.Specs.Power.LamPSPS.Tko = NaN;
-    Aircraft.Specs.Power.LamPSPS.Clb = NaN;
-    Aircraft.Specs.Power.LamPSPS.Crs = NaN;
-    Aircraft.Specs.Power.LamPSPS.Des = NaN;
-    Aircraft.Specs.Power.LamPSPS.Lnd = NaN;
-    Aircraft.Specs.Power.LamPSPS.SLS = NaN;
-    Aircraft.Specs.Power.LamPSES.Tko = NaN;
-    Aircraft.Specs.Power.LamPSES.Clb = NaN;
-    Aircraft.Specs.Power.LamPSES.Crs = NaN;
-    Aircraft.Specs.Power.LamPSES.Des = NaN;
-    Aircraft.Specs.Power.LamPSES.Lnd = NaN;
+    Aircraft.Specs.Power.LamPSES.Split = NaN;
+    Aircraft.Specs.Power.LamPSES.Alt = NaN;
     Aircraft.Specs.Power.LamPSES.SLS = NaN;
+    Aircraft.Specs.Power.LamPSPS.Split = NaN;
+    Aircraft.Specs.Power.LamPSPS.Alt = NaN;
+    Aircraft.Specs.Power.LamPSPS.SLS = NaN;
     Aircraft.Specs.Power.Battery.ParCells = NaN;
     Aircraft.Specs.Power.Battery.SerCells =  NaN;
     Aircraft.Specs.Power.Battery.BegSOC = NaN;
@@ -239,7 +227,6 @@ else
 
 
     % Power
-
     if ~isfield(Aircraft.Specs,"Power")
         Aircraft.Specs.Power.SLS = NaN;
         Aircraft.Specs.Power.SpecEnergy.Fuel = NaN;
@@ -250,30 +237,18 @@ else
         Aircraft.Specs.Power.P_W.SLS = NaN;
         Aircraft.Specs.Power.P_W.EM = NaN;
         Aircraft.Specs.Power.P_W.EG = NaN;
-        Aircraft.Specs.Power.LamTS.Tko = NaN;
-        Aircraft.Specs.Power.LamTS.Clb = NaN;
-        Aircraft.Specs.Power.LamTS.Crs = NaN;
-        Aircraft.Specs.Power.LamTS.Des = NaN;
-        Aircraft.Specs.Power.LamTS.Lnd = NaN;
+        Aircraft.Specs.Power.LamTS.Split = NaN;
+        Aircraft.Specs.Power.LamTS.Alt = NaN;
         Aircraft.Specs.Power.LamTS.SLS = NaN;
-        Aircraft.Specs.Power.LamTSPS.Tko = NaN;
-        Aircraft.Specs.Power.LamTSPS.Clb = NaN;
-        Aircraft.Specs.Power.LamTSPS.Crs = NaN;
-        Aircraft.Specs.Power.LamTSPS.Des = NaN;
-        Aircraft.Specs.Power.LamTSPS.Lnd = NaN;
+        Aircraft.Specs.Power.LamTSPS.Split = NaN;
+        Aircraft.Specs.Power.LamTSPS.Alt = NaN;
         Aircraft.Specs.Power.LamTSPS.SLS = NaN;
-        Aircraft.Specs.Power.LamPSPS.Tko = NaN;
-        Aircraft.Specs.Power.LamPSPS.Clb = NaN;
-        Aircraft.Specs.Power.LamPSPS.Crs = NaN;
-        Aircraft.Specs.Power.LamPSPS.Des = NaN;
-        Aircraft.Specs.Power.LamPSPS.Lnd = NaN;
-        Aircraft.Specs.Power.LamPSPS.SLS = NaN;
-        Aircraft.Specs.Power.LamPSES.Tko = NaN;
-        Aircraft.Specs.Power.LamPSES.Clb = NaN;
-        Aircraft.Specs.Power.LamPSES.Crs = NaN;
-        Aircraft.Specs.Power.LamPSES.Des = NaN;
-        Aircraft.Specs.Power.LamPSES.Lnd = NaN;
+        Aircraft.Specs.Power.LamPSES.Split = NaN;
+        Aircraft.Specs.Power.LamPSES.Alt = NaN;
         Aircraft.Specs.Power.LamPSES.SLS = NaN;
+        Aircraft.Specs.Power.LamPSPS.Split = NaN;
+        Aircraft.Specs.Power.LamPSPS.Alt = NaN;
+        Aircraft.Specs.Power.LamPSPS.SLS = NaN;
         Aircraft.Specs.Power.Battery.ParCells = NaN;
         Aircraft.Specs.Power.Battery.SerCells =  NaN;
         Aircraft.Specs.Power.Battery.BegSOC = NaN;
@@ -326,27 +301,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamTS")
-            Aircraft.Specs.Power.LamTS.Tko = NaN;
-            Aircraft.Specs.Power.LamTS.Clb = NaN;
-            Aircraft.Specs.Power.LamTS.Crs = NaN;
-            Aircraft.Specs.Power.LamTS.Des = NaN;
-            Aircraft.Specs.Power.LamTS.Lnd = NaN;
+            Aircraft.Specs.Power.LamTS.Alt = NaN;
             Aircraft.Specs.Power.LamTS.SLS = NaN;
+            Aircraft.Specs.Power.LamTS.Split = NaN;
         else
-            if ~isfield(Aircraft.Specs.Power.LamTS,"Tko")
-                Aircraft.Specs.Power.LamTS.Tko = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamTS,"Split")
+                Aircraft.Specs.Power.LamTS.Split = NaN;
             end
-            if ~isfield(Aircraft.Specs.Power.LamTS,"Clb")
-                Aircraft.Specs.Power.LamTS.Clb = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTS,"Crs")
-                Aircraft.Specs.Power.LamTS.Crs = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTS,"Des")
-                Aircraft.Specs.Power.LamTS.Des = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTS,"Lnd")
-                Aircraft.Specs.Power.LamTS.Lnd = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamTS,"Alt")
+                Aircraft.Specs.Power.LamTS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamTS,"SLS")
                 Aircraft.Specs.Power.LamTS.SLS = NaN;
@@ -354,27 +317,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamTSPS")
-            Aircraft.Specs.Power.LamTSPS.Tko = NaN;
-            Aircraft.Specs.Power.LamTSPS.Clb = NaN;
-            Aircraft.Specs.Power.LamTSPS.Crs = NaN;
-            Aircraft.Specs.Power.LamTSPS.Des = NaN;
-            Aircraft.Specs.Power.LamTSPS.Lnd = NaN;
+            Aircraft.Specs.Power.LamTSPS.Alt = NaN;
             Aircraft.Specs.Power.LamTSPS.SLS = NaN;
+            Aircraft.Specs.Power.LamTSPS.Split = NaN;
         else
-            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Tko")
-                Aircraft.Specs.Power.LamTSPS.Tko = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Split")
+                Aircraft.Specs.Power.LamTSPS.Split = NaN;
             end
-            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Clb")
-                Aircraft.Specs.Power.LamTSPS.Clb = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Crs")
-                Aircraft.Specs.Power.LamTSPS.Crs = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Des")
-                Aircraft.Specs.Power.LamTSPS.Des = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Lnd")
-                Aircraft.Specs.Power.LamTSPS.Lnd = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamTSPS,"Alt")
+                Aircraft.Specs.Power.LamTSPS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamTSPS,"SLS")
                 Aircraft.Specs.Power.LamTSPS.SLS = NaN;
@@ -382,27 +333,15 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamPSPS")
-            Aircraft.Specs.Power.LamPSPS.Tko = NaN;
-            Aircraft.Specs.Power.LamPSPS.Clb = NaN;
-            Aircraft.Specs.Power.LamPSPS.Crs = NaN;
-            Aircraft.Specs.Power.LamPSPS.Des = NaN;
-            Aircraft.Specs.Power.LamPSPS.Lnd = NaN;
+            Aircraft.Specs.Power.LamPSPS.Alt = NaN;
             Aircraft.Specs.Power.LamPSPS.SLS = NaN;
+            Aircraft.Specs.Power.LamPSPS.Split = NaN;
         else
-            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Tko")
-                Aircraft.Specs.Power.LamPSPS.Tko = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Split")
+                Aircraft.Specs.Power.LamPSPS.Split = NaN;
             end
-            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Clb")
-                Aircraft.Specs.Power.LamPSPS.Clb = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Crs")
-                Aircraft.Specs.Power.LamPSPS.Crs = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Des")
-                Aircraft.Specs.Power.LamPSPS.Des = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Lnd")
-                Aircraft.Specs.Power.LamPSPS.Lnd = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamPSPS,"Alt")
+                Aircraft.Specs.Power.LamPSPS.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamPSPS,"SLS")
                 Aircraft.Specs.Power.LamPSPS.SLS = NaN;
@@ -410,33 +349,21 @@ else
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamPSES")
-            Aircraft.Specs.Power.LamPSES.Tko = NaN;
-            Aircraft.Specs.Power.LamPSES.Clb = NaN;
-            Aircraft.Specs.Power.LamPSES.Crs = NaN;
-            Aircraft.Specs.Power.LamPSES.Des = NaN;
-            Aircraft.Specs.Power.LamPSES.Lnd = NaN;
+            Aircraft.Specs.Power.LamPSES.Alt = NaN;
             Aircraft.Specs.Power.LamPSES.SLS = NaN;
+            Aircraft.Specs.Power.LamPSES.Split = NaN;
         else
-            if ~isfield(Aircraft.Specs.Power.LamPSES,"Tko")
-                Aircraft.Specs.Power.LamPSES.Tko = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamPSES,"Split")
+                Aircraft.Specs.Power.LamPSES.Split = NaN;
             end
-            if ~isfield(Aircraft.Specs.Power.LamPSES,"Clb")
-                Aircraft.Specs.Power.LamPSES.Clb = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSES,"Crs")
-                Aircraft.Specs.Power.LamPSES.Crs = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSES,"Des")
-                Aircraft.Specs.Power.LamPSES.Des = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Power.LamPSES,"Lnd")
-                Aircraft.Specs.Power.LamPSES.Lnd = NaN;
+            if ~isfield(Aircraft.Specs.Power.LamPSES,"Alt")
+                Aircraft.Specs.Power.LamPSES.Alt = NaN;
             end
             if ~isfield(Aircraft.Specs.Power.LamPSES,"SLS")
                 Aircraft.Specs.Power.LamPSES.SLS = NaN;
             end
         end
-
+        
         if ~isfield(Aircraft.Specs.Power,"Battery")
             Aircraft.Specs.Power.Battery.ParCells = NaN;
             Aircraft.Specs.Power.Battery.SerCells =  NaN;

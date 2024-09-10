@@ -35,6 +35,9 @@ for i = 1:4
    % get alt range from ac struct
    altLam = Aircraft.Specs.Power.(lams(i)).Alt;
 
+   % sls lambda
+   lamSLS = Aircraft.Specs.Power.(lams(i)).SLS;
+
    % initialize power split array
    npoints = length(Alt);
    %Aircraft.Mission.History.SI.Power.(lams(i)) = zeros(npoints,1);
@@ -43,8 +46,8 @@ for i = 1:4
    if length(Aircraft.Specs.Power.(lams(i)).Split) == npoints
        Aircraft.Mission.History.SI.Power.(lams(i)) = Aircraft.Specs.Power.(lams(i)).Split;
 
-   % check if a power split v alt is designated
-   elseif lam ~= 0 && ~isnan(lam)
+   % check if an HEA is wanted 
+   elseif lamSLS ~= 0
 
        % iterate through number of split segements
        for j = 1:length(lam)
@@ -69,8 +72,8 @@ for i = 1:4
            
            else
                 % find beginning and ending index of altitude vector
-               BegDif = ((seg(1) - Alt) <= 0);
-               EndDif = ((seg(2) - Alt) <= 0);
+               BegDif = ((seg(1) - Alt) < 0);
+               EndDif = ((seg(2) - Alt) < 0);
                SegBeg = find(BegDif, 1) - 1;
                SegEnd = find(EndDif, 1) - 1;
            end

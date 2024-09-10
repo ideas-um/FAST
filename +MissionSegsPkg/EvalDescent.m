@@ -119,7 +119,7 @@ MaxIter = 10;
                              AltEnd, dISA, TypeEnd, VelEnd);
 
 % vector of equally spaced altitudes and velocities
-Alt = linspace(AltBeg, AltEnd, npoint)'; % m
+Alt = Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd); % m
 TAS = linspace(TASBeg, TASEnd, npoint)'; % m/s
 
 % initialize arrays that accumulate (and start at 0)
@@ -214,7 +214,6 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
     Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
     Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-    Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
     
     % ------------------------------------------------------
     

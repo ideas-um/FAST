@@ -101,7 +101,7 @@ dh_dt = zeros(npoint,1);
 FPA = zeros(npoint, 1);
 
 % altitude------[npoint x 1]
-Alt = repmat(Aircraft.Specs.Performance.Alts.Tko, npoint, 1);
+Alt = Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd); % m
 
 % total mass in each time------[npoint x 1]
 Mass = repmat(MTOW, npoint, 1);
@@ -162,13 +162,12 @@ Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
 Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
 Aircraft.Mission.History.SI.Performance.Time(SegBeg:SegEnd) = Time;
 Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
                              
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
 % for full throttle, recompute the operational power splits
-Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+%Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
 % assume all available power is for flying
 Preq = Inf(npoint, 1);

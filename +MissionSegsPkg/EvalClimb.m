@@ -254,7 +254,6 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
     Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
     Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-    %Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
     
     % ------------------------------------------------------
     
@@ -272,7 +271,7 @@ while (iter < MaxIter)
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
     
     % for full throttle, recompute the operational power splits
-    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    %Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
     % ------------------------------------------------------
 

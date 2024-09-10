@@ -63,15 +63,16 @@ for i = 1:4
            % convert feet to meters
            seg = UnitConversionPkg.ConvLength(seg, 'ft', 'm');
 
-           % find beginning and ending index of altitude vector
-           BegDif = ((seg(1) - Alt) <= 0);
-           EndDif = ((seg(2) - Alt) <= 0);
-           SegBeg = find(BegDif, 1) - 1;
-           SegEnd = find(EndDif, 1) - 1;
-           
            % check if split designated for start of flight
-           if SegBeg == 0
-               SegBeg = 1;
+           if seg(2) == 0
+               SegBeg = 1; SegEnd = 9;
+           
+           else
+                % find beginning and ending index of altitude vector
+               BegDif = ((seg(1) - Alt) <= 0);
+               EndDif = ((seg(2) - Alt) <= 0);
+               SegBeg = find(BegDif, 1) - 1;
+               SegEnd = find(EndDif, 1) - 1;
            end
 
                % eventually change that if the new segement index is lower

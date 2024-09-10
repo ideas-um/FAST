@@ -75,6 +75,7 @@ end
 
 % remember the power split
 Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
+Aircraft.Specs.Power.LamTSPS.Split = Aircraft.Mission.History.SI.Power.LamTSPS;
 
 % ----------------------------------------------------------
 

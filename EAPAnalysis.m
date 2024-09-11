@@ -2,7 +2,7 @@ function [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 %
 % [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 24 apr 2024
+% last updated: 05 jun 2024
 %
 % For a given aircraft, either:
 %
@@ -58,9 +58,6 @@ end
 % structure                  %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% battery specific energy
-ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
 
 % check for fuel and batteries
 Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
@@ -231,20 +228,7 @@ while (iter < MaxIter)
     
     % compute the fuel burn weight changes
     dWfuel = Fburn - Wfuel;
-    
-    % get cumulative battery energy (if any)
-    if (any(Batt))
         
-        % get the battery energy
-        Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(end, Batt);
-        
-    else
-        
-        % no battery energy
-        Ebatt = 0;
-        
-    end
-    
     % check if a retrofit is being performed (fixed battery weight)
     if (Type == -2)
         
@@ -253,21 +237,12 @@ while (iter < MaxIter)
         
     else
         
-        % check for a detailed battery model
-        if (Aircraft.Settings.DetailedBatt == 1)
-            
-            % resize the battery for power and energy
-            Aircraft = BatteryPkg.ResizeBattery(Aircraft);
-            
-            % find the difference between the new and old battery weight
-            dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
-            
-        else
+        % resize the battery for power and energy
+        Aircraft = BatteryPkg.ResizeBattery(Aircraft);
         
-            % size the battery based on energy demand only
-            dWbatt = Ebatt ./ ebatt - Wbatt;
+        % find the difference between the new and old battery weight
+        dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
             
-        end        
     end
     
     % update mtow

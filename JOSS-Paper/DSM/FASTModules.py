@@ -34,7 +34,7 @@ import openmdao.api as om
 #                            #
 ##############################
 
-class Initialization(om.ExplicitComponent):
+class Initialization(om.Group):
     """
     
     Initialization:
@@ -44,16 +44,110 @@ class Initialization(om.ExplicitComponent):
     """
 
     def setup(self):
+
+        # subsystems
+        self.add_subsystem("SpecificationFile",SpecificationFile(),promotes_inputs=[("A/C_Specs"),("Mission_Profile"),("Run_Settings")],promotes_outputs=[("Pre-Processed_Specifications")])
+        self.add_subsystem("InputProcessing",InputProcessing(),promotes_outputs=[("Processed_Specifications")])
+        self.add_subsystem("ModifiedInputs",ModifiedInputs(),promotes_inputs=[("MTOW_Guess")],promotes_outputs=[("Point_Performance_Parameters"),("Candidate_A/C_Design"),("Validated_Mission_Profile")])
+
+        # make connections
+        self.connect("Pre-Processed_Specifications",[("InputProcessing.Variable_Instantiation"),("InputProcessing.Regressions"),("InputProcessing.Default_Settings")])
+        self.connect("Processed_Specifications","ModifiedInputs.Processed_Specifications")
+
+
+
+    # end setup
+# end Initialization
+   
+   
+# ----------------------------------------------------------
+
+
+##############################
+#                            #
+# Specification File CLASS   #
+#                            #
+##############################
+
+class SpecificationFile(om.ExplicitComponent):
+    """
+    
+    SpecificationFile:
+
+    User inputted files and values.
+
+    """
+
+    def setup(self):
         self.add_input("A/C_Specs")
         self.add_input("Mission_Profile")
         self.add_input("Run_Settings")
+        self.add_output("Pre-Processed_Specifications")
+
+        
+
+    # end setup
+# end Specification File
+
+
+# ----------------------------------------------------------
+
+
+##############################
+#                            #
+# Input Processing CLASS     #
+#                            #
+##############################
+
+class InputProcessing(om.ExplicitComponent):
+    """
+    
+    InputProcessing:
+
+    Regressions and instatiation.
+
+    """
+
+    def setup(self):
+        self.add_input("Variable_Instantiation")
+        self.add_input("Regressions")
+        self.add_input("Default_Settings")
+        self.add_output("Processed_Specifications")
+
+        
+
+    # end setup
+# end Specification File
+
+
+# ----------------------------------------------------------
+
+##############################
+#                            #
+# Modified Inputs CLASS      #
+#                            #
+##############################
+
+class ModifiedInputs(om.ExplicitComponent):
+    """
+    
+    ModifiedInputs:
+
+    Inputs after being processed.
+
+    """
+
+    def setup(self):
+        self.add_input("Processed_Specifications")
         self.add_input("MTOW_Guess")
         self.add_output("Point_Performance_Parameters")
         self.add_output("Candidate_A/C_Design")
         self.add_output("Validated_Mission_Profile")
 
+        
+
     # end setup
-# end Initialization
+# end ModifiedInputs
 
 
 # ----------------------------------------------------------

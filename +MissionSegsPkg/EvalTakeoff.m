@@ -167,7 +167,7 @@ Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
 % for full throttle, recompute the operational power splits
-%Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
 % assume all available power is for flying
 Preq = Inf(npoint, 1);

@@ -188,7 +188,7 @@ class PointPerformance(om.ExplicitComponent):
 #                            #
 ##############################
 
-class OEWIteration(om.ExplicitComponent):
+class OEWIteration(om.Group):
     """
     
     OEW_Iteration:
@@ -198,6 +198,32 @@ class OEWIteration(om.ExplicitComponent):
     """
 
     def setup(self):
+        self.add_subsystem("WeightBuildUp",WeightBuildUp(),promotes_inputs=["MTOW","T_or_P","S"],promotes_outputs=["Updated_MTOW","Sized_A/C"])
+        self.add_subsystem("PropulsionOnDesign",PropulsionOnDesign())
+
+    # end setup
+# end OEWIteration
+
+
+# ----------------------------------------------------------
+
+##############################
+#                            #
+# Smaller OEW CLASS          #
+#                            #
+##############################
+
+class WeightBuildUp(om.ExplicitComponent):
+    """
+    
+    OEW_Iteration:
+    
+    Estimate the aircraft's airframe and propulsion system weights.
+    
+    """
+
+    def setup(self):
+        self.add_input("MTOW")
         self.add_input("T_or_P")
         self.add_input("S")
         self.add_output("OEW")
@@ -205,7 +231,34 @@ class OEWIteration(om.ExplicitComponent):
         self.add_output("Sized_A/C")
 
     # end setup
-# end OEWIteration
+# end WeightBuildUp
+
+
+# ----------------------------------------------------------
+
+##############################
+#                            #
+# Propulsion On Design CLASS #
+#                            #
+##############################
+
+class PropulsionOnDesign(om.ExplicitComponent):
+    """
+    
+    PropulsionOnDesign:
+    
+    Design.
+    
+    """
+
+    def setup(self):
+        self.add_input("DesignPerformance")
+        self.add_input("EngineDesignConditions")
+        self.add_input("DesignPowerSplit")
+        self.add_output("PropulsionSystemWeights")
+
+    # end setup
+# end PropulsionOnDesign
 
 
 # ----------------------------------------------------------
@@ -361,6 +414,8 @@ class AircraftSizing(om.Group):
         self.connect("Mission_Analysis.Mission_History", ["ES_Sizing.Fuel_Energy_Expended", "ES_Sizing.Battery_Energy_Expended", "ES_Sizing.Final_SOC"])
         self.connect("ES_Sizing.Fuel_Weight", "MTOW_Update.Fuel_Weight")
         self.connect("ES_Sizing.Battery_Weight", "MTOW_Update.Battery_Weight")
+        self.connect("OEW_Iteration.PropulsionOnDesign.PropulsionSystemWeights","OEW_Iteration.MTOW")
+        self.connect("Airframe_Propulsion_System_Sizing.T_or_P","OEW_Iteration.PropulsionOnDesign.DesignPerformance")
 
     # end setup
 # end AircraftSizing

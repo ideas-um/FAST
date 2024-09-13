@@ -2,9 +2,10 @@ function [Success] = TestConvTemp()
 %
 % [Success] = TestConvTemp()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 11 jul 2024
+% last updated: 13 sep 2024
 %
-% Generate simple test cases to confirm that the temperature conversion script
+% Generate simple test cases to confirm that the temperature 
+% conversion script
 % is working properly.
 %
 % INPUTS:
@@ -34,7 +35,6 @@ Pass = ones(12, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
 
 %% CASE 1A: TEMPERATURE CONVERSIONS FOR K TO C %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,6 +68,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 1B: TEMPERATURE CONVERSIONS FOR K TO R %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -99,6 +100,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 1C: TEMPERATURE CONVERSIONS FOR K TO F %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -165,6 +167,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2B: TEMPERATURE CONVERSIONS FOR R TO C %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -197,6 +200,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 2C: TEMPERATURE CONVERSIONS FOR R TO F %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -263,6 +267,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 3B: TEMPERATURE CONVERSIONS FOR C TO R %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -294,6 +299,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 3C: TEMPERATURE CONVERSIONS FOR C TO F %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -360,6 +366,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 4B: TEMPERATURE CONVERSIONS FOR F TO R %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -392,6 +399,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 4C: TEMPERATURE CONVERSIONS FOR F TO C %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -421,11 +429,7 @@ TrueValue = 337.1516667;
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
-% increment the test counter
-itest = itest + 1;
-
 % ----------------------------------------------------------
-
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

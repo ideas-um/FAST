@@ -2,7 +2,7 @@ function [Success] = TestConvForce()
 %
 % [Success] = TestConvForce()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 11 jul 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the force conversion script
 % is working properly.
@@ -34,7 +34,6 @@ Pass = ones(2, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
 
 %% CASE 1: FORCE CONVERSIONS FOR N TO LBF %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,9 +96,6 @@ TrueValue = 104327.828761;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

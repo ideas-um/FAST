@@ -2,7 +2,7 @@ function [Success] = TestConvLength()
 %
 % [Success] = TestConvLength()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 11 jul 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the length conversion script
 % is working properly.
@@ -34,7 +34,6 @@ Pass = ones(20, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
 
 %% CASE 1A: LENGTH CONVERSIONS FOR FT TO M %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,6 +67,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 1B: LENGTH CONVERSIONS FOR FT TO KM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -100,6 +100,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 1C: LENGTH CONVERSIONS FOR FT TO MI %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -131,6 +132,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 1D: LENGTH CONVERSIONS FOR FT TO NM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,6 +199,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2B: LENGTH CONVERSIONS FOR M TO KM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -229,6 +232,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2C: LENGTH CONVERSIONS FOR M TO MI %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -260,6 +264,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 2D: LENGTH CONVERSIONS FOR M TO NM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -326,6 +331,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 3B: LENGTH CONVERSIONS FOR KM TO M %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -358,6 +364,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 3C: LENGTH CONVERSIONS FOR KM TO MI %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -389,6 +396,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 3D: LENGTH CONVERSIONS FOR KM TO NM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -455,6 +463,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 4B: LENGTH CONVERSIONS FOR MI TO M %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -487,6 +496,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 4C: LENGTH CONVERSIONS FOR MI TO KM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -518,6 +528,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 4D: LENGTH CONVERSIONS FOR MI TO NM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,6 +595,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 5B: LENGTH CONVERSIONS FOR NM TO M %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -615,6 +627,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 5C: LENGTH CONVERSIONS FOR NM TO KM %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -648,6 +661,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 5D: LENGTH CONVERSIONS FOR NM TO MI %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -676,9 +690,6 @@ TrueValue = 11.8116;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

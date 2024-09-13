@@ -2,7 +2,7 @@ function [Success] = TestConvMass()
 %
 % [Success] = TestConvMass()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 11 jul 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the mass conversion script
 % is working properly.
@@ -34,7 +34,6 @@ Pass = ones(6, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
 
 %% CASE 1A: MASS CONVERSIONS FOR LBM TO KG %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,6 +66,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 1B: MASS CONVERSIONS FOR LBM TO SLUGS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -133,6 +133,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2B: MASS CONVERSIONS FOR KG TO SLUGS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -198,6 +199,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 3B: MASS CONVERSIONS FOR SLUGS TO KG %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -227,11 +229,7 @@ TrueValue = 5254.38884;
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
-% increment the test counter
-itest = itest + 1;
-
 % ----------------------------------------------------------
-
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

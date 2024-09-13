@@ -2,7 +2,7 @@ function [Success] = TestConvTSFC()
 %
 % [Success] = TestConvTSFC()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 11 jul 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the TSFC conversion script
 % is working properly.
@@ -34,7 +34,6 @@ Pass = ones(2, 1);
 % count the tests
 itest = 1;
 
-% ----------------------------------------------------------
 
 %% CASE 1: TSFC CONVERSIONS FOR SI TO IMP %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,9 +96,6 @@ TrueValue = 0.03124991148;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

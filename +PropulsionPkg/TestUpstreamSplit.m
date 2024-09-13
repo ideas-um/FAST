@@ -2,7 +2,7 @@ function [Success] = TestUpstreamSplit()
 %battery resize
 % [Success] = TestUpstreamSplit()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 27 aug 2024
+% last updated: 12 sep 2024
 %
 % Generate simple test cases to confirm that the upstream power script
 % is working properly.

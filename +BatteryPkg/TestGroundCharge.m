@@ -2,7 +2,7 @@ function [Success] = TestGroundCharge()
 %battery resize
 % [Success] = TestGroundCharge()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 31 jul 2024
+% last updated: 12 sep 2024
 %
 % Generate simple test cases to confirm that the battery ground charge
 % script is working properly.

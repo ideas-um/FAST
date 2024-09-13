@@ -2,7 +2,7 @@ function [Success] = TestModel()
 %
 % [Success] = TestModel()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 12 sep 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the battery model script 
 % is working properly.
@@ -34,6 +34,7 @@ Pass = ones(3, 1);
 % count the tests
 itest = 1;
 
+
 %% CASE 1: SINGLE CELL BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -59,8 +60,8 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC, ...
+    TestIn.Time, TestIn.SOCi, TestIn.Parallel,TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, Q, SOC];
@@ -100,8 +101,8 @@ TestIn.Series = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC, ...
+    TestIn.Time, TestIn.SOCi, TestIn.Parallel, TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, Q, SOC];
@@ -114,6 +115,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 3: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,8 +142,8 @@ TestIn.Series = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC, ...
+    TestIn.Time, TestIn.SOCi, TestIn.Parallel, TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, Q, SOC];
@@ -155,7 +157,8 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 % increment the test counter
 itest = itest + 1;
 
-%% CASE 3: MULTIPLE PARALLEL, MULTIPLE SERIES BATTERY MODEL %%
+
+%% CASE 4: MULTIPLE PARALLEL, MULTIPLE SERIES BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -180,8 +183,8 @@ TestIn.Series = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the model
-[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC,TestIn.Time,TestIn.SOCi, ...
-    TestIn.Parallel,TestIn.Series);
+[Voltage, Pout, Capacity, Q, SOC] = BatteryPkg.Model(TestIn.PreSOC, ...
+    TestIn.Time, TestIn.SOCi, TestIn.Parallel, TestIn.Series);
 
 % store resulting values
 TestValue = [Voltage, Pout, Capacity, Q, SOC];
@@ -191,9 +194,6 @@ TrueValue = [10.8624, 46.0300, 499.9950, 31.5000, 62.3295];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

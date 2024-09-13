@@ -1,8 +1,8 @@
-function [Success] = TestFAST()
+function [] = TestFAST()
 %battery resize
 % [Success] = TestFAST()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 12 sep 2024
+% last updated: 13 sep 2024
 %
 % Driver file for all FAST test cases
 %
@@ -13,6 +13,7 @@ function [Success] = TestFAST()
 %     none
 %
 
+
 %% TEST BATTERY PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -20,6 +21,7 @@ function [Success] = TestFAST()
 BatteryPkg.TestGroundCharge();
 BatteryPkg.TestModel();
 BatteryPkg.TestResizeBattery();
+
 
 %% TEST POPULSION PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,6 +31,7 @@ PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
 PropulsionPkg.TestSplitPower();
 PropulsionPkg.TestUpstreamSplit();
+
 
 %% TEST UNIT CONVERSION PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -34,6 +34,7 @@ Pass = ones(2, 1);
 % count the tests
 itest = 1;
 
+
 %% CASE 1: SIMPLE BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,9 +113,6 @@ TrueValue = 0.1872;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS05);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

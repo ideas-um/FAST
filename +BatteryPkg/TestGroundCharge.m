@@ -2,7 +2,7 @@ function [Success] = TestGroundCharge()
 %battery resize
 % [Success] = TestGroundCharge()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 12 sep 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the battery ground charge
 % script is working properly.
@@ -34,6 +34,7 @@ Pass = ones(3, 1);
 % count the tests
 itest = 1;
 
+
 %% CASE 1: SINGLE CELL BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -43,7 +44,7 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
+% define the original state of the battery
 TestIn.Mission.History.SI.Power.SOC = 40;
 TestIn.Specs.Power.Battery.SerCells = 1;
 TestIn.Specs.Power.Battery.ParCells = 1;
@@ -78,7 +79,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
+% define the original state of the battery
 TestIn.Mission.History.SI.Power.SOC = 23;
 TestIn.Specs.Power.Battery.SerCells = 1;
 TestIn.Specs.Power.Battery.ParCells = 5;
@@ -103,6 +104,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 3: MULTIPLE PARALLEL, SINGLE SERIES BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,7 +114,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
+% define the original state of the battery
 TestIn.Mission.History.SI.Power.SOC = 45;
 TestIn.Specs.Power.Battery.SerCells = 2;
 TestIn.Specs.Power.Battery.ParCells = 1;
@@ -137,6 +139,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 4: MULTIPLE CELL, MULTIPLE SERIES BATTERY MODEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -146,7 +149,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be charged
+% define the original state of the battery
 TestIn.Mission.History.SI.Power.SOC = 50;
 TestIn.Specs.Power.Battery.SerCells = 3;
 TestIn.Specs.Power.Battery.ParCells = 3;
@@ -167,9 +170,6 @@ TrueValue = 100;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

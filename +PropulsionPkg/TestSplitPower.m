@@ -2,7 +2,7 @@ function [Success] = TestSplitPower()
 %battery resize
 % [Success] = TestSplitPower()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 3 aug 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the power split script 
 % is working properly.
@@ -34,6 +34,7 @@ Pass = ones(2, 1);
 % count the tests
 itest = 1;
 
+
 %% CASE 1: SINGLE ENGINE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -43,7 +44,7 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define constants for the split
+% define constants for the power split
 TestIn.Specs.Propulsion.Eta.TSPS = [0.8, 0.8];
 TestIn.Specs.Propulsion.Eta.PSPS = [0.3, 0.3; 0.3, 0.3];
 
@@ -69,6 +70,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 % increment the test counter
 itest = itest + 1;
 
+
 %% CASE 2: MULTIPLE ENGINES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -78,10 +80,10 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define constants for the split
+% define constants for the power split
 TestIn.Specs.Propulsion.Eta.TSPS = [0.88, 0.88, 0.88, ; 0.88, 0.88, 0.88];
-TestIn.Specs.Propulsion.Eta.PSPS = [0.38, 0.38, 0.38; 0.38, 0.38, 0.38; 0.38, 0.38, 0.38];
-format short;
+TestIn.Specs.Propulsion.Eta.PSPS = [0.38, 0.38, 0.38; 0.38, 0.38, 0.38; 
+    0.38, 0.38, 0.38];
 
 % ----------------------------------------------------------
 
@@ -92,8 +94,9 @@ format short;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the power split
-TestValue = PropulsionPkg.SplitPower(TestIn, [45000000; 3000000; 6000000; 3000000], ...
-    [0.5, 0.5], [0, 1, 0; 0, 0, 1], [1, 0, 0; 1, 1, 0; 1, 0, 1]);
+TestValue = PropulsionPkg.SplitPower(TestIn, [45000000; 3000000; ...
+    6000000; 3000000], [0.5, 0.5], [0, 1, 0; 0, 0, 1], [1, 0, 0; ...
+    1, 1, 0; 1, 0, 1]);
 
 % list the correct values of the output
 TrueValue = [1.3457e+08, 0.6728e+08, 0.6728e+08;
@@ -102,9 +105,6 @@ TrueValue = [1.3457e+08, 0.6728e+08, 0.6728e+08;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

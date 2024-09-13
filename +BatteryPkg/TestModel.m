@@ -44,7 +44,7 @@ itest = 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be modeled
+% define the battery to be modeled
 TestIn.PreSOC = 100;
 TestIn.Time = 100;
 TestIn.SOCi = 90;
@@ -85,7 +85,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be modeled
+% define the battery to be modeled
 TestIn.PreSOC = 100;
 TestIn.Time = 56;
 TestIn.SOCi = 72;
@@ -126,7 +126,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be modeled
+% define the battery to be modeled
 TestIn.PreSOC = 72;
 TestIn.Time = 9;
 TestIn.SOCi = 50;
@@ -167,7 +167,7 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the value to be modeled
+% define the battery to be modeled
 TestIn.PreSOC = 500;
 TestIn.Time = 90;
 TestIn.SOCi = 70;

@@ -2,7 +2,7 @@ function [Success] = TestUpstreamSplit()
 %battery resize
 % [Success] = TestUpstreamSplit()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 12 sep 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the upstream power script
 % is working properly.
@@ -33,6 +33,7 @@ Pass = ones(3, 1);
 
 % count the tests
 itest = 1;
+
 
 %% CASE 1: SINGLE ENGINE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,6 +71,7 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS04);
 
 % increment the test counter
 itest = itest + 1;
+
 
 %% CASE 2: MULTIPLE ENGINES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,9 +150,6 @@ TrueValue = [0.4987, 0.0000, 0.0000, 0.0000; 0.5013, 0.0000, 0.0000, 0.0000;
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS04);
-
-% increment the test counter
-itest = itest + 1;
 
 % ----------------------------------------------------------
 

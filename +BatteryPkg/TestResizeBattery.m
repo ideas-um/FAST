@@ -2,7 +2,7 @@ function [Success] = TestResizeBattery()
 %
 % [Success] = TestResizeBattery()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 31 jul 2024
+% last updated: 13 sep 2024
 %
 % Generate simple test cases to confirm that the resize battery script
 % is working properly.

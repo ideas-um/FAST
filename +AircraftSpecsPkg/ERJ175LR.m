@@ -165,8 +165,8 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = .09;
-Aircraft.Specs.Power.LamTSPS.Alt = [0, 0];
+Aircraft.Specs.Power.LamTSPS.Split = {.09, .01};
+Aircraft.Specs.Power.LamTSPS.Alt = {[0, 0], [10, 15000]};
 Aircraft.Specs.Power.LamTSPS.SLS = 0.09;
 
 % power splits between power/power sources (electric power / total power)
@@ -204,7 +204,7 @@ Aircraft.Settings.OEW.MaxIter = 50;
 Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
-Aircraft.Settings.Analysis.MaxIter = 50;
+Aircraft.Settings.Analysis.MaxIter = 20;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

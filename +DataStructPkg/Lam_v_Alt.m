@@ -53,7 +53,7 @@ for i = 1:4
        for j = 1:length(lam)
            
            % only one split given
-           if length(lam) == 1
+           if isscalar(lam)
                split = lam;
                seg = altLam;
 

@@ -17,7 +17,7 @@ function [] = TestFAST()
 %% TEST BATTERY PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% run test cases and store results
+% run test cases and print results
 BatteryPkg.TestGroundCharge();
 BatteryPkg.TestModel();
 BatteryPkg.TestResizeBattery();
@@ -26,7 +26,7 @@ BatteryPkg.TestResizeBattery();
 %% TEST POPULSION PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% run test cases and store results
+% run test cases and print results
 PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
 PropulsionPkg.TestSplitPower();
@@ -36,7 +36,7 @@ PropulsionPkg.TestUpstreamSplit();
 %% TEST UNIT CONVERSION PACKAGE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% run test cases and store results
+% run test cases and print results
 UnitConversionPkg.TestConvForce();
 UnitConversionPkg.TestConvLength();
 UnitConversionPkg.TestConvMass();

@@ -1,6 +1,6 @@
 function [] = TestFAST()
-%battery resize
-% [Success] = TestFAST()
+%
+% [] = TestFAST()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 13 sep 2024
 %

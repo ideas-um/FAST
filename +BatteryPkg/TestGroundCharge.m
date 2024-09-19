@@ -1,8 +1,9 @@
 function [Success] = TestGroundCharge()
-%battery resize
+%
 % [Success] = TestGroundCharge()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 13 sep 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the battery ground charge
 % script is working properly.
@@ -11,7 +12,8 @@ function [Success] = TestGroundCharge()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
 
 
@@ -23,7 +25,6 @@ function [Success] = TestGroundCharge()
 % setup testing methods      %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % relative tolerance for checking if the tests passed
 EPS06 = 1.0e-06;
@@ -58,7 +59,7 @@ TestIn.Specs.Power.Battery.ParCells = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 220, 0.043);
+TestValue = BatteryPkg.GroundCharge(TestIn, 220, -43);
 
 % list the correct values of the output
 TrueValue = 66.8269;
@@ -93,7 +94,7 @@ TestIn.Specs.Power.Battery.ParCells = 5;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 60, 1.5);
+TestValue = BatteryPkg.GroundCharge(TestIn, 60, -1500);
 
 % list the correct values of the output
 TrueValue = 83.5877;
@@ -128,7 +129,7 @@ TestIn.Specs.Power.Battery.ParCells = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 300, 0.097);
+TestValue = BatteryPkg.GroundCharge(TestIn, 300, -97);
 
 % list the correct values of the output
 TrueValue = 86.1557;
@@ -163,7 +164,7 @@ TestIn.Specs.Power.Battery.ParCells = 3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % complete the ground charge and store resulting value
-TestValue = BatteryPkg.GroundCharge(TestIn, 600, 1);
+TestValue = BatteryPkg.GroundCharge(TestIn, 600, -1000);
 
 % list the correct values of the output
 TrueValue = 100;
@@ -171,12 +172,9 @@ TrueValue = 100;
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
-% ----------------------------------------------------------
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%compute the answers
 
 % identify any tests that failed
 itest = find(~Pass);
@@ -185,7 +183,7 @@ itest = find(~Pass);
 if (isempty(itest))
     
     % all tests passed
-    fprintf(1, "TestGroundCharge tests passed!\n");
+    fprintf(1, "GroundCharge tests passed!\n");
     
     % return success
     Success = 1;
@@ -193,7 +191,7 @@ if (isempty(itest))
 else
     
     % print out header
-    fprintf(1, "TestGroundCharge tests failed:\n");
+    fprintf(1, "GroundCharge tests failed:\n");
     
     % print which tests failed
     fprintf(1, "    Test %d\n", itest);

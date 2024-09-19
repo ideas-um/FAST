@@ -23,8 +23,9 @@ Additional Contributors:
 - Nawa Khailany
 - Janki Patel
 - Michael Tsai
+- Vaibhav Rau
 
-README last updated: 14 Jun 2024
+README last updated: 19 sep 2024
 
 ## Learn More About FAST
 
@@ -142,7 +143,18 @@ To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with 
 3. During the mission evaluation, the thrust (for a turbojet or turbofan) or power (for a turboprop or piston aircraft) is lapsed by a power of the density ratio (density at altitude to density at sea level). For turbojets and turbofans, this exponent is set to 1. For turboprops or piston aircraft, this exponent is set to 0 (no lapse). Currently, the user is unable to specify the exponent. However, it can be modified inside the "EngineLapse" function, which is housed in the "PropulsionPkg" folder.
 4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST. Updates to this package are expected to commence in Spring/Summer 2024 and be released by the end of 2024.
 
-# (VI) Acknowledgments:
+# (VI) Testing FAST:
+
+Multiple unit tests are shipped with FAST to ensure that the code is operating correctly. In order to test FAST, run the following command:
+
+```matlab
+>> TestFAST();
+```
+
+If all of the tests run correctly, then FAST is up-to-date and can be ran. If some of the tests fail, please submit an issue on GitHub using the following link: [https://github.com/ideas-um/FAST/issues](https://github.com/ideas-um/FAST/issues).
+
+# (VII) Acknowledgments:
+
 This work is sponsored by the NASA Aeronautics Research Mission Directorate and the Electrified Powertrain Flight Demonstration (EPFD) project, "Development of a Parametrically Driven Electrified Aircraft Design and Optimization Tool". The IDEAS Lab would like to thank Ralph Jansen, Andrew Meade, Karin Bozak, Amy Chicatelli, Noah Listgarten, Dennis Rohn, and Gaudy Bezos-O'Connor from the NASA EPFD project for supporting this work and providing valuable technical input and feedback throughout the duration of the project.
 
 Glenn Engineering and Research Support Contract (GEARS)

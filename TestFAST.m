@@ -4,7 +4,7 @@ function [] = TestFAST()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % last updated: 13 sep 2024
 %
-% Driver file for all FAST test cases
+% Driver file for all FAST test cases.
 %
 % INPUTS:
 %     none

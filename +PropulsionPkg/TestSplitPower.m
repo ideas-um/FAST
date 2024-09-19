@@ -1,8 +1,9 @@
 function [Success] = TestSplitPower()
-%battery resize
+%
 % [Success] = TestSplitPower()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 13 sep 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the power split script 
 % is working properly.
@@ -11,7 +12,8 @@ function [Success] = TestSplitPower()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
 
 
@@ -23,7 +25,6 @@ function [Success] = TestSplitPower()
 % setup testing methods      %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % relative tolerance for checking if the tests passed
 EPS03 = 1.0e-03;
@@ -106,12 +107,9 @@ TrueValue = [1.3457e+08, 0.6728e+08, 0.6728e+08;
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS03);
 
-% ----------------------------------------------------------
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%compute the answers
 
 % identify any tests that failed
 itest = find(~Pass);

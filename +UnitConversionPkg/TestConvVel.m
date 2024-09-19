@@ -2,7 +2,8 @@ function [Success] = TestConvVel()
 %
 % [Success] = TestConvVel()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 13 sep 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the velocity conversion script
 % is working properly.
@@ -11,7 +12,8 @@ function [Success] = TestConvVel()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
 
 
@@ -23,7 +25,6 @@ function [Success] = TestConvVel()
 % setup testing methods      %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % relative tolerance for checking if the tests passed
 EPS05 = 1.0e-05;

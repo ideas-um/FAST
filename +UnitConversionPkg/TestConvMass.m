@@ -2,7 +2,8 @@ function [Success] = TestConvMass()
 %
 % [Success] = TestConvMass()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 13 sep 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the mass conversion script
 % is working properly.
@@ -11,7 +12,8 @@ function [Success] = TestConvMass()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
 
 
@@ -23,7 +25,6 @@ function [Success] = TestConvMass()
 % setup testing methods      %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % relative tolerance for checking if the tests passed
 EPS06 = 1.0e-06;
@@ -233,8 +234,6 @@ Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%compute the answers
 
 % identify any tests that failed
 itest = find(~Pass);

@@ -2,7 +2,7 @@ function [Success] = TestPowerAvailable()
 %
 % [Success] = TestPowerAvailable()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 jun 2024
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the power available function
 % is working properly.
@@ -11,7 +11,8 @@ function [Success] = TestPowerAvailable()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
 
 

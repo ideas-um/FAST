@@ -38,8 +38,6 @@ if LamSLS ~= 0
     % get alt range from ac struct
     altPC = Aircraft.Specs.Power.PC.EM.Alt;
 
-    Aircraft.Mission.History.SI.Power.PC = zeros(npoints,4);
-
     % make tko PC = 100%
     tkoEnd = Aircraft.Mission.Profile.SegEnd(1);
     Aircraft.Mission.History.SI.Power.PC(1:tkoEnd-1, [3,4]) = 1;
@@ -72,12 +70,12 @@ if LamSLS ~= 0
        % check if altitude entered is larger than cruise altitude
        % if so climb until start of cruise segment
        if isempty(SegEnd)
-            CrsBeg = find(Aircraft.Mission.Profile.Segs == 'Cruise');
-            SegEnd = CrsBeg - 1;
+            CrsBeg = find(Aircraft.Mission.Profile.Segs == 'Cruise',1);
+            SegEnd = Aircraft.Mission.Profile.SegBeg(CrsBeg) - 1;
        end
 
        npoints = SegEnd - SegBeg + 1;
-       Aircraft.Mission.History.SI.Power.PC.EM(SegBeg:SegEnd, [3,4]) = linspace(code, code, npoints);
+       Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]) = repmat(code, npoints, 2);
     end
     %Aircraft.Specs.Power.PC = Aircraft.Mission.History.SI.Power.PC;
 end

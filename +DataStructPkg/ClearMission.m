@@ -158,6 +158,7 @@ else
     Aircraft.Mission.History.SI.Power.Voltage( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Current( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.PC(      ielem:end, :) = 0;
     
     % aircraft energy as a function of time
     Aircraft.Mission.History.SI.Energy.KE(      ielem:end, :) = 0;

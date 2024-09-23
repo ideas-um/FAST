@@ -208,6 +208,10 @@ PreqES = zeros(npnt, nes);
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
+    PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, end);
+end
+
 % loop through points to get power outputs by thrust/power sources
 for ipnt = 1:npnt
     
@@ -233,6 +237,12 @@ for ipnt = 1:npnt
     
     % get the power output by the driven  power sources
     PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
+    
+    if exist('PC_EM', 'var') 
+        PreqPS(ipnt,[3,4]) = PC_EM(ipnt) * Pav_PS(ipnt, [3,4]);
+        PreqPS(ipnt,[1,2]) = PreqTS(ipnt) - PreqPS(ipnt,[3,4]);
+    end
+
     
     % get the power output by the driving power sources
     PreqPS(ipnt, :) = PreqPS(ipnt, :) * (SplitPSPS ./ EtaPSPS);
@@ -594,6 +604,8 @@ Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
 % energy quantities
 Aircraft.Mission.History.SI.Energy.E_ES(    SegBeg:SegEnd, :) = E_ES    ;
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
+
+Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
 % ----------------------------------------------------------
 

@@ -149,6 +149,9 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
 
+LamSLS = Aircraft.Specs.Power.LamTSPS.SLS;
+Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd) = repmat(LamSLS, npoint, 1);
+
 % if not first segment, get accumulated quantities
 if (SegBeg > 1)
     
@@ -269,9 +272,9 @@ while (iter < MaxIter)
     
     % get the power available
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
-    
+
     % for full throttle, recompute the operational power splits
-    %Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    %Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd, PC);
 
     % ------------------------------------------------------
 
@@ -379,6 +382,7 @@ while (iter < MaxIter)
     
     % power required (ncases)
     Preq = dPE_dt + dKE_dt + DV;
+    %Preq = Inf(npoint, 1);
     
     % thrust required
     Treq = Preq ./ TAS;

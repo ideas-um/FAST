@@ -113,6 +113,9 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
 
+LamSLS = Aircraft.Specs.Power.LamTSPS.SLS;
+Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd) = repmat(LamSLS, npoint, 1);
+
 % check for any fuel
 if (any(Fuel))
     
@@ -167,7 +170,7 @@ Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
 % for full throttle, recompute the operational power splits
-Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+%Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd, PC);
 
 % assume all available power is for flying
 Preq = Inf(npoint, 1);

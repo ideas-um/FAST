@@ -42,15 +42,23 @@ ParIndx = find(cellfun(@(x) ~isempty(x), ParConns));
 npar = length(ParIndx);
 
 % get the power available (equal to power output for "full throttle" case)
-Pav_PS = Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
+%Pav_PS = Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
+
+% get power output for computing splits
+Pout_PS = Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :);
+Pav_PS  = Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
 
 
 %% RE-COMPUTE THE POWER SPLITS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% don't re-compute if there aren't any splits
-if (Aircraft.Specs.Power.LamTSPS.Split == 0)
-    return
+% don't re-compute if there aren't any splits, only get engine power code
+if (Aircraft.Specs.Power.LamTSPS.SLS == 0)
+    PC_Eng = Pout_PS./Pav_PS;
+    nans = isnan(PC_Eng);
+    PC_Eng(nans) = 0;
+    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, :) = PC_Eng;
+    return;
 end
 
 % loop through each power split
@@ -62,20 +70,30 @@ for ipar = 1:npar
     % get the supplemental connection(s)
     isupp = ParConns{imain};
     
-    % get the total power output at any given time from those sources
-    Pout = sum(Pav_PS(:, [imain, isupp]), 2);
+    % get the total power output at any given time from each source
+    PoutEng = Pout_PS(:, imain);
+    PoutEM  = Pout_PS(:, isupp);
+
+    % get total power avalible at each segment
+    PavEng = Pav_PS(:, imain);
+    PavEM  = Pav_PS(:, isupp);
     
     % compute the downstream power split
-    SplitTSPS = Pav_PS(:, [imain, isupp]) ./ Pout;
+    SplitTSPS = PoutEM ./ (PoutEng + PoutEM);
     
     % remember the actual power split
-    LamTSPS = SplitTSPS(:, end);
+    LamTSPS = SplitTSPS;
+
+    % Compute the power code
+    PC_Eng = PoutEng./PavEng;
+
+    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
     
 end
 
 % remember the power split
 Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Specs.Power.LamTSPS.Split = Aircraft.Mission.History.SI.Power.LamTSPS;
+
 
 % ----------------------------------------------------------
 

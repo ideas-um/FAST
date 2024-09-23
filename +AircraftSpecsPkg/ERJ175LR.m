@@ -159,15 +159,19 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
+% EM Power code (only works for PHE right now)
+Aircraft.Specs.Power.PC.EM.Split = 0;
+Aircraft.Specs.Power.PC.EM.Alt = 0;
+
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
 Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = {.09, .01};
-Aircraft.Specs.Power.LamTSPS.Alt = {[0, 0], [10, 15000]};
-Aircraft.Specs.Power.LamTSPS.SLS = 0.09;
+Aircraft.Specs.Power.LamTSPS.Split = 0; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Alt = 0; %{[0, 0], [10, 15000]};
+Aircraft.Specs.Power.LamTSPS.SLS = 0.09; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -181,11 +185,11 @@ Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = 100;%100;
-Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
+Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

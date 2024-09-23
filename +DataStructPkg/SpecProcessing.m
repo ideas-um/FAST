@@ -533,7 +533,14 @@ for i = 1:length(Powerfields)
     if isstruct(Power.(Powerfields{i}))
         subfields = fieldnames(Power.(Powerfields{i}));
         for j = 1:length(subfields)
-            if iscell(Power.(Powerfields{i}).(subfields{j}))
+            if isstruct(Power.(Powerfields{i}).(subfields{j}))
+                subsubfields = fieldnames(Power.(Powerfields{i}).(subfields{j}));
+                for k = 1:length(subsubfields)
+                    if isnan(Power.(Powerfields{i}).(subfields{j}).(subsubfields{k}))
+                        Power.(Powerfields{i}).(subfields{j}).(subsubfields{k}) = DefaultSettings.(Powerfields{i}).(subfields{j}).(subsubfields{k});
+                    end
+                end
+            elseif iscell(Power.(Powerfields{i}).(subfields{j}))
                 continue;
             elseif isnan(Power.(Powerfields{i}).(subfields{j}))
                 Power.(Powerfields{i}).(subfields{j}) = DefaultPower.(Powerfields{i}).(subfields{j});

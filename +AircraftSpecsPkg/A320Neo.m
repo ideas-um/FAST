@@ -1,8 +1,9 @@
 function [Aircraft] = A320Neo()
 %
 % [Aircraft] = A320Neo()
-% written by Max Arnson, marnson@umich.edu
-% last updated: 24 July 2024
+% written by Max Arnson, marnson@umich.edu and Yi-Chih Wang,
+% ycwangd@umich.edu
+% last updated: 20 Sep 2024
 % 
 % create a baseline model of the A320neo WV054. this version uses a 
 % conventional propulsion architecture.
@@ -39,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 15309/95;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 0.7; %1.000;
-Aircraft.Specs.Aero.L_D.CrsCF = 0.9; %1.023;
+Aircraft.Specs.Aero.L_D.ClbCF = 1;
+Aircraft.Specs.Aero.L_D.CrsCF = 1;
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1; %0.900;
+Aircraft.Specs.Propulsion.MDotCF = 1;
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.03; %0.992;
+Aircraft.Specs.Weight.WairfCF = 1;
  
 
 %% VEHICLE PERFORMANCE %%

@@ -276,7 +276,7 @@ switch unitsflag
 
         DTindex = randi(100,1,1);
 
-        if DTindex > 95
+        if DTindex > 90
             Plane.Settings.DataTypeValidation = "Validation";
         else
             Plane.Settings.DataTypeValidation = "Training";

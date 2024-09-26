@@ -142,7 +142,7 @@ for ii = 1:length(FanEngineFields)
 
     DTindex = randi(100,1,1);
 
-    if DTindex > 95
+    if DTindex > 90
         TurbofanEngines.(FanEngineFields{ii}).DataTypeValidation = "Validation";
     else
         TurbofanEngines.(FanEngineFields{ii}).DataTypeValidation = "Training";

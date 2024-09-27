@@ -1,4 +1,4 @@
-function [Psupp] = PowerSupplementCheck(iprob)
+function [Psupp] = PowerSupplementCheck(PreqDr, TSPS, PSPS, SplitPSPS, EtaPSPS, PSType, EtaFan)
 %
 % [Psupp] = PowerSupplementCheck(iprob)
 % written by Paul Mokotoff, prmoko@umich.edu
@@ -11,93 +11,37 @@ function [Psupp] = PowerSupplementCheck(iprob)
 % it provides power (positive output, unless the flow is reversed).
 %
 % INPUTS:
-%     iprob - the problem to be solved.
-%             size/type/units: 1-by-1 / integer / []
+%     PreqDr    - the power required to turn the driven power sources.
+%                 size/type/units: npnt-by-nps / double / [W]
+%
+%     TSPS      - the architecture matrix for the thrust-power source
+%                 connections.
+%                 size/type/units: nts-by-nps / integer / []
+%
+%     PSPS      - the architecture matrix for the power-power source
+%                 connections.
+%                 size/type/uints: nps-by-nps / integer / []
+%
+%     SplitPSPS - the operational power split matrix between all of the
+%                 power sources.
+%                 size/type/units: nps-by-nps / double / [%]
+%
+%     EtaPSPS   - the efficiency matrix for the power-power source
+%                 connections.
+%                 size/type/units: nps-by-nps / double / [%]
+%
+%     PSType    - the types of power sources (gas-turbine engine, electric
+%                 motor, etc.) in the propulsion architecture.
+%                 size/type/units: 1-by-nps / int / []
+%
+%     EtaFan    - the fan efficiency for the gas-turbine engines.
+%                 size/type/units: 1-by-1 / double / [%]
 %
 % OUTPUTS:
-%     Psupp - the supplemental power provided/required into each power
-%             source.
-%             size/type/units: 1-by-nps / double / [W]
+%     Psupp     - the supplemental power provided/required into each power
+%                 source.
+%                 size/type/units: npnt-by-nps / double / [W]
 %
-
-
-%% ESTABLISH ARBITRARY PARAMETERS FOR NOW %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if     (iprob == 1)
-    
-    % series/parallel
-    PSPS = [1, 0; 1, 1];
-    PreqDr = [80, 20; 70, 30];
-    SplitPSPS = [1, 0; 0.9, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [1, 1];
-    PSType = [1, 0];
-    FanEfficiency = 1;
-    
-elseif (iprob == 2)
-
-    % series/parallel, but swap order
-    PSPS = [1, 1; 0, 1];
-    PreqDr = [20, 80; 30, 70];
-    SplitPSPS = [1, 0.9; 0, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [1, 1];
-    PSType = [0, 1];
-    FanEfficiency = 1;
-    
-elseif (iprob == 3)
-
-    % series only
-    PSPS = [1, 0; 1, 1];
-    PreqDr = [10, 90; 15, 85];
-    SplitPSPS = [1, 0; 1, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [1, 0; 0, 1];
-    PSType = [1, 0];
-    FanEfficiency = 1;
-
-elseif (iprob == 4)
-    
-    % series only, but swap order
-    PSPS = [1, 1; 0, 1];
-    PreqDr = [90, 10; 85, 15];
-    SplitPSPS = [1, 1; 0, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [0, 1; 1, 0];
-    PSType = [0, 1];
-    FanEfficiency = 1;
-
-elseif (iprob == 5)
-    
-    % parallel only
-    PSPS = [1, 0; 0, 1];
-    PreqDr = [80, 20; 90, 10];
-    SplitPSPS = [1, 0; 0, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [1, 1];
-    PSType = [1, 0];
-    FanEfficiency = 1;
-
-elseif (iprob == 6)
-    
-    % parallel only, but swap order
-    PSPS = [1, 0; 0, 1];
-    PreqDr = [20, 80; 10, 90];
-    SplitPSPS = [1, 0; 0, 1];
-    EtaPSPS = [1, 1; 1, 1];
-    TSPS = [1, 1];
-    PSType = [0, 1];
-    FanEfficiency = 1;
-    
-else
-    
-    % don't solve
-    Psupp = 0;
-    
-    return
-    
-end    
 
 
 %% PERFORM THE ANALYSIS %%
@@ -167,7 +111,7 @@ if (any(AnyParallel))
         Helping = find((TSPS(icomp, :) > 0) & (PSType == 0));
                 
         % add the power supplement
-        Psupp(:, Driving) = Psupp(:, Driving) + PreqDr(:, Helping) ./ FanEfficiency; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        Psupp(:, Driving) = Psupp(:, Driving) + PreqDr(:, Helping) ./ EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
         
     end % for
 end % if

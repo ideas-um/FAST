@@ -193,6 +193,7 @@ nes = length(ESType);
 
 % allocate memory for the power required
 PreqTS = zeros(npnt, nts);
+PreqDr = zeros(npnt, nps);
 PreqPS = zeros(npnt, nps);
 PreqES = zeros(npnt, nes);
 
@@ -232,10 +233,10 @@ for ipnt = 1:npnt
     PreqTS(ipnt, :) = Preq(ipnt) * SplitTS;
     
     % get the power output by the driven  power sources
-    PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
+    PreqDr(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
     
     % get the power output by the driving power sources
-    PreqPS(ipnt, :) = PreqPS(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+    PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
         
 end
 

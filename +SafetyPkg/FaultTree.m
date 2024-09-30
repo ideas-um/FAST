@@ -1,10 +1,11 @@
-function [] = FaultTree()
+function [] = FaultTree(Arch, Components)
 %
-%[] = FaultTree()
+% [] = FaultTree(Arch, Components))
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 aug 2024
+% last updated: 30 sep 2024
 %
-% Create a fault tree from the adjacency matrix of a directed graph.
+% Create a fault tree from the adjacency matrix of a directed graph with
+% the names of the given components.
 %
 % INPUTS:
 %     none
@@ -13,72 +14,28 @@ function [] = FaultTree()
 %     none
 %
 
-% cleanup before running
-close all
-
-%% TEST CASE %%
-%%%%%%%%%%%%%%%
-
-% example:
-%
-%     |-----|     |-----|     |-----|     |-----|
-%     | c_1 | --> | c_2 | --> | c_3 | --> | out |
-%     |-----|     |-----|     |-----|     |-----|
-%
-
-% create the "adjacency" matrix
-% A = [0, 1, 0, 0; ...
-%      0, 0, 1, 0; ...
-%      0, 0, 0, 1; ...
-%      0, 0, 0, 0] ;
-
-% more complex case, parallel architecture
-A = [0, 1, 0, 0, 0, 0, 0, 0; ...
-     0, 0, 1, 0, 0, 0, 0, 0; ...
-     0, 0, 0, 1, 1, 0, 0, 0; ...
-     0, 0, 0, 0, 0, 1, 0, 0; ...
-     0, 0, 0, 0, 0, 0, 1, 0; ...
-     0, 0, 0, 0, 0, 0, 0, 1; ...
-     0, 0, 0, 0, 0, 0, 0, 1; ...
-     0, 0, 0, 0, 0, 0, 0, 0] ;
- 
-% slightly more complex case, multiple energy sources
-% A = [0, 0, 1, 0, 0; ...
-%      0, 0, 1, 0, 0; ...
-%      0, 0, 0, 1, 0; ...
-%      0, 0, 0, 0, 1; ...
-%      0, 0, 0, 0, 0] ;
-
 
 %% PROCESS THE MATRIX %%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% since we move from TS to ES, switch the direction
-A = A';
+% since we move from power sink to energy source, switch the direction
+Arch = Arch';
 
 % get the number of nodes
-[nnode, ~] = size(A);
+[nnode, ~] = size(Arch);
 
 % get the sources
-isrc = find(sum(A, 1) == 0);
+isrc = find(sum(Arch, 1) == 0);
 
 
 %% PLOT THE FAULT TREE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 % generate node labels (sink shows thrust generated, so label separately)
-NodeLabels = [strcat("Element " + num2str((1:nnode-1)') + " Fail"); ...
-              "Loss of Thrust"];
+NodeLabels = strcat("Loss of ", Components.Name);
 
 % create the graph
-G0 = digraph(A, NodeLabels);
-
-% % plot the tree
-% figure;
-% T0 = plot(G0);
-% 
-% % turn off edges
-% T0.ArrowSize = 0;
+G0 = digraph(Arch, NodeLabels);
 
 
 %% ADD THE LOGIC GATES %%
@@ -91,10 +48,13 @@ BPath = bfsearch(G0, isrc, "allevents");
 nedge = height(G0.Edges);
 
 % make a larger matrix to include the logical gates
-B = [A, zeros(nnode, nedge); zeros(nedge, nnode), zeros(nedge)];
+B = [Arch, zeros(nnode, nedge); zeros(nedge, nnode), zeros(nedge)];
+
+% allocate memory to remember the nodes corresponding to each edge
+ColIdx = zeros(nnode, 1);
 
 % remember the column index for new logic gates
-idx = nnode + 1;
+idx = nnode;
 
 % loop through the paths searched
 for istep = 1:height(BPath)
@@ -102,37 +62,39 @@ for istep = 1:height(BPath)
     % get the event
     CurEvent = BPath.Event(istep);
     
-    if      (CurEvent == "finishnode"      )
+    if      (CurEvent == "discovernode"    )
         
         % increment the index
         idx = idx + 1;
         
+        % remember the index
+        ColIdx(BPath.Node(istep)) = idx;
+        
     elseif ((CurEvent == "edgetonew"       ) || ...
             (CurEvent == "edgetodiscovered"))
         
+        % get the beginning and ending nodes
+        BegNode = BPath.Edge(istep, 1);
+        EndNode = BPath.Edge(istep, 2);
+        
+        % get the index of the beginning node
+        icol = ColIdx(BegNode);
+        
         % remove the existing path
-        B(BPath.Edge(istep, 1), BPath.Edge(istep, 2)) = 0;
+        B(BegNode, EndNode) = 0;
         
         % add in a stop at the logic gate
-        B(BPath.Edge(istep, 1), idx                ) = 1;
-        B(idx                , BPath.Edge(istep, 2)) = 1;
-        
+        B(BegNode, icol   ) = 1;
+        B(icol   , EndNode) = 1;
+                
     end        
 end
 
-% memory for the gates' names
-GateLabels = repmat("", nedge, 1);
+% offset the gate column indexes to access the nodes
+ColIdx = ColIdx - nnode;
 
-% check how many connections leave the nodes
-OutOrder = sum(B(nnode+1:end, :), 2);
-
-% get the number of OR and AND gates
-nor  = OutOrder == 1;
-nand = OutOrder >  1;
-
-% update the gate labels
-GateLabels(nor ) = strcat("OR" , num2str((1:sum(nor ))'));
-GateLabels(nand) = strcat("AND", num2str((1:sum(nand))'));
+% remember for the gates' names
+GateLabels = strcat(Components.GateType(ColIdx), num2str(Components.GateIdx(ColIdx)));
 
 % create new node labels
 NodeLabels = [NodeLabels; GateLabels];
@@ -147,6 +109,10 @@ B(:, Island) = [];
 % remove the islands' node labels
 NodeLabels(Island) = [];
 
+
+%% RE-ARRANGE THE DATA TO LOOK LIKE A TREE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % create a new digraph
 G1 = digraph(B, NodeLabels);
 
@@ -156,10 +122,6 @@ T1 = plot(G1);
 
 % turn off the edges
 T1.ArrowSize = 0;
-
-
-%% RE-ARRANGE THE DATA TO LOOK LIKE A TREE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get the number of nodes in the new graph
 [nnode, ~] = size(B);

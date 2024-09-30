@@ -1,6 +1,6 @@
 function [] = FaultTree(Arch, Components)
 %
-% [] = FaultTree(Arch, Components))
+% [] = FaultTree(Arch, Components)
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 30 sep 2024
 %
@@ -8,7 +8,8 @@ function [] = FaultTree(Arch, Components)
 % the names of the given components.
 %
 % INPUTS:
-%     none
+%     TopLevelFailure - string to describe the top-level failure occurring.
+%                       size/type/units: 1-by-1 / string / []
 %
 % OUTPUTS:
 %     none

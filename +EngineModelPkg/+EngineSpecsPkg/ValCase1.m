@@ -1,28 +1,13 @@
-function [Engine] = CF34_8E5()
+function [Engine] = ValCase1()
 %
-% [Engine] = CF34_8E5()
+% [Engine] = ValCase1()
 % Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% Last Updated: 11/7/2023
 %
 % Engine specification function for use with the EngineModelPkg
 %
-% INPUTS:
-%
-% [None]
-%
-%
-% OUTPUTS:
-%
-% Engine = struct storing the information specified by the user for this
-%           specific engine
-%       size: 1x1 struct
-%
-%
-% Information
-% -----------
-%
 % Type = Turbofan
-% Applicable Aircraft = ERJ 170 Family
+% Applicable Aircraft = None
 
 %% Design Point Values
 
@@ -35,17 +20,17 @@ Engine.Mach = 0.05;
 Engine.Alt = 0;
 
 % Overall Pressure Ratio 
-Engine.OPR = 28.5;
+Engine.OPR = 30;
 
 % Fan Pressure Ratio
-Engine.FPR = 1.6;
+Engine.FPR = 1.5;
 
 % Bypass Ratio
-Engine.BPR = 5; 
+Engine.BPR = 10; 
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1511; %Previous data: 1450;
+Engine.Tt4Max = 1775.69;
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -53,7 +38,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = UnitConversionPkg.ConvForce(14510,'lbf','N'); %Previous: 61320;
+Engine.DesignThrust = 249550;
 
 
 
@@ -85,11 +70,11 @@ Engine.FanBoosters = false;
 
 % Passenger Bleeds
 % Typically 0.03
-Engine.CoreFlow.PaxBleed = 0.03;
+Engine.CoreFlow.PaxBleed = 0.00;
 
 % Air leakage
 % Typically 1%
-Engine.CoreFlow.Leakage = 0.01;
+Engine.CoreFlow.Leakage = 0.00;
 
 % Core Cooling Flow
 Engine.CoreFlow.Cooling = 0.0;
@@ -102,28 +87,17 @@ Engine.MaxIter = 300;
 
 %% Efficiencies
 % Polytropic component efficiencies
-Engine.EtaPoly.Inlet = 0.99;
-Engine.EtaPoly.Diffusers = 0.99;
-Engine.EtaPoly.Fan = 0.99;
+Engine.EtaPoly.Inlet = 1;
+Engine.EtaPoly.Diffusers = 1;
+Engine.EtaPoly.Fan = 0.94;
 Engine.EtaPoly.Compressors = 0.94;
-Engine.EtaPoly.BypassNozzle = 0.99;
-Engine.EtaPoly.Combustor = 0.995;
-Engine.EtaPoly.Turbines = 0.94;
-Engine.EtaPoly.CoreNozzle = 0.99;
-Engine.EtaPoly.Nozzles = 0.99;
+Engine.EtaPoly.BypassNozzle = 1;
+Engine.EtaPoly.Combustor = 1;
+Engine.EtaPoly.Turbines = 0.9;
+Engine.EtaPoly.CoreNozzle = 1;
+Engine.EtaPoly.Nozzles = 1;
 Engine.EtaPoly.Mixing = 0.0;
 
 
-%% Electric Supplement
-Engine.PerElec = 0;
-
-
-%% Fuel flow rate coefficients for BADA equation
-Engine.Cff3  =  0.299;
-Engine.Cff2  = -0.346;
-Engine.Cff1  =  0.701;
-Engine.Cffch =  8.e-7;
 
 end
-
-

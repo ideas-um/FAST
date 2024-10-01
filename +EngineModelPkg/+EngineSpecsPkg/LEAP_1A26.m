@@ -46,7 +46,7 @@ Engine.BPR = 11;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1600;
+Engine.Tt4Max = 1593;  %previosu data: 1597
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -54,7 +54,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 106760;
+Engine.DesignThrust = 120640;  %Prrvious data: 106760
 
 
 
@@ -93,7 +93,7 @@ Engine.CoreFlow.PaxBleed = 0.03;
 Engine.CoreFlow.Leakage = 0.01;
 
 % Core Cooling Flow
-Engine.CoreFlow.Cooling = 0.1;
+Engine.CoreFlow.Cooling = 0.0;
 
 %% Sizing Limits
 
@@ -114,8 +114,6 @@ Engine.EtaPoly.Turbines = 0.96;
 Engine.EtaPoly.CoreNozzle = 0.99;
 Engine.EtaPoly.Nozzles = 0.99;
 Engine.EtaPoly.Mixing = 0.0;
-
-
 
 end
 

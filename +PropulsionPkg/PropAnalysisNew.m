@@ -415,7 +415,6 @@ if (any(Fuel))
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
-        GetSFC_EMT = @(OffDesignEng) OffDesignEng.TSFC_with_EMT;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
@@ -506,7 +505,6 @@ if (any(Fuel))
 
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
-            SFC_EMT(ipnt, icol) = GetSFC_EMT(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the fuel flow
             MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;

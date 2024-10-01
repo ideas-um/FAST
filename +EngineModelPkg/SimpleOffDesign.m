@@ -4,7 +4,7 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
 % thanks to Swapnil Jagtap for the equation
-% last updated: 27 aug 2024
+% last updated: 01 Oct 2024
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.
@@ -69,11 +69,11 @@ SLSThrust_conv = ( Aircraft.Specs.Propulsion.SLSThrust(1) + Aircraft.Specs.Propu
 %% FUEL FLOW CALCULATIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define constants (only for the CF34-8E5 engine)
-Cff3  =  0.299;
-Cff2  = -0.346;
-Cff1  =  0.701;
-Cffch =  8.e-7;
+% fuel flow rate coefficients of BADA equation
+Cff3  =  Aircraft.Specs.Propulsion.Engine.Cff3;
+Cff2  =  Aircraft.Specs.Propulsion.Engine.Cff2;
+Cff1  =  Aircraft.Specs.Propulsion.Engine.Cff1;
+Cffch =  Aircraft.Specs.Propulsion.Engine.Cffch;
 
 % get the engine's SLS thrust (in kN)
 % if there is no electrification in takeoff, it will run
@@ -92,7 +92,6 @@ MDotAct = Cff3  * ThrustFrac ^ 3   + ...
 
 % compute the TSFC (convert thrust from kN to N)
 TSFC     = MDotAct / (ThrustReq * 1000);
-TSFC_EMT = MDotAct / ( (ThrustReq * 1000 + ElectricLoad / TAS) );
 
 
 %% FORMULATE OUTPUT STRUCTURE %%
@@ -108,7 +107,6 @@ OffOutputs.Thrust = ThrustReq * 1000;
 OffOutputs.TSFC          =                            TSFC              ;
 OffOutputs.TSFC_Imperial = UnitConversionPkg.ConvTSFC(TSFC, "SI", "Imp");
 OffOutputs.C             =                               c              ;
-OffOutputs.TSFC_with_EMT =                            TSFC_EMT          ;
 
 
 % ----------------------------------------------------------

@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 25 mar 2024
+% last updated: 27 sep 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -34,6 +34,10 @@ aclass = Aircraft.Specs.TLAR.Class;
 % specific energy of fuel
 efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;
 
+% get the propulsion architecture
+PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
+
 % energy and power source types
 ESType = Aircraft.Specs.Propulsion.PropArch.ESType;
 PSType = Aircraft.Specs.Propulsion.PropArch.PSType;
@@ -52,8 +56,8 @@ EtaPSES = Aircraft.Specs.Propulsion.Eta.PSES;
 % get the number of energy sources
 nes = length(Aircraft.Specs.Propulsion.PropArch.ESType);
 
-% get the parallel connections
-ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
+% get the fan efficiency
+EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
 
 % ----------------------------------------------------------
 
@@ -179,7 +183,6 @@ end
 
 % get the types of power sources
 Eng = PSType == +1;
-EM  = PSType ==  0;
 
 % get the types of energy sources
 Fuel = ESType == 1;
@@ -191,10 +194,12 @@ Batt = ESType == 0;
 % get the number of energy sources
 nes = length(ESType);
 
-% allocate memory for the power required
+% allocate memory for the power required and supplemented
 PreqTS = zeros(npnt, nts);
+PreqDr = zeros(npnt, nps);
 PreqPS = zeros(npnt, nps);
 PreqES = zeros(npnt, nes);
+Psupp  = zeros(npnt, nps);
 
 
 %% PROPULSION SYSTEM ANALYSIS %%
@@ -216,6 +221,7 @@ for ipnt = 1:npnt
         
         % the power/thrust sources must provide infinite power
         PreqTS(ipnt, :) = Inf;
+        PreqDr(ipnt, :) = Inf;
         PreqPS(ipnt, :) = Inf;
         
         % no need to multiply matrices, so continue on
@@ -232,10 +238,10 @@ for ipnt = 1:npnt
     PreqTS(ipnt, :) = Preq(ipnt) * SplitTS;
     
     % get the power output by the driven  power sources
-    PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
+    PreqDr(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
     
     % get the power output by the driving power sources
-    PreqPS(ipnt, :) = PreqPS(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+    PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
         
 end
 
@@ -262,6 +268,7 @@ Aircraft.Mission.History.SI.Power.Treq_PS(SegBeg:SegEnd, :) = TreqPS;
 % assume the required power can be achieved
 PoutTS = PreqTS;
 PoutPS = PreqPS;
+PoutDr = PreqDr;
 
 % check the thrust sources
 exceeds = find(PreqTS > Pav_TS);
@@ -275,7 +282,15 @@ end
 Aircraft.Mission.History.SI.Power.Pout_TS(SegBeg:SegEnd, :) = PoutTS;
 Aircraft.Mission.History.SI.Power.Tout_TS(SegBeg:SegEnd, :) = PoutTS ./ TAS;
 
-% check the power sources
+% check the driven power sources
+exceeds = find(PreqDr > Pav_PS);
+
+% if any exceed the power available, return only the power available
+if (any(exceeds))
+    PoutDr(exceeds) = Pav_PS(exceeds);
+end
+
+% check the driving power sources
 exceeds = find(PreqPS > Pav_PS);
 
 % if any exceed the power available, return only the power available
@@ -286,6 +301,17 @@ end
 % remember the output thrust/power from the power  sources
 Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :) = PoutPS;
 Aircraft.Mission.History.SI.Power.Tout_PS(SegBeg:SegEnd, :) = PoutPS ./ TAS;
+
+% allocate power to/from the gas-turbine engines for components in series/parallel
+for ipnt = 1:npnt
+    
+    % evaluate the function handles for the current splits
+    SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+    
+    % check for the power supplement
+    Psupp(ipnt, :) = PropulsionPkg.PowerSupplementCheck(PoutDr(ipnt, :), TSPS, PSPS, SplitPSPS, EtaPSPS, PSType, EtaFan);
+        
+end
 
 % ----------------------------------------------------------
 
@@ -444,19 +470,6 @@ if (any(Fuel))
                 
         % compute the thrust output from the engine
         TEng = PoutTS(ibeg:iend, icol) ./ TAS(ibeg:iend);
-    
-        % check for an electric motor connection
-        if (~isempty(ParConns(icol)))
-            
-            % get the power from the electric motors
-            EMPartPower = sum(PoutPS(:, cell2mat(ParConns(icol))), 2);
-                        
-        else
-            
-            % no electric motor power
-            EMPartPower = zeros(npnt, 1);
-            
-        end
         
         % check for any NaN or Inf (especially at takeoff)
         TEng(isnan(TEng)) = 0;
@@ -470,10 +483,7 @@ if (any(Fuel))
             
             % any required thrust < 1 must be rounded up to 5% SLS thrust
             TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
-            
-            % divide the electric motor power by the fan efficiency
-            EMPartPower = EMPartPower ./ Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-            
+                        
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
@@ -512,7 +522,7 @@ if (any(Fuel))
             end
             
             % size the engine at that point
-            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, EMPartPower(ipnt));
+            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
             
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(SizedEngine);

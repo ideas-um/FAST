@@ -522,7 +522,7 @@ if (any(Fuel))
             end
             
             % size the engine at that point
-            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
+            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, 0);
             
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(SizedEngine);

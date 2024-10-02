@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 sep 2024
+% last updated: 02 oct 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -38,6 +38,10 @@ efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;
 ESType = Aircraft.Specs.Propulsion.PropArch.ESType;
 PSType = Aircraft.Specs.Propulsion.PropArch.PSType;
 
+% get the propulsion architecture
+PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
+
 % operation matrices
 OperTS   = Aircraft.Specs.Propulsion.Oper.TS  ;
 OperTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
@@ -52,8 +56,8 @@ EtaPSES = Aircraft.Specs.Propulsion.Eta.PSES;
 % get the number of energy sources
 nes = length(Aircraft.Specs.Propulsion.PropArch.ESType);
 
-% get the parallel connections
-ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
+% get the fan efficiency
+EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
 
 % ----------------------------------------------------------
 
@@ -179,7 +183,6 @@ end
 
 % get the types of power sources
 Eng = PSType == +1;
-EM  = PSType ==  0;
 
 % get the types of energy sources
 Fuel = ESType == 1;
@@ -195,6 +198,8 @@ nes = length(ESType);
 PreqTS = zeros(npnt, nts);
 PreqPS = zeros(npnt, nps);
 PreqES = zeros(npnt, nes);
+PreqDr = zeros(npnt, nps);
+Psupp  = zeros(npnt, nps);
 
 
 %% PROPULSION SYSTEM ANALYSIS %%
@@ -216,6 +221,7 @@ for ipnt = 1:npnt
         
         % the power/thrust sources must provide infinite power
         PreqTS(ipnt, :) = Inf;
+        PreqDr(ipnt, :) = Inf;
         PreqPS(ipnt, :) = Inf;
         
         % no need to multiply matrices, so continue on
@@ -232,10 +238,10 @@ for ipnt = 1:npnt
     PreqTS(ipnt, :) = Preq(ipnt) * SplitTS;
     
     % get the power output by the driven  power sources
-    PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
+    PreqDr(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
     
     % get the power output by the driving power sources
-    PreqPS(ipnt, :) = PreqPS(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+    PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
         
 end
 
@@ -262,6 +268,7 @@ Aircraft.Mission.History.SI.Power.Treq_PS(SegBeg:SegEnd, :) = TreqPS;
 % assume the required power can be achieved
 PoutTS = PreqTS;
 PoutPS = PreqPS;
+PoutDr = PreqDr;
 
 % check the thrust sources
 exceeds = find(PreqTS > Pav_TS);
@@ -275,7 +282,15 @@ end
 Aircraft.Mission.History.SI.Power.Pout_TS(SegBeg:SegEnd, :) = PoutTS;
 Aircraft.Mission.History.SI.Power.Tout_TS(SegBeg:SegEnd, :) = PoutTS ./ TAS;
 
-% check the power sources
+% check the driven power sources
+exceeds = find(PreqDr > Pav_PS);
+
+% if any exceed the power available, return only the power available
+if (any(exceeds))
+    PoutDr(exceeds) = Pav_PS(exceeds);
+end
+
+% check the driving power sources
 exceeds = find(PreqPS > Pav_PS);
 
 % if any exceed the power available, return only the power available
@@ -286,6 +301,17 @@ end
 % remember the output thrust/power from the power  sources
 Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :) = PoutPS;
 Aircraft.Mission.History.SI.Power.Tout_PS(SegBeg:SegEnd, :) = PoutPS ./ TAS;
+
+% allocate power to/from the gas-turbine engines for components in series/parallel
+for ipnt = 1:npnt
+    
+    % evaluate the function handles for the current splits
+    SplitPSPS = PropulsionPkg.EvalSplit(OperPSPS, LamPSPS(ipnt, :));
+    
+    % check for the power supplement
+    Psupp(ipnt, :) = PropulsionPkg.PowerSupplementCheck(PoutDr(ipnt, :), TSPS, PSPS, SplitPSPS, EtaPSPS, PSType, EtaFan);
+        
+end
 
 % ----------------------------------------------------------
 
@@ -321,7 +347,6 @@ end
 SFC      = zeros(npnt, nps);
 MDotFuel = zeros(npnt, nps);
 MDotAir  = zeros(npnt, nps);
-FanDiam  = zeros(npnt, nps);
 ExitMach = zeros(npnt, nps);
 V        = zeros(npnt, nes);
 I        = zeros(npnt, nes);
@@ -438,19 +463,6 @@ if (any(Fuel))
         
         % compute the thrust output from the engine (account for fan)
         TEng = PoutTS(ibeg:iend, icol) ./ TAS(ibeg:iend);
-    
-        % check for an electric motor connection
-        if (~isempty(ParConns(icol)))
-            
-            % get the power from the electric motors
-            EMPartPower = sum(PoutPS(:, cell2mat(ParConns(icol))), 2);
-                        
-        else
-            
-            % no electric motor power
-            EMPartPower = zeros(npnt, 1);
-            
-        end
         
         % check for any NaN or Inf (especially at takeoff)
         TEng(isnan(TEng)) = 0;
@@ -489,19 +501,18 @@ if (any(Fuel))
             
             % get the required thrust/power
             if      (strcmpi(aclass, "Turbofan" ) == 1)
-                Aircraft.Specs.Propulsion.Engine.DesignThrust = TTemp(ipnt);
+                
+                % get the off-design thrust
+                OffParams.Thrust = TTemp(ipnt);
                 
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
                 
             end
-            
-            % get the off-design thrust
-            OffParams.Thrust = TTemp(ipnt);
-            
+                        
             % run the engine model
-            OffDesignEngine = EngSizeFun(Aircraft, OffParams, EMPartPower(ipnt));
+            OffDesignEngine = EngSizeFun(Aircraft, OffParams, Psupp(icol));
 
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
@@ -511,9 +522,6 @@ if (any(Fuel))
             
             % Get the engine exit mach number (of each engine)
             ExitMach(ipnt, icol) = NaN;%OffDesignEngine.States.Station9.Mach;
-            
-            % get the engine fan diamater (single engine)
-            FanDiam(ipnt, icol) = NaN; %GetDFan(OffDesignEngine);
             
             % get the air mass flow through (one) of the engines
             MDotAir(ipnt, icol) = NaN;%OffDesignEngine.MDotAir;
@@ -572,7 +580,6 @@ Aircraft.Mission.History.SI.Weight.Fburn(    SegBeg:SegEnd) = Fburn;
 Aircraft.Mission.History.SI.Propulsion.TSFC(    SegBeg:SegEnd, :) = SFC     ;
 Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
 Aircraft.Mission.History.SI.Propulsion.MDotAir( SegBeg:SegEnd, :) = MDotAir ; 
-Aircraft.Mission.History.SI.Propulsion.FanDiam( SegBeg:SegEnd, :) = FanDiam ;
 Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
 
 % power quantities

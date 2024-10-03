@@ -2,7 +2,7 @@ function [SizedERJ] = ElectrifyERJ(RunCases)
 %
 % [] = ElectrifyERJ(RunCases)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 18 jul 2024
+% last updated: 03 oct 2024
 %
 % Given an ERJ175LR model, electrify takeoff using different power splits
 % to determine the overall aircraft size and fuel burn trends.
@@ -94,7 +94,6 @@ for isplit = 1:nsplit
     
     % remember SFCs at specific points in the mission
     SFCs(isplit, 1) = SizedERJ.Mission.History.SI.Propulsion.TSFC(  2, 1); %TkoSFC
-    SFCs(isplit, 2) = SizedERJ.Mission.History.SI.Propulsion.TSFC_EMT(  2, 1); %TkoSFC_EMT
     SFCs(isplit, 3) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 37, 1); %TOCSFC
     SFCs(isplit, 4) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 39, 1); %Beginning_of_CruiseSFC
     SFCs(isplit, 5) = SizedERJ.Mission.History.SI.Propulsion.TSFC( 45, 1); %TODSFC
@@ -112,7 +111,6 @@ SFCs = UnitConversionPkg.ConvTSFC(SFCs, "SI", "Imp");
 
 % retrieve the important SFCs for plotting
 TkoSFC       = SFCs([1, 6, 8, 11], 1)';
-TkoSFC_EMT   = SFCs([1, 6, 8, 11], 2)';
 TOCSFC       = SFCs([1, 6, 8, 11], 3)';
 BegCruiseSFC = SFCs([1, 6, 8, 11], 4)';
 TODSFC       = SFCs([1, 6, 8, 11], 5)';
@@ -251,7 +249,7 @@ grid on
 % plot the important SFCs
 figure;
 hold on;
-b = bar([TkoSFC; TkoSFC_EMT; TOCSFC; BegCruiseSFC; TODSFC; BegSFC; EndSFC]);
+b = bar([TkoSFC; TOCSFC; BegCruiseSFC; TODSFC; BegSFC; EndSFC]);
 
 % add labels to the bars
 for i = 1:4
@@ -268,7 +266,7 @@ ylabel("SFC (lbm/lbf/hr)");
 grid on
 legend("Conventional", "5% PHE", "7% PHE", "10% PHE");
 xticks(1:7);
-xticklabels(["Takeoff", "Takeoff with EM thrust", "Top of Climb", "Beginning of Cruise", "Top of Descent", "Start of Reserve", "End of Reserve"]);
+xticklabels(["Takeoff", "Top of Climb", "Beginning of Cruise", "Top of Descent", "Start of Reserve", "End of Reserve"]);
 set(gca, "FontSize", 18);
 ylim([0, 0.9]);
 

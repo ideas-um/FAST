@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 oct 2024
+% last updated: 03 oct 2024
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -59,7 +59,25 @@ LamPSPS = Aircraft.Specs.Power.LamPSPS.SLS;
 
 % get propulsion system efficiencies
 EtaPSPS = Aircraft.Specs.Propulsion.Eta.PSPS;
-EtaFan  = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+
+% check the aircraft class
+if      (strcmpi(aclass, "Turbofan" ) == 1)
+    
+    % get the fan efficiency
+    EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+    
+elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1)  )
+    
+    % there is no fan, assume perfect efficiency
+    EtaFan = 1;
+    
+else
+    
+    % throw error
+    error("ERROR - PropulsionSizing: invalid aircraft class provided.");
+    
+end
 
 % check if the power optimization structure is available
 if (isfield(Aircraft, "PowerOpt"))
@@ -148,11 +166,6 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
     % get the total power  (p/w * mtow)
     P0 = Aircraft.Specs.Power.SLS;
     
-else
-    
-    % throw error
-    error("ERROR - SplitPower: invalid aircraft class provided.");
-    
 end
 
 % get the power/thrust split function handles
@@ -180,11 +193,13 @@ Psupp = PropulsionPkg.PowerSupplementCheck(PowerDr, TSPS, PSPS, SplitPSPS, EtaPS
 ThrustPS = PowerPS ./ TkoVel;
 Tsupp    = Psupp   ./ TkoVel;
 
-% remember the power  available for each power source
-Aircraft.Specs.Propulsion.SLSPower = PowerPS;
+% remember the power  available/supplemented for each power source
+Aircraft.Specs.Propulsion.SLSPower   = PowerPS ;
+Aircraft.Specs.Propulsion.PowerSupp  = Psupp   ;
 
-% remember the thrust available for each power source
-Aircraft.Specs.Propulsion.SLSThrust = ThrustPS;
+% remember the thrust available/supplemeneted for each power source
+Aircraft.Specs.Propulsion.SLSThrust  = ThrustPS;
+Aircraft.Specs.Propulsion.ThrustSupp = Tsupp   ;
 
 % check for a fully-electric architecture (so engines don't get sized)
 if (any(PSType > 0))

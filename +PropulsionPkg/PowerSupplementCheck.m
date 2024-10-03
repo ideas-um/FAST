@@ -2,7 +2,7 @@ function [Psupp] = PowerSupplementCheck(PreqDr, TSPS, PSPS, SplitPSPS, EtaPSPS, 
 %
 % [Psupp] = PowerSupplementCheck(iprob)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 sep 2024
+% last updated: 03 oct 2024
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -110,8 +110,8 @@ if (any(AnyParallel))
         % find the electric motors that are supplementing
         Helping = find((TSPS(icomp, :) > 0) & (PSType == 0));
                 
-        % add the power supplement
-        Psupp(:, Driving) = Psupp(:, Driving) + PreqDr(:, Helping) ./ EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        % add the power supplement, accounting for the fan efficiency
+        Psupp(:, Driving) = Psupp(:, Driving) + PreqDr(:, Helping) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
         
     end % for
 end % if

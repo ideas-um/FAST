@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 oct 2024
+% last updated: 03 oct 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -56,8 +56,24 @@ EtaPSES = Aircraft.Specs.Propulsion.Eta.PSES;
 % get the number of energy sources
 nes = length(Aircraft.Specs.Propulsion.PropArch.ESType);
 
-% get the fan efficiency
-EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+% check the aircraft class
+if      (strcmpi(aclass, "Turbofan" ) == 1)
+    
+    % get the fan efficiency
+    EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+    
+elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1)  )
+    
+    % there is no fan, assume perfect efficiency
+    EtaFan = 1;
+    
+else
+    
+    % throw error
+    error("ERROR - PropAnalysisNew: invalid aircraft class provided.");
+    
+end
 
 % ----------------------------------------------------------
 
@@ -436,10 +452,13 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(Aircraft, OffParams, ElecPower) EngineModelPkg.SimpleOffDesign(Aircraft, OffParams, ElecPower);
+        EngSizeFun = @(Aircraft, OffParams, ElecPower, ieng) EngineModelPkg.SimpleOffDesign(Aircraft, OffParams, ElecPower, ieng);
 
         % get the TSFC from the engine performance
         GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
+        
+        % get the fuel flow rate
+        MDot = @(OffDesignEng) OffDesignEng.Fuel;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
@@ -448,7 +467,10 @@ if (any(Fuel))
         EngSizeFun = @(EngSpec, EMPower) EngineModelPkg.TurbopropNonlinearSizing(EngSpec, EMPower);
 
         % get the BSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.TSFC_Imperial;
+        GetSFC = @(SizedEngine) SizedEngine.BSFC_Imp;
+        
+        % get the fuel flow rate
+        MDot = @(OffDesignEng) OffDesignEng.Fuel.MDot;
 
     end
     
@@ -505,20 +527,25 @@ if (any(Fuel))
                 % get the off-design thrust
                 OffParams.Thrust = TTemp(ipnt);
                 
+                % run the engine model
+                OffDesignEngine = EngSizeFun(Aircraft, OffParams, Psupp(ipnt, icol), icol);
+                
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
+                
+                % get the required power
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
                 
+                % run the engine model
+                OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
+                
             end
-                        
-            % run the engine model
-            OffDesignEngine = EngSizeFun(Aircraft, OffParams, Psupp(icol));
-
+            
             % get out the SFC (could be TSFC or BSFC)
             SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the fuel flow
-            MDotFuel(ipnt, icol) = OffDesignEngine.Fuel * Aircraft.Specs.Propulsion.MDotCF;
+            MDotFuel(ipnt, icol) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % Get the engine exit mach number (of each engine)
             ExitMach(ipnt, icol) = NaN;%OffDesignEngine.States.Station9.Mach;

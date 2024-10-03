@@ -238,10 +238,23 @@ for ipnt = 1:npnt
     % get the power output by the driven  power sources
     PreqPS(ipnt, :) = PreqTS(ipnt, :) * (SplitTSPS ./ EtaTSPS);
     
+    
+%Use full EM then fill with engine power
     if exist('PC_EM', 'var') 
         PreqPS(ipnt,[3,4]) = PC_EM(ipnt) * Pav_PS(ipnt, [3,4]);
         PreqPS(ipnt,[1,2]) = PreqTS(ipnt) - PreqPS(ipnt,[3,4]);
     end
+
+    %{
+    if Pav_PS(ipnt, 1) > PreqTS(ipnt,1)
+        PreqPS(ipnt,[1,2]) = PreqTS(ipnt);
+        PreqPS(ipnt,[3,4]) = [0,0];
+    else
+        PreqPS(ipnt,[1,2]) = Pav_PS(ipnt, [1,2]);
+        PreqPS(ipnt,[3,4]) = PreqTS(ipnt) - PreqPS(ipnt,[1,2]);
+    end
+    %}
+
 
     
     % get the power output by the driving power sources

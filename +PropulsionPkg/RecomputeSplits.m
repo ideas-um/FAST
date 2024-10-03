@@ -57,7 +57,7 @@ if (Aircraft.Specs.Power.LamTSPS.SLS == 0)
     PC_Eng = Pout_PS./Pav_PS;
     nans = isnan(PC_Eng);
     PC_Eng(nans) = 0;
-    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, :) = PC_Eng;
+    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, :) = PC_Eng(:, 1);
     return;
 end
 
@@ -86,8 +86,12 @@ for ipar = 1:npar
 
     % Compute the power code
     PC_Eng = PoutEng./PavEng;
+    PC_EM = PoutEM./PavEM;
+    PC_EM_NaN = isnan(PC_EM);
+    PC_EM(PC_EM_NaN) = 0;
 
     Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
+    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
     
 end
 

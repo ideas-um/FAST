@@ -62,7 +62,7 @@ switch unitsflag
 
         % BRE method (for reference, not currently in use)
         c = Plane.Specs.Propulsion.Engine.TSFC_Crs*0.453592/4.44822/3600*9.81;
-        R = Plane.Specs.Performance.Range*1e3;
+        R = Plane.Specs.Performance.Range*1e3 + UnitConversionPkg.ConvLength(100,'naut mi','m') + UnitConversionPkg.ConvVel(100,'kts','m/s')*(45*60);
         Wrat = log((Plane.Specs.Weight.MTOW)/(Plane.Specs.Weight.MTOW-Plane.Specs.Weight.Fuel));
         %Plane.Specs.Performance.Alts.Crs
         T = MissionSegsPkg.StdAtm(Plane.Specs.Performance.Alts.Crs);

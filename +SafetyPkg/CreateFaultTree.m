@@ -298,7 +298,7 @@ for icomp = (nrow+1):NewSize
 end
 
 % draw the fault tree
-SafetyPkg.FaultTree(Arch, Components);
+SafetyPkg.DrawFaultTree(Arch, Components);
 
 % ----------------------------------------------------------
 

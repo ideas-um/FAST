@@ -120,7 +120,7 @@ TSFC    = MDotAct / (ThrustReq * 1000);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % remember the fuel flow
-OffOutputs.Fuel = MDotAct;
+OffOutputs.Fuel = MDotAct; 
 
 % remember the thrust output (convert to kN from N)
 OffOutputs.Thrust = ThrustReq * 1000;

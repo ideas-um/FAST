@@ -288,6 +288,7 @@ DefaultWeight.MLW = 0;                      % good
 DefaultWeight.Batt = 0;                      % good
 DefaultWeight.EG = 0;                        % good
 DefaultWeight.EM = 0;                        % good
+DefaultWeight.EAP = 0;
 DefaultWeight.WairfCF = 1;
 % DefaultWeight.Fuel = 0;                    % regression
 % DefaultPropulsion.Arch = 'C';             *required*

@@ -1,4 +1,4 @@
-function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx)
+function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx)
 %
 % [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
@@ -58,10 +58,15 @@ end
 ThrustReq = ThrustReq - TsuppOffDesign;
 
 % negative thrust required indicates the electric motor produces all power
-if (ThrustReq < -1.0e-06)
+if     (ThrustReq < -1.0e-06)
     
     % therefore, no thrust from the engine is needed
     ThrustReq = 0;
+
+elseif (ThrustReq > Aircraft.Mission.History.SI.Power.Tav_PS(MissionIdx, EngineIdx))
+
+    % set the thrust required to the thrust available
+    ThrustReq = Aircraft.Mission.History.SI.Power.Tav_PS(MissionIdx, EngineIdx);
     
 end
 
@@ -104,7 +109,7 @@ SLSThrust_HE = ThrustEng / 1000;
 % compute the thrust ratio ... if there is no electrification in takeoff,
 % it will run non-electrification case, which c = 1
 % (SLSThrust_HE = SLSThrust_Conv)
-c = 2 - SLSThrust_HE / SLSThrust_conv;
+c = Aircraft.Specs.Propulsion.Engine.HEcoeff; %2 - SLSThrust_HE / SLSThrust_conv;
     
 % compute the fraction of thrust required to SLS thrust
 ThrustFrac = ThrustReq / (c * SLSThrust_conv);

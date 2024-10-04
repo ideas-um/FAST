@@ -117,7 +117,6 @@ isnk = find(                 noutput == 0 );
 itrn = find((ninput ~= 0) & (noutput ~= 0));
 
 % get the number of sources, sinks, and transmitters
-nsrc = length(isrc);
 nsnk = length(isnk);
 ntrn = length(itrn);
 
@@ -133,33 +132,25 @@ end
 if (RemoveSrc == 1)
         
     % remove their connections, but keep them in the matrix
-    Arch(isrc, :) = 0;
+    Arch(isrc, :) = 0; %#ok<*FNDSB>
     
     % re-count the number of input/output connections
     ninput  = sum(Arch, 1)';
     noutput = sum(Arch, 2) ;
     
     % re-find the sources, sinks, and transmitters
-    isrc = find( ninput == 0                  );
     isnk = find(                 noutput == 0 );
     itrn = find((ninput ~= 0) & (noutput ~= 0));
     
     % re-compute the number of sources, sinks, and transmitters
-    nsrc = length(isrc);
     nsnk = length(isnk);
     ntrn = length(itrn);
     
 end
 
-% find the connections in the existing architecture
-[irow, icol] = find(Arch);
-
 
 %% COUNT THE INTERNAL/DOWNSTREAM FAILURES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% remember the downstream failures
-idwn = [itrn; isnk];
 
 % count the downstream failures available
 ndwn = ntrn + nsnk;

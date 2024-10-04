@@ -4,7 +4,7 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, Engin
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
 % thanks to Swapnil Jagtap for the equation
-% last updated: 03 Oct 2024
+% last updated: 04 Oct 2024
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.
@@ -47,8 +47,11 @@ ThrustReq = OffParams.Thrust;
 TsuppOffDesign = ElectricLoad / TAS;
 
 % check that it is a number
-if (isnan(TsuppOffDesign))
+if (isnan(TsuppOffDesign) || isinf(TsuppOffDesign))
+    
+    % otherwise, return 0
     TsuppOffDesign = 0;
+    
 end
 
 % subtract the thrust provided by the electric motor

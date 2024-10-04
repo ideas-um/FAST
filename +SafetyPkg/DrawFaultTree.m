@@ -8,8 +8,24 @@ function [] = DrawFaultTree(Arch, Components)
 % the names of the given components.
 %
 % INPUTS:
-%     TopLevelFailure - string to describe the top-level failure occurring.
-%                       size/type/units: 1-by-1 / string / []
+%     Arch       - the architecture matrix representing the system
+%                  architecture to be analyzed.
+%                  size/type/units: n-by-n / int / []
+%
+%     Components - a structure array containing each component in the
+%                  system architecture and the following information about
+%                  it:
+%                      a) the component name, a string
+%                      b) the component type, a string
+%                      c) a column vector of failure rates
+%                      d) a column vector of failure modes corresponding to
+%                         the failure rates
+%                      e) a column vector of the logic gates corresponding
+%                         to each node/failure
+%                      f) a column vector of indices to be appended to the
+%                         logic gates (because matlab requires unique node
+%                         labels)
+%                  size/type/units: 1-by-1 / struct / []
 %
 % OUTPUTS:
 %     none

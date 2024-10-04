@@ -1,10 +1,10 @@
-function [] = FaultTree(Arch, Components)
+function [] = DrawFaultTree(Arch, Components)
 %
-% [] = FaultTree(Arch, Components)
+% [] = DrawFaultTree(Arch, Components)
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 04 oct 2024
 %
-% Create a fault tree from the adjacency matrix of a directed graph with
+% Draw a fault tree from the adjacency matrix of a directed graph with
 % the names of the given components.
 %
 % INPUTS:

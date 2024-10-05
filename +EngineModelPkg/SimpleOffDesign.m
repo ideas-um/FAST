@@ -1,10 +1,9 @@
 function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx)
 %
-% [OffOutputs] = SimpleOffDesign(OnDesignEngine, OffParams, ElectricLoad)
+% [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx))
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% thanks to Swapnil Jagtap for the equation
-% last updated: 04 Oct 2024
+% last updated: 05 Oct 2024
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.
@@ -20,6 +19,10 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, Engin
 %                    size/type/units: 1-by-1 / double / [W]
 %
 %     EngineIdx    - index of the engine (power source) being evaluated.
+%                    size/type/units: 1-by-1 / integer / []
+%
+%     MissionIdx   - index of the point in the mission history being
+%                    evaluated.
 %                    size/type/units: 1-by-1 / integer / []
 %
 % OUTPUTS:
@@ -103,13 +106,13 @@ Cff2  =  Aircraft.Specs.Propulsion.Engine.Cff2 ;
 Cff1  =  Aircraft.Specs.Propulsion.Engine.Cff1 ;
 Cffch =  Aircraft.Specs.Propulsion.Engine.Cffch;
 
-% get the engine's SLS thrust
-SLSThrust_HE = ThrustEng / 1000;
-
 % compute the thrust ratio ... if there is no electrification in takeoff,
 % it will run non-electrification case, which c = 1
-% (SLSThrust_HE = SLSThrust_Conv)
-c = Aircraft.Specs.Propulsion.Engine.HEcoeff; %2 - SLSThrust_HE / SLSThrust_conv;
+% (SLSThrust_HE = SLSThrust_Conv). the equation was formerly:
+%     c = 2 - SLSThrust_HE / SLSThrust_conv;
+%
+% now, we just use a coefficient from the engine specification file
+c = Aircraft.Specs.Propulsion.Engine.HEcoeff;
     
 % compute the fraction of thrust required to SLS thrust
 ThrustFrac = ThrustReq / (c * SLSThrust_conv);

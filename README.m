@@ -24,7 +24,7 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-% README last updated: 18 jun 2024
+% README last updated: 05 oct 2024
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -367,6 +367,15 @@ function [] = README()
 %         previous versions of FAST. Updates to this package are expected
 %         to commence in Spring/Summer 2024 and be released by the end of
 %         2024.
+%
+%     (5) Currently, we are in the process of switching to a new off-design
+%         engine model. As a result of that, some of the engines provided
+%         in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to
+%         date. The engines that currently work are the LEAP-1A26,
+%         CF34-8E5, and any turboprop engine. If you want to use a turbofan
+%         engine not listed above, please refer to
+%         "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients
+%         that need to be provided to use the fuel flow equation.
 %
 %
 % -------------------------------------------------------------------------

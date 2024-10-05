@@ -115,6 +115,11 @@ Engine.EtaPoly.CoreNozzle = 0.99;
 Engine.EtaPoly.Nozzles = 0.99;
 Engine.EtaPoly.Mixing = 0.0;
 
+%% Offdesign coefficient of BADA equation 
+Engine.Cff3    =  0.4006;
+Engine.Cff2    = -0.4323;
+Engine.Cff1    =  0.9946;
+Engine.Cffch   =  6.1*10^-7;
+Engine.HEcoeff =  1;
+
 end
-
-

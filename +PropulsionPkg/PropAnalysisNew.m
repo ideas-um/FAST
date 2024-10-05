@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 oct 2024
+% last updated: 05 oct 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -359,11 +359,9 @@ end
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% allocate memory for the SFC and fuel flow (assume no engine)
+% allocate memory for the engine and battery outputs
 SFC      = zeros(npnt, nps);
 MDotFuel = zeros(npnt, nps);
-MDotAir  = zeros(npnt, nps);
-ExitMach = zeros(npnt, nps);
 V        = zeros(npnt, nes);
 I        = zeros(npnt, nes);
 Q        = zeros(npnt, nes);
@@ -547,12 +545,6 @@ if (any(Fuel))
             % get the fuel flow
             MDotFuel(ipnt, icol) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
-            % Get the engine exit mach number (of each engine)
-            ExitMach(ipnt, icol) = NaN;%OffDesignEngine.States.Station9.Mach;
-            
-            % get the air mass flow through (one) of the engines
-            MDotAir(ipnt, icol) = NaN;%OffDesignEngine.MDotAir;
-            
         end                
     end
         
@@ -606,8 +598,6 @@ Aircraft.Mission.History.SI.Weight.Fburn(    SegBeg:SegEnd) = Fburn;
 % propulsion system quantities
 Aircraft.Mission.History.SI.Propulsion.TSFC(    SegBeg:SegEnd, :) = SFC     ;
 Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
-Aircraft.Mission.History.SI.Propulsion.MDotAir( SegBeg:SegEnd, :) = MDotAir ; 
-Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
 
 % power quantities
 Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;

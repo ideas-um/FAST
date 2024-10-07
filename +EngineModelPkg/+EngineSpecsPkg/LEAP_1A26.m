@@ -1,8 +1,9 @@
 function [Engine] = LEAP_1A26()
 %
-% [Engine] = CF34_8E5()
+% [Engine] = LEAP_1A26()
 % Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% modified by Paul Mokotoff, prmoko@umich.edu
+% Last Updated: 07 oct 2024
 %
 % Engine specification function for use with the EngineModelPkg
 %
@@ -46,7 +47,7 @@ Engine.BPR = 11;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1593;  %previosu data: 1597
+Engine.Tt4Max = 1593;
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -54,7 +55,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 120640;  %Prrvious data: 106760
+Engine.DesignThrust = 120640;
 
 
 

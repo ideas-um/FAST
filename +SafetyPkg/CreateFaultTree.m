@@ -2,7 +2,7 @@ function [] = CreateFaultTree(Arch, Components, RemoveSrc)
 %
 % CreateFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 sep 2024
+% last updated: 07 oct 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -114,11 +114,9 @@ noutput = sum(Arch, 2) ;
 % find the sources, sinks, and transmitters
 isrc = find( ninput == 0                  );
 isnk = find(                 noutput == 0 );
-itrn = find((ninput ~= 0) & (noutput ~= 0));
 
-% get the number of sources, sinks, and transmitters
+% get the number of sinks
 nsnk = length(isnk);
-ntrn = length(itrn);
 
 % for a fault tree, there can only be one sink
 if (nsnk > 1)
@@ -136,16 +134,7 @@ if (RemoveSrc == 1)
     
     % re-count the number of input/output connections
     ninput  = sum(Arch, 1)';
-    noutput = sum(Arch, 2) ;
-    
-    % re-find the sources, sinks, and transmitters
-    isnk = find(                 noutput == 0 );
-    itrn = find((ninput ~= 0) & (noutput ~= 0));
-    
-    % re-compute the number of sources, sinks, and transmitters
-    nsnk = length(isnk);
-    ntrn = length(itrn);
-    
+        
 end
 
 
@@ -153,7 +142,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % count the downstream failures available
-ndwn = ntrn + nsnk;
+ndwn = sum(ninput > 1);
 
 % check which internal failures are available
 iinf = ~strcmpi(Components.FailMode, "") & ninput ~= 0;
@@ -184,7 +173,7 @@ Components.FailMode = [Components.FailMode; repmat("", nadd, 1)];
 IntrFailIdx = nrow + cumsum(iinf);
 
 % establish downstream failure indices (offset by maximum index thus far)
-DownFailIdx = max(IntrFailIdx) + cumsum(ninput ~= 0);
+DownFailIdx = max(IntrFailIdx) + cumsum(ninput > 1);
 
 % loop through the components
 for irow = 1:nrow
@@ -192,21 +181,34 @@ for irow = 1:nrow
     % find the components upstream of the current one
     FlowsTo = find(Arch(irow, :));
     
-    % update the flows
-    Arch(irow, FlowsTo) = 0;
-    Arch(irow, DownFailIdx(FlowsTo)) = 1;
+    % check if any have multiple inputs
+    MultiIn = find(ninput(FlowsTo) >  1);
     
+    % check for multiple inputs
+    if any(MultiIn)
+        
+        % connect to the downstream failure instead of the component
+        Arch(irow,             FlowsTo(MultiIn) ) = 0;
+        Arch(irow, DownFailIdx(FlowsTo(MultiIn))) = 1;
+        
+    end
+        
     % check for a downstream failure
     if (ninput(irow) > 0)
+                
+        % check if there are multiple inputs
+        if (ninput(irow) > 1)
+            
+            % add the downstream failure
+            Arch(DownFailIdx(irow), irow) = 1;
+            
+            % update the component structure
+            Components.Name(    DownFailIdx(irow)) = strcat(Components.Name(irow), " Downstream Failure");
+            Components.Type(    DownFailIdx(irow)) =        Components.Type(irow);
+            Components.FailMode(DownFailIdx(irow)) =                                "Downstream"         ;
+                
+        end
         
-        % add the downstream failure
-        Arch(DownFailIdx(irow), irow) = 1;
-        
-        % update the component structure
-        Components.Name(    DownFailIdx(irow)) = strcat(Components.Name(irow), " Downstream Failure");
-        Components.Type(    DownFailIdx(irow)) =        Components.Type(irow);
-        Components.FailMode(DownFailIdx(irow)) =                                "Downstream"         ;
-    
         % check for an internal failure
         if (iinf(irow) == 1)
         
@@ -221,10 +223,17 @@ for irow = 1:nrow
             
             % modify the component failure
             Components.Name(    irow) = strcat(Components.Name(irow), " Failure");
-            Components.FailRate(irow) = 0;
             Components.FailMode(irow) = "Failure";
-        
+            Components.FailRate(irow) = 0;
+                    
         end
+        
+    else
+        
+        % convert the name of the component to represent a failure
+        Components.Name(    irow) = strcat(Components.Name(irow), " Failure");
+        Components.FailMode(irow) = "Failure";
+        
     end
 end
 

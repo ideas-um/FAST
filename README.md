@@ -25,7 +25,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 19 sep 2024
+README last updated: 05 Oct 2024
 
 ## Learn More About FAST
 
@@ -100,7 +100,7 @@ for more information on creating engine specification files for the engine model
 
 FAST performs on- and off-design analysis of a user-prescribed aircraft on a user-prescribed mission profile. To run this tool, call the "Main" function with an aircraft specification function and a parametric mission profile. To do so, the user must:
 
-1. Prescribe their aircraft configuration via a function call. This can be achieved  by updating the example.m file provided in “AircraftSpecsPkg”. See this package for more instructions and examples. In the function, the user should:
+1. Prescribe their aircraft configuration via a function call. This can be achieved  by updating the example.m file provided in “AircraftSpecsPkg�?. See this package for more instructions and examples. In the function, the user should:
     - Select whether an on-design (+1, sizing and performance) analysis or off-design (-1, performance only) analysis should be performed, which is the second argument in the call to "EAPAnalysis". This is controlled by the variable: "Aircraft.Settings.Analysis.Type". The default is +1 (sizing and performance) if this value is not provided.
     - Select the maximum number of iterations to be performed during the analysis. The value must be a positive integer and is controlled by the following variable: "Aircraft.Settings.Analysis.MaxIter". The default is 50 iterations.
     - Select whether or not the mission profile should be plotted after the analysis has been completed. This is controlled by the following variable: "Aircraft.Settings.Plotting". The default is 0 (no plotting).
@@ -142,6 +142,7 @@ To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with 
 2. Some of the variables in the aircraft specification may have dependencies on each other. In the event that a dependency exists, the user will see a warning in the command window, indicating which variables will be prioritized and used to compute the others. If this warning appears, it does not mean that the design failed to converge or is deprecated. Instead, it means that excess information was supplied before the analysis began.
 3. During the mission evaluation, the thrust (for a turbojet or turbofan) or power (for a turboprop or piston aircraft) is lapsed by a power of the density ratio (density at altitude to density at sea level). For turbojets and turbofans, this exponent is set to 1. For turboprops or piston aircraft, this exponent is set to 0 (no lapse). Currently, the user is unable to specify the exponent. However, it can be modified inside the "EngineLapse" function, which is housed in the "PropulsionPkg" folder.
 4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST. Updates to this package are expected to commence in Spring/Summer 2024 and be released by the end of 2024.
+5. Currently, we are in the process of switching to a new off-design engine model. As a result of that, some of the engines provided in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to date. The engines that currently work are the LEAP-1A26, CF34-8E5, and any turboprop engine. If you want to use a turbofan engine not listed above, please refer to "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients that need to be provided to use the fuel flow equation. Additionally, due to this switch, please refrain from using the "+EngineModelPkg\TurbofanOffDesign" function or any functions that it calls within its routine.
 
 # (VI) Testing FAST:
 

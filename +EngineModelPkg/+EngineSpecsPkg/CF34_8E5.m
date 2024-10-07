@@ -1,8 +1,9 @@
 function [Engine] = CF34_8E5()
 %
 % [Engine] = CF34_8E5()
-% Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% written by Maxfield Arnson
+% updated by Paul Mokotoff, prmoko@umich.edu
+% last updated: 05 oct 2024
 %
 % Engine specification function for use with the EngineModelPkg
 %
@@ -28,11 +29,11 @@ function [Engine] = CF34_8E5()
 
 % Design point Mach Number 
 % If SLS, enter 0.05
-Engine.Mach = 0.8;
+Engine.Mach = 0.05;
 
 % Design point Altitude [m]
 % If SLS, enter 0
-Engine.Alt = 1e4;
+Engine.Alt = 0;
 
 % Overall Pressure Ratio 
 Engine.OPR = 28.5;
@@ -45,7 +46,7 @@ Engine.BPR = 5;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1450;
+Engine.Tt4Max = 1511; %Previous data: 1450;
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -53,7 +54,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 61320 / 5;
+Engine.DesignThrust = UnitConversionPkg.ConvForce(14510,'lbf','N'); %Previous: 61320;
 
 
 
@@ -117,6 +118,15 @@ Engine.EtaPoly.Mixing = 0.0;
 %% Electric Supplement
 Engine.PerElec = 0;
 
+
+%% Fuel flow rate coefficients for BADA equation
+Engine.Cff3  =  0.299;
+Engine.Cff2  = -0.346;
+Engine.Cff1  =  0.701;
+Engine.Cffch =  8.e-7;
+
+% add the thrust coefficient for the BADA equation
+Engine.HEcoeff = 1;
 
 end
 

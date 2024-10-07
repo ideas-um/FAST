@@ -377,6 +377,10 @@ function [] = README()
 %         "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients
 %         that need to be provided to use the fuel flow equation.
 %
+%         Additionally, due to this switch, please refrain from using the
+%         "+EngineModelPkg\TurbofanOffDesign" function or any functions
+%         that it calls within its routine.
+%
 %
 % -------------------------------------------------------------------------
 %

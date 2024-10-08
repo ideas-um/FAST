@@ -1,4 +1,4 @@
-function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,GAMMA,weights,prior)
+function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,SIGMA,weights,prior)
 %
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target)
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target,weights)
@@ -70,5 +70,5 @@ end
 % Calculate posterior mean and variance for each requested target
 [PostMu,PostVar] =...
     RegressionPkg.CreatePosterior(DataMatrix,...
-    Prior,target,hypers,GAMMA);
+    Prior,target,hypers,SIGMA);
 end

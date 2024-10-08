@@ -24,6 +24,6 @@ InverseTerm = inv(Kbarbar + sig2_prior.*eye(PS));
 
 for i = 1:length(PostMu)
 [PostMu(i),PostVar(i)] = ...
-    RegressionPkg.BuildRegression(DataMatrix,prior(i),target(i,:),hypers,InverseTerm,GAMMA);
+    RegressionPkg.BuildRegression(DataMatrix,prior(i),target(i,:),hypers,InverseTerm);
 end
 end

@@ -1,4 +1,4 @@
-function [] = InitializeDatabase(AssumedM)
+function [DatabaseStruct] = InitializeDatabase()
 % [] = InitalizeDatabase()
 %
 % Written By Maxfield Arnson; marnson@umich.edu
@@ -17,14 +17,6 @@ function [] = InitializeDatabase(AssumedM)
 %
 %
 
-
-clc; close all;
-
-switch nargin
-    case 1
-    case 0
-        AssumedM = 0.8;
-end
 
 %% Read in AC Data, assign variables
 
@@ -221,14 +213,6 @@ for ii = 4:66
     PropEngineUnits.(RawTPE{ii,3}) = RawTPE{ii,2};
 end
 
-%% Manual Touch ups
-
-% these aircraft were assigned the wrong units in the database
-TurbopropAC.D228_100.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLength(223,'naut mi','m')/3600;
-TurbopropAC.D228_101.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLength(223,'naut mi','m')/3600;
-TurbopropAC.D228_200.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLength(223,'naut mi','m')/3600;
-TurbopropAC.D228_201.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLength(223,'naut mi','m')/3600;
-TurbopropAC.D228_202.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLength(223,'naut mi','m')/3600;
 
 %% Calculated Values
 % Call functions that calculate all desired ratios from the data in the
@@ -237,11 +221,11 @@ TurbopropAC.D228_202.Specs.Performance.Vels.Crs = 0.4;%UnitConversionPkg.ConvLen
 
 % Fans
 for ll = 1:length(FanFields)
-    TurbofanAC.(FanFields{ll}) = DatabasePkg.CalcFanVals(TurbofanAC.(FanFields{ll}),"Vals",AssumedM);
+    TurbofanAC.(FanFields{ll}) = DatabasePkg.CalcFanVals(TurbofanAC.(FanFields{ll}),"Vals");
 end
 
 FanUnitsReference.Specs.Propulsion.Engine = FanEngineUnits;
-FanUnitsReference = DatabasePkg.CalcFanVals(FanUnitsReference,"Units",AssumedM);
+FanUnitsReference = DatabasePkg.CalcFanVals(FanUnitsReference,"Units");
 
 % Props
 
@@ -288,7 +272,15 @@ writecell(JMPCellProps, fullfile("+DatabasePkg", "JMPInputSheetPROPS.xlsx"))
 
 %% Write Databases to .mat file
 
-save(fullfile("+DatabasePkg", "IDEAS_DB.mat"),'TurbofanAC','TurbofanEngines','TurbopropAC','TurbopropEngines','FanUnitsReference','PropUnitsReference')
+%save(fullfile("+DatabasePkg", "IDEAS_DB.mat"),'TurbofanAC','TurbofanEngines','TurbopropAC','TurbopropEngines','FanUnitsReference','PropUnitsReference')
+
+%Output to a Variable
+DatabaseStruct.TurbofanAC = TurbofanAC;
+DatabaseStruct.TurbofanEngines = TurbofanEngines;
+DatabaseStruct.FanUnitsReference = FanUnitsReference;
+DatabaseStruct.TurbopropAC = TurbopropAC;
+DatabaseStruct.TurbopropEngines = TurbopropEngines;
+DatabaseStruct.PropUnitsReference = PropUnitsReference;
 
 disp('Databases successfully initialized.')
 

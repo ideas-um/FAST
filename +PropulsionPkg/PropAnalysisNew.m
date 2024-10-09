@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysisNew(Aircraft)
 %
 % [Aircraft] = PropAnalysisNew(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 sep 2024
+% last updated: 05 oct 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -42,6 +42,10 @@ TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
 ESType = Aircraft.Specs.Propulsion.PropArch.ESType;
 PSType = Aircraft.Specs.Propulsion.PropArch.PSType;
 
+% get the propulsion architecture
+PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
+
 % operation matrices
 OperTS   = Aircraft.Specs.Propulsion.Oper.TS  ;
 OperTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
@@ -56,8 +60,24 @@ EtaPSES = Aircraft.Specs.Propulsion.Eta.PSES;
 % get the number of energy sources
 nes = length(Aircraft.Specs.Propulsion.PropArch.ESType);
 
-% get the fan efficiency
-EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+% check the aircraft class
+if      (strcmpi(aclass, "Turbofan" ) == 1)
+    
+    % get the fan efficiency
+    EtaFan = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+    
+elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1)  )
+    
+    % there is no fan, assume perfect efficiency
+    EtaFan = 1;
+    
+else
+    
+    % throw error
+    error("ERROR - PropAnalysisNew: invalid aircraft class provided.");
+    
+end
 
 % ----------------------------------------------------------
 
@@ -199,6 +219,7 @@ PreqTS = zeros(npnt, nts);
 PreqDr = zeros(npnt, nps);
 PreqPS = zeros(npnt, nps);
 PreqES = zeros(npnt, nes);
+PreqDr = zeros(npnt, nps);
 Psupp  = zeros(npnt, nps);
 
 
@@ -343,12 +364,9 @@ end
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% allocate memory for the SFC and fuel flow (assume no engine)
+% allocate memory for the engine and battery outputs
 SFC      = zeros(npnt, nps);
 MDotFuel = zeros(npnt, nps);
-MDotAir  = zeros(npnt, nps);
-FanDiam  = zeros(npnt, nps);
-ExitMach = zeros(npnt, nps);
 V        = zeros(npnt, nes);
 I        = zeros(npnt, nes);
 Q        = zeros(npnt, nes);
@@ -437,13 +455,13 @@ if (any(Fuel))
     if      (strcmpi(aclass, "Turbofan" ) == 1)
 
         % call the appropriate engine sizing function
-        EngSizeFun = @(EngSpec, EMPower) EngineModelPkg.TurbofanNonlinearSizing(EngSpec, EMPower);
+        EngSizeFun = @(Aircraft, OffParams, ElecPower, ieng, ipnt) EngineModelPkg.SimpleOffDesign(Aircraft, OffParams, ElecPower, ieng, ipnt);
 
-        % get the TSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.TSFC;
-
-        % get the fan diameter from the engine sizing
-        GetDFan = @(SizedEngine) SizedEngine.FanDiam;
+        % get the TSFC from the engine performance
+        GetSFC = @(OffDesignEng) OffDesignEng.TSFC;
+        
+        % get the fuel flow rate
+        MDot = @(OffDesignEng) OffDesignEng.Fuel;
 
     elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
             (strcmpi(aclass, "Piston"   ) == 1) )
@@ -452,10 +470,10 @@ if (any(Fuel))
         EngSizeFun = @(EngSpec, EMPower) EngineModelPkg.TurbopropNonlinearSizing(EngSpec, EMPower);
 
         % get the BSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.BSFC;
-
-        % set the fan diameter to nonexistent
-        GetDFan = @(SizedEngine) NaN;
+        GetSFC = @(SizedEngine) SizedEngine.BSFC_Imp;
+        
+        % get the fuel flow rate
+        MDot = @(OffDesignEng) OffDesignEng.Fuel.MDot;
 
     end
     
@@ -467,8 +485,8 @@ if (any(Fuel))
         
         % get the column index
         icol = HasEng(ieng);
-                
-        % compute the thrust output from the engine
+        
+        % compute the thrust output from the engine (account for fan)
         TEng = PoutTS(ibeg:iend, icol) ./ TAS(ibeg:iend);
         
         % check for any NaN or Inf (especially at takeoff)
@@ -494,50 +512,43 @@ if (any(Fuel))
             PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
             
         end
-    
-        % temporary mach number
-        MTemp = Mach(ibeg:iend);
         
-        % any mach number < 0.05 must be rounded up to 0.05
-        MTemp(Mach < 0.05) = 0.05;
-        
-        % get altitudes
-        Alt = Alt(ibeg:iend);
-                
+        % get altitudes and mach number
+        Alt  = Alt( ibeg:iend);
+        Mach = Mach(ibeg:iend);
+                        
         % compute the SFC as a function of thrust required
         for ipnt = 1:(npnt-1)
             
             % update the engine performance requirements
-            Aircraft.Specs.Propulsion.Engine.Mach = MTemp(ipnt);
-            Aircraft.Specs.Propulsion.Engine.Alt  = Alt(  ipnt);
+            OffParams.FlightCon.Mach = Mach(ipnt);
+            OffParams.FlightCon.Alt  = Alt( ipnt);
             
             % get the required thrust/power
             if      (strcmpi(aclass, "Turbofan" ) == 1)
-                Aircraft.Specs.Propulsion.Engine.DesignThrust = TTemp(ipnt);
+                
+                % get the off-design thrust
+                OffParams.Thrust = TTemp(ipnt);
+                
+                % run the engine model
+                OffDesignEngine = EngSizeFun(Aircraft, OffParams, Psupp(ipnt, icol), icol, ipnt);
                 
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
+                
+                % get the required power
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
+                
+                % run the engine model
+                OffDesignEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
                 
             end
             
-            % size the engine at that point
-            SizedEngine = EngSizeFun(Aircraft.Specs.Propulsion.Engine, 0);
-            
             % get out the SFC (could be TSFC or BSFC)
-            SFC(ipnt, icol) = GetSFC(SizedEngine);
+            SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the fuel flow
-            MDotFuel(ipnt, icol) = SizedEngine.Fuel.MDot * Aircraft.Specs.Propulsion.MDotCF;
-            
-            % Get the engine exit mach number (of each engine)
-            ExitMach(ipnt, icol) = SizedEngine.States.Station9.Mach;
-            
-            % get the engine fan diamater (single engine)
-            FanDiam(ipnt, icol) = GetDFan(SizedEngine);
-            
-            % get the air mass flow through (one) of the engines
-            MDotAir(ipnt, icol) = SizedEngine.MDotAir;
+            MDotFuel(ipnt, icol) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
         end                
     end
@@ -592,9 +603,6 @@ Aircraft.Mission.History.SI.Weight.Fburn(    SegBeg:SegEnd) = Fburn;
 % propulsion system quantities
 Aircraft.Mission.History.SI.Propulsion.TSFC(    SegBeg:SegEnd, :) = SFC     ;
 Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
-Aircraft.Mission.History.SI.Propulsion.MDotAir( SegBeg:SegEnd, :) = MDotAir ; 
-Aircraft.Mission.History.SI.Propulsion.FanDiam( SegBeg:SegEnd, :) = FanDiam ;
-Aircraft.Mission.History.SI.Propulsion.ExitMach(SegBeg:SegEnd, :) = ExitMach;
 
 % power quantities
 Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;

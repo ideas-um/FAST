@@ -23,8 +23,9 @@ function [] = README()
 %     Nawa Khailany
 %     Janki Patel
 %     Michael Tsai
+%     Vaibhav Rau
 % 
-% README last updated: 18 jun 2024
+% README last updated: 05 oct 2024
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -367,6 +368,52 @@ function [] = README()
 %         previous versions of FAST. Updates to this package are expected
 %         to commence in Spring/Summer 2024 and be released by the end of
 %         2024.
+%
+%     (5) Currently, we are in the process of switching to a new off-design
+%         engine model. As a result of that, some of the engines provided
+%         in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to
+%         date. The engines that currently work are the LEAP-1A26,
+%         CF34-8E5, and any turboprop engine. If you want to use a turbofan
+%         engine not listed above, please refer to
+%         "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients
+%         that need to be provided to use the fuel flow equation.
+%
+%         Additionally, due to this switch, please refrain from using the
+%         "+EngineModelPkg\TurbofanOffDesign" function or any functions
+%         that it calls within its routine.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (VI) Testing FAST:
+%
+% Multiple unit tests are shipped with FAST to ensure that the code is
+% operating correctly. In order to test FAST, run the following command:
+%
+%     TestFAST();
+%
+% If all of the tests run correctly, then FAST is up-to-date and can be
+% ran. If some of the tests fail, please submit an issue on GitHub using
+% the following link: https://github.com/ideas-um/FAST/issues.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (VII) Acknowledgments:
+%
+% This work is sponsored by the NASA Aeronautics Research Mission
+% Directorate and the Electrified Powertrain Flight Demonstration (EPFD)
+% project, "Development of a Parametrically Driven Electrified Aircraft
+% Design and Optimization Tool". The IDEAS Lab would like to thank Ralph
+% Jansen, Andrew Meade, Karin Bozak, Amy Chicatelli, Noah Listgarten,
+% Dennis Rohn, and Gaudy Bezos-O'Connor from the NASA EPFD project for
+% supporting this work and providing valuable technical input and feedback
+% throughout the duration of the project.
+%
+% Glenn Engineering and Research Support Contract (GEARS)
+% Contract No. 80GRC020D0003
 %
 %
 % -------------------------------------------------------------------------

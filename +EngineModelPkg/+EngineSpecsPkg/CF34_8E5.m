@@ -1,8 +1,9 @@
 function [Engine] = CF34_8E5()
 %
 % [Engine] = CF34_8E5()
-% Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% written by Maxfield Arnson
+% updated by Paul Mokotoff, prmoko@umich.edu
+% last updated: 05 oct 2024
 %
 % Engine specification function for use with the EngineModelPkg
 %
@@ -124,6 +125,8 @@ Engine.Cff2  = -0.346;
 Engine.Cff1  =  0.701;
 Engine.Cffch =  8.e-7;
 
+% add the thrust coefficient for the BADA equation
+Engine.HEcoeff = 1;
 end
 
 

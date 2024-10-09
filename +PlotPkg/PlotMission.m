@@ -2,7 +2,7 @@ function [] = PlotMission(Aircraft)
 %
 % [] = PlotMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 29 aug 2024
+% last updated: 07 oct 2024
 %
 % Obtain the mission history from the aircraft structure, convert necessary
 % values from SI to English units, and plot them.
@@ -61,7 +61,7 @@ TreqVector = Aircraft.Mission.History.SI.Power.Treq_PS ./ 1000;
  TavVector = Aircraft.Mission.History.SI.Power.Tav_PS  ./ 1000;
 ToutVector = Aircraft.Mission.History.SI.Power.Tout_PS ./ 1000;
 
-% SFC (then convert to lbm/hp/hr)
+% SFC (then convert to lbm/lbf/hr)
 if (strcmpi(Aircraft.Specs.TLAR.Class, "Turbofan") == 1)
     
     % convert to english units (taken from TurbofanOnDesignCycle)

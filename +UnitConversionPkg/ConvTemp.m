@@ -2,7 +2,8 @@ function [newval] = ConvTemp(oldval,oldunit,newunit)
 %
 % [newval] = ConvTemp(oldval,oldunit,newunit)  
 % written by Maxfield Arnson, marnson@umich.edu
-% updated 23 apr 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 19 sep 2024
 %
 % Convert a temperature value from one unit to another. Supported units are
 % listed below. Input variables oldunit and newunit should take a value
@@ -48,9 +49,9 @@ switch oldunit
             case 'C'
                 newval = oldval - 273.15;
             case 'R'
-                newval = oldval.*1.8;
+                newval = oldval .* 1.8;
             case 'F'
-                newval = oldval.*1.8 - 459.67;
+                newval = oldval .* 1.8 - 459.67;
             otherwise
                 error(errormsg)
         end
@@ -61,18 +62,18 @@ switch oldunit
             case 'C'
                 newval = oldval;
             case 'R'
-                newval = (oldval + 273.15).*1.8;
+                newval = (oldval + 273.15) .* 1.8;
             case 'F'
-                newval = (oldval + 273.15).*1.8 - 459.67;
+                newval = (oldval + 273.15) .* 1.8 - 459.67;
             otherwise
                 error(errormsg)
         end
     case 'R'
         switch newunit
             case 'K'
-                newval = oldval./1.8;                
+                newval = oldval ./ 1.8;                
             case 'C'
-                newval = oldval./1.8 - 273.15;
+                newval = oldval ./ 1.8 - 273.15;
             case 'R'
                 newval = oldval;
             case 'F'
@@ -83,9 +84,9 @@ switch oldunit
     case 'F'
         switch newunit
             case 'K'
-                newval = (oldval - 459.67)./1.8;
+                newval = (oldval - 32) .* (5 / 9) + 273.15;
             case 'C'
-                newval = (oldval - 459.67)./1.8 + 273.15;
+                newval = (oldval - 32) .* (5 / 9);
             case 'R'
                 newval = oldval + 459.67;
             case 'F'
@@ -96,8 +97,4 @@ switch oldunit
     otherwise
         error(errormsg)
 end
-
-
-
 end
-

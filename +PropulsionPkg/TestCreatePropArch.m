@@ -2,7 +2,7 @@ function [Success] = TestCreatePropArch()
 %
 % [Success] = TestCreatePropArch()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 jul 2024
+% last updated: 19 sep 2024
 %
 % Generate simple test cases to confirm that the propulsion architectures
 % are being created properly. Assume all tests are for turboprop
@@ -12,8 +12,11 @@ function [Success] = TestCreatePropArch()
 %     none
 %
 % OUTPUTS:
-%     Success - flag to show whether all of the tests passed (1) or not (0)
+%     Success - flag to show if all of the tests passed (1) or not (0).
+%               size/type/units: 1-by-1 / int / []
 %
+
+
 %% TEST CASE SETUP %%
 %%%%%%%%%%%%%%%%%%%%%
 

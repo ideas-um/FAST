@@ -112,8 +112,8 @@ ninput  = sum(Arch, 1)';
 noutput = sum(Arch, 2) ;
 
 % find the sources, sinks, and transmitters
-isrc = find( ninput == 0                  );
-isnk = find(                 noutput == 0 );
+isrc = find(ninput  == 0);
+isnk = find(noutput == 0);
 
 % get the number of sinks
 nsnk = length(isnk);
@@ -137,18 +137,20 @@ if (RemoveSrc == 1)
         
 end
 
+DPath = dfsearch(
+
 
 %% COUNT THE INTERNAL/DOWNSTREAM FAILURES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% count the downstream failures available
-ndwn = sum(ninput > 1);
 
 % check which internal failures are available
 iinf = ~strcmpi(Components.FailMode, "") & ninput ~= 0;
 
 % count the number of internal failures available
 ninf = sum(iinf);
+
+% count the downstream failures available
+ndwn = sum(ninput > 1);
 
 % count the number of rows/columns to add
 nadd = ndwn + ninf;
@@ -178,63 +180,55 @@ DownFailIdx = max(IntrFailIdx) + cumsum(ninput > 1);
 % loop through the components
 for irow = 1:nrow
     
-    % find the components upstream of the current one
+    % find the components that this one flows to
     FlowsTo = find(Arch(irow, :));
     
-    % check if any have multiple inputs
+    % check if these components have multiple inputs
     MultiIn = find(ninput(FlowsTo) >  1);
     
-    % check for multiple inputs
+    % if any of them do ...
     if any(MultiIn)
         
-        % connect to the downstream failure instead of the component
+        % connect to a downstream failure instead of the component failure
         Arch(irow,             FlowsTo(MultiIn) ) = 0;
         Arch(irow, DownFailIdx(FlowsTo(MultiIn))) = 1;
         
     end
+    
+    % check if there are multiple inputs to the current component
+    if (ninput(irow) > 1)
         
-    % check for a downstream failure
-    if (ninput(irow) > 0)
-                
-        % check if there are multiple inputs
-        if (ninput(irow) > 1)
-            
-            % add the downstream failure
-            Arch(DownFailIdx(irow), irow) = 1;
-            
-            % update the component structure
-            Components.Name(    DownFailIdx(irow)) = strcat(Components.Name(irow), " Downstream Failure");
-            Components.Type(    DownFailIdx(irow)) =        Components.Type(irow);
-            Components.FailMode(DownFailIdx(irow)) =                                "Downstream"         ;
-                
-        end
+        % add the downstream failure
+        Arch(DownFailIdx(irow), irow) = 1;
         
-        % check for an internal failure
-        if (iinf(irow) == 1)
-        
-            % update the architecture matrix
-            Arch(IntrFailIdx(irow), irow) = 1;
-            
-            % move the component failure to the internal failure
-            Components.Name(    IntrFailIdx(irow)) = strcat(Components.Name(    irow), " Internal Failure");
-            Components.Type(    IntrFailIdx(irow)) = Components.Type(    irow);
-            Components.FailRate(IntrFailIdx(irow)) = Components.FailRate(irow);
-            Components.FailMode(IntrFailIdx(irow)) = Components.FailMode(irow);
-            
-            % modify the component failure
-            Components.Name(    irow) = strcat(Components.Name(irow), " Failure");
-            Components.FailMode(irow) = "Failure";
-            Components.FailRate(irow) = 0;
-                    
-        end
-        
-    else
-        
-        % convert the name of the component to represent a failure
-        Components.Name(    irow) = strcat(Components.Name(irow), " Failure");
-        Components.FailMode(irow) = "Failure";
+        % update the component structure
+        Components.Name(    DownFailIdx(irow)) = strcat(Components.Name(irow), " Downstream Failure");
+        Components.Type(    DownFailIdx(irow)) =        Components.Type(irow);
+        Components.FailMode(DownFailIdx(irow)) =                                "Downstream"         ;
         
     end
+                                   
+    % check for an internal failure
+    if (iinf(irow) == 1)
+        
+        % update the architecture matrix
+        Arch(IntrFailIdx(irow), irow) = 1;
+        
+        % move the component failure to the internal failure
+        Components.Name(    IntrFailIdx(irow)) = strcat(Components.Name(    irow), " Internal Failure");
+        Components.Type(    IntrFailIdx(irow)) = Components.Type(    irow);
+        Components.FailRate(IntrFailIdx(irow)) = Components.FailRate(irow);
+        Components.FailMode(IntrFailIdx(irow)) = Components.FailMode(irow);
+        
+        % delete the failure rate of the this component (moved above)
+        Components.FailRate(irow) = 0;
+       
+    end
+    
+    % convert the name of the component to represent a failure
+    Components.Name(    irow) = strcat(Components.Name(irow), " Failure");
+    Components.FailMode(irow) = "Failure";
+    
 end
 
 

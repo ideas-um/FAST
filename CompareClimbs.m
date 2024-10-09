@@ -1,5 +1,6 @@
 Aircraft1 = Conventional;
 Aircraft2 = AC_tko_09;
+Aircraft3 = AC_boost;
 
 
 % get the number of points in each segment
@@ -15,18 +16,26 @@ dist2 = convlength(Aircraft2.Mission.History.SI.Performance.Dist(1:n), 'm', 'nau
 dist1 = convlength(Aircraft1.Mission.History.SI.Performance.Dist(1:n), 'm', 'naut mi');
 alt2 = convlength(Aircraft2.Mission.History.SI.Performance.Alt(1:n), 'm', 'ft');
 alt1 = convlength(Aircraft1.Mission.History.SI.Performance.Alt(1:n), 'm', 'ft');
-time1 = Aircraft1.Mission.History.SI.Performance.Time(1:n);
-time2 = Aircraft2.Mission.History.SI.Performance.Time(1:n);
+alt3 = convlength(Aircraft3.Mission.History.SI.Performance.Alt(1:n), 'm', 'ft');
+time1 = Aircraft1.Mission.History.SI.Performance.Time(1:n)/60;
+time2 = Aircraft2.Mission.History.SI.Performance.Time(1:n)/60;
+time3 = Aircraft3.Mission.History.SI.Performance.Time(1:n)/60;
 vel1 = Aircraft1.Mission.History.SI.Performance.EAS(1:n);
 vel2 = Aircraft2.Mission.History.SI.Performance.EAS(1:n);
 roc1 = Aircraft1.Mission.History.SI.Performance.RC(1:n);
 roc2 = Aircraft2.Mission.History.SI.Performance.RC(1:n);
-plot(time1 , roc1, '-o')
+roc3 = Aircraft3.Mission.History.SI.Performance.RC(1:n);
+fuel1 = Aircraft1.Mission.History.SI.Weight.Fburn(1:n);
+fuel2 = Aircraft2.Mission.History.SI.Weight.Fburn(1:n);
+fuel3 = Aircraft3.Mission.History.SI.Weight.Fburn(1:n);
+
+plot(time1 , fuel1, '-o')
 hold on
-plot(time2, roc2, '-o')
+plot(time2, fuel2, '-o')
+plot(time3, fuel3, '-o')
 %plot(Aircraft2.Mission.History.SI.Performance.Time(1:n), Aircraft2.Mission.History.SI.Performance.Alt(1:n), '-o')
-xlabel("Time (s)")
-ylabel("Rate of Climb (m/s)")
+xlabel("Time (min)")
+ylabel("Fuel Burn (kg)")
 title("Mission Profile")
-legend("Conventional", "Optimal Hybridized Takeoff")
+legend("Conventional", "Optimal Hybridized Tko", "Optimial Hybridized Tko w/ Clb Boost")
 %axis([0, 3000, -10, 40000])

@@ -30,10 +30,10 @@ end
 ERJ = AircraftSpecsPkg.ERJ175LR;
 
 % number of power splits
-nsplit = 16;
+nsplit = 13;
 
 % assume a set of takeoff power splits
-LambdaTko = linspace(0, 15, nsplit);
+LambdaTko = linspace(8, 20, nsplit);
 
 % remember the results
 MTOW  = zeros(nsplit, 1);

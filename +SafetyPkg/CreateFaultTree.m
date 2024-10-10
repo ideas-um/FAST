@@ -2,7 +2,7 @@ function [] = CreateFaultTree(Arch, Components, RemoveSrc)
 %
 % CreateFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 oct 2024
+% last updated: 10 oct 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -134,10 +134,12 @@ if (RemoveSrc == 1)
     
     % re-count the number of input/output connections
     ninput  = sum(Arch, 1)';
-        
+            
 end
 
-DPath = dfsearch(
+% keep a copy of the original architecture
+ArchCopy = Arch      ;
+CompCopy = Components;
 
 
 %% COUNT THE INTERNAL/DOWNSTREAM FAILURES %%
@@ -230,6 +232,117 @@ for irow = 1:nrow
     Components.FailMode(irow) = "Failure";
     
 end
+
+
+%% ACCOUNT FOR DUPLICATE PRIMARY EVENTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% get the component names
+CompNames = CompCopy.Name;
+
+% count the number of input/output connections
+ninput  = sum(ArchCopy, 1)';
+noutput = sum(ArchCopy, 2) ;
+
+% find the duplicate primary events
+DuplicEvents = noutput > 1 & ninput == 0;
+
+% loop through the duplicate events
+for idup = find(DuplicEvents')
+    
+    % get the connections from the duplicate
+    DupCons = find(ArchCopy(idup, :));
+    
+    % get the number of connections
+    ncon = length(DupCons);
+    
+    % zero all connections
+    ArchCopy(idup, DupCons) = 0;
+    
+    % memory for the upstream components
+    UpComps = zeros(ncon, 1);
+    
+    % loop through the connections
+    for icon = 1:ncon
+        
+        % get the connection
+        jcon = DupCons(icon);
+        
+        % re-activate the connection one at a time
+        ArchCopy(idup, jcon) = 1;
+        
+        % create a graph
+        G = digraph(ArchCopy, CompNames);
+        
+        % perform a depth-first search to find the upstream component
+        DPath = dfsearch(G, idup);
+        
+        % remember the component
+        UpComps(icon) = DPath(end-1);
+        
+        % deactivate the connection
+        ArchCopy(idup, jcon) = 0;
+        
+    end
+    
+    % re-activate the connections
+    ArchCopy(idup, DupCons) = 1;
+        
+    % find common component connected to the upstream components discovered
+    TopNode = find(sum(ArchCopy(UpComps, :), 1) == ncon);
+    
+    % remove the connections from the duplicates
+    Arch(idup, DupCons) = 0;
+    
+    % connect to the top-level event
+    Arch(idup, TopNode) = 1;
+    
+end
+
+
+%% ELIMINATE EXCESS CONNECTIONS FROM SIMPLIFICATION %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% count the number of input/output connections
+ninput  = sum(Arch, 1)';
+noutput = sum(Arch, 2) ;
+
+% find the excess nodes with one input/output
+Extras = find(ninput == 1 & noutput == 1)';
+
+% loop through each extra
+for iextra = Extras
+    
+    % get the row where the flow starts
+    irow = find(Arch(:, iextra));
+    
+    % get the column where the flow ends
+    icol = find(Arch(iextra, :));
+    
+    % remove the flows
+    Arch(irow, iextra) = 0;
+    Arch(iextra, icol) = 0;
+    
+    % connect the flow directly from beginning to end
+    Arch(irow, icol) = 1;
+    
+end
+
+% find vertices that are islands
+Island = find((sum(Arch, 1)' == 0) & (sum(Arch, 2) == 0));
+
+% remove the islands' rows/columns from the adjacency matrix
+Arch(Island, :) = [];
+Arch(:, Island) = [];
+
+% remove the islands' node labels
+Components.Name(    Island) = [];
+Components.Type(    Island) = [];
+Components.FailRate(Island) = [];
+Components.FailMode(Island) = [];
+
+% update the matrix size (removed islands)
+NewSize = NewSize - length(Island);
 
 
 %% CREATE THE FAULT TREE %%

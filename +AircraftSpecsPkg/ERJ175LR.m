@@ -168,12 +168,12 @@ Aircraft.Specs.Power.LamTS.Lnd = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Tko = 0;
-Aircraft.Specs.Power.LamTSPS.Clb = 0;
+Aircraft.Specs.Power.LamTSPS.Tko = 0.09;
+Aircraft.Specs.Power.LamTSPS.Clb = 0.15;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;
 Aircraft.Specs.Power.LamTSPS.Lnd = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Tko = 0;
@@ -193,11 +193,11 @@ Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
-Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
+Aircraft.Specs.Power.Battery.ParCells = 100;%100;
+Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
+Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%
@@ -216,7 +216,7 @@ Aircraft.Settings.OEW.MaxIter = 50;
 Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
-Aircraft.Settings.Analysis.MaxIter = 50;
+Aircraft.Settings.Analysis.MaxIter = 20;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

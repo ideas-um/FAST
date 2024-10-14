@@ -38,7 +38,7 @@ EtaProp = Specs.Propulsion.Eta.Prop;
 EtaEM = Specs.Power.Eta.EM;
 
 % design power split
-PhiDesign = Specs.Power.Phi.SLS;
+DesignSplit = Specs.Power.LamTSPS.SLS;
 
 % electric motor power-weight ratio
 P_Wem = Specs.Power.P_W.EM;
@@ -66,7 +66,7 @@ History = Aircraft.Mission.History.SI;
 %Pout = History.Power.Out(ielem);
 %Pav  = History.Power.Av( ielem);
 Pout = History.Power.Pout_PS(ielem);
-Pout_Em = Pout(:,3);
+Pout_EM = Pout(:,3);
 Pout_GT = Pout(:,1);
 
 % get current SOC of aircraft
@@ -92,7 +92,7 @@ dt = diff(Time);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % compute the coefficient to obtain the energy consumed by the battery
-EbattCoeff = Pout_EM(1:end-1) .* dt;
+EbattCoeff = Pout_EM(1:(end-1)) .* dt;
 
 %{
 Currently dont need engine power
@@ -148,8 +148,8 @@ if (any(contains(Segments, "Takeoff")))
 end
 
 % number of total constraints and design variables (per power split)
-ncon = 4;
-nvar = 5;
+ncon = 1;
+nvar = 2;
 
 % number of total constraints using all power splits
 acon = 2;
@@ -175,8 +175,8 @@ for iphi = 1:nphi
     icol = ncon * (iphi - 1) + nphi + 1;
     
     % constrain the minimum power split
-    Tableau(irow, iphi) = -1;
-    Tableau(irow, icol) = +1;
+    Tableau(irow, iphi) = 1;
+    Tableau(irow, icol) = 1;
     
     % update row/col for the next slack variable (upper power split limit)
     irow = irow + 1;

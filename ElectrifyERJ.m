@@ -34,7 +34,7 @@ ERJ = AircraftSpecsPkg.ERJ175LR;
 
 % assume a set of takeoff power splits
 LambdaTko = (.5:.5:11);
-LambdaClb = (0:.5:10);
+LambdaClb = 0;%(0:.5:10);
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 
@@ -88,16 +88,15 @@ for csplit =1:nclb
         SizedERJ = foo.SizedERJ;
         
     end
-    
+            % remember the weights
+        MTOW( tsplit, csplit) = SizedERJ.Specs.Weight.MTOW   ;
+        Wfuel(tsplit, csplit) = SizedERJ.Specs.Weight.Fuel   ;
+        Wbatt(tsplit, csplit) = SizedERJ.Specs.Weight.Batt   ;
+        Wem(  tsplit, csplit) = SizedERJ.Specs.Weight.EM     ;
+        Weng( tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
+        E_em( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,2);
+        E_gt( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,1);
     end
-        % remember the weights
-    MTOW( tsplit, csplit) = SizedERJ.Specs.Weight.MTOW   ;
-    Wfuel(tsplit, csplit) = SizedERJ.Specs.Weight.Fuel   ;
-    Wbatt(tsplit, csplit) = SizedERJ.Specs.Weight.Batt   ;
-    Wem(  tsplit, csplit) = SizedERJ.Specs.Weight.EM     ;
-    Weng( tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
-    E_em( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,2);
-    E_gt( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,1);
 end
 
 

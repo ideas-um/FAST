@@ -169,7 +169,7 @@ Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
 Aircraft.Specs.Power.LamTSPS.Tko = 0.09;
-Aircraft.Specs.Power.LamTSPS.Clb = 0.15;
+Aircraft.Specs.Power.LamTSPS.Clb = 0;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;
 Aircraft.Specs.Power.LamTSPS.Lnd = 0;
@@ -198,6 +198,9 @@ Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
 Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+
+% coefficient for HEA engine analysis
+Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

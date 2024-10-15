@@ -33,8 +33,8 @@ ERJ = AircraftSpecsPkg.ERJ175LR;
 %nsplit = 13;
 
 % assume a set of takeoff power splits
-LambdaTko = (.5:.5:11);
-LambdaClb = 0;%(0:.5:10);
+LambdaTko = (0:.5:10);
+LambdaClb = 1;%(0:.5:10);
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 
@@ -67,6 +67,8 @@ for csplit =1:nclb
     ERJ.Specs.Power.LamTSPS.Tko = LambdaTko(tsplit) / 100;
     ERJ.Specs.Power.LamTSPS.Clb = LambdaClb(csplit) / 100;
     ERJ.Specs.Power.LamTSPS.SLS = LambdaTko(tsplit) / 100;
+
+    ERJ.Specs.Propulsion.Engine.HEcoeff = 1 +  ERJ.Specs.Power.LamTSPS.SLS;
     
     % check if cases must be run
     if (RunCases == 1)

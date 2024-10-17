@@ -2,7 +2,7 @@ function [] = CreateFaultTree(Arch, Components, RemoveSrc)
 %
 % CreateFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 oct 2024
+% last updated: 17 oct 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -133,13 +133,9 @@ if (RemoveSrc == 1)
     Arch(isrc, :) = 0; %#ok<*FNDSB>
     
     % re-count the number of input/output connections
-    ninput  = sum(Arch, 1)';
-            
+    ninput = sum(Arch, 1)';
+    
 end
-
-% keep a copy of the original architecture
-ArchCopy = Arch      ;
-CompCopy = Components;
 
 
 %% COUNT THE INTERNAL/DOWNSTREAM FAILURES %%
@@ -234,68 +230,38 @@ for irow = 1:nrow
 end
 
 
-%% ACCOUNT FOR DUPLICATE PRIMARY EVENTS %%
+%% ACCOUNT FOR REDUNDANT PRIMARY EVENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% get the component names
-CompNames = CompCopy.Name;
+% loop through until there's no more redundant events
+while (1)
+    
+    % count the number of input/output connections
+    ninput  = sum(Arch, 1)';
+    noutput = sum(Arch, 2) ;
+    
+    % find the duplicate primary events
+    DuplicEvents = noutput > 1 & ninput == 0;
 
-% count the number of input/output connections
-ninput  = sum(ArchCopy, 1)';
-noutput = sum(ArchCopy, 2) ;
-
-% find the duplicate primary events
-DuplicEvents = noutput > 1 & ninput == 0;
-
-% loop through the duplicate events
-for idup = find(DuplicEvents')
-    
-    % get the connections from the duplicate
-    DupCons = find(ArchCopy(idup, :));
-    
-    % get the number of connections
-    ncon = length(DupCons);
-    
-    % zero all connections
-    ArchCopy(idup, DupCons) = 0;
-    
-    % memory for the upstream components
-    UpComps = zeros(ncon, 1);
-    
-    % loop through the connections
-    for icon = 1:ncon
+    % check if there are any duplicate events
+    if (~any(DuplicEvents))
         
-        % get the connection
-        jcon = DupCons(icon);
-        
-        % re-activate the connection one at a time
-        ArchCopy(idup, jcon) = 1;
-        
-        % create a graph
-        G = digraph(ArchCopy, CompNames);
-        
-        % perform a depth-first search to find the upstream component
-        DPath = dfsearch(G, idup);
-        
-        % remember the component
-        UpComps(icon) = DPath(end-1);
-        
-        % deactivate the connection
-        ArchCopy(idup, jcon) = 0;
+        % if there are none, break out of the loop
+        break;
         
     end
     
-    % re-activate the connections
-    ArchCopy(idup, DupCons) = 1;
-        
-    % find common component connected to the upstream components discovered
-    TopNode = find(sum(ArchCopy(UpComps, :), 1) == ncon);
+    % find the duplicate events
+    idup = find(DuplicEvents');
+    
+    % get the output flows
+    [OutFlowRow, OutFlowCol] = find(Arch(idup, :));
     
     % remove the connections from the duplicates
-    Arch(idup, DupCons) = 0;
+    Arch(OutFlowRow, OutFlowCol) = 0;
     
     % connect to the top-level event
-    Arch(idup, TopNode) = 1;
+    Arch(idup, isnk) = 1;
     
 end
 

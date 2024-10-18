@@ -2,7 +2,7 @@ function [] = CreateFaultTree(Arch, Components, RemoveSrc)
 %
 % CreateFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 oct 2024
+% last updated: 18 oct 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -137,21 +137,32 @@ if (RemoveSrc == 1)
     
 end
 
+% get the number of sources
+nsrc = length(isrc);
 
-%% COUNT THE INTERNAL/DOWNSTREAM FAILURES %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% allocate memory for all of the path lengths
+PathLength = zeros(nsrc, 1);
+
+% create a directed graph of the architecture
+DG = digraph(Arch);
+
+% loop through all paths to find the longest one
+for ipath = 1:nsrc
+    [~, PathLength(ipath)] = shortestpath(DG, isrc(ipath), isnk);
+end
+
+% get the longest path for the maximum number of redundant primary events
+nred = max(PathLength);
+
+
+%% COUNT THE INTERNAL/DOWNSTREAM/PRIMARY FAILURES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % check which internal failures are available
 iinf = ~strcmpi(Components.FailMode, "") & ninput ~= 0;
 
-% count the number of internal failures available
-ninf = sum(iinf);
-
-% count the downstream failures available
-ndwn = sum(ninput > 1);
-
-% count the number of rows/columns to add
-nadd = ndwn + ninf;
+% add internal/downstream failures for all components and redundant fails
+nadd = 2 * ncomp + nred; %ndwn + ninf + nred;
 
 % add as many entries to the matrix as needed
 Arch = [Arch, zeros(nrow, nadd); zeros(nadd, ncol), zeros(nadd)];
@@ -169,11 +180,14 @@ Components.FailMode = [Components.FailMode; repmat("", nadd, 1)];
 %% ADD THE DOWNSTREAM/INTERNAL FAILURES INTO THE TREE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% establish internal failure indices (offset by number of components)
-IntrFailIdx = nrow + cumsum(iinf);
+% indices for internal failure modes (offset by number of components)
+IntrFailIdx = nrow + (1:ncomp)';%cumsum(iinf);
 
-% establish downstream failure indices (offset by maximum index thus far)
-DownFailIdx = max(IntrFailIdx) + cumsum(ninput > 1);
+% indices for downstream failures (offset by maximum index thus far)
+DownFailIdx = max(IntrFailIdx) + (1:ncomp)';%cumsum(ninput > 1);
+
+% indices for redundant primary events (offset by maximum index thus far)
+RednFailIdx = max(DownFailIdx) + (1:nred)';
 
 % loop through the components
 for irow = 1:nrow
@@ -203,7 +217,7 @@ for irow = 1:nrow
         Components.Name(    DownFailIdx(irow)) = strcat(Components.Name(irow), " Downstream Failure");
         Components.Type(    DownFailIdx(irow)) =        Components.Type(irow);
         Components.FailMode(DownFailIdx(irow)) =                                "Downstream"         ;
-        
+                
     end
                                    
     % check for an internal failure
@@ -229,13 +243,21 @@ for irow = 1:nrow
     
 end
 
+% assume all redundant primary event spaces will be used
+Components.Name(    RednFailIdx) = strcat("Primary Event Fail", num2str((1:nred)'));
+Components.FailRate(RednFailIdx) = 0;
+Components.FailMode(RednFailIdx) = strcat("Primary Event Fail", num2str((1:nred)'));
+
 
 %% ACCOUNT FOR REDUNDANT PRIMARY EVENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% index for the redundant failure mode
+ired = 1;
+
 % loop through until there's no more redundant events
 while (1)
-    
+        
     % count the number of input/output connections
     ninput  = sum(Arch, 1)';
     noutput = sum(Arch, 2) ;
@@ -260,10 +282,26 @@ while (1)
     % remove the connections from the duplicates
     Arch(OutFlowRow, OutFlowCol) = 0;
     
-    % connect to the top-level event
-    Arch(idup, isnk) = 1;
+    % connect to the primary redundant failure
+    Arch(idup, RednFailIdx(ired)) = 1;
+    
+    % connect the primary redundant failure to the sink
+    Arch(RednFailIdx(ired), isnk) = 1;
     
 end
+
+
+%% CHECK IF DOWNSTREAM FAILURES STILL EXIST %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% get the column sum of the downstream failures
+ColSum = sum(Arch(:, DownFailIdx), 1)';
+
+% check which ones have no flow into it (sum of 0)
+RemoveDownFail = find(ColSum == 0);
+
+% remove any downstream failure connections
+Arch(DownFailIdx(RemoveDownFail), :) = 0;
 
 
 %% ELIMINATE EXCESS CONNECTIONS FROM SIMPLIFICATION %%

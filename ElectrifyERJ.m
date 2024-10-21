@@ -33,8 +33,8 @@ ERJ = AircraftSpecsPkg.ERJ175LR;
 %nsplit = 13;
 
 % assume a set of takeoff power splits
-LambdaTko = (0:.5:10);
-LambdaClb = 1;%(0:.5:10);
+LambdaTko = 9;
+LambdaClb = [.5, 1, 1.5, 3, 5];
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 
@@ -108,60 +108,22 @@ end
 % turn climb % to 
 labels = cellstr(arrayfun(@(x) sprintf('%.1f%%', x), LambdaClb, 'UniformOutput', false));
 
-% plot the MTOW results
-figure;
-yyaxis left
-plot(LambdaTko, MTOW, "-o", "LineWidth", 2);
-ylabel("MTOW (kg)");
-
-% format plot
-title("Electrified ERJ - MTOW");
-xlabel("Power Split (%)");
-legend(labels)
-set(gca, "FontSize", 18);
-grid on
-
+num = length(Wfuel);
 % plot the fuel burn results
 figure;
+cmap = jet(num);
+hold on
 yyaxis left
-plot(LambdaTko, Wfuel, "-o", "LineWidth", 2);
+for i = 1:num
+    plot(LambdaTko, Wfuel(:,i), '-o', 'Color', cmap(i,:),"LineWidth", 2);
+end
 ylabel("Block Fuel (kg)");
-
 % format plot
 title("Electrified ERJ - Block Fuel");
 xlabel("Power Split (%)");
 legend(labels)
 set(gca, "FontSize", 18);
 grid on
-
-% plot the engine weight results
-figure;
-yyaxis left
-plot(LambdaTko, Weng, "-o", "LineWidth", 2);
-ylabel("Engine Weight (kg)");
-
-% format plot
-title("Electrified ERJ - Engine Weight");
-xlabel("Power Split (%)");
-set(gca, "FontSize", 18);
-legend(labels)
-grid on
-
-% plot the battery and electric motor weight results
-figure;
-yyaxis left
-plot(LambdaTko, Wbatt, "-o", "LineWidth", 2);
-ylabel("Battery Weight (kg)");
-yyaxis right
-plot(LambdaTko, Wem, "-o", "LineWidth", 2);
-ylabel("Electric Motor Weight (kg)");
-
-% format plot
-title("Electrified ERJ - Electrical Components");
-xlabel("Power Split (%)");
-legend(labels)
-grid on
-
 
 % ----------------------------------------------------------
 

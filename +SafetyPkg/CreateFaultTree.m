@@ -2,7 +2,7 @@ function [] = CreateFaultTree(Arch, Components, RemoveSrc)
 %
 % CreateFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 18 oct 2024
+% last updated: 21 oct 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -154,6 +154,9 @@ end
 % get the longest path for the maximum number of redundant primary events
 nred = max(PathLength);
 
+% remember the initial architecture (before adding other failures)
+InitArch = Arch;
+
 
 %% COUNT THE INTERNAL/DOWNSTREAM/PRIMARY FAILURES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -256,11 +259,11 @@ Components.FailMode(RednFailIdx) = strcat("Primary Event Fail", num2str((1:nred)
 ired = 1;
 
 % loop through until there's no more redundant events
-while (1)
+while (ired <= nred)
         
     % count the number of input/output connections
-    ninput  = sum(Arch, 1)';
-    noutput = sum(Arch, 2) ;
+    ninput  = sum(InitArch, 1)';
+    noutput = sum(InitArch, 2) ;
     
     % find the duplicate primary events
     DuplicEvents = noutput > 1 & ninput == 0;
@@ -276,8 +279,17 @@ while (1)
     % find the duplicate events
     idup = find(DuplicEvents');
     
+    % zero all rows unaffected by the duplicate
+    TempInitArch = zeros(ncomp  );
+    TempArch     = zeros(NewSize);
+    
+    % use only the rows with duplicate events
+    TempInitArch(idup, :) = InitArch(idup, :);
+    TempArch(    idup, :) = Arch(    idup, :);
+    
     % get the output flows
-    [OutFlowRow, OutFlowCol] = find(Arch(idup, :));
+    [InitOutRow, InitOutCol] = find(TempInitArch);
+    [OutFlowRow, OutFlowCol] = find(TempArch    );
     
     % remove the connections from the duplicates
     Arch(OutFlowRow, OutFlowCol) = 0;
@@ -287,6 +299,15 @@ while (1)
     
     % connect the primary redundant failure to the sink
     Arch(RednFailIdx(ired), isnk) = 1;
+    
+    % update the initial architecture
+    InitArch(InitOutRow, InitOutCol) = 0;
+    
+    % connect the primary reduandant failure to the sink
+    InitArch(idup, isnk) = 1;
+    
+    % increment the reduction failure index
+    ired = ired + 1;
     
 end
 

@@ -116,10 +116,6 @@ SizedEngine.OffDesignMap = EngineModelPkg.TF_OD_MapMaker(SizedEngine);
 SizedEngine.Specs.Sizing = 0;
 end
 
-% remember the calibration factors for off-design
-SizedEngine.Cal.c1 = EngSpecFun.Cal.c1;
-SizedEngine.Cal.c2 = EngSpecFun.Cal.c2;
-
 
 %% Graphing
 

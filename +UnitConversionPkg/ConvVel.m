@@ -99,4 +99,3 @@ newval = oldval.*ScaleFactor;
 
 
 end
-

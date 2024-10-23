@@ -3,7 +3,8 @@ function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 % [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 % written by Sasha Kryuchkov
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% modified by Vaibhav Rau, vaibhav.rau@warriorlife.net
+% last updated: 19 sep 2024
 %
 % Simulate aircraft charging at an airport gate.
 %
@@ -16,7 +17,7 @@ function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 %                  size/type/units: 1-by-1 / double / [s]
 %
 %     ChrgRate   - airport charging rate.
-%                  size/type/units: 1-by-1 / double / [kW/h]
+%                  size/type/units: 1-by-1 / double / [kW]
 %
 % OUTPUTS:
 %     SOCEnd     - state of charge after the ground turn.
@@ -44,7 +45,7 @@ if (SOCBeg < 0)
 end
 
 % charge the battery
-[~, ~, ~, SOCEnd] = BatteryPkg.Model(ChrgRate, GroundTime, SOCBeg, ...
+[~, ~, ~, ~, SOCEnd] = BatteryPkg.Model(ChrgRate, GroundTime, SOCBeg, ...
                                      ParCells,SerCells);
 
 % maximum SOC is 100% (fully charged) and can't be "overcharged"

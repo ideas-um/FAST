@@ -3,7 +3,7 @@ function [Aircraft] = ERJ175LR()
 % [Aircraft] = ERJ175LR()
 % originally written for E175 by Nawa Khailany
 % modified to E175LR by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 jul 2024
+% last updated: 07 oct 2024
 % 
 % Create a baseline model of the ERJ 175, long-range version (also known as
 % an ERJ 170-200). This version uses a conventional propulsion
@@ -40,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.002; %1.000; % formerly 0.985
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000; %1.000; % formerly 0.985
+Aircraft.Specs.Aero.L_D.ClbCF = 1.002;
+Aircraft.Specs.Aero.L_D.CrsCF = 1.000;
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.029; %1.042; % formerly 1.000
+Aircraft.Specs.Propulsion.MDotCF = 1.029;
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.018; %1.018; % formerly 1.0333
+Aircraft.Specs.Weight.WairfCF = 1.018;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -57,10 +57,10 @@ Aircraft.Specs.Weight.WairfCF = 1.018; %1.018; % formerly 1.0333
 Aircraft.Specs.Performance.Vels.Tko = UnitConversionPkg.ConvVel(135, "kts", "m/s");
 
 % cruise  speed (mach)
-Aircraft.Specs.Performance.Vels.Crs = 0.78; %0.8; % at 35,000 ft, Mach 0.78
+Aircraft.Specs.Performance.Vels.Crs = 0.78; % at 35,000 ft, Mach 0.78
 
 % takeoff altitude (m)
-Aircraft.Specs.Performance.Alts.Tko =     0;
+Aircraft.Specs.Performance.Alts.Tko = 0;
 
 % cruise altitude (m)
 Aircraft.Specs.Performance.Alts.Crs = UnitConversionPkg.ConvLength(35000, "ft", "m");

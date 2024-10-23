@@ -1,8 +1,9 @@
 function [Engine] = CF34_8E5()
 %
 % [Engine] = CF34_8E5()
-% Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% written by Maxfield Arnson
+% updated by Paul Mokotoff, prmoko@umich.edu
+% last updated: 05 oct 2024
 %
 % Engine specification function for use with the EngineModelPkg
 %
@@ -117,9 +118,15 @@ Engine.EtaPoly.Mixing = 0.0;
 %% Electric Supplement
 Engine.PerElec = 0;
 
-% calibration factors
-Engine.Cal.c1 = 0.584614; %0.580931; %0.58847;
-Engine.Cal.c2 = 0.196721; %0.196721; %0.17213;
+
+%% Fuel flow rate coefficients for BADA equation
+Engine.Cff3  =  0.299;
+Engine.Cff2  = -0.346;
+Engine.Cff1  =  0.701;
+Engine.Cffch =  8.e-7;
+
+% add the thrust coefficient for the BADA equation
+Engine.HEcoeff = 1;
 
 end
 

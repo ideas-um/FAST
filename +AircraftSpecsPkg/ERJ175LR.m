@@ -161,8 +161,8 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = 0.2;
-Aircraft.Specs.Power.PC.EM.Alt = [20000, 35000];
+Aircraft.Specs.Power.PC.EM.Split = 0;
+Aircraft.Specs.Power.PC.EM.Alt =0;
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
@@ -170,7 +170,7 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = 0; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = 0.09; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0; %{[0, 0], [10, 15000]};
 Aircraft.Specs.Power.LamTSPS.SLS = 0.09; %0.09;
 
@@ -191,6 +191,9 @@ Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
 Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+
+% coefficient for HEA engine analysis
+Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

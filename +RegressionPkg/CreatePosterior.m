@@ -5,7 +5,7 @@ PostMu = zeros(size(target,1),1);
 PostVar = PostMu;
 
 
-sig2_prior = (mean(prior)*5e-2)^2;
+sig2_prior = (mean(prior)*7.5e-2)^2;
 
 % INVERSE DATA MATRIX
 PS = size(DataMatrix,1);

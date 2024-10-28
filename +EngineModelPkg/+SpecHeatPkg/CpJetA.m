@@ -94,9 +94,15 @@ heat = (T_high*(C+L) + L*log(exp(k*(y-T_high))+1)/k) -(T_low*(C+L) + L*log(exp(k
 % xlabel('Temperature [K]')
 % ylabel('Specific Heat at Constant Pressure (C_p) [J/kgK]')
 % legend('Raw Data','Fitted Curve','location','southeast')
-% text(300,4500,"R^2 = " + R2,'FontName','Times','FontSize',12)
+% text(300,4500,"R^2 = " + R2,'FontName','Times','FontSize',16)
 % 
 % ax = gca;
 % ax.FontName = 'Times';
+% ax.FontSize = 16;
+% 
+% f = gcf;
+% f.Position = [100 500 600 500];
+% 
+% print(f, '../EAP/DB_Paper_Scripts/cpjet','-dpdf')
 
 end

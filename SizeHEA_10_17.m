@@ -16,24 +16,38 @@ LambdaTko = 0:1:10;  % Takeoff power splits in %
 LambdaClb = 0:1:6;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
+tkoname = 10*LambdaTko;
+clbname = 10*LambdaClb;
+
+ERJ.Specs.Power.LamTSPS.Tko = 0;
+ERJ.Specs.Power.LamTSPS.Clb = 0;
+ERJ.Specs.Power.LamTSPS.SLS = 0;
+ERJ.Specs.Power.Battery.ParCells = NaN; %100 
+ERJ.Specs.Power.Battery.SerCells = NaN;  % 62
+ERJ.Specs.Power.Battery.BegSOC = NaN;   %100
+% Size the aircraft for the current power split
+Conv = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
 % Initialize the matrix to store fuel burn
 FuelBurn = NaN(nsplit, nclb);  % Fuel burn for each tko and clb combo (use NaN for non-converged cases)
+
+% Store percentage diff
+Percentage_diff_clb = NaN(length(LambdaTko), length(LambdaClb));
 
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
 % Loop through all power splits
 for tsplit = 1:nsplit
     for csplit = 1:nclb
+        % filename for a .mat file
+        MyMat = sprintf("ERJ_tko0%d_clb0%d.mat", tkoname(tsplit), clbname(csplit));
         % Set the power splits for the current iteration
         if LambdaTko(tsplit) == 0 && LambdaClb(csplit) == 0
-            % Case when both takeoff and climb power splits are 0%
-            ERJ.Specs.Power.LamTSPS.Tko = LambdaTko(tsplit) / 100;
-            ERJ.Specs.Power.LamTSPS.Clb = 0;
-            ERJ.Specs.Power.LamTSPS.SLS = LambdaTko(tsplit) / 100;
-            ERJ.Specs.Power.Battery.ParCells = NaN; %100 
-            ERJ.Specs.Power.Battery.SerCells = NaN;  % 62
-            ERJ.Specs.Power.Battery.BegSOC = NaN;   %100
+            % Store the fuel burn for the current LambdaTko and LambdaClb
+            FuelBurn(tsplit, csplit) = Conv.Specs.Weight.Fuel;
+            % Percentage diff
+            Percentage_diff_clb(tsplit, csplit) = 0;
+            continue;
         else
             % General case when takeoff power split is non-zero
             ERJ.Specs.Power.LamTSPS.Tko = LambdaTko(tsplit) / 100;
@@ -46,8 +60,9 @@ for tsplit = 1:nsplit
 
         ERJ.Specs.Propulsion.Engine.HEcoeff = 1 +  ERJ.Specs.Power.LamTSPS.SLS;
 
-        % Size the aircraft for the current power split
         SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        % save the aircraft
+        save(MyMat, "SizedERJ");
 
         % Check if the sizing converged
         if SizedERJ.Settings.Converged == 0
@@ -57,7 +72,10 @@ for tsplit = 1:nsplit
         end
 
         % Store the fuel burn for the current LambdaTko and LambdaClb
-        FuelBurn(tsplit, csplit) = SizedERJ.Mission.History.SI.Weight.Fburn(end);
+        FuelBurn(tsplit, csplit) = SizedERJ.Specs.Weight.Fuel;
+
+        % Percentage diff
+        Percentage_diff_clb(tsplit, csplit) = (SizedERJ.Specs.Weight.Fuel - Conv.Specs.Weight.Fuel)/Conv.Specs.Weight.Fuel * 100;
 
         % Optional: Display the progress
         fprintf('Iteration (Tko = %.1f, Clb = %.1f) - Fuel Burn: %.2f kg\n', ...

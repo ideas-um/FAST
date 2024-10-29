@@ -2,7 +2,7 @@ function [] = PlotMission(Aircraft)
 %
 % [] = PlotMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 mar 2024
+% last updated: 07 oct 2024
 %
 % Obtain the mission history from the aircraft structure, convert necessary
 % values from SI to English units, and plot them.
@@ -61,7 +61,7 @@ TreqVector = Aircraft.Mission.History.SI.Power.Treq_PS ./ 1000;
  TavVector = Aircraft.Mission.History.SI.Power.Tav_PS  ./ 1000;
 ToutVector = Aircraft.Mission.History.SI.Power.Tout_PS ./ 1000;
 
-% SFC (then convert to lbm/hp/hr)
+% SFC (then convert to lbm/lbf/hr)
 if (strcmpi(Aircraft.Specs.TLAR.Class, "Turbofan") == 1)
     
     % convert to english units (taken from TurbofanOnDesignCycle)
@@ -125,19 +125,19 @@ set(gcf, 'Position', get(0, 'Screensize'));
 
 % plot altitude against time
 subplot(2, 2, 1);
-PlotPkg.PlotPerfParam(Time, Alt, "Flight Time (min)", "Altitude (ft)", "Altitude");
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
 
 % plot distance against time
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, Dist, "Flight Time (min)", "Distance Flown (nmi)", "Distance");
+PlotPkg.PlotPerfParam(Time, Dist, 0, "Flight Time (min)", "Distance Flown (nmi)", "Distance");
 
 % plot velocity against time
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, TAS, "Flight Time (min)", "Airspeed (kts)", "Airspeed (TAS)");
+PlotPkg.PlotPerfParam(Time, TAS, 0, "Flight Time (min)", "Airspeed (kts)", "Airspeed (TAS)");
 
 % plot rate of climb against time
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), "Flight Time (min)", "Rate of Climb (ft/min)", "Rate of Climb");
+PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), 1, "Flight Time (min)", "Rate of Climb (ft/min)", "Rate of Climb");
 
 % ----------------------------------------------------------
 
@@ -155,19 +155,19 @@ set(gcf, 'Position', get(0, 'Screensize'));
 
 % plot altitude against time
 subplot(2, 2, 1);
-PlotPkg.PlotPerfParam(Time, Alt, "Flight Time (min)", "Altitude (ft)", "Altitude");
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
 
 % plot distance against time
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, Dist, "Flight Time (min)", "Distance Flown (nmi)", "Distance");
+PlotPkg.PlotPerfParam(Time, Dist, 0, "Flight Time (min)", "Distance Flown (nmi)", "Distance");
 
 % plot the total weight
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, Weight, "Flight Time (min)", "Aircraft Weight (lbf)", "Weight");
+PlotPkg.PlotPerfParam(Time, Weight, 0, "Flight Time (min)", "Aircraft Weight (lbf)", "Weight");
 
 % plot the fuel burned
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time, Fburn, "Flight Time (min)", "Total Fuel Burned (lbf)", "Fuel Burn");
+PlotPkg.PlotPerfParam(Time, Fburn, 0, "Flight Time (min)", "Total Fuel Burned (lbf)", "Fuel Burn");
 
 % ----------------------------------------------------------
 
@@ -186,19 +186,19 @@ set(gcf, 'Position', get(0, 'Screensize'));
 
 % plot altitude against time
 subplot(2, 2, 1);
-PlotPkg.PlotPerfParam(Time, Alt, "Flight Time (min)", "Altitude (ft)", "Altitude");
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
 
 % plot the power output
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, PoutVector, "Flight Time (min)", "Power Output (MW)", "Power Output");
+PlotPkg.PlotPerfParam(Time, PoutVector, 0, "Flight Time (min)", "Power Output (MW)", "Power Output");
 
 % plot the fuel flow
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, MDotFuel, "Flight Time (min)", "Fuel Flow (kg/s)", "Fuel Flow");
+PlotPkg.PlotPerfParam(Time, MDotFuel, 1, "Flight Time (min)", "Fuel Flow (kg/s)", "Fuel Flow");
 
 % plot the sfc
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time, SFC, "Flight Time (min)", "SFC (lbm/hp/hr)", "SFC");
+PlotPkg.PlotPerfParam(Time, SFC, 0, "Flight Time (min)", "SFC (lbm/hp/hr)", "SFC");
 
 % ----------------------------------------------------------
 
@@ -215,35 +215,35 @@ set(gcf, 'Position', get(0, 'Screensize'));
 
 % plot altitude against time
 subplot(3, 3, 1);
-PlotPkg.PlotPerfParam(Time, Alt, "Flight Time (min)", "Altitude (ft)", "Altitude");
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
 
 % plot airspeed against time
 subplot(3, 3, 4);
-PlotPkg.PlotPerfParam(Time, TAS, "Flight Time (min)", "Airspeed (kts)", "Airspeed (TAS)");
+PlotPkg.PlotPerfParam(Time, TAS, 0, "Flight Time (min)", "Airspeed (kts)", "Airspeed (TAS)");
 
 % plot rate of climb against time
 subplot(3, 3, 7);
-PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), "Flight Time (min)", "Rate of Climb (ft/min)", "Rate of Climb");
+PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), 1, "Flight Time (min)", "Rate of Climb (ft/min)", "Rate of Climb");
 
 % plot power available/required against time
 subplot(3, 3, [2, 3]);
 hold on
-PlotPkg.PlotPerfParam(Time,  PavVector, "Flight Time (min)", "Power (MW)", "Power");
-PlotPkg.PlotPerfParam(Time, PreqVector, "Flight Time (min)", "Power (MW)", "Power");
+PlotPkg.PlotPerfParam(Time,  PavVector, 0, "Flight Time (min)", "Power (MW)", "Power");
+PlotPkg.PlotPerfParam(Time, PreqVector, 0, "Flight Time (min)", "Power (MW)", "Power");
 
 % plot thrust available/required against time
 subplot(3, 3, [5, 6]);
 hold on
-PlotPkg.PlotPerfParam(Time,  TavVector, "Flight Time (min)", "Thrust (kN)", "Thrust");
-PlotPkg.PlotPerfParam(Time, TreqVector, "Flight Time (min)", "Thrust (kN)", "Thrust");
+PlotPkg.PlotPerfParam(Time,  TavVector, 0, "Flight Time (min)", "Thrust (kN)", "Thrust");
+PlotPkg.PlotPerfParam(Time, TreqVector, 0, "Flight Time (min)", "Thrust (kN)", "Thrust");
 
 % plot thrust output against time
 subplot(3, 3, 8);
-PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), "Flight Time (min)", "Thrust Output (N)", "Thrust Output");
+PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), 0, "Flight Time (min)", "Thrust Output (N)", "Thrust Output");
 
 % plot power output against time
 subplot(3, 3, 9);
-PlotPkg.PlotPerfParam(Time(1:end-1), PoutVector(1:end-1, :), "Flight Time (min)", "Power Output (MW)", "Power Output");
+PlotPkg.PlotPerfParam(Time(1:end-1), PoutVector(1:end-1, :), 0, "Flight Time (min)", "Power Output (MW)", "Power Output");
 
 % ----------------------------------------------------------
 
@@ -260,19 +260,19 @@ set(gcf, 'Position', get(0, 'Screensize'));
 
 % plot altitude against time
 subplot(2, 2, 1);
-PlotPkg.PlotPerfParam(Time, Alt, "Flight Time (min)", "Altitude (ft)", "Altitude");
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
 
 % plot specific excess power against time
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, Ps, "Flight Time (min)", "Specific Excess Power (m/s)", "Specific Excess Power");
+PlotPkg.PlotPerfParam(Time, Ps, 0, "Flight Time (min)", "Specific Excess Power (m/s)", "Specific Excess Power");
 
 % plot power available against time
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, PavScalar, "Flight Time (min)", "Power Available (MW)", "Total Power Available");
+PlotPkg.PlotPerfParam(Time, PavScalar, 0, "Flight Time (min)", "Power Available (MW)", "Total Power Available");
 
 % plot power available against time
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time, PreqScalar, "Flight Time (min)", "Power Required (MW)", "Total Power Required");
+PlotPkg.PlotPerfParam(Time, PreqScalar, 0, "Flight Time (min)", "Power Required (MW)", "Total Power Required");
 
 % ----------------------------------------------------------
 

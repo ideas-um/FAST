@@ -1,12 +1,12 @@
 function [Aircraft] = A320Neo()
 %
 % [Aircraft] = A320Neo()
-% written by Max Arnson, marnson@umich.edu
-% modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 25 jun 2024
+% written by Max Arnson, marnson@umich.edu and Yi-Chih Wang,
+% ycwangd@umich.edu
+% last updated: 20 Sep 2024
 % 
-% Create a model of an Airbus A320neo with a conventional propulsion
-% architecture.
+% create a baseline model of the A320neo WV054. this version uses a 
+% conventional propulsion architecture.
 %
 % All required inputs contain "** required **" before the description of
 % the parameter to be specified. All other parameters may remain as NaN,
@@ -38,6 +38,20 @@ Aircraft.Specs.TLAR.Class = "Turbofan";
 % ** required **
 % approximate number of passengers (payload / average passenger mass)
 Aircraft.Specs.TLAR.MaxPax = 15309 / 95;
+
+
+%% MODEL CALIBRATION FACTORS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% calibration factors for lift-drag ratios
+Aircraft.Specs.Aero.L_D.ClbCF = 1;
+Aircraft.Specs.Aero.L_D.CrsCF = 1;
+
+% fuel flow calibration factor
+Aircraft.Specs.Propulsion.MDotCF = 1;
+
+% airframe weight calibration factor
+Aircraft.Specs.Weight.WairfCF = 1;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -66,15 +80,11 @@ Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvLength(2250/60, "ft", "
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios
-crLDcf = 1.00; % aim for +/- 10%
-cbLDcf = 1.00; % aim for +/- 10%
+% lift-drag ratio during climb  
+Aircraft.Specs.Aero.L_D.Clb = 16 * Aircraft.Specs.Aero.L_D.ClbCF;
 
-% lift-drag ratio during climb
-Aircraft.Specs.Aero.L_D.Clb = 16 * cbLDcf;
-
-% lift-drag ratio during cruise
-Aircraft.Specs.Aero.L_D.Crs = NaN; % was 18.23 * crLDcf
+% lift-drag ratio during cruise 
+Aircraft.Specs.Aero.L_D.Crs = 18.23 * Aircraft.Specs.Aero.L_D.CrsCF;
 
 % assume same lift-drag ratio during climb and descent
 Aircraft.Specs.Aero.L_D.Des = Aircraft.Specs.Aero.L_D.Clb;
@@ -214,7 +224,7 @@ Aircraft.Settings.Analysis.MaxIter = 50;
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)
 %     -1 for off-design mode (aircraft performance           )
-Aircraft.Settings.Analysis.Type = +1;
+Aircraft.Settings.Analysis.Type = 1;
 
 % plotting, either:
 %     1 for plotting on

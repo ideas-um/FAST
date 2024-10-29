@@ -5,6 +5,7 @@
 % Functions
 % -------------------------------------------------------------------------
 % A320Neo                       - AircraftSpecsPkg.A320Neo is a function.
+% AEA                           - AircraftSpecsPkg.AEA is a function.
 % ATR42                         - AircraftSpecsPkg.ATR42 is a function.
 % ERJ175LR                      - AircraftSpecsPkg.ERJ175LR is a function.
 % ERJ190_E2                     - AircraftSpecsPkg.ERJ190_E2 is a function.

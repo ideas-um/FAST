@@ -100,7 +100,7 @@ ylabel(ly);
 grid on
 
 % larger font size
-set(gca, 'FontSize', 16);
+set(gca, 'FontSize', 12, 'FontName', 'Times');
 
 % ----------------------------------------------------------
 

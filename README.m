@@ -25,7 +25,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 05 oct 2024
+% README last updated: 29 oct 2024
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -149,12 +149,17 @@ function [] = README()
 %                    This package contains code to run retrofit studies on
 %                    an aircraft by electrifying its powertrain and
 %                    replacing part of the payload with batteries.
+%
+%             (o) +TutorialsPkg
+%                     This package contains Matlab scripts to accompany all
+%                     the playlist of YouTube tutorial videos, which can be
+%                     accessed using this link: https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-
 % 
-%             (o) +UnitConversionPkg
+%             (p) +UnitConversionPkg
 %                    This package contains functions which perform unit
 %                    conversions for use in FAST.
 % 
-%             (p) +VisualizationPkg
+%             (q) +VisualizationPkg
 %                    This package contains information about visualizing
 %                    both the aicraft's outer mold line(as a wireframe) and
 %                    its propulsion architecture (in a schematic).

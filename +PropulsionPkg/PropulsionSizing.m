@@ -212,7 +212,7 @@ if (any(PSType > 0))
         IO = {["Thrust_Max"],["DryWeight"]};
 
         % row vector can have multiple targets for a single input
-        target = ThrustPS(Eng)';
+        target = Aircraft.Specs.Propulsion.Thrust.SLS; %ThrustPS(Eng)';
 
         % run the regression
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);

@@ -27,4 +27,4 @@ jobs:
         with:
           message: '(auto) Paper PDF Draft'
           # This should be the path to the paper within your repo.
-          add: 'JOSS-Paper/paper.pdf' # 'paper/*.pdf' to commit all PDFs in the paper directory	 
+          add: JOSS-Paper/paper.pdf

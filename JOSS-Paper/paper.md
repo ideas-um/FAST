@@ -129,9 +129,9 @@ Then, an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodo
 Lastly, the energy required from the mission analysis informs the "Energy Source Sizing", which updates the aircraft's weight.
 The iteration continues until converging on a sized aircraft.
 
-![Example mission history plots.\label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}
+![Example mission history plots.\label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG)
 
-![Transport aircraft geometry shipped with FAST.\label{Fig:GeometryExample}](Figures/Transport.PNG){width = 80%}
+![Transport aircraft geometry shipped with FAST.\label{Fig:GeometryExample}](Figures/Transport.PNG)
 
 After sizing, the aircraft model is returned as a data structure, allowing for further analysis or integration into other studies.
 FAST also offers post-processing options, including mission history visualization (see \autoref{Fig:MissionHistoryLabeled}) and geometric visualization of the sized aircraft (see \autoref{Fig:GeometryExample}).

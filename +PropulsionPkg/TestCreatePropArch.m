@@ -2,7 +2,7 @@ function [Success] = TestCreatePropArch()
 %
 % [Success] = TestCreatePropArch()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 sep 2024
+% last updated: 11 nov 2024
 %
 % Generate simple test cases to confirm that the propulsion architectures
 % are being created properly. Assume all tests are for turboprop
@@ -57,6 +57,9 @@ EtaProp = 0.80;
 
 % store the propeller efficiency
 TestIn.Specs.Power.Eta.Propeller = EtaProp;
+
+% store the engine fan efficiency
+TestIn.Specs.Propulsion.Engine.EtaPoly.Fan = 1;
 
 
 %% CASE 1A: CONVENTIONAL, 2 ENGINES %%

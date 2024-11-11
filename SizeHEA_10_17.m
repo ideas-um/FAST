@@ -163,10 +163,25 @@ for j = 1:length(LambdaClb)
             ERJ.Specs.Power.Battery.SerCells = 62;  % 62
             ERJ.Specs.Power.Battery.BegSOC = 100;   %100
         end
+
+
+    % check if cases must be run
+    if (RunCases == 1)
+        
+        % size the aircraft
+        SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+
+        conv(tsplit, csplit) = SizedERJ.Settings.Converged;
+
+        % save the aircraft
+        save(MyMat, "SizedERJ");
+        
+    else
     
         % sizing power split aircraft for tko
         ERJ.Specs.Propulsion.Engine.HEcoeff = 1 +  ERJ.Specs.Power.LamTSPS.SLS;
         SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    end
     
         if SizedERJ.Settings.Converged == 0
             continue
@@ -207,23 +222,3 @@ legend('show','FontSize',12);
 grid on;
 hold off;
 
-
-%% -----------------------------------TESTING SECTION ---------------------------------------------%%
-
-a = AircraftSpecsPkg.ERJ175LR;
-
-a.Specs.Power.LamTSPS.Tko = 0.5 / 100;
-a.Specs.Power.LamTSPS.Clb = 8 / 100;
-a.Specs.Power.LamTSPS.SLS = 0.5 / 100;
-
-a.Specs.Power.Battery.ParCells = 100; %100 
-a.Specs.Power.Battery.SerCells = 62;  % 62
-a.Specs.Power.Battery.BegSOC = 100;   %100
-
-a.Specs.Power.SpecEnergy.Batt = 0.25;
-a.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m");
-
-a.Specs.Propulsion.Engine.HEcoeff = 1 +  a.Specs.Power.LamTSPS.SLS;
-
-b = Main(a, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-b.Specs.Weight.Fuel

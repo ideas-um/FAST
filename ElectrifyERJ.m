@@ -25,106 +25,157 @@ end
 
 %% INITIALIZATION %%
 %%%%%%%%%%%%%%%%%%%%
-
-% get the ERJ
+% Get the ERJ
 ERJ = AircraftSpecsPkg.ERJ175LR;
 
-% number of power splits
-%nsplit = 13;
+% Changing Battery Specific Energy & Range
+batt = 500;
+ERJ.Specs.Power.SpecEnergy.Batt = batt/1000;
+range = 1000;
+ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(range, "naut mi", "m");
 
-% assume a set of takeoff power splits
-LambdaTko = 9;
-LambdaClb = [.5, 1, 1.5, 3, 5];
+% Assume a set of takeoff power splits (LambdaTko)
+LambdaTko = 0:.5:10;  % Takeoff power splits in % 
+LambdaClb = 0:.5:5;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
-
-% remember the results
-MTOW  = zeros(nsplit, nclb);
-Wbatt = zeros(nsplit, nclb);
-Wfuel = zeros(nsplit, nclb);
-Wem   = zeros(nsplit, nclb);
-Weng  = zeros(nsplit, nclb);
-E_em  = zeros(nsplit, nclb);
-E_gt  = zeros(nsplit, nclb);
-
-%check if the sizing converged
-conv = zeros(nsplit, nclb);
-
 tkoname = 10*LambdaTko;
 clbname = 10*LambdaClb;
 
+ERJ.Specs.Power.LamTSPS.Tko = 0;
+ERJ.Specs.Power.LamTSPS.Clb = 0;
+ERJ.Specs.Power.LamTSPS.SLS = 0;
+ERJ.Specs.Power.Battery.ParCells = NaN; %100 
+ERJ.Specs.Power.Battery.SerCells = NaN;  % 62
+ERJ.Specs.Power.Battery.BegSOC = NaN;   %100
+% Size the aircraft for the current power split
+Conv = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+
+% Initialize the matrix to store fuel burn
+FuelBurn = NaN(nsplit, nclb);  % Fuel burn for each tko and clb combo (use NaN for non-converged cases)
+
+% Store percentage diff
+Percentage_diff_clb = NaN(length(LambdaTko), length(LambdaClb));
+
+Subdir = sprintf("HEA_%dnmi_%dWhkg", range, batt);
+
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
+% Loop through all power splits
+for tsplit = 1:nsplit
+    for csplit = 1:nclb
+        % filename for a .mat file
+        MyMat = sprintf("ERJ_tko0%d_clb0%d.mat", tkoname(tsplit), clbname(csplit));
+        HEA_Path = fullfile(Subdir, MyMat);
+        % Set the power splits for the current iteration
+        if LambdaTko(tsplit) == 0
+            % Store the fuel burn for the current LambdaTko and LambdaClb
+            FuelBurn(tsplit, csplit) = Conv.Specs.Weight.Fuel;
+            % Percentage diff
+            Percentage_diff_clb(tsplit, csplit) = 0;
+            continue;
+        else
+            % General case when takeoff power split is non-zero
+            ERJ.Specs.Power.LamTSPS.Tko = LambdaTko(tsplit) / 100;
+            ERJ.Specs.Power.LamTSPS.Clb = LambdaClb(csplit) / 100;
+            ERJ.Specs.Power.LamTSPS.SLS = LambdaTko(tsplit) / 100;  % SLS based on takeoff split
+            ERJ.Specs.Power.Battery.ParCells = 100; %100 
+            ERJ.Specs.Power.Battery.SerCells = 62;  % 62
+            ERJ.Specs.Power.Battery.BegSOC = 100;   %100
+        end
 
-% loop through all power splits
-for csplit =1:nclb
-    for tsplit = 1:nsplit
+        if RunCases == 0
+            load(HEA_Path);
+        else
+            ERJ.Specs.Propulsion.Engine.HEcoeff = 1 +  ERJ.Specs.Power.LamTSPS.SLS;
     
-    % filename for a .mat file
-    MyMat = sprintf("ERJ_tko0%d_clb0%d.mat", tkoname(tsplit), clbname(csplit));
-    
-    % remember the new power split
-    ERJ.Specs.Power.LamTSPS.Tko = LambdaTko(tsplit) / 100;
-    ERJ.Specs.Power.LamTSPS.Clb = LambdaClb(csplit) / 100;
-    ERJ.Specs.Power.LamTSPS.SLS = LambdaTko(tsplit) / 100;
+            SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+            % save the aircraft
+            save(HEA_Path, "SizedERJ");
+        end
 
-    ERJ.Specs.Propulsion.Engine.HEcoeff = 1 +  ERJ.Specs.Power.LamTSPS.SLS;
-    
-    % check if cases must be run
-    if (RunCases == 1)
-        
-        % size the aircraft
-        SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        % Check if the sizing converged
+        if SizedERJ.Settings.Converged == 0
+            % If the aircraft did not converge, skip this iteration
+            fprintf('Skipped: (Tko = %.1f, Clb = %.1f) did not converge\n', LambdaTko(tsplit), LambdaClb(csplit));
+            continue;
+        end
 
-        conv(tsplit, csplit) = SizedERJ.Settings.Converged;
+        % Store the fuel burn for the current LambdaTko and LambdaClb
+        FuelBurn(tsplit, csplit) = SizedERJ.Specs.Weight.Fuel;
 
-        % save the aircraft
-        save(MyMat, "SizedERJ");
-        
-    else
-        
-        % get the .mat file
-        foo = load(MyMat);
-        
-        % get the sized aircraft
-        SizedERJ = foo.SizedERJ;
-        
-    end
-            % remember the weights
-        MTOW( tsplit, csplit) = SizedERJ.Specs.Weight.MTOW   ;
-        Wfuel(tsplit, csplit) = SizedERJ.Specs.Weight.Fuel   ;
-        Wbatt(tsplit, csplit) = SizedERJ.Specs.Weight.Batt   ;
-        Wem(  tsplit, csplit) = SizedERJ.Specs.Weight.EM     ;
-        Weng( tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
-        E_em( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,2);
-        E_gt( tsplit, csplit) = SizedERJ.Mission.History.SI.Energy.E_ES(end,1);
+        % Percentage diff
+        Percentage_diff_clb(tsplit, csplit) = (SizedERJ.Specs.Weight.Fuel - Conv.Specs.Weight.Fuel)/Conv.Specs.Weight.Fuel * 100;
+
+        % Optional: Display the progress
+        fprintf('Iteration (Tko = %.1f, Clb = %.1f) - Fuel Burn: %.2f kg\n', ...
+                LambdaTko(tsplit), LambdaClb(csplit), FuelBurn(tsplit, csplit));
     end
 end
-
 
 %% POST-PROCESS %%
 %%%%%%%%%%%%%%%%%%
-
-% turn climb % to 
-labels = cellstr(arrayfun(@(x) sprintf('%.1f%%', x), LambdaClb, 'UniformOutput', false));
-
-num = length(Wfuel);
-% plot the fuel burn results
 figure;
-cmap = jet(num);
-hold on
-yyaxis left
-for i = 1:num
-    plot(LambdaTko, Wfuel(:,i), '-o', 'Color', cmap(i,:),"LineWidth", 2);
+hold on;
+
+% Define a set of colors and line styles
+cmap = lines(nclb);  % Use the 'lines' colormap, which gives you distinct colors
+linestyles = {'-', '--', ':', '-.'};  % Different line styles
+markers = {'o', 's', 'd', '^', 'v', '*', '+', 'x'};  % Different markers
+
+% Plot one line for each LambdaClb
+for csplit = 1:nclb
+    % Only plot for non-NaN fuel burn values
+    plot(LambdaTko, FuelBurn(:, csplit), ...
+         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
+         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
+         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
+         'LineWidth', 1.5, ...  % Set line width for better visibility
+         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
 end
-ylabel("Block Fuel (kg)");
-% format plot
-title("Electrified ERJ - Block Fuel");
-xlabel("Power Split (%)");
-legend(labels)
-set(gca, "FontSize", 18);
-grid on
+
+% Add labels, title, and legend
+xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
+ylabel('Fuel Burn (kg)','FontSize',14);
+title_text = sprintf('Fuel Burn vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text, 'FontSize', 14);
+legend('show','FontSize',12);
+grid on;
+hold off;
+
 
 % ----------------------------------------------------------
+
+
+%% Percentage Change of Fuel burn to Conventional vs Tko power split
+
+cmap = lines(length(LambdaClb));  % Use the 'lines' colormap, which gives you distinct colors
+linestyles = {'-', '--', ':', '-.'};  % Different line styles
+markers = {'o', 's', 'd', '^', 'v', '*', '+', 'x'};  % Different markers
+
+figure;
+hold on;
+
+% Plot one line for each LambdaClb
+for csplit = 1:length(LambdaClb)
+    % Only plot for non-NaN fuel burn values
+    plot(LambdaTko, Percentage_diff_clb(:, csplit), ...
+         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
+         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
+         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
+         'LineWidth', 1.5, ...  % Set line width for better visibility
+         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
+end
+
+xlabel('Takeoff Power Split (%)','FontSize',14);
+ylabel('Percentage Difference (%)','FontSize',14);
+title_text = sprintf(['Percentage Difference of Fuel Burn: Conventional vs. Tko-Power-Split AC \n' ...
+    'at %.0f nmi Range and %.2f kWh/kg Battery Specific Energy'], ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text,'FontSize',14);
+legend('show','FontSize',12);
+grid on;
+hold off;
 
 end

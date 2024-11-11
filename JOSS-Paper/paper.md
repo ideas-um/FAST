@@ -85,13 +85,13 @@ Combined with physics-based models, FAST rapidly analyzes an aircraft configurat
 This rapid sizing is achieved through an energy-based mission analysis, which approximates the aircraft as a point mass to evaluate the aircraft dynamics, forces, and energy required for a given mission [@anderson1999aircraft; @cinar2018methodology].
 Additionally, FAST can analyze any propulsion architecture, including conventional, electric, and hybrid systems, using a graph theory-inspired approach that represents propulsion system connections and in-flight operations as matrices [@cinar2020framework].
 
+![Electrified freighter propulsion architecture\label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.PNG)
+
 FAST has been utilized in multiple research projects within NASA's EPFD project to assess the performance of conventional and electrified aircraft.
-First, a commercial freighter was electrified by replacing the outboard gas-turbine engines with electric motors [@mokotoff2025fast], shown in Fig. ???.
+First, a commercial freighter was electrified by replacing the outboard gas-turbine engines with electric motors [@mokotoff2025fast], shown in Fig. \autoref{Fig:LM100J-PropArch}.
 The trade studies explored the fuel burn savings achieved by removing a fraction of the freighter's payload to accommodate the electrified propulsion system components.
 Also, NASA's **SU**bsonic **S**ingle **A**ft E**n**gine (**SUSAN**) concept was modeled in FAST and explored how advanced technologies impacted the aircraft's performance [@wang2025subsonic].
 More granular aerodynamic and propulsive models were incorporated into FAST to better assess the benefits of boundary layer ingestion and distributed electric propulsion technologies.
-
-![Electrified freighter propulsion architecture \label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.PNG){width = 80%}
 
 FAST was also used to explore advanced propulsion system designs and their impacts on the final aircraft design [@arnson2024system].
 Advanced ATR 42-600 configurations were designed with battery electric and hydrogen fuel cell electric propulsion systems.

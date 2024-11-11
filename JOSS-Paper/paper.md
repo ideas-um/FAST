@@ -76,8 +76,8 @@ By supporting early-stage design, FAST addresses a gap in currently available co
 
 During early-phase conceptual aircraft design, engineers know little information about their design.
 This is particularly challenging for novel aircraft designs, as key parameters may be unknown at the outset.
-Existing aircraft design tools are intended for late conceptual design, requiring detailed design information and a geometric configuration upfront [@cinar2018methodology; @david2021fast; @gratz2024aviary], or are coupled with design optimization environments [@lukaczyk2015suave; @gratz2024aviary; @david2021fast} such as OpenMDAO [@gray2019openmdao].
-These tools can accommodate more detailed analyses, such as component weight estimations [@cinar2018methodology; @gratz2024aviary] or low-fidelity aerodynamic analyses [@lukaczyk2015suave; @david2021fast]. Such analyses require the user to select an aircraft configuration a-priori, which prohibits rapid design space exploration.
+Existing aircraft design tools are intended for late conceptual design, requiring detailed design information and a geometric configuration upfront [@cinar2018methodology; @david2021fast; @gratz2024aviary], or are coupled with design optimization environments [@lukaczyk2015suave; @gratz2024aviary; @david2021fast] such as OpenMDAO [@gray2019openmdao].
+These tools can accommodate more detailed analyses, such as component weight estimations [@cinar2018methodology; @gratz2024aviary] or low-fidelity aerodynamic analyses [@lukaczyk2015suave; @david2021fast]. Such analyses require the user to select an aircraft configuration a priori, which prohibits rapid design space exploration.
 
 FAST addresses these challenges by leveraging historical data from over 450 aircraft and 200 engines to create predictive regressions [@arnson2025predicting].
 These regressions are employed to estimate any design parameters that the user may not know, such as engine weight based on required thrust or power.
@@ -98,7 +98,7 @@ Advanced ATR 42-600 configurations were designed with battery electric and hydro
 The aircraft's performance was assessed while varying key performance parameters such as the battery gravimetric specific energy, powertrain efficiency, and fuel cell power-to-weight ratio.
 
 ARPA-E used FAST to estimate the fuel/operating costs for electrified aircraft on domestic US flights [@debock2024special].
-Also, a fleet of hybrid electric aircraft was sized and operated on routes currently flown by regional jets using FAST @[deng2023sizing].
+Also, a fleet of hybrid electric aircraft was sized and operated on routes currently flown by regional jets using FAST [@deng2023sizing].
 This work demonstrated how hybrid electric aircraft can be integrated into a regional airline's fleet while maintaining the same operational capabilities as existing aircraft, assuming that the necessary battery-charging infrastructure and power supplies are available.
 
 <!--------------------------------------------------------->
@@ -113,14 +113,14 @@ This work demonstrated how hybrid electric aircraft can be integrated into a reg
 
 # FAST Workflow Overview
 
-![High-level overview of FAST's main functionality (produced using [@gray2019openmdao]).\label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG)
+![High-level overview of FAST's main functionality, produced using [@gray2019openmdao].\label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG)
 
 \autoref{Fig:HighLevelDSM} provides an overview of FAST's functionality, detailing all user inputs and modules.
 Data is passed forwards (colored red) and provided as feedback (colored green) in an iterative process.
 
 First, the user provides the Aircraft Specifications and a Mission Profile, which informs FAST how to fly the aircraft while sizing it.
 Then, FAST's Initialization module assembles the user-provided information into an aircraft model and utilizes its historical database [@arnson2025predicting] to generate regressions and predict any unknown parameters.
-Once the initial model is complete, FAST generates mathematical representations of the propulsion architecture and its operation during flight (from [@cinar2020framework]).
+Once the initial model is complete, FAST generates mathematical representations of the propulsion architecture and its operation during flight [@cinar2020framework].
 
 The aircraft is sized using a fixed-point iteration [@ascher2011first].
 First, an inner iteration sizes the airframe and propulsion system between the "Airframe and Propulsion System Sizing" and "Weight Build-Up" modules.
@@ -134,7 +134,7 @@ The iteration continues until converging on a sized aircraft.
 ![Transport aircraft geometry shipped with FAST.\label{Fig:GeometryExample}](Figures/Transport.PNG)
 
 After sizing, the aircraft model is returned as a data structure, allowing for further analysis or integration into other studies.
-FAST also offers post-processing options, including mission history visualization (see \autoref{Fig:MissionHistoryLabeled}) and geometric visualization of the sized aircraft (see \autoref{Fig:GeometryExample}).
+FAST also offers post-processing options, including mission history visualization (see \autoref{Fig:MissionHistory}) and geometric visualization of the sized aircraft (see \autoref{Fig:GeometryExample}).
 To visualize an aircraft concept, users either prescribe their own aircraft geometry or use one that is pre-defined within FAST [@khailany2025aircraft].
 
 <!--------------------------------------------------------->

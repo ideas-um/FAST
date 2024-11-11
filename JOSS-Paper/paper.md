@@ -85,10 +85,10 @@ Combined with physics-based models, FAST rapidly analyzes an aircraft configurat
 This rapid sizing is achieved through an energy-based mission analysis, which approximates the aircraft as a point mass to evaluate the aircraft dynamics, forces, and energy required for a given mission [@anderson1999aircraft; @cinar2018methodology].
 Additionally, FAST can analyze any propulsion architecture, including conventional, electric, and hybrid systems, using a graph theory-inspired approach that represents propulsion system connections and in-flight operations as matrices [@cinar2020framework].
 
-![Electrified freighter propulsion architecture\label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.PNG)
+![Electrified freighter propulsion architecture.\label{Fig:LM100J-PropArch}](Figures/ElectrifiedPropArch-NoLambda.PNG)
 
 FAST has been utilized in multiple research projects within NASA's EPFD project to assess the performance of conventional and electrified aircraft.
-First, a commercial freighter was electrified by replacing the outboard gas-turbine engines with electric motors [@mokotoff2025fast], shown in Fig. \autoref{Fig:LM100J-PropArch}.
+First, a commercial freighter was electrified by replacing the outboard gas-turbine engines with electric motors [@mokotoff2025fast], shown in \autoref{Fig:LM100J-PropArch}.
 The trade studies explored the fuel burn savings achieved by removing a fraction of the freighter's payload to accommodate the electrified propulsion system components.
 Also, NASA's **SU**bsonic **S**ingle **A**ft E**n**gine (**SUSAN**) concept was modeled in FAST and explored how advanced technologies impacted the aircraft's performance [@wang2025subsonic].
 More granular aerodynamic and propulsive models were incorporated into FAST to better assess the benefits of boundary layer ingestion and distributed electric propulsion technologies.
@@ -113,10 +113,10 @@ This work demonstrated how hybrid electric aircraft can be integrated into a reg
 
 # FAST Workflow Overview
 
-Figure ??? provides an overview of FAST's functionality, detailing all user inputs and modules.
-Data is passed forwards (colored red) and provided as feedback (colored green) in an iterative process.
+![High-level overview of FAST's main functionality (produced using [@gray2019openmdao]).\label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG)
 
-![High-level overview of FAST's main functionality (produced using [@gray2019openmdao]) \label{Fig:HighLevelDSM}](Figures/Collapsed-WtArrows-Edited.PNG){width = 80%}
+\autoref{Fig:HighLevelDSM} provides an overview of FAST's functionality, detailing all user inputs and modules.
+Data is passed forwards (colored red) and provided as feedback (colored green) in an iterative process.
 
 First, the user provides the Aircraft Specifications and a Mission Profile, which informs FAST how to fly the aircraft while sizing it.
 Then, FAST's Initialization module assembles the user-provided information into an aircraft model and utilizes its historical database [@arnson2025predicting] to generate regressions and predict any unknown parameters.
@@ -129,13 +129,13 @@ Then, an energy-based mission analysis [@anderson1999aircraft; @cinar2018methodo
 Lastly, the energy required from the mission analysis informs the "Energy Source Sizing", which updates the aircraft's weight.
 The iteration continues until converging on a sized aircraft.
 
+![Example mission history plots.\label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}
+
+![Transport aircraft geometry shipped with FAST.\label{Fig:GeometryExample}](Figures/Transport.PNG){width = 80%}
+
 After sizing, the aircraft model is returned as a data structure, allowing for further analysis or integration into other studies.
-FAST also offers post-processing options, including mission history visualization (see Fig. ???) and geometric visualization of the sized aircraft (see Fig. ???).
+FAST also offers post-processing options, including mission history visualization (see \autoref{Fig:MissionHistoryLabeled}) and geometric visualization of the sized aircraft (see \autoref{Fig:GeometryExample}).
 To visualize an aircraft concept, users either prescribe their own aircraft geometry or use one that is pre-defined within FAST [@khailany2025aircraft].
-
-![Example of a mission history\label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}
-
-![Transport aircraft geometry shipped with FAST\label{Fig:GeometryExample}](Figures/Transport.PNG){width = 80%}
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->

@@ -45,7 +45,7 @@ bibliography: paper.bib
 # Summary
 
 ICAO predicts that, without radical technological advancements, the global aviation industry will emit up to 28 gigatons of CO~2~ between 2020 and 2050 [@icao2022report].
-To reduce aviation-related emissions, innovative aircraft technology, including electrified aircraft propulsion, are under development.
+To reduce aviation-related emissions, innovative aircraft technology, including electrified aircraft propulsion, is under development.
 For instance, NASA's Electrified Powertrain Flight Demonstration (EPFD) Project is advancing these technologies with U.S. industry partners [@nasa2022epfd].
 However, current aircraft sizing tools require detailed design information that may not be available early in the development process, particularly for novel technologies.
 This can yield sub-optimal designs and inhibits innovation.

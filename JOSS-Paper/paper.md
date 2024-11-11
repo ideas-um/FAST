@@ -29,7 +29,7 @@ affiliations:
 
 date: 11 November 2024
 
-bibliography: paper.bib
+bibliography: JOSS-Paper/paper.bib
 
 ---
 

@@ -1,36 +1,35 @@
 ---
-
+#
 title: 'FAST: A **F**uture **A**ircraft **S**izing **T**ool for Advanced Aircraft and Propulsion System Design'
-
+#
 tags:
   - Matlab
   - Sustainable Aviation
   - Conceptual Aircraft Design
   - Electrified Aircraft Design
-
+#
 authors:
   - name: Paul R. Mokotoff
     orcid: 0009-0006-4651-5597
     affiliation: 1
-
+#
   - name: Maxfield Arnson
     orcid: 0009-0000-9432-5858
     affiliation: 1
-  
+#
   - name: Gokcin Cinar
     orcid: 0000-0002-2562-0332
     affiliation: 1
     corresponding: true
-
+#
 affiliations:
-
- - name: Department of Aerospace Engineering, University of Michigan
-   index: 1
-
+  - name: Department of Aerospace Engineering, University of Michigan
+    index: 1
+#   
 date: 11 November 2024
-
+#
 bibliography: paper.bib
-
+#
 ---
 
 <!--------------------------------------------------------->

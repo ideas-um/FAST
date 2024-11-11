@@ -9,7 +9,7 @@ function [Aircraft] = RegionalJetMission02(Aircraft)
 % jet. Note that this mission is not very detailed and could impact the
 % energy source weights required to fly.
 %
-% mission 1: 1,650 nmi range                 | mission 2: 45 minute loiter
+% mission 1: 2,150 nmi range                 | mission 2: 45 minute loiter
 %                                            | at 5,000 ft (modeled as a
 %                                            | cruise segment)
 %                                            |

@@ -133,9 +133,9 @@ After sizing, the aircraft model is returned as a data structure, allowing for f
 FAST also offers post-processing options, including mission history visualization (see Fig. \autoref{Fig:MissionHistory}) and geometric visualization of the sized aircraft (see Fig. \autoref{Fig:GeometryExample}).
 To visualize an aircraft concept, users either prescribe their own aircraft geometry or use one that is pre-defined within FAST [@khailany2025aircraft].
 
-![Example of a mission history \label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}
+![Example of a mission history\label{Fig:MissionHistory}](Figures/MissionHistoryLabeled.PNG){width = 80%}
 
-![Transport aircraft geometry shipped with FAST \label{Fig:GeometryExample}](Figures/Transport.PNG){width = 80%}
+![Transport aircraft geometry shipped with FAST\label{Fig:GeometryExample}](Figures/Transport.PNG){width = 80%}
 
 <!--------------------------------------------------------->
 <!--------------------------------------------------------->

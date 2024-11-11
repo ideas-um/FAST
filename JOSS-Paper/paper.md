@@ -14,7 +14,7 @@ authors:
     affiliation: 1
 
   - name: Maxfield Arnson
-  - orcid: 0009-0000-9432-5858
+    orcid: 0009-0000-9432-5858
     affiliation: 1
   
   - name: Gokcin Cinar

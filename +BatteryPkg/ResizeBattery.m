@@ -3,7 +3,7 @@ function [Aircraft] = ResizeBattery(Aircraft)
 % [Aircraft] = ResizeBattery(Aircraft)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 jul 2024
+% last updated: 12 nov 2024
 %
 % After an aircraft flies a mission, update its battery size. If a "simple"
 % battery model is used (not considering cells in series and parallel),
@@ -27,11 +27,22 @@ function [Aircraft] = ResizeBattery(Aircraft)
 %% GET INFO FROM THE AIRCRAFT STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% battery specific energy
-ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
-
 % find index associated with a battery
 Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
+
+% if there is no battery, return a zero battery weight
+if (all(~Batt, "all"))
+    
+    % return zero battery weight
+    Aircraft.Specs.Weight.Batt = 0;
+    
+    % exit the function
+    return
+    
+end
+
+% battery specific energy
+ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
 
 % energy consumed during flight
 Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt);

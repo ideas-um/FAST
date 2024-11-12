@@ -221,7 +221,7 @@ for itime = 1:ntime
     SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q;
     
     % update the capacity
-    Capacity(itime) = Q * SOC(itime) / 100 * Series * Parallel;
+    Capacity(itime) = Q * SOC(itime) / 100 * Parallel;
     
     % compute the power output
     Pout(itime) = Voltage(itime) * Current(itime);

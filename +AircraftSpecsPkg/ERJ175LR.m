@@ -120,7 +120,7 @@ Aircraft.Specs.Weight.Batt = 0;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "PHE";
+Aircraft.Specs.Propulsion.Arch.Type = "C";
 
 % get the engine
 Aircraft.Specs.Propulsion.Engine = EngineModelPkg.EngineSpecsPkg.CF34_8E5;

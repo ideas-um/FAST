@@ -186,9 +186,31 @@ fprintf(1, "    Wbatt = %.6e lbm   \n",     UnitConversionPkg.ConvMass(Wbatt, "k
 fprintf(1, "    Wfuel = %.6e lbm   \n",     UnitConversionPkg.ConvMass(Wfuel, "kg", "lbm"));
 fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1, "m", "ft") ^ 2);
 
+%%%% Save Sized Aircraft from Each Iterations %%%%
+% Define the folder where the files will be saved
+saveFolder = 'AircraftIterations';
+
+% Create the folder if it doesn't exist
+if ~exist(saveFolder, 'dir')
+    mkdir(saveFolder);
+else
+    % If the folder exists, clear all its previous results（may comment out this part if you don't want remove them）
+    files = dir(fullfile(saveFolder, '*.mat'));
+    for k = 1:length(files)
+        delete(fullfile(saveFolder, files(k).name)); % Delete each file
+    end
+end
+
+% Initialize storage for Aircraft structure history
+AircraftHistory = cell(MaxIter, 1); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% assume a maximum c-rate
+MaxAllowCRate = 5;
+
 % iterate until convergence
 while (iter < MaxIter)
-           
+
     % clear mission history and/or size the aircraft after first iteration
     if (iter > 0)
         
@@ -242,7 +264,7 @@ while (iter < MaxIter)
         
         % find the difference between the new and old battery weight
         dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
-            
+       
     end
     
     % update mtow
@@ -296,7 +318,13 @@ while (iter < MaxIter)
     fprintf(1, "    Wem   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Wem     , "kg", "lbm")    );
     fprintf(1, "    Weg   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Weg     , "kg", "lbm")    );
     fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1 , "m" , "ft" ) ^ 2);
+
+    % Store the Aircraft structure at this iteration
+    AircraftHistory{iter+1} = Aircraft;
     
+    % Save Aircraft structure to a MAT file for each iteration
+    save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter+1)), 'Aircraft');    
+
     % iterate
     iter = iter + 1;
     
@@ -311,6 +339,7 @@ while (iter < MaxIter)
         (~any(mtow_conv > EPS))  )
         break;
     end 
+
 end
 
 % print warning if maximum iterations reached
@@ -324,7 +353,51 @@ if ((iter == MaxIter) && (Type > 0))
     
 end
 
-
+%% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if Aircraft.Specs.Power.LamTSPS.Tko == 0 && Aircraft.Specs.Power.LamTSPS.Clb == 0
+    % if conventional aircraft, do nothing
+else
+    % Check the number of iterations in AircraftHistory
+    numIterations = length(AircraftHistory);
+    
+    if numIterations < 3
+        % Handle the case where there are fewer than 3 iterations
+        fprintf('Warning: Only %d iterations available. Using all iterations.\n', numIterations);
+        
+        % Use all available iterations
+        lastAircraft = AircraftHistory; 
+        maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
+    
+        % Extract the max C-rate for each available iteration
+        for i = 1:numIterations
+            maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate(i));
+        end
+    else
+        % Use the last 3 iterations if more than 3 interations available
+        lastAircraft = AircraftHistory(end-2:end);
+        maxC_rates = zeros(3, 1); % Initialize for the last 3 iterations
+    
+        % Extract the max C-rate for each of the last 3 iterations
+        for i = 1:3
+            maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate(i));
+        end
+    end
+    
+    % Find the structure where max(C-rate) < 5 and closest to 5
+    validIndices = find(maxC_rates < 5); % Find indices where max C-rate is valid
+    if isempty(validIndices)
+        error('No structure found with max(C-rate) < 5.');
+    end
+    
+    % Get the index of the structure closest to 5
+    [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
+    selectedIndex = validIndices(bestIndex);
+    
+    % Output the final selected Aircraft structure
+    Aircraft = lastAircraft{selectedIndex};
+    
+end
 %% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -1,4 +1,4 @@
-function [Aircraft] = ERJ175LR()
+function [Aircraft] = ERJ175LR_conv()
 %
 % [Aircraft] = ERJ175LR()
 % originally written for E175 by Nawa Khailany
@@ -147,18 +147,6 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 % gravimetric specific energy of battery (kWh/kg), not used here
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
-%{
-    % maximum extracted capacity and voltage
-    QMax = 2.6; % Ah
-    VMax = 3.6; % V
-    
-    % acceptable SOC threshold
-    MinSOC = 20;
-    
-    % assume a maximum c-rate
-    MaxAllowCRate = 5;
-%}
-
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
 Aircraft.Specs.Power.Eta.EG = 0.96;
@@ -180,12 +168,12 @@ Aircraft.Specs.Power.LamTS.Lnd = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Tko = 0.085;
+Aircraft.Specs.Power.LamTSPS.Tko = 0;
 Aircraft.Specs.Power.LamTSPS.Clb = 0;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;
 Aircraft.Specs.Power.LamTSPS.Lnd = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0.085;
+Aircraft.Specs.Power.LamTSPS.SLS = 0;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Tko = 0;
@@ -205,14 +193,14 @@ Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = 100;%100;
-Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
+Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
 
-% coefficient for HEA engine analysis
-Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
+% % % coefficient for HEA engine analysis
+ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%

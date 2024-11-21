@@ -365,7 +365,7 @@ MDotFuel = zeros(npnt, nps);
 V        = zeros(npnt, nes);
 I        = zeros(npnt, nes);
 Q        = zeros(npnt, nes);
-
+C_rate   = zeros(npnt, nes);
 % check for a battery
 if (any(Batt))   
     
@@ -382,8 +382,9 @@ if (any(Batt))
         if (DetailedBatt == 1)
             
             % power available from the battery
-            [V(ibeg:iend, icol), I(ibeg:iend, icol), PreqES(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
-                PreqES(ibeg:iend, icol), dt, SOC(1    , icol), ParCells, SerCells);
+            [V(ibeg:iend, icol), I(ibeg:iend, icol), PreqES(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol) ...
+                 % C_rate(ibeg:iend, icol)...
+                ] = BatteryPkg.Model(PreqES(ibeg:iend, icol), dt, SOC(1    , icol), ParCells, SerCells); 
             
             % check if the SOC falls below 20%
             BattDeplete = find(SOC(:, icol) < 20, 1);
@@ -604,6 +605,10 @@ Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;
 Aircraft.Mission.History.SI.Power.Voltage( SegBeg:SegEnd, :) = V  ;
 Aircraft.Mission.History.SI.Power.Current( SegBeg:SegEnd, :) = I  ;
 Aircraft.Mission.History.SI.Power.Capacity(SegBeg:SegEnd, :) = Q  ;
+% Aircraft.Mission.History.SI.Power.C_rate(  SegBeg:SegEnd, :) = C_rate(:,2);
+Aircraft.Mission.History.SI.Power.V_cell(  SegBeg:SegEnd, :) = V ./ SerCells;   % Find Voltage per cell
+Aircraft.Mission.History.SI.Power.Cur_cell(SegBeg:SegEnd, :) = I ./ ParCells;   % Find Current per cell
+Aircraft.Mission.History.SI.Power.Cap_cell(SegBeg:SegEnd, :) = Q ./ ParCells;   % Find Capacity per cell
 
 % splits
 Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;

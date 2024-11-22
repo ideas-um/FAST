@@ -213,7 +213,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     Aircraft.Specs.Power.Battery.ParCells = Npar;
 
     % remember the battery c-rates arrangement
-    % Aircraft.Mission.History.SI.Power.C_rate_2 = C_rate(:);
+    Aircraft.Mission.History.SI.Power.C_rate = C_rate(:);
 end
 
 % ----------------------------------------------------------

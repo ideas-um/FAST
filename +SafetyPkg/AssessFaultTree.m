@@ -2,7 +2,7 @@ function [Pfail] = AssessFaultTree(Arch, Components, RemoveSrc)
 %
 % AssessFaultTree.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 nov 2024
+% last updated: 25 nov 2024
 %
 % Given an adjacency-like matrix, assemble a fault tree that accounts for
 % internal failures and redundant primary events.
@@ -159,6 +159,9 @@ MyFT = str2sym(Failure);
 
 % expand the fault tree first and then simplify
 SimpFT = simplify(expand(MyFT), "Steps", 10 * ncomp);
+
+% expand one last time in case any failures combined
+SimpFT = expand(SimpFT);
 
 % convert the simplified fault tree to a string
 FailString = string(SimpFT);

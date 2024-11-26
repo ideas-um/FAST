@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 sep 2024
+% last updated: 26 nov 2024
 %
 % Given a propulsion architecture, create the necessary interdependency,
 % operation and efficiency matrices to perform a propulsion system

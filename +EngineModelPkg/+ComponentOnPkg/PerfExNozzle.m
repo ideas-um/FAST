@@ -84,6 +84,21 @@ u9 = u9i*EtaPoly.Nozzles;
 Ts9 = Tt9 - u9^2/2/Cp;
 Pt9 = Ps9*(Tt9/Ts9)^(g/(g - 1));
 M9 = u9/sqrt(g*R*Ts9);
+% 
+% NPR = Pt5/Ps9;
+% u9 = sqrt(2 * Cp*Tt9*EtaPoly.Nozzles*(1 - (1/NPR)^((g-1)/g)));
+% 
+% Ts9 = Tt9 - u9^2/2/Cp;
+% M9 = u9/sqrt(g*R*Ts9);
+% 
+% Pt9 = Pt5;
+
+if M9 > 1
+    M9 = 1;
+    u9 = M9*sqrt(g*R*Ts9);
+    Ts9 = Tt9 - u9^2/2/Cp;
+    Ps9 = Pt9/(Tt9/Ts9)^(g/(g - 1));
+end
 
 %% Assign Outputs
 NewState = OldState;

@@ -5,8 +5,8 @@ function [Tt3] = NewtonRaphsonTt3(Tt1,heat)
 % Updated 10/5/2023
 %
 % This function is essentially a numerical inverse of CpAir(). Given an
-% amount of specific heat added and an initial temperature it will find the
-% temperature the air is raised to. Data used for the curve fits is
+% amount of specific heat removed and an initial temperature it will find the
+% temperature the air is dropped to. Data used for the curve fits is
 % referenced in both CpAir() and CvAir().
 %
 %

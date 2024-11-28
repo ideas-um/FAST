@@ -46,6 +46,9 @@ end
 %% Info used to create S-curve (Included for Reference Only)
 % https://www.ohio.edu/mechanical/thermo...
 % /property_tables/air/air_Cp_Cv.html
+
+% 
+% clc
 % data = [
 %     250
 %     1.003
@@ -130,18 +133,48 @@ end
 % p = polyfit(temp,cp,3);
 % 
 % 
-% switch nargin
-%     case 1
-%         heat = polyval(p,T_low);
-%     case 2
-%         p_int = polyint(p);
-%         heat = diff(polyval(p_int,[T_low,T_high]));
-% end
-%
-% Graph to Check
+% 
+% 
+% L = 233.0000;
+% k = 1/210;
+% yp = 875;
+% C = 993;
+% 
+% 
+% % end
+% Tin = linspace(0,3000,3000);
+% 
+% 
+% 
+% y = cp;
+% ybar = mean(cp);
+% f = L./(1+exp(-k*(temp-yp)))+ C;
+% 
+% R2 = 1 - sum((y - f).^2)/sum((y - ybar).^2)
+% 
+% 
+% close all
 % figure(3)
 % scatter(temp,cp);
 % hold on
-% plot(1:1:1500,polyval(p,1:1:1500))
+% plot(Tin,L./(1+exp(-k*(Tin-yp)))+ C)
+% grid on
+% xlabel('Temperature [K]')
+% ylabel('Specific Heat at Constant Pressure (C_p) [J/kgK]')
+% legend('Raw Data','Fitted Curve','location','southeast')
+% text(300,1200,"R^2 = " + R2,'FontName','Times','FontSize',16)
+% 
+% ax = gca;
+% ax.FontName = 'Times';
+% ax.FontSize = 16;
+% 
+% f = gcf;
+% f.Position = [100 500 600 500];
+% 
+% print(f, '../EAP/DB_Paper_Scripts/cpcurve','-dpdf')
+
+
+
 
 end
+

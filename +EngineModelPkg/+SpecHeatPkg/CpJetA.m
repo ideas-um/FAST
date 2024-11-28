@@ -36,7 +36,7 @@ heat = (T_high*(C+L) + L*log(exp(k*(y-T_high))+1)/k) -(T_low*(C+L) + L*log(exp(k
 % /HyChem/approach/Report_Jet_Fuel_Thermochemical_Properties_v6.pdf
 % 
 % 
-% % temp (K)   Cp (cal/mol-K)
+% temp (K)   Cp (cal/mol-K)
 % data = [
 % 298. 54.325   
 %  300. 54.646  
@@ -66,23 +66,43 @@ heat = (T_high*(C+L) + L*log(exp(k*(y-T_high))+1)/k) -(T_low*(C+L) + L*log(exp(k
 % 
 % temp = data(:,1); cp = data(:,2);
 % cp = cp*4.184/MW*1e3;
-% p = polyfit(temp,cp,3);
-% 
-% vec = -400:1:4000;
-% 
-% 
-% scatter(temp,cp)
-% hold on
-% 
-% plot(vec,polyval(p,vec))
 % 
 % L = 4600;
 % k = 1/410;
-% y = 500;
+% yp = 500;
 % C = 100;
 % 
-% heat = L./(1+exp(-k.*(vec-y)))+ C;
 % 
-% plot(vec,heat)
+% % end
+% Tin = linspace(0,3000,3000);
+% 
+% 
+% 
+% y = cp;
+% ybar = mean(cp);
+% f = L./(1+exp(-k*(temp-yp)))+ C;
+% 
+% R2 = 1 - sum((y - f).^2)/sum((y - ybar).^2)
+% 
+% 
+% close all
+% figure(3)
+% scatter(temp,cp);
+% hold on
+% plot(Tin,L./(1+exp(-k*(Tin-yp)))+ C)
+% grid on
+% xlabel('Temperature [K]')
+% ylabel('Specific Heat at Constant Pressure (C_p) [J/kgK]')
+% legend('Raw Data','Fitted Curve','location','southeast')
+% text(300,4500,"R^2 = " + R2,'FontName','Times','FontSize',16)
+% 
+% ax = gca;
+% ax.FontName = 'Times';
+% ax.FontSize = 16;
+% 
+% f = gcf;
+% f.Position = [100 500 600 500];
+% 
+% print(f, '../EAP/DB_Paper_Scripts/cpjet','-dpdf')
 
 end

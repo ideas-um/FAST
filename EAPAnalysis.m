@@ -325,6 +325,29 @@ while (iter < MaxIter)
     % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
     save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter+1)), 'Aircraft');    
 
+    % Stop iteration early if the last three iterations produce the same
+    % results within the error tolerance to end Zig-zag
+    BattW_tol = 0.01;
+    if iter >= 3
+
+        % Extract the this and second-to-last iterations
+        ThisIteration = AircraftHistory{iter+1};
+        Sec_2_LastIteration = AircraftHistory{iter-1};
+
+        % Ending with C-rate within limitation
+        if max(Aircraft.Mission.History.SI.Power.C_rate) < MaxAllowCRate
+
+        % Compare key metrics (e.g., MTOW, Wfuel, Wbatt)
+            BattW_diff = abs(ThisIteration.Specs.Weight.Batt - Sec_2_LastIteration.Specs.Weight.Batt);
+
+            % Check if the differences are below a threshold
+            if BattW_diff < BattW_tol
+            break;
+            end
+        end
+    end
+
+
     % iterate
     iter = iter + 1;
     
@@ -353,8 +376,8 @@ if ((iter == MaxIter) && (Type > 0))
     
 end
 
-%% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5% %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if Aircraft.Specs.Power.LamTSPS.Tko == 0 
     % if conventional aircraft, do nothing
 else

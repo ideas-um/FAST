@@ -84,13 +84,13 @@ for i = 1:NumComponents
                 ToLeave = [ToLeave; j + NumESources];
 
                 % print statement
-                fprintf('%s connects to %s\n',['PowerSource_' , num2str(j)], ...
+                fprintf('%s is powered by %s\n',['PowerSource_' , num2str(j)], ...
                                               ['EnergySource_', num2str(i)])   ;
  
             else
                 
                 % print statement
-                fprintf('%s does not connect to %s\n',['PowerSource_' , num2str(j)], ...
+                fprintf('%s is not powered by  %s\n',['PowerSource_' , num2str(j)], ...
                                                       ['EnergySource_', num2str(i)])   ;
                                                   
             end
@@ -122,13 +122,13 @@ for i = 1:NumComponents
                 ToLeave = [ToLeave; j + NumESources];
 
                 % print statement
-                fprintf('%s connects to %s\n',['PowerSource_', num2str(j)]              , ...
+                fprintf('%s is powered by %s\n',['PowerSource_', num2str(j)]              , ...
                                               ['PowerSource_', num2str(i - NumESources)])   ;
 
             else
                 
                 % print statement
-                fprintf('%s does not connect to %s\n',['PowerSource_', num2str(j)]              , ...
+                fprintf('%s is not powered by %s\n',['PowerSource_', num2str(j)]              , ...
                                                       ['PowerSource_', num2str(i - NumESources)])   ;
 
             end
@@ -178,13 +178,13 @@ for i = 1:NumComponents
                         Architecture.Index.(['x', num2str(i - NumPSources + k - 1)]).Leaving = [Architecture.Index.(['x', num2str(i - NumPSources + k - 1)]).Leaving; i];
         
                         % print statement
-                        fprintf('%s is driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                        fprintf('%s is powered by by %s\n',['ThrustSource_',num2str(j)]                           , ...
                                                        ['PowerSource_',num2str(i - NumESources - NumPSources + k - 1)])   ;
                       
                     else
                         
                         % print statement
-                        fprintf('%s is not driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                        fprintf('%s is not powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
                                                            ['PowerSource_',num2str(i - NumESources - NumPSources + k - 1)])   ;
         
                     end
@@ -200,13 +200,13 @@ for i = 1:NumComponents
                         Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving = [Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving; i];
         
                         % print statement
-                        fprintf('%s is driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                        fprintf('%s is powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
                                                        ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
                       
                     else
                         
                         % print statement
-                        fprintf('%s is not driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                        fprintf('%s is not powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
                                                            ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
         
                     end

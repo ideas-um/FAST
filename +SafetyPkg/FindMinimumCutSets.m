@@ -2,7 +2,7 @@ function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 %
 % [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 dec 2024
+% last updated: 03 dec 2024
 %
 % Given an adjacency-like matrix, find the minimum cut sets that account
 % for internal failures and redundant primary events. then, using the
@@ -150,7 +150,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % recursively search the system architecture to extract all failure modes
-FailModes = CreateCutSets(Arch, Components, isnk)
+FailModes = CreateCutSets(Arch, Components, isnk);
+
+% eliminate duplicate events (idempotent law)
+FailModes = IdempotentLaw(FailModes);
 
 
 %% COMPUTE PROBABILITY OF FAILURE %%
@@ -352,6 +355,111 @@ for irow = 1:mrow
         end
     end
 end
+
+
+end
+
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+
+function [NewModes] = IdempotentLaw(FailModes)
+%
+% [NewModes] = IdempotentLaw(FailModes)
+% written by Paul Mokotoff, prmoko@umich.edu
+% last updated: 03 dec 2024
+%
+% use the idempotent law to eliminate duplicate events in a single failure
+% mode of a fault tree. the idempotent law is a boolean algebra rule,
+% stating that: X * X = X
+%
+% INPUTS:
+%     FailModes - matrix of required failures for the system to fail. each
+%                 row represents a single failure mode.
+%                 size/type/units: m-by-n / string / []
+%
+% OUTPUTS:
+%     NewModes  - updated matrix after the idempotent law is applied. the
+%                 number of columns returned may be reduced due to the
+%                 simplifications (i.e., p <= n).
+%                 size/type/units: m-by-p / string / []
+%
+
+
+%% PRE-PROCESSING %%
+%%%%%%%%%%%%%%%%%%%%
+
+% get the number of failure modes and maximum number of comopnents
+[nmode, ncomp] = size(FailModes);
+
+
+%% BOOLEAN ALGEBRA SIMPLIFICATION %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% loop through each row
+for imode = 1:nmode
+        
+    % index on the current component/column
+    icomp = 1;
+    
+    % compare entries to those after it
+    while (icomp < ncomp)
+        
+        % check if a string exists
+        if (strcmpi(FailModes(imode, icomp), ""))
+            
+            % there is no string to compare to, break out
+            break
+            
+        end
+        
+        % start at the next component
+        jcomp = icomp + 1;
+        
+        % compare entries
+        while (jcomp <= ncomp)
+            
+            % check if there is a string to compare to
+            if (strcmpi(FailModes(imode, jcomp), ""))
+                
+                % there is no string to compare to, break out
+                break
+                
+            end
+            
+            % make the comparison
+            if (strcmpi(FailModes(imode, icomp), FailModes(imode, jcomp)))
+                
+                % remove the latter event
+                FailModes(imode, jcomp:end-1) = FailModes(imode, jcomp+1:end);
+                
+                % add an empty string at the end
+                FailModes(imode, end) = "";
+                
+            else
+                
+                % increment the component
+                jcomp = jcomp + 1;
+                
+            end
+                        
+        end
+        
+        % increment the component
+        icomp = icomp + 1;
+        
+    end
+end
+
+
+%% POST-PROCESSING %%
+%%%%%%%%%%%%%%%%%%%%%
+
+% check if any of the ending columns are empty
+KeepCol = any(~strcmpi(FailModes, ""), 1);
+
+% use only the columns with failure modes in them
+NewModes = FailModes(:, KeepCol);
 
 
 end

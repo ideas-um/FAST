@@ -125,6 +125,10 @@ for itrn = 1:ntrn
         
         % once available, input a fuel cell model here
         
+    elseif (TrnType(itrn) == 3) % electric generator
+        
+        % once available, input an electric generator model here
+        
     else
         
         % throw an error

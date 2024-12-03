@@ -4,9 +4,10 @@ function [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 03 dec 2024
 %
-% Given a propulsion architecture, create the necessary interdependency,
+% Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
-% analysis.
+% analysis. For all matrices created, the convention is to order the
+% components as: sources, transmitters, and sinks.
 %
 % INPUTS:
 %     Aircraft - structure with information about the propulsion
@@ -91,10 +92,10 @@ if     (strcmpi(ArchName, "C"  ) == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(              1, 1); ... % no efficiency for the fuel
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(         NumEng, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), repmat(EtaTS, NumEng, 1); ... % account for the propeller/fan efficiency
-              ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(              1, 1)] ;   % no efficiency for the sink
+    EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller/fan efficiency
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiency for the sink
+              ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiency - end of flow
           
     % downstream efficiency matrix
     EtaDwn = [ones(     1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for the fuel
@@ -145,10 +146,10 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(              1, 1); ... % no efficiency for the battery
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(         NumEng, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , repmat(EtaTS, NumEng, 1); ... % account for the propeller/fan efficiency
-              ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(              1, 1)] ;   % no efficiency for the sink
+    EtaUps = [ones(     1, 1), repmat(EtaEM,      1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(         NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller/fan efficiency
+              ones(NumEng, 1), ones(         NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiency for the sink
+              ones(     1, 1), ones(              1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiency - end of the flow
           
     % downstream efficiency matrix
     EtaDwn = [ones(              1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for the battery
@@ -205,12 +206,12 @@ elseif (strcmpi(ArchName, "PHE") == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(1     , NumEng)                                    , ones(              1, 1); ... % no efficiency for the fuel
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(1     , NumEng)                                    , ones(              1, 1); ... % no efficiency for the battery
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(         NumEng, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(         NumEng, 1); ... % account for electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , repmat(EtaTS, NumEng, 1); ... % account for propeller/fan efficiency
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(1     , NumEng)                                    , ones(              1, 1)] ;   % no efficiency for the sink
+    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng), ones(1     , NumEng)                                    , ones(     1, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), repmat(EtaEM,      1, NumEng), ones(1     , NumEng)                                    , ones(     1, 1); ... % account for electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for propeller/fan efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for propeller/fan efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiency for the sink
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng), ones(1     , NumEng)                                    , ones(     1, 1)] ;   % no efficiency - end of the flow
     
     % downstream efficiency matrix
     EtaDwn = [ones(     1, 1), ones(              1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for the fuel
@@ -269,12 +270,12 @@ elseif (strcmpi(ArchName, "SHE") == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(     1, NumEng)                                    ,   ones(            1, 1); ... % no efficiencies for the fuel
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(     1, NumEng)                                    ,   ones(            1, 1); ... % no efficiencies for the battery
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    ,   ones(       NumEng, 1); ... % assume a gas-turbine efficiency of 1 (not used)
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM),   ones(       NumEng, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , repmat(EtaTS, NumEng, 1); ... % account for the propeller efficiency
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(     1, NumEng)                                    ,   ones(            1, 1)] ;   % no efficiencies for the sink
+    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume a gas-turbine efficiency of 1 (not used)
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), repmat(EtaEM,      1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiencies for the sink
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiencies - end of the flow
         
     % downstream efficiency matrix
     EtaDwn = [ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiencies for the fuel
@@ -333,12 +334,12 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(     1, NumEng)                                   , ones(     1, NumEng)                                    ,   ones(            1, 1); ... % no efficiency for fuel
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                   , ones(NumEng, NumEng)                                    ,   ones(       NumEng, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1- EtaEG), ones(NumEng, NumEng)                                    ,   ones(       NumEng, 1); ... % account for the electric generator efficiency
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                   , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM),   ones(       NumEng, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng), ones(NumEng, NumEng)                                   , ones(NumEng, NumEng)                                    , repmat(EtaTS, NumEng, 1); ... % account for the propeller/fan efficiency
-              ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng), ones(     1, NumEng)                                   , ones(     1, NumEng)                                    ,   ones(            1, 1)] ;   % no efficiency for the sink
+    EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng)                                   , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG), ones(NumEng, NumEng)                                   , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric generator efficiency
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1- EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                   , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller/fan efficiency
+              ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                   , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiency for the sink
+              ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng)                                   , ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiency - end of the flow
     
     % downstream efficiency matrix
     EtaDwn = [ones(     1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for fuel
@@ -398,12 +399,12 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(       1, 1), ones(       1, NumEng), ones(       1, NumEng), ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng),   ones(              1, 1); ... % no efficiency for fuel
-              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng),   ones(         NumEng, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
-              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng), ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng),   ones(         NumEng, 1); ... % account for electric generator efficiency
-              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(  NumEng, NumEng),   ones(         NumEng, 1); ... % account for electric motor efficiency
-              ones(2*NumEng, 1), ones(2*NumEng, NumEng), ones(2*NumEng, NumEng), ones(2*NumEng, NumEng)                                    , ones(2*NumEng, NumEng)                                    , ones(2*NumEng, NumEng), repmat(EtaTS, 2*NumEng, 1); ... % account for propeller/fan efficiency
-              ones(       1, 1), ones(       1, NumEng), ones(       1, NumEng), ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng),   ones(              1, 1)] ;   % no efficiency for the sink
+    EtaUps = [ones(       1, 1), ones(       1, NumEng), ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
+              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(  NumEng, 1); ... % account for the electric generator efficiency ("inboard") and propeller/fan efficiency ("outboard")
+              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng)                                    , ones(  NumEng, 1); ... % account for electric motor efficiency
+              ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(  NumEng, NumEng)                                    , ones(  NumEng, 1); ... % account for the "inboard" propeller/fan efficiency
+              ones(2*NumEng, 1), ones(2*NumEng, NumEng), ones(2*NumEng, NumEng)                                    , ones(2*NumEng, NumEng)                                    , ones(2*NumEng, NumEng)                                    , ones(2*NumEng, NumEng)                                    , ones(2*NumEng, 1); ... % no efficiency for the sink
+              ones(       1, 1), ones(       1, NumEng), ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, 1)] ;   % no efficiency - end of the flow
         
     % downstream efficiency matrix
     EtaDwn = [ones(     1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 2*NumEng), ones(     1, 1); ... % no efficiency for fuel

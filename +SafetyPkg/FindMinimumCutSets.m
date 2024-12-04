@@ -2,7 +2,7 @@ function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 %
 % [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 dec 2024
+% last updated: 04 dec 2024
 %
 % Given an adjacency-like matrix, find the minimum cut sets that account
 % for internal failures and redundant primary events. then, using the
@@ -152,8 +152,11 @@ end
 % recursively search the system architecture to extract all failure modes
 FailModes = CreateCutSets(Arch, Components, isnk);
 
-% eliminate duplicate events (idempotent law)
+% eliminate duplicate events in single failure mode (idempotent law)
 FailModes = IdempotentLaw(FailModes);
+
+% eliminate duplicate events across failure modes (law of absorption)
+FailModes = LawOfAbsorption(FailModes);
 
 
 %% COMPUTE PROBABILITY OF FAILURE %%
@@ -460,6 +463,121 @@ KeepCol = any(~strcmpi(FailModes, ""), 1);
 
 % use only the columns with failure modes in them
 NewModes = FailModes(:, KeepCol);
+
+
+end
+
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+
+function [NewModes] = LawOfAbsorption(FailModes)
+%
+% [NewModes] = LawOfAbsorption(FailModes)
+% written by Paul Mokotoff, prmoko@umich.edu
+% last updated: 04 dec 2024
+%
+% use the law of absorbption to eliminate duplicate events across multiple
+% failure modes in a fault tree. the law of absorbption is a boolean
+% algebra rule stating that:
+%     a) X * (X + Y) = X
+%     b) X +  X * Y  = X
+%
+% INPUTS:
+%     FailModes - matrix of required failures for the system to fail. each
+%                 row represents a single failure mode.
+%                 size/type/units: m-by-n / string / []
+%
+% OUTPUTS:
+%     NewModes  - updated matrix after the law of absorbptiion is applied.
+%                 the number of rows and columns returned may be reduced
+%                 due to the simplifications (i.e., p <= m and q <= n).
+%                 size/type/units: p-by-q / string / []
+%
+
+
+%% PRE-PROCESSING %%
+%%%%%%%%%%%%%%%%%%%%
+
+% find the maximum number of failure modes and components in a failure
+[nfail, ncomp] = size(FailModes);
+
+
+%% BOOLEAN ALGEBRA SIMPLIFICATION %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% number of components in a failure mode
+icomp = 0;
+
+% use failure modes with icomp components to simplify more complex events
+while (icomp <= ncomp)
+    
+    % increment the number of components in the failure mode
+    icomp = icomp + 1;
+    
+    % get the index of the failure modes with icomp components
+    Baseline = find(sum(~strcmpi(FailModes, ""), 2) == icomp);
+    
+    % get the number of failure modes in the baseline
+    nmode = length(Baseline);
+    
+    % check if any exist
+    if (nmode == 0)
+        
+        % continue on
+        continue
+        
+    end
+    
+    % loop through all the failure modes
+    for imode = 1:nmode
+        
+        % get the failure
+        CurMode = FailModes(Baseline(imode), 1:icomp);
+                
+        % index for the failure modes
+        ifail = 0;
+        
+        % loop through all of the failure modes
+        while (ifail < nfail)
+    
+            % increment the failure mode
+            ifail = ifail + 1;
+            
+            % check if failure mode is used for comparison
+            if (ifail == Baseline(imode))
+                
+                % continue on
+                continue;
+                
+            end
+            
+            % look for common components
+            CheckCommon = matches(FailModes(ifail, :), CurMode);
+            
+            % check if the current failure is within other failures
+            if (sum(CheckCommon) == icomp)
+                
+                % a failure mode is shared - eliminate the current one
+                FailModes(ifail, :) = "";
+                
+            end                
+        end
+    end
+end
+
+
+%% POST-PROCESSING %%
+%%%%%%%%%%%%%%%%%%%%%
+
+% check if any of the rows are empty
+KeepRow = any(~strcmpi(FailModes, ""), 2);
+
+% check if any of the cols are empty
+KeepCol = any(~strcmpi(FailModes, ""), 1);
+
+% use only the columns with failure modes in them
+NewModes = FailModes(KeepRow, KeepCol);
 
 
 end

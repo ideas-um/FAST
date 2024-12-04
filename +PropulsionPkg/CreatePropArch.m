@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 dec 2024
+% last updated: 04 dec 2024
 %
 % Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
@@ -230,30 +230,34 @@ elseif (strcmpi(ArchName, "PHE") == 1)
 elseif (strcmpi(ArchName, "SHE") == 1)
     
     % architecture matrix
-    Arch = [zeros(     1, 1), zeros(     1, 1),  ones(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel powers the gas-turbine engines
-            zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng),  ones(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery powers the electric motors
-            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines power the electric motors
-            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % electric motors power the propellers/fans
-            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % propellers/fans power send their power to the sink
-            zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink connects to nothing
+    Arch = [zeros(     1, 1), zeros(     1, 1),  ones(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel powers the gas-turbine engines
+            zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng),  ones(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery powers the electric motors
+            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines power the electric generators
+            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % electric generators power the electric motors
+            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % electric motors spin the propellers/fans
+            zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % propellers/fans connect to the sink
+            zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink powers nothing
+            
         
     % upstream power splits
     OperUps = @() ...
-              [zeros(     1, 1), zeros(     1, 1), repmat(1 / NumEng,      1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel sends all its power to the gas-turbine engines
-               zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery sends all its power to the electric motors
-               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),    eye(            NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines send all their power to the electric motors
-               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % electric motors send all their power to the propellers/fans
-               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % propellers/fans power send all their power to the sink
-               zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink doesn't send power
+              [zeros(     1, 1), zeros(     1, 1), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel splits its power evenly amongst the gas-turbine engines
+               zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery splits its power evenly amongst the electric motors
+               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines each power an electric generator
+               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),    eye(            NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % electric generators each power an electric motor
+               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % electric motors each power a propeller/fan
+               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % propellers/fans send all their power to the sink
+               zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink sends no power
            
     % downstream power splits
     OperDwn = @(lam) ...
-              [zeros(     1, 1), zeros(           1, 1),             zeros(     1, NumEng), zeros(     1, NumEng), zeros(                  1, NumEng), zeros(     1, 1); ... % fuel requires no power
-               zeros(     1, 1), zeros(           1, 1),             zeros(     1, NumEng), zeros(     1, NumEng), zeros(                  1, NumEng), zeros(     1, 1); ... % battery requires no power
-                ones(NumEng, 1), zeros(      NumEng, 1),             zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines require power from fuel
-               zeros(NumEng, 1), repmat(lam, NumEng, 1), (1 - lam) *   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % electric motors split their power between the battery and gas-turbine engines
-               zeros(NumEng, 1), zeros(      NumEng, 1),             zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % propellers/fans require their power from the electric motors
-               zeros(     1, 1), zeros(           1, 1),             zeros(     1, NumEng), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % sinks require their power from the propellers/fans
+              [zeros(     1, 1),  zeros(          1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, 1); ... % fuel requires no power
+               zeros(     1, 1),  zeros(          1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, 1); ... % battery requires no power
+                ones(NumEng, 1),  zeros(     NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines require fuel
+               zeros(NumEng, 1),  zeros(     NumEng, 1),   eye(NumEng, NumEng), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % electric generators require gas-turbine engines
+               zeros(NumEng, 1), repmat(lam, NumEng, 1), zeros(NumEng, NumEng),   eye(NumEng, NumEng) * (1 - lam), zeros(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % electric motors require battery and the electric generators
+               zeros(NumEng, 1),  zeros(     NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng)            ,   eye(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % propellers/fans require the electric motors
+               zeros(     1, 1),  zeros(          1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % the sink requires the propellers/fans
            
     % check the aircraft class
     if (strcmpi(aclass, "Turbofan") == 1)
@@ -270,26 +274,28 @@ elseif (strcmpi(ArchName, "SHE") == 1)
     end
            
     % upstream efficiency matrix
-    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume a gas-turbine efficiency of 1 (not used)
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), repmat(EtaEM,      1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller efficiency
-              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(         NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiencies for the sink
-              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiencies - end of the flow
+    EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    ,   ones(            1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume a gas-turbine efficiency of 1 (not used)
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , repmat(EtaEM,      1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG),   ones(       NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric generator efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    ,   ones(       NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    ,   ones(       NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller/fan efficiency
+              ones(NumEng, 1), ones(NumEng, 1), ones(NumEng, NumEng), ones(NumEng, NumEng)                                    ,   ones(       NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, 1); ... % no efficiencies for the sink
+              ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    ,   ones(            1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1)] ;   % no efficiencies - end of the flow
         
     % downstream efficiency matrix
-    EtaDwn = [ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiencies for the fuel
-              ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiencies for the battery
-              ones(NumEng, 1),   ones(       NumEng, 1), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, NumEng), ones(NumEng, 1); ... % assume a gas-turbine efficiency of 1 (not used)
-              ones(NumEng, 1), repmat(EtaEM, NumEng, 1), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng), ones(NumEng, 1); ... % account for the electric motor efficiency
-              ones(NumEng, 1),   ones(       NumEng, 1), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, NumEng), ones(NumEng, 1); ... % account for the propeller efficiency
-              ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1)] ;   % no efficiencies for the sink
+    EtaDwn = [ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for fuel
+              ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1); ... % no efficiency for battery
+              ones(NumEng, 1),   ones(       NumEng, 1), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, NumEng), ones(NumEng, 1); ... % assume a gas-turbine engine efficiency of 1 (not used)
+              ones(NumEng, 1),   ones(       NumEng, 1), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, NumEng), ones(NumEng, 1); ... % account for the electric generator efficiency
+              ones(NumEng, 1), repmat(EtaEM, NumEng, 1), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEM), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng), ones(NumEng, 1); ... % account for the electric motor efficiency
+              ones(NumEng, 1),   ones(       NumEng, 1), ones(NumEng, NumEng)                                    , ones(NumEng, NumEng)                                    , ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, NumEng), ones(NumEng, 1); ... % account for the propeller/fan efficiency
+              ones(     1, 1),   ones(            1, 1), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, 1)] ;   % no efficiency for the sink
     
     % source type (1 = fuel, 0 = battery)
     SrcType = [1, 0];
     
     % transmitter type (1 = engine, 0 = electric motor, 2 = propeller/fan)
-    TrnType = [ones(1, NumEng), zeros(1, NumEng), repmat(2, 1, NumEng)];
+    TrnType = [ones(1, NumEng), zeros(1, NumEng), repmat(3, 1, NumEng), repmat(2, 1, NumEng)];
     
 elseif (strcmpi(ArchName, "TE" ) == 1)
     
@@ -353,7 +359,7 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
     SrcType = 1;
     
     % transmitter type (1 = engine, 0 = electric motor, 2 = propeller/fan)
-    TrnType = [ones(1, NumEng), zeros(1, NumEng), repmat(2, 1, NumEng)];
+    TrnType = [ones(1, NumEng), repmat(3, 1, NumEng), zeros(1, NumEng), repmat(2, 1, NumEng)];
     
 elseif (strcmpi(ArchName, "PE" ) == 1)
     

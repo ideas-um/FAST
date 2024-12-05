@@ -198,7 +198,7 @@ function [Failures] = CreateCutSets(Arch, Components, icomp)
 %
 % [Failures] = CreateCutSets(Arch, Components, icomp)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 dec 2024
+% last updated: 05 dec 2024
 %
 % List out all components in the cut set for a system architecture. For
 % each function call, check whether an internal failure mode exists and if
@@ -240,10 +240,16 @@ if (~strcmpi(Components.FailMode(icomp), "") == 1)
     
     % add the component failure
     IntFails = Components.Name(icomp);
+    
+    % index the failure
+    ifail = 1;
 
 else
     
     IntFails = [];
+    
+    % index the failure
+    ifail = 0;
 
 end
 
@@ -275,7 +281,7 @@ if (ndwn > 0)
     [~, ncol] = size(FinalFails);
     
     % add columns to the internal failure mode and append downstream fails
-    Failures = [IntFails, repmat("", 1, ncol - 1); FinalFails];
+    Failures = [IntFails, repmat("", 1, ncol - ifail); FinalFails];
     
 else
     

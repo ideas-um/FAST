@@ -240,11 +240,11 @@ if (~strcmpi(Components.FailMode(icomp), "") == 1)
     
     % add the component failure
     IntFails = Components.Name(icomp);
-    
+
 else
     
     IntFails = [];
-    
+
 end
 
 
@@ -392,7 +392,7 @@ function [NewModes] = IdempotentLaw(FailModes)
 %
 % [NewModes] = IdempotentLaw(FailModes)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 dec 2024
+% last updated: 05 dec 2024
 %
 % use the idempotent law to eliminate duplicate events in a single failure
 % mode of a fault tree. the idempotent law is a boolean algebra rule,
@@ -421,57 +421,17 @@ function [NewModes] = IdempotentLaw(FailModes)
 %% BOOLEAN ALGEBRA SIMPLIFICATION %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% loop through each row
-for imode = 1:nmode
+% loop through all columns except the last one
+for icomp = 1:(ncomp - 1)
         
-    % index on the current component/column
-    icomp = 1;
-    
-    % compare entries to those after it
-    while (icomp < ncomp)
-        
-        % check if a string exists
-        if (strcmpi(FailModes(imode, icomp), ""))
+    % loop through remaining columns
+    for jcomp = (icomp+1) : ncomp
             
-            % there is no string to compare to, break out
-            break
-            
-        end
+        % compare the strings
+        StrCmp = strcmpi(FailModes(:, icomp), FailModes(:, jcomp));
         
-        % start at the next component
-        jcomp = icomp + 1;
-        
-        % compare entries
-        while (jcomp <= ncomp)
-            
-            % check if there is a string to compare to
-            if (strcmpi(FailModes(imode, jcomp), ""))
-                
-                % there is no string to compare to, break out
-                break
-                
-            end
-            
-            % make the comparison
-            if (strcmpi(FailModes(imode, icomp), FailModes(imode, jcomp)))
-                
-                % remove the latter event
-                FailModes(imode, jcomp:end-1) = FailModes(imode, jcomp+1:end);
-                
-                % add an empty string at the end
-                FailModes(imode, end) = "";
-                
-            else
-                
-                % increment the component
-                jcomp = jcomp + 1;
-                
-            end
-                        
-        end
-        
-        % increment the component
-        icomp = icomp + 1;
+        % eliminate all repeated events
+        FailModes(StrCmp, jcomp) = "";
         
     end
 end
@@ -480,11 +440,25 @@ end
 %% POST-PROCESSING %%
 %%%%%%%%%%%%%%%%%%%%%
 
-% check if any of the ending columns are empty
-KeepCol = any(~strcmpi(FailModes, ""), 1);
+% get the maximum number of components now used
+ncomp = max(sum(~strcmpi(FailModes, ""), 2));
 
-% use only the columns with failure modes in them
-NewModes = FailModes(:, KeepCol);
+% create a new array for returning values
+NewModes = repmat("", nmode, ncomp);
+
+% loop through each row
+for imode = 1:nmode
+    
+    % get the remaining components
+    CompsLeft = ~strcmpi(FailModes(imode, :), "");
+    
+    % get the number of components remaining
+    ncomp = sum(CompsLeft);
+    
+    % remember the remaining components
+    NewModes(imode, 1:ncomp) = FailModes(imode, CompsLeft);
+    
+end
 
 
 end

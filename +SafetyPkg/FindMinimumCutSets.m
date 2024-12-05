@@ -2,11 +2,11 @@ function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 %
 % [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 dec 2024
+% last updated: 05 dec 2024
 %
 % Given an adjacency-like matrix, find the minimum cut sets that account
 % for internal failures and redundant primary events. then, using the
-% minimum cut sets, compute the probability that the system fails.
+% minimum cut sets, compute the system-level failure rate.
 %
 % INPUTS:
 %     Arch       - the architecture matrix representing the system
@@ -159,10 +159,32 @@ FailModes = IdempotentLaw(FailModes);
 FailModes = LawOfAbsorption(FailModes);
 
 
-%% COMPUTE PROBABILITY OF FAILURE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% COMPUTE FAILURE RATE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Pfail = 0;
+% get the size of the failure modes
+[nrow, ncol] = size(FailModes);
+
+% allocate memory for the failure rates (allocate ones for ease of
+% multiplying across rows in a later step)
+FailRates = ones(nrow, ncol);
+
+% loop through each component and add in its failure rate
+for icomp = 1:ncomp
+    
+    % find the component in the failure modes
+    idx = find(strcmpi(FailModes, Components.Name(icomp)));
+    
+    % fill in the failure rate
+    FailRates(idx) = Components.FailRate(icomp);
+    
+end
+
+% multiply failure rates in the given row
+PfailIndiv = prod(FailRates, 2);
+
+% add all failure rates together for the system-level failure rate
+Pfail = sum(PfailIndiv);
 
 % ----------------------------------------------------------
 

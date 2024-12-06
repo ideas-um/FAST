@@ -1,8 +1,8 @@
-function [Psupp] = PowerSupplementCheck(PreqDr, TSPS, PSPS, SplitPSPS, EtaPSPS, PSType, EtaFan)
+function [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan)
 %
-% [Psupp] = PowerSupplementCheck(iprob)
+% [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan, itrn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 oct 2024
+% last updated: 06 dec 2024
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -11,81 +11,82 @@ function [Psupp] = PowerSupplementCheck(PreqDr, TSPS, PSPS, SplitPSPS, EtaPSPS, 
 % it provides power (positive output, unless the flow is reversed).
 %
 % INPUTS:
-%     PreqDr    - the power required to turn the driven power sources.
-%                 size/type/units: npnt-by-nps / double / [W]
+%     Preq    - the power required by each component.
+%               size/type/units: npnt-by-ntrn / double / [W]
 %
-%     TSPS      - the architecture matrix for the thrust-power source
-%                 connections.
-%                 size/type/units: nts-by-nps / integer / []
+%     Arch    - the architecture matrix for the transmitters only.
+%               size/type/units: ntrn-by-ntrn / integer / []
 %
-%     PSPS      - the architecture matrix for the power-power source
-%                 connections.
-%                 size/type/uints: nps-by-nps / integer / []
+%     Lambda  - the operational matrix for the transmitters only.
+%               size/type/units: ntrn-by-ntrn / double / [%]
 %
-%     SplitPSPS - the operational power split matrix between all of the
-%                 power sources.
-%                 size/type/units: nps-by-nps / double / [%]
+%     Eta     - the efficiency matrix for the transmitters only.
+%               size/type/units: ntrn-by-ntrn / double / [%]
 %
-%     EtaPSPS   - the efficiency matrix for the power-power source
-%                 connections.
-%                 size/type/units: nps-by-nps / double / [%]
+%     TrnType - the types of transmitters (gas-turbine engine, electric
+%               motor, etc.) in the propulsion architecture.
+%               size/type/units: 1-by-ntrn / int / []
 %
-%     PSType    - the types of power sources (gas-turbine engine, electric
-%                 motor, etc.) in the propulsion architecture.
-%                 size/type/units: 1-by-nps / int / []
-%
-%     EtaFan    - the fan efficiency for the gas-turbine engines.
-%                 size/type/units: 1-by-1 / double / [%]
+%     EtaFan  - the fan efficiency for the gas-turbine engines.
+%               size/type/units: 1-by-1 / double / [%]
 %
 % OUTPUTS:
-%     Psupp     - the supplemental power provided/required into each power
-%                 source.
-%                 size/type/units: npnt-by-nps / double / [W]
+%     Psupp   - the supplemental power provided/required by each
+%               transmitter.
+%               size/type/units: npnt-by-ntrn / double / [W]
 %
 
 
-%% PERFORM THE ANALYSIS %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PRE-PROCESSING %%
+%%%%%%%%%%%%%%%%%%%%
 
-% get the number of points
-[npnt, nps] = size(PreqDr);
+% get the number of control points and transmitters
+[npnt, ntrn] = size(Preq);
 
 % allocate memory for the supplemental power
-Psupp = zeros(npnt, nps);
+Psupp = zeros(npnt, ntrn);
 
-% check for components in series
-AnySeries = find(sum(PSPS - eye(nps), 1) > 0);
 
-% run the check
-if (any(AnySeries))
+%% CHECK FOR SERIES CONNECTIONS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% look for the gas-turbine engines
+GTEs = find(TrnType == 1);
+
+% if any gas-turbine engines exist, check for components in series (except
+% propellers/fans)
+if any(GTEs)
     
-    % memory for removing each driving PS
-    RemoveDriving = zeros(nps, 1);
+    % get the number of gas-turbine engines
+    ngte = length(GTEs);
     
-    % loop through each connection
-    for iconn = 1:length(AnySeries)
+    % loop through each gas-turbine engine connection
+    for igte = 1:ngte
         
-        % get the component
-        icomp = AnySeries(iconn);
+        % get the row of interest
+        CurRow = Arch(GTEs(igte), :);
         
-        % remove the driving source
-        RemoveDriving(icomp) = 1;
+        % get the connections that are not propellers/fans
+        Conns = (CurRow == 1) & (TrnType ~= 2);
         
-        % get the components in series
-        MyConns = find(PSPS(:, icomp) - RemoveDriving > 0);
+        % if there's no connections, move on
+        if (~any(Conns))
+            continue;
+        end
         
-        % account for the power siphon
-        Psupp(:, icomp) = Psupp(:, icomp) - PreqDr(:, MyConns) * ...
-                       (SplitPSPS(MyConns, icomp) ./ EtaPSPS(MyConns, icomp));
-                   
-        % reset the driving source
-        RemoveDriving(icomp) = 0;
-                   
-    end % for
-end % if
+        % compute the power siphon
+        Psupp(:, GTEs(igte)) = Psupp(:, GTEs(igte)) - Preq(:, Conns) * ...
+                               Lambda(Conns, GTEs(igte)) ./ Eta(Conns, GTEs(igte));
+                           
+    end
+end
+
+
+%% CHECK FOR PARALLEL CONNECTIONS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % check for components in parallel
-AnyParallel = find(sum(TSPS, 2) > 1);
+AnyParallel = find(sum(Arch, 1) > 1);
 
 % run the check
 if (any(AnyParallel))
@@ -97,7 +98,7 @@ if (any(AnyParallel))
         icomp = AnyParallel(iconn);
 
         % find the gas-turbine engine being supplemented
-        Driving = find((TSPS(icomp, :) > 0) & (PSType > 0));
+        Driving = find((Arch(:, icomp) > 0)' & (TrnType == 1));
         
         % check if there are multiple "driving" gas-turbine engines
         if (length(Driving) > 1)
@@ -108,13 +109,13 @@ if (any(AnyParallel))
         end
         
         % find the electric motors that are supplementing
-        Helping = find((TSPS(icomp, :) > 0) & (PSType == 0));
+        Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
                 
         % add the power supplement, accounting for the fan efficiency
-        Psupp(:, Driving) = Psupp(:, Driving) + PreqDr(:, Helping) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        Psupp(:, Driving) = Psupp(:, Driving) + Preq(:, Helping) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
         
-    end % for
-end % if
+    end
+end
 
 % ----------------------------------------------------------
 

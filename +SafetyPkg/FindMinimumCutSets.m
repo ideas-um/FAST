@@ -301,7 +301,7 @@ function [EnumFails] = EnumerateFailures(FailList)
 %
 % [EnumFails] = EnumerateFailures(FailList)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 02 dec 2024
+% last updated: 06 dec 2024
 %
 % Given a set of failures from multiple AND gates, enumerate all possible
 % failures that could cause a system failure.
@@ -348,44 +348,74 @@ EnumFails = repmat("", mrow, mcol);
 %% ENUMERATE %%
 %%%%%%%%%%%%%%%
 
-% list indices of components
-RowIdx = ones(1, nelem);
+% keep track of the column index
+ColIdx = 1;
 
-for irow = 1:mrow
+% loop through each set of components
+for ielem = 1:nelem
     
-    % loop through all elements
-    for ielem = 1:nelem
-        
-        % get the current element
-        CurFail = FailList{ielem};
-        
-        % get the current row
-        CurRow = CurFail(RowIdx(ielem), :);
-                
-        % find the first empty element in the row
-        ColIdx = find(strcmpi(EnumFails(irow, :), ""), 1);
-        
-        % add in the values
-        EnumFails(irow, ColIdx:ColIdx+ncol(ielem)-1) = CurRow;
-        
-    end
+    % get the current failure
+    CurFail = FailList{ielem};
     
-    % increment the final index
-    RowIdx(end) = RowIdx(end) + 1;
+    % number of times the matrix must repeat
+    nrep1 = prod(nrow(ielem+1:end));
     
-    % go through all indices backwards
-    for ielem = nelem:-1:2
-        if (RowIdx(ielem) > nrow(ielem))
-            
-            % increase the prior row index
-            RowIdx(ielem-1) = RowIdx(ielem-1) + 1;
-            
-            % reset the prior index
-            RowIdx(ielem) = 1;
-            
-        end
+    % number of times the repeated matrix repeats
+    nrep2 = prod(nrow(1:ielem-1));
+    
+    % loop through all columns
+    for icol = 1:ncol(ielem)
+        
+        % repeatedly represent the matrix elements
+        TempCol = repelem(CurFail(:, icol), nrep1);
+        
+        % repeatedly represent the column
+        EnumFails(:, ColIdx) = repmat(TempCol, nrep2, 1);
+        
+        % increment the column index
+        ColIdx = ColIdx + 1;
+        
     end
 end
+
+% % list indices of components
+% RowIdx = ones(1, nelem);
+% 
+% for irow = 1:mrow
+%     
+%     % loop through all elements
+%     for ielem = 1:nelem
+%         
+%         % get the current element
+%         CurFail = FailList{ielem};
+%         
+%         % get the current row
+%         CurRow = CurFail(RowIdx(ielem), :);
+%                 
+%         % find the first empty element in the row
+%         ColIdx = find(strcmpi(EnumFails(irow, :), ""), 1);
+%         
+%         % add in the values
+%         EnumFails(irow, ColIdx:ColIdx+ncol(ielem)-1) = CurRow;
+%         
+%     end
+%     
+%     % increment the final index
+%     RowIdx(end) = RowIdx(end) + 1;
+%     
+%     % go through all indices backwards
+%     for ielem = nelem:-1:2
+%         if (RowIdx(ielem) > nrow(ielem))
+%             
+%             % increase the prior row index
+%             RowIdx(ielem-1) = RowIdx(ielem-1) + 1;
+%             
+%             % reset the prior index
+%             RowIdx(ielem) = 1;
+%             
+%         end
+%     end
+% end
 
 
 end

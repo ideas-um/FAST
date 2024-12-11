@@ -2,7 +2,7 @@ function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 %
 % [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 dec 2024
+% last updated: 11 dec 2024
 %
 % Given an adjacency-like matrix, find the minimum cut sets that account
 % for internal failures and redundant primary events. then, using the
@@ -198,7 +198,7 @@ function [Failures] = CreateCutSets(Arch, Components, icomp)
 %
 % [Failures] = CreateCutSets(Arch, Components, icomp)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 dec 2024
+% last updated: 11 dec 2024
 %
 % List out all components in the cut set for a system architecture. For
 % each function call, check whether an internal failure mode exists and if
@@ -241,15 +241,16 @@ if (~strcmpi(Components.FailMode(icomp), "") == 1)
     % add the component failure
     IntFails = Components.Name(icomp);
     
-    % index the failure
-    ifail = 1;
+    % flag the failure
+    FailFlag = 1;
 
 else
     
+    % no failure
     IntFails = [];
     
-    % index the failure
-    ifail = 0;
+    % turn off the failure flag
+    FailFlag = 0;
 
 end
 
@@ -279,9 +280,9 @@ if (ndwn > 0)
     
     % get the size of the downstream failures
     [~, ncol] = size(FinalFails);
-    
-    % add columns to the internal failure mode and append downstream fails
-    Failures = [IntFails, repmat("", 1, ncol - ifail); FinalFails];
+        
+    % add columns and append downstream failures
+    Failures = [IntFails, strings(1, ncol - FailFlag); FinalFails];
     
 else
     
@@ -301,7 +302,7 @@ function [EnumFails] = EnumerateFailures(FailList)
 %
 % [EnumFails] = EnumerateFailures(FailList)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 06 dec 2024
+% last updated: 11 dec 2024
 %
 % Given a set of failures from multiple AND gates, enumerate all possible
 % failures that could cause a system failure.
@@ -342,7 +343,7 @@ mrow = prod(nrow);
 mcol =  sum(ncol);
 
 % allocate memory for the output array
-EnumFails = repmat("", mrow, mcol);
+EnumFails = strings(mrow, mcol);
 
 
 %% ENUMERATE %%
@@ -378,45 +379,6 @@ for ielem = 1:nelem
     end
 end
 
-% % list indices of components
-% RowIdx = ones(1, nelem);
-% 
-% for irow = 1:mrow
-%     
-%     % loop through all elements
-%     for ielem = 1:nelem
-%         
-%         % get the current element
-%         CurFail = FailList{ielem};
-%         
-%         % get the current row
-%         CurRow = CurFail(RowIdx(ielem), :);
-%                 
-%         % find the first empty element in the row
-%         ColIdx = find(strcmpi(EnumFails(irow, :), ""), 1);
-%         
-%         % add in the values
-%         EnumFails(irow, ColIdx:ColIdx+ncol(ielem)-1) = CurRow;
-%         
-%     end
-%     
-%     % increment the final index
-%     RowIdx(end) = RowIdx(end) + 1;
-%     
-%     % go through all indices backwards
-%     for ielem = nelem:-1:2
-%         if (RowIdx(ielem) > nrow(ielem))
-%             
-%             % increase the prior row index
-%             RowIdx(ielem-1) = RowIdx(ielem-1) + 1;
-%             
-%             % reset the prior index
-%             RowIdx(ielem) = 1;
-%             
-%         end
-%     end
-% end
-
 
 end
 
@@ -428,7 +390,7 @@ function [NewModes] = IdempotentLaw(FailModes)
 %
 % [NewModes] = IdempotentLaw(FailModes)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 dec 2024
+% last updated: 11 dec 2024
 %
 % use the idempotent law to eliminate duplicate events in a single failure
 % mode of a fault tree. the idempotent law is a boolean algebra rule,
@@ -480,7 +442,7 @@ end
 ncomp = max(sum(~strcmpi(FailModes, ""), 2));
 
 % create a new array for returning values
-NewModes = repmat("", nmode, ncomp);
+NewModes = strings(nmode, ncomp);
 
 % loop through each row
 for imode = 1:nmode

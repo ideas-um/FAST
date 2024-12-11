@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 dec 2024
+% last updated: 11 dec 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -170,8 +170,8 @@ TV = sum(Pav(:, nsrc+ntrn+1:end), 2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % remember the thrust and power available for the transmitters
-Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :) = Pav(:, nsrc+1:nsrc+ntrn);
-Aircraft.Mission.History.SI.Power.Tav(SegBeg:SegEnd, :) = Tav(:, nsrc+1:nsrc+ntrn);
+Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :) = Pav;
+Aircraft.Mission.History.SI.Power.Tav(SegBeg:SegEnd, :) = Tav;
 
 % remember the power available
 Aircraft.Mission.History.SI.Power.TV = TV;

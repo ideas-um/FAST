@@ -3,7 +3,7 @@ function [Aircraft] = ATR42()
 % [Aircraft] = ATR42()
 % originally written by ???
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 28 mar 2024
+% last updated: 12 dec 2024
 %
 % Define the ATR42 from "System Analysis and Design Space Exploration of
 % Regional Aircraft with Electrified Powertrains" for sizing/performance
@@ -122,7 +122,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.PropArch.Type = "C";
 
 % aircraft thrust-weight ratio
 Aircraft.Specs.Propulsion.T_W.SLS = NaN;

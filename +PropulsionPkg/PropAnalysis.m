@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 12 dec 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -200,6 +200,7 @@ Batt = SrcType == 0;
 
 % allocate memory for the power required and supplemental power
 Preq  = zeros(npnt, ncomp);
+Pout  = zeros(npnt, ncomp);
 Psupp = zeros(npnt, ncomp);
 
 
@@ -216,6 +217,12 @@ Psupp = zeros(npnt, ncomp);
 
 % remember the power at the sink
 Preq(:, end) = PreqSnk;
+
+% get the transmitter and sink indices
+TrnSnkIdx = (nsrc + 1) : ncomp;
+
+% get the source and transmitter indices
+SrcTrnIdx = 1 : (nsrc + ntrn);
 
 % loop through points to get power outputs by thrust/power sources
 for ipnt = 1:npnt
@@ -234,58 +241,44 @@ for ipnt = 1:npnt
     % evaluate the function handles for the current splits
     Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
-    % propagate the power downstream
-    Preq(ipnt, :) = PropulsionPkg.PowerFlow(Preq(ipnt, :)', Arch', Splits, EtaDwn, -1)';
-    
+    % propagate the power downstream to the transmitters
+    Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', Splits(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
+
 end
 
 % temporary power required array for iterating
 TempReq = Preq;
 
-% iterate until converged
-while (1)
-    
-    % assume the required power can be provided
-    Pout = TempReq;
-    
-    % look at the transmitters and sinks only
-    PoutTest = Pout(:, (nsrc + 1):end);
-    PavTest  = Pav( :, (nsrc + 1):end);
-    
-    % check if any power requirements exceed the power available
-    exceeds = find(PoutTest > PavTest);
-    
-    % if any exceed the power available, return only the power available
-    if (any(exceeds))
-        PoutTest(exceeds) = PavTest(exceeds);
-    else
-        break;
-    end
-    
-    % set the required power as the output power
-    TempReq(:, (nsrc + 1):end) = PoutTest;    
-    
-    % loop through points to get power outputs by thrust/power sources
-    for ipnt = 1:npnt
+% get the number of sources
+nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+
+% assume the required power can be provided
+Pout(:, TrnSnkIdx) = TempReq(:, TrnSnkIdx);
+
+% look at the transmitters and sinks only
+PoutTest = Pout(:, TrnSnkIdx);
+PavTest  = Pav( :, TrnSnkIdx);
+
+% check if any power requirements exceed the power available
+exceeds = find(PoutTest - PavTest > 1.0e-06);
+
+% if any exceed the power available, return only the power available
+if (any(exceeds))
+    PoutTest(exceeds) = PavTest(exceeds);
+end
+
+% set the required power as the output power
+Pout(:, TrnSnkIdx) = PoutTest;
+
+% loop through points to propagate power to the sources
+for ipnt = 1:npnt
         
-        % if the power required is infinitely large, return infinity
-        if (isinf(Preq(ipnt, end)))
-            
-            % all components must provide infinite power
-            TempReq(ipnt, :) = Inf;
-            
-            % no need to multiply matrices, so continue on
-            continue;
-            
-        end
-        
-        % evaluate the function handles for the current splits
-        Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
-        
-        % propagate the power downstream
-        TempReq(ipnt, :) = PropulsionPkg.PowerFlow(TempReq(ipnt, :)', Arch', Splits, EtaDwn, -1)';
-        
-    end
+    % evaluate the function handles for the current splits
+    Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    
+    % propagate the power downstream
+    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', Splits(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
+    
 end
 
 % compute the thrust required/output
@@ -349,8 +342,8 @@ if (any(Batt))
         if (DetailedBatt == 1)
             
             % power available from the battery
-            [V(ibeg:iend, icol), I(ibeg:iend, icol), Preq(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
-             Preq(ibeg:iend, icol), dt, SOC(1, icol), ParCells, SerCells);
+            [V(ibeg:iend, icol), I(ibeg:iend, icol), Pout(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
+             Pout(ibeg:iend, icol), dt, SOC(1, icol), ParCells, SerCells);
             
             % check if the SOC falls below 20%
             BattDeplete = find(SOC(:, icol) < 20, 1);
@@ -359,7 +352,7 @@ if (any(Batt))
             if ((~isempty(BattDeplete)) && (strcmpi(ArchType, "E") == 0) && (Aircraft.Settings.Analysis.Type < 0))
                 
                 % no more power is provided from the electric motor or battery
-                Preq(BattDeplete:end, icol) = 0;
+                Pout(BattDeplete:end, icol) = 0;
                 
                 % zero the splits
                 LamDwn(BattDeplete:end, :) = 0;
@@ -374,10 +367,10 @@ if (any(Batt))
         end
 
         % get the energy from the battery
-        E_ES(2:end, icol) = E_ES(1, icol) + cumsum(Preq(ibeg:iend, icol) .* dt);
+        E_ES(2:end, icol) = E_ES(1, icol) + cumsum(Pout(ibeg:iend, icol) .* dt);
         
         % get the battery energy remaining
-        Eleft_ES(2:end, icol) = Eleft_ES(1, icol) - cumsum(Preq(ibeg:iend, icol) .* dt);
+        Eleft_ES(2:end, icol) = Eleft_ES(1, icol) - cumsum(Pout(ibeg:iend, icol) .* dt);
         
         % check if the battery remaining goes negative
         StopBatt = find(Eleft_ES(:, icol) < 0, 1);
@@ -395,16 +388,19 @@ if (any(Batt))
             ieng = find(Eng) + nsrc;
             
             % assume the gas-turbine engines can handle the EM load
-            Pout(StopBatt:iend, ieng) = Pout(StopBatt:iend, ieng) + repmat(Preq(StopBatt:iend, icol) ./ neng, 1, neng);
+            Pout(StopBatt:iend, ieng) = Pout(StopBatt:iend, ieng) + repmat(Pout(StopBatt:iend, icol) ./ neng, 1, neng);
             
             % set the battery power to 0 and remaining battery to 0
-            Preq(StopBatt:end, icol) = 0;
+            Pout(StopBatt:end, icol) = 0;
             
             % recompute the battery energy consumed
-            E_ES(2:end, icol) = E_ES(1, icol) + cumsum(Preq(ibeg:iend, icol) .* dt);
+            E_ES(2:end, icol) = E_ES(1, icol) + cumsum(Pout(ibeg:iend, icol) .* dt);
             
             % recompute the battery energy remaining
-            Eleft_ES(2:end, icol) = Eleft_ES(1, icol) - cumsum(Preq(ibeg:iend, icol) .* dt);
+            Eleft_ES(2:end, icol) = Eleft_ES(1, icol) - cumsum(Pout(ibeg:iend, icol) .* dt);
+            
+            % update the thrust output
+            Tout = Pout ./ TAS;
             
         end
     end
@@ -513,10 +509,10 @@ if (any(Fuel))
             end
             
             % get out the SFC (could be TSFC or BSFC)
-            SFC(ipnt, icol) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+            SFC(ipnt, HasEng(ieng)) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the fuel flow
-            MDotFuel(ipnt, icol) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+            MDotFuel(ipnt, HasEng(ieng)) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
             % get the appropriate elements
             ielem = [ifuel, icol];
@@ -525,7 +521,7 @@ if (any(Fuel))
             Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
             
             % temporary mass flow rate
-            Tempdmdt = PropulsionPkg.PowerFlow([zeros(1, nfuel), MDotFuel(ipnt, icol)]', ...
+            Tempdmdt = PropulsionPkg.PowerFlow([zeros(1, nfuel), MDotFuel(ipnt, HasEng(ieng))]', ...
                        Arch(ielem, ielem)', Splits(ielem, ielem), EtaDwn(ielem, ielem), -1)';
             
             % update the mass flow rates

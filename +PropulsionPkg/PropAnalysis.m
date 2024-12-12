@@ -450,8 +450,11 @@ if (any(Fuel))
         % get the column index (offset by number of sources)
         icol = HasEng(ieng) + nsrc;
         
-        % compute the thrust output from the engine
-        TEng = Tout(ibeg:iend, icol);
+        % find the propeller that the engine is connected to
+        [~, iprop] = find(Arch(icol, :));
+        
+        % compute the thrust output from the propeller
+        TEng = Tout(ibeg:iend, iprop);
         
         % check for any NaN or Inf (especially at takeoff)
         TEng(isnan(TEng)) = 0;

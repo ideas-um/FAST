@@ -2,7 +2,7 @@ function [P] = PowerFlow(P, Arch, Lambda, Eta, Direct, Tol)
 %
 % [P] = PowerFlow(P, Arch, Lambda, Eta, Direct, Tol)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 18 nov 2024
+% last updated: 12 dec 2024
 %
 % given a system architecture, propagate "stuff" through it.
 %
@@ -86,8 +86,11 @@ end
 % find the matrix to represent propagation through the system architecture
 M = PropFun(Arch, Lambda, Eta);
 
-% multiply while 2-norm is greater than a tolerance
-while (norm(Pold - P) > EPS)
+% iteration counter
+iter = 0;
+
+% multiply while 2-norm is greater than a tolerance 
+while ((norm(Pold - P) > EPS) && (iter < n))
     
     % multiply (propagate through the system architecture)
     Pstar = M * P;
@@ -100,6 +103,9 @@ while (norm(Pold - P) > EPS)
     
     % update
     P(UpdateIndx) = Pstar(UpdateIndx);
+    
+    % increment the iteration
+    iter = iter + 1;
 
 end
 

@@ -2,7 +2,7 @@ function [Aircraft] = EvalLanding(Aircraft)
 %
 % [Aircraft] = EvalLanding(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 09 sep 2024
+% last updated: 12 dec 2024
 %
 % Evaluate the landing segment. The landing segment only uses two control
 % points (treats it as a single segment) and cannot be changed by the user.
@@ -87,8 +87,8 @@ Time  = zeros(npoint, 1);
 Eleft_ES = zeros(npoint, 1);
 
 % get the energy source types
-Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
-Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
+Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
+Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
 % if not first segment, get accumulated quantities
 if (SegBeg > 1)
@@ -150,33 +150,6 @@ Time(2:end) = Time(1) + cumsum(dTime);
 Alt = repmat(  AltLand,    npoint, 1) ;
 TAS = linspace(TASLand, 0, npoint   )';
 
-% assume thrust split comes from the aircraft specifications
-LamTS = repmat(Aircraft.Specs.Power.LamTS.Lnd, npoint, 1);
-
-% assume energy/power/thrust splits come from the aircraft specifications
-LamTSPS = repmat(Aircraft.Specs.Power.LamTSPS.Lnd, npoint, 1);
-LamPSPS = repmat(Aircraft.Specs.Power.LamPSPS.Lnd, npoint, 1);
-LamPSES = repmat(Aircraft.Specs.Power.LamPSES.Lnd, npoint, 1);
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
-
-% remember the splits
-Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
-Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
-
 % update the mission history
 Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
 Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
@@ -223,20 +196,11 @@ KE = 0.5 .* Mass .* TAS .^ 2;
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-% assume only 30% power can be used for landing
-Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :) = 0.3 * Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
-Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = 0.3 * Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :);
-Aircraft.Mission.History.SI.Power.Pav_TS(SegBeg:SegEnd, :) = 0.3 * Aircraft.Mission.History.SI.Power.Pav_TS(SegBeg:SegEnd, :);
-Aircraft.Mission.History.SI.Power.Tav_TS(SegBeg:SegEnd, :) = 0.3 * Aircraft.Mission.History.SI.Power.Tav_TS(SegBeg:SegEnd, :);
-
-% apply the 30% restriction to the TV power too
-Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd) = 0.3 * Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
-
 % get the power available
 Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
 
-% assume the thrust/power available matches the thrust/power required
-Preq = Pav;
+% assume 30% of the power is used for landing
+Preq = 0.3 * Pav;
 
 % since the final TAS = 0, assume no thrust or power is required
 Preq(end) = 0;

@@ -89,6 +89,9 @@ nsnk = ncomp - nsrc - ntrn;
 ThrustAv = repmat(Aircraft.Specs.Propulsion.SLSThrust, npnt, 1);
  PowerAv = repmat(Aircraft.Specs.Propulsion.SLSPower , npnt, 1);
  
+% assume no power available at the propellers yet (need to propagate)
+PowerAv(:, TrnType == 2) = 0;
+ 
 % loop through all transmitters
 for itrn = 1:ntrn
     

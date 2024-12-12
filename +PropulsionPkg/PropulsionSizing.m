@@ -142,9 +142,9 @@ if (any(TrnType > 0))
         IO = {["Thrust_Max"],["DryWeight"]};
 
         % row vector can have multiple targets for a single input
-        target = Tdwn(Eng)';
+        target = Tdwn(Eng);
 
-        % run the regression
+        % run the regression - input must be a column vector
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
         
         % get the first engine index (assume all engines are the same)

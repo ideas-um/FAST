@@ -2,7 +2,7 @@ function [] = PlotMission(Aircraft)
 %
 % [] = PlotMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 nov 2024
+% last updated: 12 dec 2024
 %
 % Obtain the mission history from the aircraft structure, convert necessary
 % values from SI to English units, and plot them.
@@ -51,15 +51,24 @@ PreqScalar = Aircraft.Mission.History.SI.Power.Req      ./ 1.0e+06;
 PavScalar  = Aircraft.Mission.History.SI.Power.TV       ./ 1.0e+06;
 Ps         = Aircraft.Mission.History.SI.Performance.Ps           ;
 
+% get the architecture
+ncomp = length(Aircraft.Specs.Propulsion.PropArch.Arch);
+nsrc  = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+ntrn  = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
+nsnk  = ncomp - nsrc - ntrn;
+
+% get the transmitters that are not propellers
+itrn = [false(1, nsrc), Aircraft.Specs.Propulsion.PropArch.TrnType ~= 2, false(1, nsnk)];
+
 % power required/available/output as vectors (convert to MW)
-PreqVector = Aircraft.Mission.History.SI.Power.Preq_PS ./ 1.0e+06;
- PavVector = Aircraft.Mission.History.SI.Power.Pav_PS  ./ 1.0e+06;
-PoutVector = Aircraft.Mission.History.SI.Power.Pout_PS ./ 1.0e+06;
+PreqVector = Aircraft.Mission.History.SI.Power.Preq(:, itrn) ./ 1.0e+06;
+ PavVector = Aircraft.Mission.History.SI.Power.Pav( :, itrn) ./ 1.0e+06;
+PoutVector = Aircraft.Mission.History.SI.Power.Pout(:, itrn) ./ 1.0e+06;
 
 % thrust required/available/output as vectors (convert to kN)
-TreqVector = Aircraft.Mission.History.SI.Power.Treq_PS ./ 1000;
- TavVector = Aircraft.Mission.History.SI.Power.Tav_PS  ./ 1000;
-ToutVector = Aircraft.Mission.History.SI.Power.Tout_PS ./ 1000;
+TreqVector = Aircraft.Mission.History.SI.Power.Treq(:, itrn) ./ 1000;
+ TavVector = Aircraft.Mission.History.SI.Power.Tav( :, itrn) ./ 1000;
+ToutVector = Aircraft.Mission.History.SI.Power.Tout(:, itrn) ./ 1000;
 
 % SFC (then convert to lbm/lbf/hr)
 if (strcmpi(Aircraft.Specs.TLAR.Class, "Turbofan") == 1)

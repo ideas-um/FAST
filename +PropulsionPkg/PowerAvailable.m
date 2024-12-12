@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 12 dec 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -144,6 +144,9 @@ end
 % allocate memory for the power available
 Pav = zeros(npnt, ncomp);
 
+% get the transmitter and sink indices
+idx = (nsrc + 1) : ncomp;
+
 % loop through points to get the power available
 for ipnt = 1:npnt
     
@@ -154,7 +157,7 @@ for ipnt = 1:npnt
     Pav(ipnt, :) = [zeros(1, nsrc), PowerAv(ipnt, :), zeros(1, nsnk)];
     
     % propagate the power upstream
-    Pav(ipnt, :) = PropulsionPkg.PowerFlow(Pav(ipnt, :)', Arch, Lambda, EtaUps, +1)';
+    Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
                
 end
 
@@ -174,7 +177,7 @@ Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :) = Pav;
 Aircraft.Mission.History.SI.Power.Tav(SegBeg:SegEnd, :) = Tav;
 
 % remember the power available
-Aircraft.Mission.History.SI.Power.TV = TV;
+Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd) = TV;
 
 % ----------------------------------------------------------
 

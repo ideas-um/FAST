@@ -149,6 +149,10 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
+% remember the power splits
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamDwn.Clb;
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamUps.Clb;
+
 % if not first segment, get accumulated quantities
 if (SegBeg > 1)
     

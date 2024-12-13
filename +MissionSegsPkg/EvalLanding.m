@@ -2,7 +2,7 @@ function [Aircraft] = EvalLanding(Aircraft)
 %
 % [Aircraft] = EvalLanding(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 dec 2024
+% last updated: 13 dec 2024
 %
 % Evaluate the landing segment. The landing segment only uses two control
 % points (treats it as a single segment) and cannot be changed by the user.
@@ -125,6 +125,10 @@ else
     end
     
 end
+
+% remember the power splits
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamDwn.Lnd;
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamUps.Lnd;
 
 
 %% FLY THE LANDING SEGMENT %%

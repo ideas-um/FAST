@@ -3,7 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 11 dec 2024
+% last modified: 13 dec 2024
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
 % acceleration and maximum thrust/power from all power sources.
@@ -29,7 +29,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % weight: get the maximum takeoff weight
-MTOW = Aircraft.Specs.Weight.MTOW; 
+MTOW = Aircraft.Specs.Weight.MTOW;
 
 % ----------------------------------------------------------
 
@@ -128,6 +128,10 @@ if (any(Batt))
     Eleft_ES(:, Batt) = Aircraft.Specs.Power.SpecEnergy.Batt * Aircraft.Specs.Weight.Batt;
     
 end
+
+% remember the power splits
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamDwn.Tko;
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamUps.Tko;
 
 
 %% FLY TAKEOFF %%

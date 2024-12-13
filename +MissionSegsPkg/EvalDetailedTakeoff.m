@@ -3,7 +3,7 @@ function [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % written by Nawa Khailany, nawakhai@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 11 dec 2024
+% last modified: 13 dec 2024
 %
 % Evaluate the takeoff segment. Assume maximum thrust/power from all
 % components in the propulsion system. In the detailed takeoff segment, the
@@ -102,6 +102,10 @@ Alt = repmat(Aircraft.Specs.Performance.Alts.Tko, npoint, 1);
 
 % total mass in each time
 Mass = repmat(MTOW, npoint, 1);
+
+% remember the power splits
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamDwn.Tko;
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamUps.Tko;
 
 
 %% FLY TAKEOFF %%

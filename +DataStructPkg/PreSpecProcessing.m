@@ -2,7 +2,7 @@ function [Aircraft] = PreSpecProcessing(Aircraft)
 %
 % [Aircraft] = PreSpecProcessing(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 11 dec 2024
+% last updated: 13 dec 2024
 %
 % Instantiate any variables not specified in an aircraft data structure.
 % This function allows users to neglect to assign NaN values to parameters
@@ -283,17 +283,57 @@ else
 
         if ~isfield(Aircraft.Specs.Power,"LamDwn")
             Aircraft.Specs.Power.LamDwn.SLS = NaN;
+            Aircraft.Specs.Power.LamDwn.Tko = NaN;
+            Aircraft.Specs.Power.LamDwn.Clb = NaN;
+            Aircraft.Specs.Power.LamDwn.Crs = NaN;
+            Aircraft.Specs.Power.LamDwn.Des = NaN;
+            Aircraft.Specs.Power.LamDwn.Lnd = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamDwn,"SLS")
                 Aircraft.Specs.Power.LamDwn.SLS = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamDwn,"Tko")
+                Aircraft.Specs.Power.LamDwn.Tko = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamDwn,"Clb")
+                Aircraft.Specs.Power.LamDwn.Clb = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamDwn,"Crs")
+                Aircraft.Specs.Power.LamDwn.Crs = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamDwn,"Des")
+                Aircraft.Specs.Power.LamDwn.Des = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamDwn,"Lnd")
+                Aircraft.Specs.Power.LamDwn.Lnd = NaN;
             end
         end
 
         if ~isfield(Aircraft.Specs.Power,"LamUps")
             Aircraft.Specs.Power.LamUps.SLS = NaN;
+            Aircraft.Specs.Power.LamUps.Tko = NaN;
+            Aircraft.Specs.Power.LamUps.Clb = NaN;
+            Aircraft.Specs.Power.LamUps.Crs = NaN;
+            Aircraft.Specs.Power.LamUps.Des = NaN;
+            Aircraft.Specs.Power.LamUps.Lnd = NaN;
         else
             if ~isfield(Aircraft.Specs.Power.LamUps,"SLS")
                 Aircraft.Specs.Power.LamUps.SLS = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamUps,"Tko")
+                Aircraft.Specs.Power.LamUps.Tko = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamUps,"Clb")
+                Aircraft.Specs.Power.LamUps.Clb = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamUps,"Crs")
+                Aircraft.Specs.Power.LamUps.Crs = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamUps,"Des")
+                Aircraft.Specs.Power.LamUps.Des = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Power.LamUps,"Lnd")
+                Aircraft.Specs.Power.LamUps.Lnd = NaN;
             end
         end
         

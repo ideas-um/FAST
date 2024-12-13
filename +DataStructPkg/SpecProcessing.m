@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% lasat updated: 11 dec 2024
+% lasat updated: 13 dec 2024
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -304,7 +304,17 @@ DefaultPropulsion.MDotCF = 1;
 % DefaultPower.P_W.Batt =                     *calculated*
 DefaultPower.Eta.Propeller = 0.8;
 DefaultPower.LamDwn.SLS = 0;
-DefaultPower.LamUps.SLS = 1;
+DefaultPower.LamDwn.Tko = 0;
+DefaultPower.LamDwn.Clb = 0;
+DefaultPower.LamDwn.Crs = 0;
+DefaultPower.LamDwn.Des = 0;
+DefaultPower.LamDwn.Lnd = 0;
+DefaultPower.LamUps.SLS = 0;
+DefaultPower.LamUps.Tko = 0;
+DefaultPower.LamUps.Clb = 0;
+DefaultPower.LamUps.Crs = 0;
+DefaultPower.LamUps.Des = 0;
+DefaultPower.LamUps.Lnd = 0;
 DefaultPower.P_W.EG = 5;                      % good
 %DefaultPower.P_W.EM = 5;                     % EDC Projection
 % DefaultPower.SpecEnergy.Fuel = 4.32e7;               % if statement

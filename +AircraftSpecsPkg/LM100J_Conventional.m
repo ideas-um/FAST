@@ -3,7 +3,7 @@ function [Aircraft] = LM100J_Conventional()
 % [Aircraft] = LM100J_Conventional()
 % originally written by Max Arnson marnson@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 apr 2024
+% last updated: 13 dec 2024
 %
 % Define the LM100J from Lockheed Martins' Brochure.
 %
@@ -129,7 +129,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.PropArch.Type = "C";
 
 % ----------------------------------------------------------
 
@@ -183,38 +183,6 @@ Aircraft.Specs.Power.P_W.EM = NaN;
 
 % electric generator power-weight ratio (kW/kg)
 Aircraft.Specs.Power.P_W.EG = NaN;
-
-% thrust splits (thrust / total thrust)
-Aircraft.Specs.Power.LamTS.Tko = 0;
-Aircraft.Specs.Power.LamTS.Clb = 0;
-Aircraft.Specs.Power.LamTS.Crs = 0;
-Aircraft.Specs.Power.LamTS.Des = 0;
-Aircraft.Specs.Power.LamTS.Lnd = 0;
-Aircraft.Specs.Power.LamTS.SLS = 0;
-
-% power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Tko = 0;
-Aircraft.Specs.Power.LamTSPS.Clb = 0;
-Aircraft.Specs.Power.LamTSPS.Crs = 0;
-Aircraft.Specs.Power.LamTSPS.Des = 0;
-Aircraft.Specs.Power.LamTSPS.Lnd = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0;
-
-% power splits between power/power sources (electric power / total power)
-Aircraft.Specs.Power.LamPSPS.Tko = 0;
-Aircraft.Specs.Power.LamPSPS.Clb = 0;
-Aircraft.Specs.Power.LamPSPS.Crs = 0;
-Aircraft.Specs.Power.LamPSPS.Des = 0;
-Aircraft.Specs.Power.LamPSPS.Lnd = 0;
-Aircraft.Specs.Power.LamPSPS.SLS = 0;
-
-% power splits between energy/power sources (electric power / total power)
-Aircraft.Specs.Power.LamPSES.Tko = 0;
-Aircraft.Specs.Power.LamPSES.Clb = 0;
-Aircraft.Specs.Power.LamPSES.Crs = 0;
-Aircraft.Specs.Power.LamPSES.Des = 0;
-Aircraft.Specs.Power.LamPSES.Lnd = 0;
-Aircraft.Specs.Power.LamPSES.SLS = 0;
 
 % battery cell configuration and initial SOC
 Aircraft.Specs.Power.Battery.SerCells = NaN;
@@ -279,7 +247,7 @@ Aircraft.Settings.Plotting = 1;
 % plot visualization results
 % 0 = no plotting
 % 1 = plotting
-Aircraft.Settings.VisualizeAircraft = 1;
+Aircraft.Settings.VisualizeAircraft = 0;
 
 % view results as a table
 % 0 = no table

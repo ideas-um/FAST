@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 09 dec 2024
+% last updated: 13 dec 2024
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -117,7 +117,7 @@ Pdwn = PropulsionPkg.PowerFlow([zeros(1, ntrn), P0]', Arch(idx, idx)', Splits(id
 idx = nsrc + (1 : ntrn);
 
 % get the supplemental power
-Psupp = PropulsionPkg.PowerSupplementCheck(Pdwn(1:end-1)', Arch(idx, idx)', Splits(idx, idx), EtaDwn(idx, idx), TrnType, EtaFan);
+Psupp = PropulsionPkg.PowerSupplementCheck(Pdwn(1:end-1)', Arch(idx, idx), Splits(idx, idx), EtaDwn(idx, idx), TrnType, EtaFan);
 
 % convert power to thrust
 Tdwn  = Pdwn  ./ TkoVel;

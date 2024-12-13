@@ -3,7 +3,7 @@ function [Aircraft] = EvalClimb(Aircraft)
 % [Aircraft] = EvalClimb(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 11 dec 2024
+% last updated: 13 dec 2024
 %
 % Evaluate a climb segment by iterating over the power required. While
 % iterating over the power required, the drag and specific excess power
@@ -316,7 +316,7 @@ while (iter < MaxIter)
         dh_dt = [diff(Alt) ./ dTime; 0];
         
         % find points that exceed the maximum rate of climb
-        irow = find(dh_dt > dh_dtMax);
+        irow = find(dh_dt - dh_dtMax > EPS06);
         
         % adjust points that exceed the maximum rate of climb
         if (any(irow))
@@ -344,7 +344,7 @@ while (iter < MaxIter)
         dV_dtMax = (Ps - dh_dt) .* g ./ TAS;
 
         % adjust points when the required acceleration can't be realized
-        if (any(dV_dt > dV_dtMax))
+        if (any(dV_dt - dV_dtMax > EPS06))
             
             % assume maximum acceleration at all points
             dV_dt = dV_dtMax;

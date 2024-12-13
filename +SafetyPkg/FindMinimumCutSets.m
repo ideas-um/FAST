@@ -1,8 +1,8 @@
-function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
+function [Pfail, FailModes] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 %
-% [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
+% [Pfail, FailModes] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 13 dec 2024
 %
 % Given an adjacency-like matrix, find the minimum cut sets that account
 % for internal failures and redundant primary events. then, using the
@@ -32,6 +32,10 @@ function [Pfail] = FindMinimumCutSets(Arch, Components, RemoveSrc)
 % OUTPUTS:
 %     Pfail      - the probability that the system fails.
 %                  size/type/units: 1-by-1 / double / []
+%
+%     FailModes  - string array of the different ways that the system
+%                  architecture can fail.
+%                  size/type/units: nfail-by-ncomp / string / []
 %
 
 

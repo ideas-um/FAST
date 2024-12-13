@@ -2,7 +2,7 @@ function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 %
 % [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 13 dec 2024
 %
 % Re-compute the operational power splits for a "full throttle" setting
 % during the mission.
@@ -59,6 +59,13 @@ nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
 % get the power available (equal to power output for "full throttle" case)
 Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
 
+% get the power splits
+LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
+LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
+
+% re-compute the power splits that are nonzero, so get their indices
+idx = any(LamUps > 0, 2);
+
 % loop through each power split
 for ipar = 1:npar
     
@@ -69,10 +76,10 @@ for ipar = 1:npar
     isupp = ParConns{imain};
     
     % get the total power output at any given time from those sources
-    Pout = sum(Pav(:, [imain+nsrc, isupp]), 2);
+    Pout = sum(Pav(idx, [imain+nsrc, isupp]), 2);
     
     % compute the downstream power split
-    LamDwn = Pav(:, isupp) ./ Pout;
+    LamDwn(idx, :) = Pav(idx, isupp) ./ Pout;
         
 end
 

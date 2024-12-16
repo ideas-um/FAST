@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 dec 2024
+% last updated: 16 dec 2024
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -132,7 +132,7 @@ Aircraft.Specs.Propulsion.SLSThrust  = Tdwn(1:end-1)';
 Aircraft.Specs.Propulsion.ThrustSupp = Tsupp         ;
 
 % check for a fully-electric architecture (so engines don't get sized)
-if (any(TrnType > 0))
+if (any(TrnType > 0 & TrnType ~= 2))
 
     % lapse thrust/power for turbofan/turboprops, respectively
     if      (strcmpi(aclass, "Turbofan" ) == 1)

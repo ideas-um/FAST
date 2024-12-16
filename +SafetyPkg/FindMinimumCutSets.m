@@ -202,7 +202,7 @@ function [Failures] = CreateCutSets(Arch, Components, icomp)
 %
 % [Failures] = CreateCutSets(Arch, Components, icomp)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 16 dec 2024
 %
 % List out all components in the cut set for a system architecture. For
 % each function call, check whether an internal failure mode exists and if
@@ -281,6 +281,12 @@ if (ndwn > 0)
     
     % get the final set of downstream failures
     FinalFails = EnumerateFailures(DwnFails);
+    
+    % eliminate duplicate events in single failure mode (idempotent law)
+    FinalFails = IdempotentLaw(FinalFails);
+    
+    % eliminate duplicate events across failure modes (law of absorption)
+    FinalFails = LawOfAbsorption(FinalFails);
     
     % get the size of the downstream failures
     [~, ncol] = size(FinalFails);

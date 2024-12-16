@@ -3,7 +3,7 @@ function [Aircraft] = A320Neo()
 % [Aircraft] = A320Neo()
 % written by Max Arnson, marnson@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% last updated: 20 Sep 2024
+% last updated: 16 dec 2024
 % 
 % create a baseline model of the A320neo WV054. this version uses a 
 % conventional propulsion architecture.
@@ -123,7 +123,7 @@ Aircraft.Specs.Weight.Batt = NaN;
 % "SHE" = series hybrid electric
 % "TE"  = fully turboelectric
 % "PE"  = partially turboelectric
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.PropArch.Type = "C";
 
 % **required** for configurations using gas-turbine engines
 % get the engine model
@@ -235,7 +235,7 @@ Aircraft.Settings.Plotting = 0;
 Aircraft.Settings.Table = 0;
 
 % flag to visualize the aircraft while sizing
-Aircraft.Settings.VisualizeAircraft = 1;
+Aircraft.Settings.VisualizeAircraft = 0;
 
 % check if the aircraft should be visualized
 if (Aircraft.Settings.VisualizeAircraft == 1)

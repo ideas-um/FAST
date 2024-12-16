@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 dec 2024
+% last updated: 16 dec 2024
 %
 % Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
@@ -469,8 +469,8 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
     
     % get number of arguments for each (potential) split
-    Aircraft.Settings.nargOperUps = nargin(Aircraft.Specs.Propulsion.OperUps);
-    Aircraft.Settings.nargOperDwn = nargin(Aircraft.Specs.Propulsion.OperDwn);
+    Aircraft.Settings.nargOperUps = nargin(Aircraft.Specs.Propulsion.PropArch.OperUps);
+    Aircraft.Settings.nargOperDwn = nargin(Aircraft.Specs.Propulsion.PropArch.OperDwn);
     
     % ------------------------------------------------------
     

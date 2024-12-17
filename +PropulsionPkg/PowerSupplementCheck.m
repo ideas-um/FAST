@@ -2,7 +2,7 @@ function [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan
 %
 % [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan, itrn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 06 dec 2024
+% last updated: 17 dec 2024
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -76,7 +76,7 @@ if any(GTEs)
         
         % compute the power siphon
         Psupp(:, GTEs(igte)) = Psupp(:, GTEs(igte)) - Preq(:, Conns) * ...
-                               Lambda(Conns, GTEs(igte)) ./ Eta(Conns, GTEs(igte));
+                               (Lambda(Conns, GTEs(igte)) ./ Eta(Conns, GTEs(igte)));
                            
     end
 end

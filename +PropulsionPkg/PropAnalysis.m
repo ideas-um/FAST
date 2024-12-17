@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 dec 2024
+% last updated: 17 dec 2024
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -56,6 +56,9 @@ ntrn = length(TrnType);
 
 % get the number of components
 ncomp = length(Arch);
+
+% get the number of sinks
+nsnk = ncomp - nsrc - ntrn;
 
 % check the aircraft class
 if      (strcmpi(aclass, "Turbofan" ) == 1)
@@ -444,6 +447,9 @@ if (any(Fuel))
     % get the indices of the engines
     HasEng = find(Eng);
     
+    % get the trnasmitters that are propellers
+    itrn = [false(1, nsrc), TrnType == 2, false(1, nsnk)];
+    
     % loop through the engines
     for ieng = 1:length(HasEng)
         
@@ -451,7 +457,7 @@ if (any(Fuel))
         icol = HasEng(ieng) + nsrc;
         
         % find the propeller that the engine is connected to
-        [~, iprop] = find(Arch(icol, :));
+        [~, iprop] = find(Arch(icol, :) & itrn);
         
         % compute the thrust output from the propeller
         TEng = Tout(ibeg:iend, iprop);

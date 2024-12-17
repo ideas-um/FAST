@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 dec 2024
+% last updated: 17 dec 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -88,9 +88,16 @@ nsnk = ncomp - nsrc - ntrn;
 % remember the SLS thrust/power available in each transmitter
 ThrustAv = repmat(Aircraft.Specs.Propulsion.SLSThrust, npnt, 1);
  PowerAv = repmat(Aircraft.Specs.Propulsion.SLSPower , npnt, 1);
+
+% get indices for transmitters
+itrn = (1:ntrn) + nsrc;
+
+% find all upstream transmitters (i.e., input at least one transmitter and
+% maybe a source)
+UpTrn = find(sum(Arch(itrn, itrn), 1) > 0);
  
 % assume no power available at the propellers yet (need to propagate)
-PowerAv(:, TrnType == 2) = 0;
+PowerAv(:, UpTrn) = 0; %#ok<FNDSB>
  
 % loop through all transmitters
 for itrn = 1:ntrn

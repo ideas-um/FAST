@@ -1,19 +1,4 @@
 
-[c, cr, Pdif] = AvgTSFC(SizedERJ, Conv)
-
-
-
-
-
-
-
-
-
-
-
-%% functions
-
-
 function [Clb, Crs, Pdif]= AvgTSFC(Aircraft, Conv)
 
     w = Aircraft.Specs.Weight;

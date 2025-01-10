@@ -12,8 +12,8 @@ ERJ.Specs.Power.SpecEnergy.Batt = 0.25;
 ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m");
 
 % Assume a set of takeoff power splits (LambdaTko)
-LambdaTko = 0:1:10;  % Takeoff power splits in % 
-LambdaClb = 0:1:6;   % Climbing power splits in % 
+LambdaTko = 0:0.5:10;  % Takeoff power splits in % 
+LambdaClb = 0:0.5:5;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 tkoname = 10*LambdaTko;

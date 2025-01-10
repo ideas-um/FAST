@@ -1,4 +1,4 @@
-function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
+function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate, npnt)
 %
 % [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 % written by Sasha Kryuchkov
@@ -29,7 +29,7 @@ function [SOCEnd] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % SOC upon arrival
-SOCBeg = Aircraft.Mission.History.SI.Power.SOC(end);
+SOCBeg = Aircraft.Mission.History.SI.Power.SOC(npnt, 2);
 
 % number of cells in series and parallel
 SerCells = Aircraft.Specs.Power.Battery.SerCells;

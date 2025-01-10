@@ -113,6 +113,11 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
 
+% check if detailed battery model
+if Aircraft.Settings.DetailedBatt == 1
+    Aircraft.Mission.History.SI.Power.SOC(1,2) = Aircraft.Specs.Power.Battery.BegSOC;
+end
+
 % check for any fuel
 if (any(Fuel))
     

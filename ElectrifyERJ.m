@@ -118,6 +118,8 @@ end
 figure;
 hold on;
 
+FuelBurn = UnitConversionPkg.ConvMass(FuelBurn, "kg", "lbm");
+
 % Define a set of colors and line styles
 cmap = lines(nclb);  % Use the 'lines' colormap, which gives you distinct colors
 linestyles = {'-', '--', ':', '-.'};  % Different line styles

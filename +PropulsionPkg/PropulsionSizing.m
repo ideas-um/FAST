@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 dec 2024
+% last updated: 16 jan 2025
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -41,9 +41,11 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 % find the engines and electric motors
 Eng = TrnType == 1;
 EM  = TrnType == 0;
+EG  = TrnType == 3;
 
 % get the electric motor power-weight ratio
 P_Wem = Aircraft.Specs.Power.P_W.EM;
+P_Weg = Aircraft.Specs.Power.P_W.EG;
 
 % get the propulsion architecture
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
@@ -216,8 +218,9 @@ end
 % remember the weight of the engines
 Aircraft.Specs.Weight.Engines = sum(Weng);
 
-% compute the electric motor weight
+% compute the electric motor and generator weight
 Aircraft.Specs.Weight.EM = sum(Pdwn(EM)) / P_Wem;
+Aircraft.Specs.Weight.EG = sum(Pdwn(EG)) / P_Weg;
 
 % ----------------------------------------------------------
 

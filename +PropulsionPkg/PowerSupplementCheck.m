@@ -2,7 +2,7 @@ function [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan
 %
 % [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan, itrn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 dec 2024
+% last updated: 17 jan 2025
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -100,8 +100,8 @@ if (any(AnyParallel))
         % find the gas-turbine engine being supplemented
         Driving = find((Arch(:, icomp) > 0)' & (TrnType == 1));
         
-        % check if there are multiple "driving" gas-turbine engines
-        if (length(Driving) > 1)
+        % check if there are multiple (or none) "driving" gas-turbines
+        if (length(Driving) ~= 1)
             
             % don't know how much each motor is powering each gas-turbine
             continue;

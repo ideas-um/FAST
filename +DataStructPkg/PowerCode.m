@@ -19,6 +19,7 @@ for i = 1 : length(Profile.Segs)
 
     % fill altitude in mission history 
     Aircraft.Mission.History.SI.Performance.Alt(Profile.SegBeg(i):Profile.SegEnd(i), 1) = SegAlt;
+
 end
 
 Alt = Aircraft.Mission.History.SI.Performance.Alt;
@@ -29,10 +30,13 @@ LamSLS = Aircraft.Specs.Power.LamTSPS.SLS;
 npoints = length(Alt);
 
 %Keep for later to override clear mission for optimization
-%if length(Aircraft.Specs.Power.PC.EM) == npoints
-%    Aircraft.Mission.History.SI.Power.PC = Aircraft.Specs.Power.PC.EM;
 
-if LamSLS ~= 0
+if length(Aircraft.Specs.Power.PC.EM) == npoints
+    Aircraft.Mission.History.SI.Power.PC(:,3) = Aircraft.Specs.Power.PC.EM;
+    Aircraft.Mission.History.SI.Power.PC(:,4) = Aircraft.Specs.Power.PC.EM;
+
+
+elseif LamSLS ~= 0
 
     PC = Aircraft.Specs.Power.PC.EM.Split;
     % get alt range from ac struct

@@ -266,6 +266,14 @@ ThrustTS = PowerTS ./ TAS;
 % consolidate power from thrust sources into a scalar value
 TVPower = PowerTS * ones(nts, 1);
 
+%% HARD CODING POWER AVAILABLE FOR EM w/ PC %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
+    Pav = Aircraft.Specs.Weight.EM/2 * 10^3;
+    PowerAv(:,[3,4]) = repmat(Pav, npnt, 2);
+end
+
 
 %% STORE OUTPUTS IN THE AIRCRAFT STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

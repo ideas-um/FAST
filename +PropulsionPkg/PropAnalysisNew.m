@@ -280,7 +280,7 @@ for ipnt = 1:npnt
 
     
     % get the power output by the driving power sources
-    PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
+    %PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
         
 end
 

@@ -1,4 +1,4 @@
-function [Aircraft] = FlyMission(Aircraft)
+  function [Aircraft] = FlyMission(Aircraft)
 %
 % [Aircraft] = FlyMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu

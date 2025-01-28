@@ -176,8 +176,10 @@ if Type < 0
         Aircraft.Specs.Weight.Batt;
 end
 
-% initialize the mission history
-Aircraft = DataStructPkg.InitMissionHistory(Aircraft);
+if Type > 0
+    % initialize the mission history
+    Aircraft = DataStructPkg.InitMissionHistory(Aircraft);
+end
 
 % print initial size
 fprintf(1, "Initial Size:          \n"                                                    );
@@ -230,10 +232,13 @@ while (iter < MaxIter)
     dWfuel = Fburn - Wfuel;
         
     % check if a retrofit is being performed (fixed battery weight)
+    % off design batery weight fixed
     if (Type == -2)
         
         % fixed battery weight
         dWbatt = 0;
+
+        %dWfuel = 0;
         
     else
         

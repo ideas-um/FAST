@@ -161,8 +161,8 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = 0;
-Aircraft.Specs.Power.PC.EM.Alt =0;
+Aircraft.Specs.Power.PC.EM.Split = .5;
+Aircraft.Specs.Power.PC.EM.Alt =[0, 36000];
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = 0.09; %{.09, .01};
-Aircraft.Specs.Power.LamTSPS.Alt = 0; %{[0, 0], [10, 15000]};
-Aircraft.Specs.Power.LamTSPS.SLS = 0.09; %0.09;
+Aircraft.Specs.Power.LamTSPS.Split = .085; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Alt = 0;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.085; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -200,8 +200,8 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of control points in each segment
-Aircraft.Settings.TkoPoints = NaN;
-Aircraft.Settings.ClbPoints = NaN;
+Aircraft.Settings.TkoPoints = 2;
+Aircraft.Settings.ClbPoints = 2;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;
 

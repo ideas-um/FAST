@@ -2,7 +2,8 @@ function [] = TestFAST()
 %
 % [] = TestFAST()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
-% last updated: 13 sep 2024
+% modified by Paul Mokotoff, prmoko@umich.edu
+% last updated: 11 nov 2024
 %
 % Driver file for all FAST test cases.
 %
@@ -43,5 +44,13 @@ UnitConversionPkg.TestConvMass();
 UnitConversionPkg.TestConvTemp();
 UnitConversionPkg.TestConvTSFC();
 UnitConversionPkg.TestConvVel();
+
+
+%% TESTS COMPLETED %%
+%%%%%%%%%%%%%%%%%%%%%
+
+% print a notice
+fprintf(1, "\nAll FAST tests completed! Check above to see if any have failed.\n");
+
 
 end

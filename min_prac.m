@@ -1,6 +1,8 @@
 
 % fmincon practice
 % goal optimize off design power code for one flight
+    load("SizedHEA.mat")
+
 n1= SizedHEA.Mission.Profile.SegBeg(2);
 n2= SizedHEA.Mission.Profile.SegEnd(4)-1;
 
@@ -10,19 +12,21 @@ A = ones(1,b);
 lb = zeros(1, b);
 ub = ones(1, b);
 
-PC1 = .01 * ones(b,1);
-fburn = PCvFburn(PC1)
+fburnOG = SizedHEA.Specs.Weight.Fuel;
 
-options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','sqp');
+options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','interior-point');
+tic
 PCbest = fmincon(@PCvFburn, PC0, [], [], [], [], lb, ub, @Con_ebatt, options);
+toc 
 
-
+fburnOpt = PCvFburn(PCbest);
+fdiff = (fburnOpt - fburnOG)/fburnOG
 
 
 %% functions
 function [fburn] = PCvFburn(PC)
 
-    load("SizedHea2.mat")
+    load("SizedHEA.mat")
     Aircraft = SizedHEA;
 
     n1= Aircraft.Mission.Profile.SegBeg(2);
@@ -41,14 +45,12 @@ end
 function [c, ceq] = Con_ebatt(PC)
 
     % get aircraft
-    load("SizedHea2.mat")
+    load("SizedHEA.mat")
     Aircraft = SizedHEA;
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
+    npts = length(Aircraft.Mission.History.SI.Performance.Alt);
 
-    SOC = Aircraft.Mission.History.SI.Power.SOC(n2, 2);
-    SOCMax = 20;
-    %{
     PC0 = zeros(npts,1);
     PC0(1:(n1-1)) = ones(n1-1,1);
     PC0(n1:n2) = PC;
@@ -60,10 +62,8 @@ function [c, ceq] = Con_ebatt(PC)
 
     % get battery max energy
     Ebattmax = Aircraft.Specs.Weight.Batt * Aircraft.Specs.Power.SpecEnergy.Batt;
-    c = Ebatt - .9*Ebattmax;
+    c = Ebatt - .96*Ebattmax;
     
-    %}
-    c = SOC - SOCMax;
     ceq = [];
 
 end

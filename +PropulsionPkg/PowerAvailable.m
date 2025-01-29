@@ -270,7 +270,7 @@ TVPower = PowerTS * ones(nts, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
-    Pav = Aircraft.Specs.Weight.EM/2 * 10^3;
+    Pav = Aircraft.Specs.Weight.EM/2 * 10^3 * Aircraft;
     PowerAv(:,[3,4]) = repmat(Pav, npnt, 2);
 end
 

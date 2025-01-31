@@ -13,12 +13,14 @@ A = ones(1,b);
 lb = zeros(1, b);
 ub = ones(1, b);
 
-fburnOG = SizedHEA.Specs.Weight.Fuel;
+fburnOG = PCvFburn(PC0);
 
 options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','interior-point');
+options.OptimalityTolerance = 10^-3;
+options.StepTolerance = 10^-6;
 tic
 PCbest = fmincon(@PCvFburn, PC0, [], [], [], [], lb, ub, @Con_ebatt, options);
-toc 
+t = toc 
 
 fburnOpt = PCvFburn(PCbest);
 fdiff = (fburnOpt - fburnOG)/fburnOG
@@ -26,9 +28,10 @@ fdiff = (fburnOpt - fburnOG)/fburnOG
 
 %% functions
 function [fburn] = PCvFburn(PC)
-
+    
     load("SizedHEA.mat")
     Aircraft = SizedHEA;
+    Aircraft.Specs.Performance.Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
 
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
@@ -42,6 +45,7 @@ function [fburn] = PCvFburn(PC)
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     
     fburn = Aircraft.Specs.Weight.Fuel;
+    
 end
 
 function [c, ceq] = Con_ebatt(PC)

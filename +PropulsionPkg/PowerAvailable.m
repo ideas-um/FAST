@@ -122,6 +122,9 @@ for ips = 1:nps
         end
         
     elseif (PSType(ips) == 0) % electric motor
+        Pav = Aircraft.Specs.Weight.EM/2 * 10^3;
+        PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
+        PowerAv(:,[3,4]) = PC_EM.*repmat(Pav, npnt, 2);
         
         % once available, input an electric motor model here
         

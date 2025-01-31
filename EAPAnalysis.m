@@ -182,11 +182,13 @@ if Type > 0
 end
 
 % print initial size
+%{
 fprintf(1, "Initial Size:          \n"                                                    );
 fprintf(1, "    MTOW  = %.6e lbm   \n",     UnitConversionPkg.ConvMass(MTOW , "kg", "lbm"));
 fprintf(1, "    Wbatt = %.6e lbm   \n",     UnitConversionPkg.ConvMass(Wbatt, "kg", "lbm"));
 fprintf(1, "    Wfuel = %.6e lbm   \n",     UnitConversionPkg.ConvMass(Wfuel, "kg", "lbm"));
 fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1, "m", "ft") ^ 2);
+%}
 
 % iterate until convergence
 while (iter < MaxIter)
@@ -291,7 +293,7 @@ while (iter < MaxIter)
     % get the electric components' weights
     Wem = Aircraft.Specs.Weight.EM;
     Weg = Aircraft.Specs.Weight.EG;
-    
+    %{
     % print iteration result (in english units)
     fprintf(1, "Iteration %2d:\n"         , iter                                                 );
     fprintf(1, "    MTOW  = %.6e lbm   \n", UnitConversionPkg.ConvMass(mtow_new, "kg", "lbm")    );
@@ -301,7 +303,7 @@ while (iter < MaxIter)
     fprintf(1, "    Wem   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Wem     , "kg", "lbm")    );
     fprintf(1, "    Weg   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Weg     , "kg", "lbm")    );
     fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1 , "m" , "ft" ) ^ 2);
-    
+    %}
     % iterate
     iter = iter + 1;
     

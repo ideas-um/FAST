@@ -68,8 +68,8 @@ if (Aircraft.Settings.DetailedBatt == 1)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % maximum extracted capacity and voltage
-    QMax = 2.6; % Ah
-    VMax = 3.6; % V
+    VMax = 4.0880; % 3.6
+    QMax = 3; % 2.6
 
     % acceptable SOC threshold
     MinSOC = 20;
@@ -212,8 +212,10 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % remember the new cell arrangement
     Aircraft.Specs.Power.Battery.ParCells = Npar;
 
-    % remember the battery c-rates arrangement
-    Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar) ;
+    % remember the battery c-rates updated
+    % Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar);
+
+
 end
 
 % ----------------------------------------------------------

@@ -1,4 +1,4 @@
-function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Model(Preq, Time, SOCBeg, Parallel, Series)
+function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Model(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 %
 % [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
 % originally written by Sasha Kryuchkov
@@ -93,7 +93,7 @@ Time = Time ./ 3600;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % nominal cell voltage [V]
-VoTemp = 4.0880;
+VoTemp = 3.6 ;% 4.0880
 
 % internal resistance [Ohm]
 ResistanceTemp = 0.0199;
@@ -107,8 +107,17 @@ A = 0.0986;
 % exponential capacity [(Ah)^-1]
 B = 30;
 
-% maximum capacity [Ah]
-Q = 3;
+% Determine maximum capacity [Ah] based on analysis type and degradation effect
+if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Settings.Degradation == 1
+
+    % Off-design analysis with battery degradation effect
+    Q = 3 * Aircraft.Specs.Battery.SOH(end) / 100;
+else
+    
+    % Either on-design analysis or off-design without degradation effect
+    Q = 3;
+end
+
 
 % discharge curve slope (taken from E-PASS)
 DischargeCurveSlope = 0.29732;

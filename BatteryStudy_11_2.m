@@ -21,7 +21,8 @@ FuelBurn = NaN(nsplit, nclb);  % Fuel burn for each tko and clb combo (use NaN f
 % avg_TSFC_crs = NaN(nsplit, nclb);
 % avg_TSFC_clb = NaN(nsplit, nclb);
 % EG_weight = NaN(nsplit, nclb);
-% Batt_weight = NaN(nsplit, nclb);
+Batt_weight = NaN(nsplit, nclb);
+C_rate = NaN(nsplit, nclb);
 
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -65,7 +66,10 @@ for tsplit = 1:nsplit
         % avg_TSFC_crs(tsplit, csplit) = mean(SizedERJ.Mission.History.SI.Propulsion.TSFC(37:46,1));
         % avg_TSFC_clb(tsplit, csplit) = mean(SizedERJ.Mission.History.SI.Propulsion.TSFC(10:37,1));
         % EG_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
-        % Batt_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Batt  
+        Batt_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Batt;
+        C_rate(tsplit, csplit) = max(SizedERJ.Mission.History.SI.Power.C_rate);
+
+
         % % Optional: Display the progress
         % fprintf('Iteration (Tko = %.1f, Clb = %.1f) - Fuel Burn: %.2f kg\n', ...
         %         LambdaTko(tsplit), LambdaClb(csplit), FuelBurn(tsplit, csplit));
@@ -107,12 +111,107 @@ else
     fprintf('Successfully loaded %d files from %s.\n', length(matFiles), loadFolder);
 end
 
-c_rate_list = zeros(length(loadedData),1);
 
-for i = 1:length(loadedData)
-    c_rate_list = max(loadedData{i, 1}.Aircraft.Mission.History.SI.Power.C_rate);
-    disp(c_rate_list)
+
+
+%% Conceptual Battery degradation study
+
+SOHss = [];
+FECss = 0;
+FEC_info = [];
+
+for i = 1:1000
+    [a, b] = BatteryPkg.CyclAging(SizedERJ, 1, FECss, 30*60,-250000);
+
+    if a < 70
+        break
+    end
+    FECss = b;
+    FEC_info(i) = FECss;
+    SOHss(i) = a;
+end
+
+plot(SOHss, LineWidth= 2)
+xlabel('Battery Cycling Times');
+ylabel("Battery SOH [%]");
+grid on
+title('Battery Degradation')
+
+
+%% OFF-design test
+clc;clear
+SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+SizedERJ.Settings.Analysis.Type=-2;
+
+SOHs = [];
+FECs = [];
+Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end);
+for i = 1:1000
+
+    Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+   
+    if Off_SizedERJ.Specs.Battery.SOH(end) < 0
+        break
+    end
+
+    SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+    FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end); 
+
 end
 
 
-%% Battery study
+plot(SOHs, 'LineWidth', 2);
+hold on
+plot(1:length(FECs), repmat(70, 1, length(FECs)), 'LineWidth', 2, 'LineStyle', '--', 'Color', 'r'); % Ensure horizontal line works
+hold off
+xlabel('Battery Cycling Times');
+ylabel("Battery SOH [%]");
+grid on
+title('Battery Degradation')
+
+
+
+%%
+
+clc;clear
+SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+SizedERJ.Settings.Analysis.Type=-2;
+
+SOHs_20 = [];
+SOHs_25 = [];
+SOHs_30 = [];
+SOHs_35 = [];
+
+SizedERJ.Specs.Battery.OpTemp = 35;
+
+Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+
+for i = 1:1000
+
+    Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+   
+    if Off_SizedERJ.Specs.Battery.SOH(end) < 0
+        break
+    end
+
+    SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+
+end
+
+
+plot(SOHs_20, 'LineWidth', 2);
+hold on
+plot(SOHs_25, 'LineWidth', 2);
+plot(SOHs_30, 'LineWidth', 2);
+plot(SOHs_35, 'LineWidth', 2);
+plot(1:length(SOHs_20), repmat(70, 1, length(SOHs_20)), 'LineWidth', 2, 'LineStyle', '--', 'Color', 'r'); 
+hold off
+xlabel('Battery Cycling Times');
+ylabel("Battery SOH [%]");
+grid on
+title('Battery Degradation');
+legend( "T=20°C", "T=25°C", "T=30°C", "T=35°C");
+

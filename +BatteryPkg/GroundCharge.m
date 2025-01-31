@@ -4,6 +4,7 @@ function [Aircraft] = GroundCharge(Aircraft, GroundTime, ChrgRate)
 % written by Sasha Kryuchkov
 % modified by Paul Mokotoff, prmoko@umich.edu
 % modified by Vaibhav Rau, vaibhav.rau@warriorlife.net
+% modified by Yipeng Liu, yipenglx@umich.edu
 % last updated: 19 sep 2024
 %
 % Simulate aircraft charging at an airport gate.
@@ -59,7 +60,7 @@ SOCSeries(1) = SOCBeg;
 
 % Calculate initial values for Voltage, Current, Pout, Capacity, and C_rate without altering SOC
 [VoltageSeries(1), CurrentSeries(1), PoutSeries(1), CapacitySeries(1), SOCSeries(2), C_rateSeries(1)] = ...
-    BatteryPkg.Model(ChrgRate, TimeStep, SOCBeg, ParCells, SerCells);
+    BatteryPkg.Model(Aircraft, ChrgRate, TimeStep, SOCBeg, ParCells, SerCells);
 
 %% SIMULATE CHARGING %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -67,7 +68,7 @@ SOCSeries(1) = SOCBeg;
 for i = 2:numSteps
     % Update the charging model for each 1-second interval
     [VoltageSeries(i), CurrentSeries(i), PoutSeries(i), CapacitySeries(i), SOCSeries(i+1), C_rateSeries(i)] = ...
-        BatteryPkg.Model(ChrgRate, TimeStep, SOCSeries(i), ParCells, SerCells);
+        BatteryPkg.Model(Aircraft,ChrgRate, TimeStep, SOCSeries(i), ParCells, SerCells);
 
     % minimum SOC is 0% (fully depleted) and can't be negative
     if (SOCSeries(i) < 0)
@@ -90,7 +91,7 @@ end
 
 % Add one more calculation for the last value of capacity due to issue
 % of Model.m, line 227
-[~, ~, ~, CapacitySeries(end + 1), ~, ~] = BatteryPkg.Model(ChrgRate, TimeStep, SOCSeries(end), ParCells, SerCells);
+[~, ~, ~, CapacitySeries(end + 1), ~, ~] = BatteryPkg.Model(Aircraft, ChrgRate, TimeStep, SOCSeries(end), ParCells, SerCells);
 
 %% POST PROCESS %%
 %%%%%%%%%%%%%%%%%%

@@ -13,7 +13,7 @@ ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m")
 
 % Assume a set of takeoff power splits (LambdaTko)
 LambdaTko = 0:0.5:10;  % Takeoff power splits in % 
-LambdaClb = 0;   % Climbing power splits in % 
+LambdaClb = 0:0.5:10;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 
@@ -24,6 +24,9 @@ avg_TSFC_crs = NaN(nsplit, nclb);
 avg_TSFC_clb = NaN(nsplit, nclb);
 EG_weight = NaN(nsplit, nclb);
 Batt_weight = NaN(nsplit, nclb);
+Max_crate = NaN(nsplit, nclb);
+CellPar = NaN(nsplit, nclb);
+
 
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -55,11 +58,11 @@ for tsplit = 1:nsplit
         SizedERJ = Main(ERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
         % Check if the sizing converged
-        if SizedERJ.Settings.Converged == 0
-            % If the aircraft did not converge, skip this iteration
-            fprintf('Skipped: (Tko = %.1f, Clb = %.1f) did not converge\n', LambdaTko(tsplit), LambdaClb(csplit));
-            continue;
-        end
+        % if SizedERJ.Settings.Converged == 0
+        %     % If the aircraft did not converge, skip this iteration
+        %     fprintf('Skipped: (Tko = %.1f, Clb = %.1f) did not converge\n', LambdaTko(tsplit), LambdaClb(csplit));
+        %     continue;
+        % end
 
         % Store the fuel burn for the current LambdaTko and LambdaClb
         FuelBurn(tsplit, csplit) = SizedERJ.Mission.History.SI.Weight.Fburn(end);
@@ -68,6 +71,14 @@ for tsplit = 1:nsplit
         avg_TSFC_clb(tsplit, csplit) = mean(SizedERJ.Mission.History.SI.Propulsion.TSFC(10:37,1));
         EG_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
         Batt_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Batt ; 
+        CellPar(tsplit, csplit) = SizedERJ.Specs.Power.Battery.ParCells; 
+
+        if LambdaTko(tsplit) == 0 && LambdaClb(csplit) == 0
+            Max_crate(tsplit, csplit) = 0 ;
+        else
+            Max_crate(tsplit, csplit) = max(SizedERJ.Mission.History.SI.Power.C_rate) ;
+        end
+        
         % Optional: Display the progress
         fprintf('Iteration (Tko = %.1f, Clb = %.1f) - Fuel Burn: %.2f kg\n', ...
                 LambdaTko(tsplit), LambdaClb(csplit), FuelBurn(tsplit, csplit));
@@ -135,9 +146,9 @@ legend('show','FontSize',12);
 grid on;
 hold off;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Post process for avg_TSFC_crs %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Post process for avg_TSFC_crs %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure;
 hold on;
 % Plot one line for each LambdaClb
@@ -162,35 +173,9 @@ grid on;
 hold off;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Post process for avg_TSFC_crs %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure;
-hold on;
-% Plot one line for each LambdaClb
-for csplit = 1:nclb
-    % Only plot for non-NaN fuel burn values
-    plot(LambdaTko, Batt_weight(:, csplit), ...
-         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
-         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
-         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
-         'LineWidth', 1.5, ...  % Set line width for better visibility
-         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
-end
-
-% Add labels, title, and legend
-xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
-ylabel('Battery Weight (kg)','FontSize',14);
-title_text = sprintf('Battery Weight vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
-    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
-title(title_text, 'FontSize', 14);
-legend('show','FontSize',12);
-grid on;
-hold off;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Post process for avg_TSFC_clb %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Post process for avg_TSFC_clb %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure;
 hold on;
 % Plot one line for each LambdaClb
@@ -214,9 +199,9 @@ legend('show','FontSize',12);
 grid on;
 hold off;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Post process for Engine Weight %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Post process for Engine Weight %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure;
 hold on;
 % Plot one line for each LambdaClb
@@ -240,6 +225,86 @@ legend('show','FontSize',12);
 grid on;
 hold off;
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%    Post process for C-rates    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure;
+hold on;
+% Plot one line for each LambdaClb
+for csplit = 1:nclb
+    % Only plot for non-NaN fuel burn values
+    plot(LambdaTko, Max_crate(:, csplit), ...
+         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
+         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
+         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
+         'LineWidth', 1.5, ...  % Set line width for better visibility
+         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
+end
+
+% Add labels, title, and legend
+xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
+ylabel('Max C-rate (C)','FontSize',14);
+title_text = sprintf('Max C-rate vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text, 'FontSize', 14);
+legend('show','FontSize',12);
+grid on;
+hold off;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Post process for Battery Weight %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure;
+hold on;
+% Plot one line for each LambdaClb
+for csplit = 1:nclb
+    % Only plot for non-NaN fuel burn values
+    plot(LambdaTko, Batt_weight(:, csplit), ...
+         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
+         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
+         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
+         'LineWidth', 1.5, ...  % Set line width for better visibility
+         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
+end
+
+% Add labels, title, and legend
+xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
+ylabel('Battery Weight (kg)','FontSize',14);
+title_text = sprintf('Battery Weight vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text, 'FontSize', 14);
+legend('show','FontSize',12);
+grid on;
+hold off;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Post process for Battery Parallel Cell # %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure;
+hold on;
+% Plot one line for each LambdaClb
+for csplit = 1:nclb
+    % Only plot for non-NaN fuel burn values
+    plot(LambdaTko, CellPar(:, csplit), ...
+         'Color', cmap(csplit, :), ...  % Assign a unique color from the colormap
+         'LineStyle', linestyles{mod(csplit-1, length(linestyles)) + 1}, ...  % Cycle through line styles
+         'Marker', markers{mod(csplit-1, length(markers)) + 1}, ...  % Cycle through markers
+         'LineWidth', 1.5, ...  % Set line width for better visibility
+         'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
+end
+
+% Add labels, title, and legend
+xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
+ylabel('Battery Cell Parallel #','FontSize',14);
+title_text = sprintf('Cell Parallel # vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text, 'FontSize', 14);
+legend('show','FontSize',12);
+grid on;
+hold off;
 % ----------------------------------------------------------
 
 
@@ -333,32 +398,3 @@ grid on;
 hold off;
 
 
-%% -----------------------------------TESTING SECTION ---------------------------------------------%%
-
-a = AircraftSpecsPkg.ERJ175LR;
-
-a.Specs.Power.LamTSPS.Tko = 8.5 / 100;
-a.Specs.Power.LamTSPS.Clb = 4 / 100;
-a.Specs.Power.LamTSPS.SLS = 8.5 / 100;
-
-a.Specs.Power.Battery.ParCells = 100; %100 
-a.Specs.Power.Battery.SerCells = 62;  % 62
-a.Specs.Power.Battery.BegSOC = 100;   %100
-
-a.Specs.Power.SpecEnergy.Batt = 0.25;
-a.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m");
-
-a.Specs.Propulsion.Engine.HEcoeff = 1 +  a.Specs.Power.LamTSPS.SLS;
-
-b = Main(a, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-b.Specs.Weight.Fuel
-
-figure
-plot(UnitConversionPkg.ConvLength(b.Mission.History.SI.Performance.Dist, 'm', 'naut mi'), ...
-    b.Mission.History.SI.Weight.Fburn)
-
-figure
-plot(UnitConversionPkg.ConvLength(b.Mission.History.SI.Performance.Dist, 'm', 'naut mi'), ...
-    b.Mission.History.SI.Propulsion.TSFC(:,1))
-
-b.Mission.History.SI.Power.Pout_PS(35,3)/(b.Mission.History.SI.Power.Pout_PS(35,3)+b.Mission.History.SI.Power.Pout_PS(35,2))

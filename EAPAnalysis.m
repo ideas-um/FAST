@@ -261,6 +261,7 @@ while (iter < MaxIter)
         
         % resize the battery for power and energy
         Aircraft = BatteryPkg.ResizeBattery(Aircraft);
+        Aircraft = MissionSegsPkg.FlyMission(Aircraft);
         
         % find the difference between the new and old battery weight
         dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
@@ -318,26 +319,35 @@ while (iter < MaxIter)
     fprintf(1, "    Wem   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Wem     , "kg", "lbm")    );
     fprintf(1, "    Weg   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Weg     , "kg", "lbm")    );
     fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1 , "m" , "ft" ) ^ 2);
-
-    % Store the Aircraft structure at this iteration
-    AircraftHistory{iter+1} = Aircraft;
     
-    % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
-    save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter+1)), 'Aircraft');    
+    if iter > 0
+        % Store the Aircraft structure at this iteration
+        AircraftHistory{iter} = Aircraft;
+        
+        % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
+        save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
+    end
 
     % Stop iteration early if the last three iterations produce the same
     % results within the error tolerance to end Zig-zag
     BattW_tol = 0.01;
-    if iter >= 3
+
+    % Find which elements in AircraftHistory are structures
+    isStruct = cellfun(@isstruct, AircraftHistory);
+
+    % Extract only the elements that are structures
+    AircraftHistory = AircraftHistory(isStruct);
+
+    if length(AircraftHistory) >= 3
 
         % Extract the this and second-to-last iterations
-        ThisIteration = AircraftHistory{iter+1};
-        Sec_2_LastIteration = AircraftHistory{iter-1};
+        ThisIteration = AircraftHistory{iter};
+        Sec_2_LastIteration = AircraftHistory{iter-2};
 
         % Ending with C-rate within limitation
         if max(Aircraft.Mission.History.SI.Power.C_rate) < MaxAllowCRate
 
-        % Compare key metrics (e.g., MTOW, Wfuel, Wbatt)
+        % Compare key metrics (Wbatt)
             BattW_diff = abs(ThisIteration.Specs.Weight.Batt - Sec_2_LastIteration.Specs.Weight.Batt);
 
             % Check if the differences are below a threshold
@@ -365,6 +375,7 @@ while (iter < MaxIter)
 
 end
 
+
 % print warning if maximum iterations reached
 if ((iter == MaxIter) && (Type > 0))
     
@@ -377,54 +388,56 @@ if ((iter == MaxIter) && (Type > 0))
 end
 
 %% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5% %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if Aircraft.Specs.Power.LamTSPS.Tko == 0 
-    % if conventional aircraft, do nothing
-else
-    % Check the number of iterations in AircraftHistory
-    numIterations = length(AircraftHistory);
-
-    % Find which elements in AircraftHistory are structures
-    isStruct = cellfun(@isstruct, AircraftHistory);
-
-    % Extract only the elements that are structures
-    AircraftHistory = AircraftHistory(isStruct);
-
-    if numIterations < 3
-
-        % Use all available iterations
-        lastAircraft = AircraftHistory; 
-        maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
-
-        % Extract the max C-rate for each available iteration
-        for i = 1:numIterations
-            maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
-        end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+if Type > 0
+    if Aircraft.Specs.Power.LamTSPS.Tko == 0 
+        % if conventional aircraft, do nothing
     else
-        % Use the last 3 iterations if more than 3 interations available
-        lastAircraft = AircraftHistory(end-2:end);
-        maxC_rates = zeros(3, 1); % Initialize for the last 3 iterations
-
-        % Extract the max C-rate for each of the last 3 iterations
-        for i = 1:3
-            maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+        % Check the number of iterations in AircraftHistory
+        numIterations = length(AircraftHistory);
+    
+        % Find which elements in AircraftHistory are structures
+        isStruct = cellfun(@isstruct, AircraftHistory);
+    
+        % Extract only the elements that are structures
+        AircraftHistory = AircraftHistory(isStruct);
+    
+        if numIterations < 3
+    
+            % Use all available iterations
+            lastAircraft = AircraftHistory; 
+            maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
+    
+            % Extract the max C-rate for each available iteration
+            for i = 1:numIterations
+                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+            end
+        else
+            % Use the last 3 iterations if more than 3 interations available
+            lastAircraft = AircraftHistory(end-2:end);
+            maxC_rates = zeros(3, 1); % Initialize for the last 3 iterations
+    
+            % Extract the max C-rate for each of the last 3 iterations
+            for i = 1:3
+                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+            end
         end
+    
+        % Find the structure where max(C-rate) < 5 and closest to 5
+        validIndices = find(maxC_rates < MaxAllowCRate); % Find indices where max C-rate is valid
+        if isempty(validIndices)
+            error('No structure found with max(C-rate) < 5.');
+        end
+    
+        % Get the index of the structure closest to 5
+        [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
+        selectedIndex = validIndices(bestIndex);
+    
+        % Output the final selected Aircraft structure
+        Aircraft = lastAircraft{selectedIndex};
+    
     end
-
-    % Find the structure where max(C-rate) < 5 and closest to 5
-    validIndices = find(maxC_rates < MaxAllowCRate); % Find indices where max C-rate is valid
-    if isempty(validIndices)
-        error('No structure found with max(C-rate) < 5.');
-    end
-
-    % Get the index of the structure closest to 5
-    [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
-    selectedIndex = validIndices(bestIndex);
-
-    % Output the final selected Aircraft structure
-    Aircraft = lastAircraft{selectedIndex};
-
- end
+end
 %% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -450,4 +463,25 @@ end
 
 % ----------------------------------------------------------
 
+%% Battery Degradation %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% grounding time
+GroundTime = Aircraft.Specs.Battery.GroundT;
+
+% LIB chemistry material
+BattChem = Aircraft.Specs.Battery.Chem;
+
+% battery charging rate in [W]
+Cpower = Aircraft.Specs.Battery.Cpower;
+
+% FEC
+FECs = Aircraft.Specs.Battery.FEC(end);
+
+if Type ~= 1 % Battery degradation only makes sense in off-design 
+    if Aircraft.Settings.Degradation == 1
+        [SOH, FEC] = BatteryPkg.CyclAging(Aircraft, BattChem, FECs, GroundTime, Cpower);
+        Aircraft.Specs.Battery.FEC(end+1,1) = FEC;
+        Aircraft.Specs.Battery.SOH(end+1,1) = SOH;
+    end
 end

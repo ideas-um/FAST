@@ -91,7 +91,7 @@ for ipar = 1:npar
     PC_EM(PC_EM_NaN) = 0;
 
     Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
-    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
+    %Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
     
 end
 

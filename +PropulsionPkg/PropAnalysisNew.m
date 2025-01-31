@@ -263,8 +263,8 @@ for ipnt = 1:npnt
     
 %Use full EM then fill with engine power
     if exist('PC_EM', 'var') 
-        PreqPS(ipnt,[3,4]) = PC_EM(ipnt) * Pav_PS(ipnt, [3,4]);
-        PreqPS(ipnt,[1,2]) = PreqTS(ipnt) - PreqPS(ipnt,[3,4]);
+        PreqPS(ipnt,[3,4]) = Pav_PS(ipnt, [3,4]);
+        PreqPS(ipnt,[1,2]) = PreqTS(ipnt)./[.99, .99] - PreqPS(ipnt,[3,4]);
     end
 
     %{

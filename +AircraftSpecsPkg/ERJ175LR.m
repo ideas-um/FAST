@@ -222,12 +222,12 @@ Aircraft.Settings.Analysis.Type = +1;
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off
-Aircraft.Settings.Plotting = 0;
+Aircraft.Settings.Plotting = 1;
 
 % make a tble of mission history
 %     1 for make table
 %     0 for no table
-Aircraft.Settings.Table = 0;
+Aircraft.Settings.Table = 1;
 
 % ----------------------------------------------------------
 

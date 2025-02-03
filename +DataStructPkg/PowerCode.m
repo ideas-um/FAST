@@ -31,10 +31,8 @@ npoints = length(Alt);
 
 %Keep for later to override clear mission for optimization
 
-if length(Aircraft.Specs.Power.PC.EM) == npoints
-    Aircraft.Mission.History.SI.Power.PC(:,3) = Aircraft.Specs.Power.PC.EM;
-    Aircraft.Mission.History.SI.Power.PC(:,4) = Aircraft.Specs.Power.PC.EM;
-
+if length(Aircraft.Specs.Power.PC) == npoints
+    Aircraft.Mission.History.SI.Power.PC = Aircraft.Specs.Power.PC;
 
 elseif LamSLS ~= 0
 

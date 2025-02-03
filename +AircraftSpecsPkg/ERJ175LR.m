@@ -200,8 +200,8 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of control points in each segment
-Aircraft.Settings.TkoPoints = NaN;
-Aircraft.Settings.ClbPoints = NaN;
+Aircraft.Settings.TkoPoints = 2;
+Aircraft.Settings.ClbPoints = 2;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;
 
@@ -222,7 +222,7 @@ Aircraft.Settings.Analysis.Type = +1;
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off
-Aircraft.Settings.Plotting = 1;
+Aircraft.Settings.Plotting = 0;
 
 % make a tble of mission history
 %     1 for make table

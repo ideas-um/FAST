@@ -230,7 +230,7 @@ Psupp  = zeros(npnt, nps);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
-    PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, end);
+    PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
 end
 
 % loop through points to get power outputs by thrust/power sources
@@ -288,12 +288,6 @@ end
 TreqPS = PreqPS ./ TAS;
 TreqTS = PreqTS ./ TAS;
 
-% remember the power/thrust required by the thrust/power sources
-Aircraft.Mission.History.SI.Power.Preq_TS(SegBeg:SegEnd, :) = PreqTS;
-Aircraft.Mission.History.SI.Power.Preq_PS(SegBeg:SegEnd, :) = PreqPS;
-Aircraft.Mission.History.SI.Power.Treq_TS(SegBeg:SegEnd, :) = TreqTS;
-Aircraft.Mission.History.SI.Power.Treq_PS(SegBeg:SegEnd, :) = TreqPS;
-
 % ----------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -317,10 +311,6 @@ if (any(exceeds))
     PoutTS(exceeds) = Pav_TS(exceeds);
 end
 
-% remember the output thrust/power from the thrust sources
-Aircraft.Mission.History.SI.Power.Pout_TS(SegBeg:SegEnd, :) = PoutTS;
-Aircraft.Mission.History.SI.Power.Tout_TS(SegBeg:SegEnd, :) = PoutTS ./ TAS;
-
 % check the driven power sources
 exceeds = find(PreqDr > Pav_PS);
 
@@ -336,10 +326,6 @@ exceeds = find(PreqPS > Pav_PS);
 if (any(exceeds))
     PoutPS(exceeds) = Pav_PS(exceeds);
 end
-
-% remember the output thrust/power from the power  sources
-Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :) = PoutPS;
-Aircraft.Mission.History.SI.Power.Tout_PS(SegBeg:SegEnd, :) = PoutPS ./ TAS;
 
 % allocate power to/from the gas-turbine engines for components in series/parallel
 for ipnt = 1:npnt
@@ -414,8 +400,26 @@ if (any(Batt))
             % update the battery/EM power and SOC
             if ((~isempty(BattDeplete)) && (strcmpi(arch, "E") == 0) && (Aircraft.Settings.Analysis.Type < 0))
                 
+                % warning: requested power code is two high for battery 
+                warning("WARNING - Requested power is more than battery capacity. EM is shut off.")
+                
+                % Redistribute required power to engines
+                % get the number of gas-turbine engines
+                neng = sum(Eng);
+ 
+                % assume the gas-turbine engines can handle the EM load
+                PoutPS(BattDeplete:iend, Eng) = PoutPS(BattDeplete:iend, Eng) + repmat(PreqES(BattDeplete:iend, icol) ./ neng * .96, 1, neng);
+
+                % check if gas-turbine engine can output that power
+                exceeds = find(PoutPS > Pav_PS);
+                % if any exceed the power available, return only the power available
+                if (any(exceeds))
+                    PoutPS(exceeds) = Pav_PS(exceeds);
+                end
+
                 % no more power is provided from the electric motor or battery
                 PreqES(BattDeplete:end, icol) = 0;
+                PoutPS(BattDeplete:end, [3,4]) = 0;
                 
                 % zero the splits
                 LamTS(  BattDeplete:end, :) = 0;
@@ -425,6 +429,9 @@ if (any(Batt))
                 
                 % change the SOC (prior index is last charge > 20%)
                 SOC(BattDeplete:end, icol) = SOC(BattDeplete - 1, icol);
+
+                % change power code to show EM is now off
+                PC_EM(BattDeplete:end, :) = 0;
                 
                 % flag this result
                 Aircraft.Mission.History.Flags.SOCOff(MissID) = 1;
@@ -623,6 +630,7 @@ Aircraft.Mission.History.SI.Propulsion.TSFC(    SegBeg:SegEnd, :) = SFC     ;
 Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
 
 % power quantities
+Aircraft.Mission.History.SI.Power.PC(  SegBeg:SegEnd, [3,4]) = PC_EM;
 Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;
 Aircraft.Mission.History.SI.Power.Voltage( SegBeg:SegEnd, :) = V  ;
 Aircraft.Mission.History.SI.Power.Current( SegBeg:SegEnd, :) = I  ;
@@ -633,6 +641,20 @@ Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
 Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
 Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
 Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
+
+% remember the power/thrust required by the thrust/power sources
+Aircraft.Mission.History.SI.Power.Preq_TS(SegBeg:SegEnd, :) = PreqTS;
+Aircraft.Mission.History.SI.Power.Preq_PS(SegBeg:SegEnd, :) = PreqPS;
+Aircraft.Mission.History.SI.Power.Treq_TS(SegBeg:SegEnd, :) = TreqTS;
+Aircraft.Mission.History.SI.Power.Treq_PS(SegBeg:SegEnd, :) = TreqPS;
+
+% output thrust/power from the power sources
+Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :) = PoutPS;
+Aircraft.Mission.History.SI.Power.Tout_PS(SegBeg:SegEnd, :) = PoutPS ./ TAS;
+
+% output thrust/power from the thrust sources
+Aircraft.Mission.History.SI.Power.Pout_TS(SegBeg:SegEnd, :) = PoutTS;
+Aircraft.Mission.History.SI.Power.Tout_TS(SegBeg:SegEnd, :) = PoutTS ./ TAS;
 
 % energy quantities
 Aircraft.Mission.History.SI.Energy.E_ES(    SegBeg:SegEnd, :) = E_ES    ;

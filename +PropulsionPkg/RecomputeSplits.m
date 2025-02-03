@@ -48,7 +48,6 @@ npar = length(ParIndx);
 Pout_PS = Aircraft.Mission.History.SI.Power.Pout_PS(SegBeg:SegEnd, :);
 Pav_PS  = Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :);
 
-
 %% RE-COMPUTE THE POWER SPLITS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -60,6 +59,9 @@ if (Aircraft.Specs.Power.LamTSPS.SLS == 0)
     Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, :) = PC_Eng(:, 1);
     return;
 end
+
+% get EM power avalibale - constant
+PavEM = Aircraft.Specs.Weight.EM * 10^3 / 2;
 
 % loop through each power split
 for ipar = 1:npar
@@ -76,7 +78,6 @@ for ipar = 1:npar
 
     % get total power avalible at each segment
     PavEng = Pav_PS(:, imain);
-    PavEM  = Pav_PS(:, isupp);
     
     % compute the downstream power split
     SplitTSPS = PoutEM ./ (PoutEng + PoutEM);
@@ -91,13 +92,15 @@ for ipar = 1:npar
     PC_EM(PC_EM_NaN) = 0;
 
     Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
-    %Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
+    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
     
 end
 
 % remember the power split
 Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
 
+% Remeber power code
+Aircraft.Specs.Power.PC = Aircraft.Mission.History.SI.Power.PC;
 
 % ----------------------------------------------------------
 

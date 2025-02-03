@@ -15,11 +15,11 @@ ub = ones(1, b);
 
 fburnOG = PCvFburn(PC0);
 
-options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','interior-point');
-options.OptimalityTolerance = 10^-3;
+options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','sqp');
+options.OptimalityTolerance = 10^-6;
 options.StepTolerance = 10^-6;
 tic
-PCbest = fmincon(@PCvFburn, PC0, [], [], [], [], lb, ub, @Con_ebatt, options);
+PCbest = fmincon(@PCvFburn, PC0, [], [], [], [], lb, ub, [], options);
 t = toc 
 
 fburnOpt = PCvFburn(PCbest);
@@ -31,7 +31,7 @@ function [fburn] = PCvFburn(PC)
     
     load("SizedHEA.mat")
     Aircraft = SizedHEA;
-    Aircraft.Specs.Performance.Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
+    %Aircraft.Specs.Performance.Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
 
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
@@ -39,9 +39,8 @@ function [fburn] = PCvFburn(PC)
     PC0 = zeros(npts,1);
     PC0(1:(n1-1)) = ones(n1-1,1);
     PC0(n1:n2) = PC;
-
     Aircraft.Settings.Analysis.Type = -2;
-    Aircraft.Specs.Power.PC.EM = PC0;
+    Aircraft.Specs.Power.PC(:, [3,4]) = repmat(PC0,1,2);
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     
     fburn = Aircraft.Specs.Weight.Fuel;

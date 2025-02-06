@@ -146,7 +146,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
@@ -161,7 +161,7 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = .5;
+Aircraft.Specs.Power.PC.EM.Split = .8;
 Aircraft.Specs.Power.PC.EM.Alt =[0, 36000];
 
 % thrust splits (thrust / total thrust)
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = .085; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = .09; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0.085; %0.09;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.09; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -200,8 +200,8 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of control points in each segment
-Aircraft.Settings.TkoPoints = 2;
-Aircraft.Settings.ClbPoints = 2;
+Aircraft.Settings.TkoPoints = NaN;
+Aircraft.Settings.ClbPoints = NaN;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;
 
@@ -229,6 +229,10 @@ Aircraft.Settings.Plotting = 0;
 %     0 for no table
 Aircraft.Settings.Table = 1;
 
+% sizing comamand window output
+%   1 output weights
+%   0 no weight output
+Aircraft.Settings.PrintOut = 1;
 % ----------------------------------------------------------
 
 end

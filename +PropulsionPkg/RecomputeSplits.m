@@ -61,7 +61,7 @@ if (Aircraft.Specs.Power.LamTSPS.SLS == 0)
 end
 
 % get EM power avalibale - constant
-PavEM = Aircraft.Specs.Weight.EM * 10^3 / 2;
+PavEM = Aircraft.Specs.Weight.EM * Aircraft.Specs.Power.P_W.EM / 2;
 
 % loop through each power split
 for ipar = 1:npar

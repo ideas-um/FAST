@@ -42,7 +42,7 @@ function [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % initial cleanup
-%clc, 
+clc, 
 close all
 
 % call user-specified input aircraft

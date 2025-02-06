@@ -29,13 +29,13 @@ end
 ERJ = AircraftSpecsPkg.ERJ175LR;
 
 % Changing Battery Specific Energy & Range
-batt = 500;
+batt = 250;
 ERJ.Specs.Power.SpecEnergy.Batt = batt/1000;
-range = 1000;
+range = 2150;
 ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(range, "naut mi", "m");
 
 % Assume a set of takeoff power splits (LambdaTko)
-LambdaTko = 0:.5:10;  % Takeoff power splits in % 
+LambdaTko = 0:.5:9;  % Takeoff power splits in % 
 LambdaClb = 0:.5:5;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
@@ -118,6 +118,8 @@ end
 figure;
 hold on;
 
+FuelBurn = UnitConversionPkg.ConvMass(FuelBurn, "kg", "lbm");
+
 % Define a set of colors and line styles
 cmap = lines(nclb);  % Use the 'lines' colormap, which gives you distinct colors
 linestyles = {'-', '--', ':', '-.'};  % Different line styles
@@ -135,12 +137,13 @@ for csplit = 1:nclb
 end
 
 % Add labels, title, and legend
-xlabel('Takeoff Power Split (λ_{Tko})','FontSize',14);
-ylabel('Fuel Burn (kg)','FontSize',14);
-title_text = sprintf('Fuel Burn vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+xlabel('Takeoff Split','FontSize',14);
+ylabel('Fuel Burn (lbm)','FontSize',14);
+title_text = sprintf('Fuel Burn for Varing Power Splits - %.0f nmi, %.2f kWh/kg', ...
     UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
 title(title_text, 'FontSize', 14);
-legend('show','FontSize',12);
+lgd = legend('show','FontSize',12);
+title(lgd, "Climb Split")
 grid on;
 hold off;
 
@@ -168,13 +171,13 @@ for csplit = 1:length(LambdaClb)
          'DisplayName', sprintf('Clb %.1f%%', LambdaClb(csplit)));  % Label for the legend
 end
 
-xlabel('Takeoff Power Split (%)','FontSize',14);
+xlabel('Takeoff Split','FontSize',14);
 ylabel('Percentage Difference (%)','FontSize',14);
-title_text = sprintf(['Percentage Difference of Fuel Burn: Conventional vs. Tko-Power-Split AC \n' ...
-    'at %.0f nmi Range and %.2f kWh/kg Battery Specific Energy'], ...
+title_text = sprintf('Fuel Burn Percent Difference wrt Baseline- \n %.0f nmi, %.2f kWh/kg', ...
     UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
 title(title_text,'FontSize',14);
-legend('show','FontSize',12);
+lgd = legend('show','FontSize',12);
+title(lgd, "Climb Split")
 grid on;
 hold off;
 

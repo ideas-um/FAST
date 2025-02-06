@@ -261,7 +261,7 @@ while (iter < MaxIter)
         
         % resize the battery for power and energy
         Aircraft = BatteryPkg.ResizeBattery(Aircraft);
-        Aircraft = MissionSegsPkg.FlyMission(Aircraft);
+        %Aircraft = MissionSegsPkg.FlyMission(Aircraft);
         
         % find the difference between the new and old battery weight
         dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
@@ -325,7 +325,7 @@ while (iter < MaxIter)
         AircraftHistory{iter} = Aircraft;
         
         % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
-        save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
+        %save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
     end
 
     % Stop iteration early if the last three iterations produce the same

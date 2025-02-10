@@ -1,4 +1,4 @@
-function [Plane] = CalcFanVals(Plane,unitsflag,AssumedM)
+function [Plane] = CalcFanVals(Plane,unitsflag)
 %
 % [Plane] = CalcFanVals(Plane,units)
 % Written by Maxfield Arnson
@@ -87,7 +87,7 @@ switch unitsflag
 
         M = Plane.Specs.Performance.Vels.Crs;
         if isnan(M)
-            M = AssumedM;
+            M = 0.8;
         end
 
         Re = 7.093e6*cmac*M*(1-0.5*(z/23500)^0.7);
@@ -276,7 +276,7 @@ switch unitsflag
 
         DTindex = randi(100,1,1);
 
-        if DTindex > 95
+        if DTindex > 90
             Plane.Settings.DataTypeValidation = "Validation";
         else
             Plane.Settings.DataTypeValidation = "Training";
@@ -344,7 +344,9 @@ switch unitsflag
         Plane.Settings.Analysis.MaxIter = "count";
         Plane.Settings.Analysis.Type = "flag";
         Plane.Settings.Plotting = "flag";
+        
         Plane.Settings.DataTypeValidation = "data type";
+        Plane.Specs.Propulsion.Engine.DataTypeValidation = "data type";
 
         Plane.Overview = rmfield(Plane.Overview,"KeyWords");
 

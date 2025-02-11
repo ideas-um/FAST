@@ -398,7 +398,7 @@ if (any(Batt))
             BattDeplete = find(SOC(:, icol) < 20, 1);
             
             % update the battery/EM power and SOC
-            if ((~isempty(BattDeplete)) && (strcmpi(arch, "E") == 0) && (Aircraft.Settings.Analysis.Type < 0))
+            if ((~isempty(BattDeplete)) && (strcmpi(arch, "E") == 0) && (Aircraft.Settings.Analysis.Type < 0)) && (Aircraft.Settings.ConSOC == 1)
                 
                 % warning: requested power code is two high for battery 
                 warning("WARNING - Requested power is more than battery capacity. EM is shut off.")

@@ -219,6 +219,9 @@ Aircraft.Settings.Analysis.MaxIter = 20;
 %     -1 for off-design mode (aircraft performance           )
 Aircraft.Settings.Analysis.Type = +1;
 
+% constrain SOC from 20% to 100% for off design 
+Aircraft.Settings.ConSOC = 1; 
+
 % plotting, either:
 %     1 for plotting on
 %     0 for plotting off

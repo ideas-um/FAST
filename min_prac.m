@@ -1,4 +1,4 @@
-Range = UnitConversionPkg.ConvLength(500, "naut mi", "m");
+Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
 
 SizedHEA.Specs.Performance.Range = Range;
 SizedHEA.Settings.Analysis.Type = -2;

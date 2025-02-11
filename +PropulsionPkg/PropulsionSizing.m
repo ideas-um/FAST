@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 oct 2024
+% last updated: 16 jan 2025
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -32,33 +32,29 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 % aircraft class
 aclass = Aircraft.Specs.TLAR.Class;
 
-% analysis type
-atype = Aircraft.Settings.Analysis.Type;
-
 % get the takeoff speed
 TkoVel = Aircraft.Specs.Performance.Vels.Tko;
 
 % get the power source type
-PSType = Aircraft.Specs.Propulsion.PropArch.PSType;
+TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 
 % find the engines and electric motors
-Eng = PSType == 1;
-EM  = PSType == 0;
+Eng = TrnType == 1;
+EM  = TrnType == 0;
+EG  = TrnType == 3;
 
 % get the electric motor power-weight ratio
 P_Wem = Aircraft.Specs.Power.P_W.EM;
+P_Weg = Aircraft.Specs.Power.P_W.EG;
 
 % get the propulsion architecture
-TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
-PSPS = Aircraft.Specs.Propulsion.PropArch.PSPS;
+Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
 % get the design splits
-LamTS   = Aircraft.Specs.Power.LamTS.SLS  ;
-LamTSPS = Aircraft.Specs.Power.LamTSPS.SLS;
-LamPSPS = Aircraft.Specs.Power.LamPSPS.SLS;
+LamDwn = Aircraft.Specs.Power.LamDwn.SLS;
 
 % get propulsion system efficiencies
-EtaPSPS = Aircraft.Specs.Propulsion.Eta.PSPS;
+EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
 
 % check the aircraft class
 if      (strcmpi(aclass, "Turbofan" ) == 1)
@@ -77,74 +73,6 @@ else
     % throw error
     error("ERROR - PropulsionSizing: invalid aircraft class provided.");
     
-end
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the number of operational splits
-        nopers = Aircraft.PowerOpt.nopers;
-        
-        % count the number of design splits
-        tsplit = 1;
-        
-        % check for design thrust splits
-        if (Aircraft.PowerOpt.Settings.DesnTS   == 1)
-            
-            % get the number of thrust splits
-            nsplit = Aircraft.Settings.nargTS  ;
-            
-            % get the splits
-            for isplit = 1:nsplit
-                
-                % get the current split
-                LamTS(  isplit) = Aircraft.PowerOpt.Splits(nopers + tsplit);
-                
-                % account for the split
-                tsplit = tsplit + 1;
-                
-            end
-        end
-        
-        % check for design thrust-power splits
-        if (Aircraft.PowerOpt.Settings.DesnTSPS == 1)
-            
-            % get the number of thrust-power splits
-            nsplit = Aircraft.Settings.nargTSPS;
-            
-            % get the splits
-            for isplit = 1:nsplit
-                
-                % get the current split
-                LamTSPS(isplit) = Aircraft.PowerOpt.Splits(nopers + tsplit);
-                
-                % account for the split
-                tsplit = tsplit + 1;
-                
-            end
-        end
-        
-        % check for design power-power splits
-        if (Aircraft.PowerOpt.Settings.DesnPSPS == 1)
-            
-            % get the number of power-power splits
-            nsplit = Aircraft.Settings.nargPSPS;
-            
-            % get the splits
-            for isplit = 1:nsplit
-                
-                % get the current split
-                LamPSPS(isplit) = Aircraft.PowerOpt.Splits(nopers + tsplit);
-                
-                % account for the split
-                tsplit = tsplit + 1;
-                
-            end
-        end
-    end
 end
 
 
@@ -169,40 +97,44 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
 end
 
 % get the power/thrust split function handles
-FunSplitTS   = Aircraft.Specs.Propulsion.Oper.TS  ;
-FunSplitTSPS = Aircraft.Specs.Propulsion.Oper.TSPS;
-FunSplitPSPS = Aircraft.Specs.Propulsion.Oper.PSPS;
+OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
 
-% get the splits
-LamTS   = Aircraft.Specs.Power.LamTS.SLS;
-LamTSPS = Aircraft.Specs.Power.LamTSPS.SLS;
-LamPSPS = Aircraft.Specs.Power.LamPSPS.SLS;
+% get the power splits
+Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn);
 
-% get function to compute the thrust/power splits
-SplitTS   = PropulsionPkg.EvalSplit(FunSplitTS  , LamTS  );
-SplitTSPS = PropulsionPkg.EvalSplit(FunSplitTSPS, LamTSPS);
-SplitPSPS = PropulsionPkg.EvalSplit(FunSplitPSPS, LamPSPS);
+% get the number of sources and transmitters
+nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+ntrn = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
+
+% number of components
+ncomp = length(Arch);
+
+% get only the transmitter and sink indices
+idx = (nsrc + 1) : ncomp;
 
 % split the power amongst the power sources
-[PowerPS, PowerDr] = PropulsionPkg.SplitPower(Aircraft, P0, SplitTS, SplitTSPS, SplitPSPS);
+Pdwn = PropulsionPkg.PowerFlow([zeros(1, ntrn), P0]', Arch(idx, idx)', Splits(idx, idx), EtaDwn(idx, idx), -1);
+
+% get only the transmitter indicies
+idx = nsrc + (1 : ntrn);
 
 % get the supplemental power
-Psupp = PropulsionPkg.PowerSupplementCheck(PowerDr, TSPS, PSPS, SplitPSPS, EtaPSPS, PSType, EtaFan);
+Psupp = PropulsionPkg.PowerSupplementCheck(Pdwn(1:end-1)', Arch(idx, idx), Splits(idx, idx), EtaDwn(idx, idx), TrnType, EtaFan);
 
 % convert power to thrust
-ThrustPS = PowerPS ./ TkoVel;
-Tsupp    = Psupp   ./ TkoVel;
+Tdwn  = Pdwn  ./ TkoVel;
+Tsupp = Psupp ./ TkoVel;
 
-% remember the power  available/supplemented for each power source
-Aircraft.Specs.Propulsion.SLSPower   = PowerPS ;
-Aircraft.Specs.Propulsion.PowerSupp  = Psupp   ;
+% remember the power  available/supplemented for each transmitter
+Aircraft.Specs.Propulsion.SLSPower   = Pdwn(1:end-1)';
+Aircraft.Specs.Propulsion.PowerSupp  = Psupp         ;
 
-% remember the thrust available/supplemeneted for each power source
-Aircraft.Specs.Propulsion.SLSThrust  = ThrustPS;
-Aircraft.Specs.Propulsion.ThrustSupp = Tsupp   ;
+% remember the thrust available/supplemented for each transmitter
+Aircraft.Specs.Propulsion.SLSThrust  = Tdwn(1:end-1)';
+Aircraft.Specs.Propulsion.ThrustSupp = Tsupp         ;
 
 % check for a fully-electric architecture (so engines don't get sized)
-if (any(PSType > 0))
+if (any(TrnType > 0 & TrnType ~= 2))
 
     % lapse thrust/power for turbofan/turboprops, respectively
     if      (strcmpi(aclass, "Turbofan" ) == 1)
@@ -212,9 +144,9 @@ if (any(PSType > 0))
         IO = {["Thrust_Max"],["DryWeight"]};
 
         % row vector can have multiple targets for a single input
-        target = Aircraft.Specs.Propulsion.Thrust.SLS; %ThrustPS(Eng)';
+        target = Tdwn(Eng);
 
-        % run the regression
+        % run the regression - input must be a column vector
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
         
         % get the first engine index (assume all engines are the same)
@@ -228,12 +160,12 @@ if (any(PSType > 0))
         if (Tsupp(ieng) > 0)
             
             % increase the engine size to generate all the thrust
-            Aircraft.Specs.Propulsion.Engine.DesignThrust = ThrustPS(ieng) + Tsupp(ieng);
+            Aircraft.Specs.Propulsion.Engine.DesignThrust = Tdwn(ieng) + Tsupp(ieng);
             
         else
             
             % leave the engine size as is, power is siphoned off
-            Aircraft.Specs.Propulsion.Engine.DesignThrust = ThrustPS(ieng);
+            Aircraft.Specs.Propulsion.Engine.DesignThrust = Tdwn(ieng);
             
         end
 
@@ -267,7 +199,7 @@ if (any(PSType > 0))
         W_f_of_pow = polyfit(PowReg,WengReg,1);
 
         % estimate the engine weights
-        Weng = polyval(W_f_of_pow, PowerPS(Eng) / 1000);
+        Weng = polyval(W_f_of_pow, Pdwn(Eng) / 1000);
 
     else
 
@@ -286,10 +218,9 @@ end
 % remember the weight of the engines
 Aircraft.Specs.Weight.Engines = sum(Weng);
 
-% check if the electric motor weight can be changed and remember it
-if (atype > 0)
-    Aircraft.Specs.Weight.EM = sum(PowerPS(EM)) / P_Wem;
-end
+% compute the electric motor and generator weight
+Aircraft.Specs.Weight.EM = sum(Pdwn(EM)) / P_Wem;
+Aircraft.Specs.Weight.EG = sum(Pdwn(EG)) / P_Weg;
 
 % ----------------------------------------------------------
 

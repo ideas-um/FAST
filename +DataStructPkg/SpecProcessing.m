@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% lasat updated: 24 apr 2024
+% lasat updated: 13 dec 2024
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -45,7 +45,6 @@ Geometry = Aircraft.Geometry;
 % remember the sizing directory
 SizeDir = Aircraft.Settings.Dir.Size;
 
-
 % remove the engine field for the regressions
 Engine = Propulsion.Engine;
 Propulsion = rmfield(Propulsion,'Engine');
@@ -65,7 +64,7 @@ if isnan(Performance.Range)
     error('Design Range (Aircraft.Performance.Range) not specified')
 end
 
-if ~isstring(Propulsion.Arch.Type) && ~ischar(Propulsion.Arch.Type)
+if ~isstring(Propulsion.PropArch.Type) && ~ischar(Propulsion.PropArch.Type)
     error('Propulsion Architecture (Aircraft.Propulsion.Arch) not specified')
 end
 
@@ -304,42 +303,24 @@ DefaultPropulsion.MDotCF = 1;
 % DefaultPower.P_W.AC = 5;                    regression
 % DefaultPower.P_W.Batt =                     *calculated*
 DefaultPower.Eta.Propeller = 0.8;
-DefaultPower.Phi.SLS = 0;                     % good
-DefaultPower.Phi.Tko = 0;                     % good
-DefaultPower.Phi.Clb = 0;                     % good
-DefaultPower.Phi.Crs = 0;                     % good
-DefaultPower.Phi.Des = 0;                     % good
-DefaultPower.Phi.Lnd = 0;                     % good
+DefaultPower.LamDwn.SLS = 0;
+DefaultPower.LamDwn.Tko = 0;
+DefaultPower.LamDwn.Clb = 0;
+DefaultPower.LamDwn.Crs = 0;
+DefaultPower.LamDwn.Des = 0;
+DefaultPower.LamDwn.Lnd = 0;
+DefaultPower.LamUps.SLS = 0;
+DefaultPower.LamUps.Tko = 0;
+DefaultPower.LamUps.Clb = 0;
+DefaultPower.LamUps.Crs = 0;
+DefaultPower.LamUps.Des = 0;
+DefaultPower.LamUps.Lnd = 0;
 DefaultPower.P_W.EG = 5;                      % good
 %DefaultPower.P_W.EM = 5;                     % EDC Projection
 % DefaultPower.SpecEnergy.Fuel = 4.32e7;               % if statement
 %DefaultPower.SpecEnergy.Batt = 0;                     % EDC Projection
 %DefaultPower.Eta.EM = 0.96;                 % switch case
 %DefaultPower.Eta.EG = 0.96;                 % switch case
-DefaultPower.LamTS.Tko = 0;
-DefaultPower.LamTS.Clb = 0;
-DefaultPower.LamTS.Crs = 0;
-DefaultPower.LamTS.Des = 0;
-DefaultPower.LamTS.Lnd = 0;
-DefaultPower.LamTS.SLS = 0;
-DefaultPower.LamTSPS.Tko = 0;
-DefaultPower.LamTSPS.Clb = 0;
-DefaultPower.LamTSPS.Crs = 0;
-DefaultPower.LamTSPS.Des = 0;
-DefaultPower.LamTSPS.Lnd = 0;
-DefaultPower.LamTSPS.SLS = 0;
-DefaultPower.LamPSPS.Tko = 0;
-DefaultPower.LamPSPS.Clb = 0;
-DefaultPower.LamPSPS.Crs = 0;
-DefaultPower.LamPSPS.Des = 0;
-DefaultPower.LamPSPS.Lnd = 0;
-DefaultPower.LamPSPS.SLS = 0;
-DefaultPower.LamPSES.Tko = 0;
-DefaultPower.LamPSES.Clb = 0;
-DefaultPower.LamPSES.Crs = 0;
-DefaultPower.LamPSES.Des = 0;
-DefaultPower.LamPSES.Lnd = 0;
-DefaultPower.LamPSES.SLS = 0;
 DefaultPower.Battery.ParCells = NaN;
 DefaultPower.Battery.SerCells = NaN;
 DefaultPower.Battery.BegSOC   = NaN;
@@ -356,10 +337,6 @@ DefaultSettings.Analysis.Type = 1;       % 1 = on design. -1 = off design
 DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots
 DefaultSettings.Table = 0;
 DefaultSettings.VisualizeAircraft = 0;
-
-% optimization settings.
-DefaultSettings.PowerOpt.DesPowSplit =  0;
-DefaultSettings.PowerOpt.OpsPowSplit =  0;
 
 % directory
 DefaultSettings.Dir.Size = pwd;
@@ -626,6 +603,3 @@ Aircraft = DataStructPkg.EngineSpecProcessing(Aircraft);
 
 
 end
-
-
-

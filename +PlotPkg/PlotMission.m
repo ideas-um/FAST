@@ -2,7 +2,7 @@ function [] = PlotMission(Aircraft)
 %
 % [] = PlotMission(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 oct 2024
+% last updated: 12 dec 2024
 %
 % Obtain the mission history from the aircraft structure, convert necessary
 % values from SI to English units, and plot them.
@@ -51,15 +51,24 @@ PreqScalar = Aircraft.Mission.History.SI.Power.Req      ./ 1.0e+06;
 PavScalar  = Aircraft.Mission.History.SI.Power.TV       ./ 1.0e+06;
 Ps         = Aircraft.Mission.History.SI.Performance.Ps           ;
 
+% get the architecture
+ncomp = length(Aircraft.Specs.Propulsion.PropArch.Arch);
+nsrc  = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+ntrn  = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
+nsnk  = ncomp - nsrc - ntrn;
+
+% get the transmitters that are not propellers
+itrn = [false(1, nsrc), Aircraft.Specs.Propulsion.PropArch.TrnType ~= 2, false(1, nsnk)];
+
 % power required/available/output as vectors (convert to MW)
-PreqVector = Aircraft.Mission.History.SI.Power.Preq_PS ./ 1.0e+06;
- PavVector = Aircraft.Mission.History.SI.Power.Pav_PS  ./ 1.0e+06;
-PoutVector = Aircraft.Mission.History.SI.Power.Pout_PS ./ 1.0e+06;
+PreqVector = Aircraft.Mission.History.SI.Power.Preq(:, itrn) ./ 1.0e+06;
+ PavVector = Aircraft.Mission.History.SI.Power.Pav( :, itrn) ./ 1.0e+06;
+PoutVector = Aircraft.Mission.History.SI.Power.Pout(:, itrn) ./ 1.0e+06;
 
 % thrust required/available/output as vectors (convert to kN)
-TreqVector = Aircraft.Mission.History.SI.Power.Treq_PS ./ 1000;
- TavVector = Aircraft.Mission.History.SI.Power.Tav_PS  ./ 1000;
-ToutVector = Aircraft.Mission.History.SI.Power.Tout_PS ./ 1000;
+TreqVector = Aircraft.Mission.History.SI.Power.Treq(:, itrn) ./ 1000;
+ TavVector = Aircraft.Mission.History.SI.Power.Tav( :, itrn) ./ 1000;
+ToutVector = Aircraft.Mission.History.SI.Power.Tout(:, itrn) ./ 1000;
 
 % SFC (then convert to lbm/lbf/hr)
 if (strcmpi(Aircraft.Specs.TLAR.Class, "Turbofan") == 1)
@@ -190,7 +199,7 @@ PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altit
 
 % plot the power output
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, PoutVector, 0, "Flight Time (min)", "Power Output (MW)", "Power Output");
+PlotPkg.PlotPerfParam(Time, PoutVector, 1, "Flight Time (min)", "Power Output (MW)", "Power Output");
 
 % plot the fuel flow
 subplot(2, 2, 2);
@@ -228,8 +237,8 @@ PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), 1, "Flight Time (min)", "Rate 
 % plot power available/required against time
 subplot(3, 3, [2, 3]);
 hold on
-PlotPkg.PlotPerfParam(Time,  PavVector, 0, "Flight Time (min)", "Power (MW)", "Power");
-PlotPkg.PlotPerfParam(Time, PreqVector, 0, "Flight Time (min)", "Power (MW)", "Power");
+PlotPkg.PlotPerfParam(Time,  PavVector, 1, "Flight Time (min)", "Power (MW)", "Power");
+PlotPkg.PlotPerfParam(Time, PreqVector, 1, "Flight Time (min)", "Power (MW)", "Power");
 
 % plot thrust available/required against time
 subplot(3, 3, [5, 6]);
@@ -239,11 +248,11 @@ PlotPkg.PlotPerfParam(Time, TreqVector, 0, "Flight Time (min)", "Thrust (kN)", "
 
 % plot thrust output against time
 subplot(3, 3, 8);
-PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), 0, "Flight Time (min)", "Thrust Output (N)", "Thrust Output");
+PlotPkg.PlotPerfParam(Time(1:end-1), ToutVector(1:end-1, :), 1, "Flight Time (min)", "Thrust Output (N)", "Thrust Output");
 
 % plot power output against time
 subplot(3, 3, 9);
-PlotPkg.PlotPerfParam(Time(1:end-1), PoutVector(1:end-1, :), 0, "Flight Time (min)", "Power Output (MW)", "Power Output");
+PlotPkg.PlotPerfParam(Time(1:end-1), PoutVector(1:end-1, :), 1, "Flight Time (min)", "Power Output (MW)", "Power Output");
 
 % ----------------------------------------------------------
 
@@ -264,15 +273,15 @@ PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altit
 
 % plot specific excess power against time
 subplot(2, 2, 3);
-PlotPkg.PlotPerfParam(Time, Ps, 0, "Flight Time (min)", "Specific Excess Power (m/s)", "Specific Excess Power");
+PlotPkg.PlotPerfParam(Time, Ps, 1, "Flight Time (min)", "Specific Excess Power (m/s)", "Specific Excess Power");
 
 % plot power available against time
 subplot(2, 2, 2);
-PlotPkg.PlotPerfParam(Time, PavScalar, 0, "Flight Time (min)", "Power Available (MW)", "Total Power Available");
+PlotPkg.PlotPerfParam(Time, PavScalar, 1, "Flight Time (min)", "Power Available (MW)", "Total Power Available");
 
 % plot power available against time
 subplot(2, 2, 4);
-PlotPkg.PlotPerfParam(Time, PreqScalar, 0, "Flight Time (min)", "Power Required (MW)", "Total Power Required");
+PlotPkg.PlotPerfParam(Time, PreqScalar, 1, "Flight Time (min)", "Power Required (MW)", "Total Power Required");
 
 % ----------------------------------------------------------
 

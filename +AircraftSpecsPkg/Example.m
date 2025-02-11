@@ -137,7 +137,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.PropArch.Type = "C";
 
 % aircraft thrust-weight ratio
 Aircraft.Specs.Propulsion.T_W.SLS = 0.3817;
@@ -199,16 +199,16 @@ Aircraft.Specs.Power.Battery.BegSOC   = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % points in takeoff segment
-Aircraft.Settings.TkoPoints = NaN;
+Aircraft.Settings.TkoPoints = 3;
 
 % points in climb   segment
-Aircraft.Settings.ClbPoints = NaN;
+Aircraft.Settings.ClbPoints = 5;
 
 % points in cruise  segment
-Aircraft.Settings.CrsPoints = NaN;
+Aircraft.Settings.CrsPoints = 5;
 
 % points in descent  segment
-Aircraft.Settings.DesPoints = NaN;
+Aircraft.Settings.DesPoints = 5;
 
 % maximum iterations when sizing OEW
 Aircraft.Settings.OEW.MaxIter = NaN;
@@ -220,9 +220,9 @@ Aircraft.Settings.OEW.Tol = NaN;
 Aircraft.Settings.Analysis.MaxIter = NaN;
 
 % on design/off design analysis
-% 1  = on design
-% -2 = off design
-Aircraft.Settings.Analysis.Type = NaN;
+% +1 = on design
+% -1 = off design
+Aircraft.Settings.Analysis.Type = +1;
 
 % plot results
 % 0 = no plotting

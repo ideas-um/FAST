@@ -3,7 +3,7 @@ function [Aircraft] = ERJ190_FE()
 % [Aircraft] = ERJ190_FE()
 % written by Max Arnson, marnson@umich.edu
 % battery pack variables added by Paul Mokotoff, prmoko@umich.edu
-% updated 28 mar 2024
+% updated 16 dec 2024
 %
 % Define the Embraer E190-E2 from "Advanced 2030 Single Aisle Aircraft
 % Modeling" to be used for aircraft sizing/performance analysis.
@@ -130,7 +130,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "E";
+Aircraft.Specs.Propulsion.PropArch.Type = "E";
 
 % aircraft thrust-weight ratio
 Aircraft.Specs.Propulsion.T_W.SLS = 0.3817;

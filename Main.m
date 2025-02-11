@@ -2,7 +2,7 @@ function [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 %
 % [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 06 may 2024
+% last updated: 11 dec 2024
 %
 % NOTE: please see README.m in the root directory for all
 %       disclaimers and how to run FAST.
@@ -107,19 +107,9 @@ Type = Aircraft.Settings.Analysis.Type;
 
 % maximum number of sizing iterations, done from the AircraftSpecsPkg file
 MaxIter = Aircraft.Settings.Analysis.MaxIter;
-
-% check if power optimization settings are available
-if (isfield(Aircraft, "PowerOpt") == 1)
-
-    % call the optimization routine
-    Aircraft = OptimizationPkg.DesOptimize(Aircraft);
-     
-else
     
-    % analyze the aircraft without any optimization
-    Aircraft = EAPAnalysis(Aircraft, Type, MaxIter);
-    
-end
+% analyze the aircraft without any optimization
+Aircraft = EAPAnalysis(Aircraft, Type, MaxIter);
 
 
 %% MISSION PROFILE PLOTTING %%

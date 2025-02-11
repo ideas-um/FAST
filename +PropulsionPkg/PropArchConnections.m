@@ -2,7 +2,7 @@ function [Aircraft] = PropArchConnections(Aircraft)
 %
 % [Aircraft] = PropArchConnections(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 mar 2024
+% last updated: 17 jan 2025
 %
 % Given a propulsion architecture, identify any parallel electric motor /
 % engine connections. These connections are used to reduce the power
@@ -24,31 +24,31 @@ function [Aircraft] = PropArchConnections(Aircraft)
 %% PRE-PROCESSING %%
 %%%%%%%%%%%%%%%%%%%%
 
-% get the TSPS matrix
-TSPS = Aircraft.Specs.Propulsion.PropArch.TSPS;
+% get the architecture
+Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
-% get the number of power sources
-[~, nps] = size(TSPS);
+% get the number of sources and transmitters
+nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+ntrn = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
 
 % assume there are no parallel connections
-Aircraft.Specs.Propulsion.PropArch.ParConns = cell(1, nps);
+Aircraft.Specs.Propulsion.PropArch.ParConns = cell(1, ntrn);
 
 
 %% FIND THE POWER SOURCES IN PARALLEL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% find the number of power sources driving each thrust source
-npsDriving = sum(TSPS, 2);
+% get the transmitter indices
+itrn = nsrc + (1 : ntrn);
 
-% find the rows that have multiple power sources driving a thrust source
-MultiplePS = find(npsDriving > 1);
+% check for components in parallel (offset by number of sources)
+AnyParallel = find(sum(Arch(itrn, itrn), 1) > 1) + nsrc;
 
-% get the number of rows to check
-nrow = length(MultiplePS);
-
-% if no sources in parallel, exit out
-if (nrow < 1)
+if (~any(AnyParallel))
+    
+    % exit the function
     return;
+    
 end
 
 
@@ -58,46 +58,32 @@ end
 % get the cell array showing the engine and electric motor connections
 ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
 
-% identify the electric motors
-EM = Aircraft.Specs.Propulsion.PropArch.PSType == 0;
+% get the transmitter types
+TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 
-% set any zero entries to -1 for logical evaluations
-TSPS(TSPS < 1) = -1;
-
-% find the electric motors in the architecture
-CheckParallel = TSPS + EM;
-
-% loop through the necessary rows
-for irow = 1:nrow
+% loop through each connection
+for iconn = 1:length(AnyParallel)
     
-    % get the current row
-    jrow = MultiplePS(irow);
+    % get the TS that is in parallel with the PS
+    icomp = AnyParallel(iconn);
     
-    % extract the row from the matrix
-    CheckRow = CheckParallel(jrow, :);
+    % find the gas-turbine engine being supplemented
+    Driving = find((Arch(itrn, icomp) > 0)' & (TrnType == 1));
         
-    % distinguish between engines and electric motors
-    [~, IsEM ] = find(CheckRow == 2);
-    [~, IsEng] = find(CheckRow == 1);
+    % find the electric motors that are supplementing (offset by nsrc)
+    Helping = find((Arch(itrn, icomp) > 0)' & (TrnType == 0)) + nsrc;
     
-    % get the number of eletric motors connected
-    neng = length(IsEng);
+    % update both driving and helping components are not empty
+    if (~isempty(Driving) && ~isempty(Helping))
     
-    % loop through the electric motors
-    for ieng = 1:neng
-        
-        % get the electric motor index
-        jeng = IsEng(ieng);
-        
-        % update its cell
-        ParConns{jeng} = [ParConns{jeng}; IsEM];
-        
-    end            
+        % list the electric motors
+        ParConns{Driving} = [ParConns{Driving}; Helping];
+    
+    end
 end
 
 % return the updated set of parallel connections
 Aircraft.Specs.Propulsion.PropArch.ParConns = ParConns;
 
-% ----------------------------------------------------------
 
 end

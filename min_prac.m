@@ -1,4 +1,4 @@
-Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
+Range = UnitConversionPkg.ConvLength(500, "naut mi", "m");
 
 SizedHEA.Specs.Performance.Range = Range;
 SizedHEA.Settings.Analysis.Type = -2;
@@ -26,34 +26,56 @@ t = Aircraft.Mission.History.SI.Performance.Time;
 t2 = SizedHEA.Mission.History.SI.Performance.Time;
 
 figure;
-plot(t2, SizedHEA.Mission.History.SI.Power.Pout_PS(:,3))
+plot(t2, SizedHEA.Mission.History.SI.Power.Pout_PS(:,3), "LineWidth",2)
 hold on
-plot(t, Aircraft.Mission.History.SI.Power.Pout_PS(:,3))
+plot(t, Aircraft.Mission.History.SI.Power.Pout_PS(:,3), "LineWidth",2)
+set(gca, "FontSize", 12)
 xlabel("Time")
 ylabel("Power")
 legend("OG", "Optimized")
 
 
 figure;
-plot(t2, SizedHEA.Mission.History.SI.Energy.E_ES(:,2))
+plot(t2, SizedHEA.Mission.History.SI.Energy.E_ES(:,2), "LineWidth",2)
 hold on
-plot(t, Aircraft.Mission.History.SI.Energy.E_ES(:,2))
+plot(t, Aircraft.Mission.History.SI.Energy.E_ES(:,2), "LineWidth",2)
+set(gca,"FontSize", 12)
 xlabel("Time")
 ylabel("Battery Energy")
 legend("OG", "Optimized")
 
 figure;
-plot(t2, SizedHEA.Mission.History.SI.Energy.E_ES(:,1))
+plot(t2, SizedHEA.Mission.History.SI.Energy.E_ES(:,1), "LineWidth",2)
 hold on
-plot(t, Aircraft.Mission.History.SI.Energy.E_ES(:,1))
+plot(t, Aircraft.Mission.History.SI.Energy.E_ES(:,1), "LineWidth",2)
+set(gca, "FontSize", 12)
 xlabel("Time")
 ylabel("Fuel Energy")
 legend("OG", "Optimized")
 
 figure;
-plot(t2, SizedHEA.Mission.History.SI.Performance.Alt)
+plot(t2, SizedHEA.Mission.History.SI.Weight.Fburn(:), "LineWidth",2)
 hold on
-plot(t, Aircraft.Mission.History.SI.Performance.Alt)
+plot(t, Aircraft.Mission.History.SI.Weight.Fburn(:), "LineWidth",2)
+set(gca, "FontSize", 12)
+xlabel("Time")
+ylabel("Fuel Burn")
+legend("OG", "Optimized")
+
+
+figure;
+plot(t2, SizedHEA.Mission.History.SI.Performance.Alt, "LineWidth",2)
+hold on
+plot(t, Aircraft.Mission.History.SI.Performance.Alt, "LineWidth",2)
+set(gca, "FontSize", 12)
 xlabel("Time")
 ylabel("Alt")
 legend("OG", "Optimized")
+
+figure;
+plot(t2, SizedHEA.Mission.History.SI.Power.PC(:,3), "LineWidth",2)
+hold on
+plot(t2, Aircraft.Mission.History.SI.Power.PC(:,3), "LineWidth",2)
+set(gca, "FontSize", 12)
+xlabel("Time")
+ylabel("EM PC")

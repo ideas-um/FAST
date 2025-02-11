@@ -16,7 +16,7 @@ ub = ones(1, b);
 fburnOG = PCvFburn(PC0);
 
 options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','interior-point');
-options.OptimalityTolerance = 10^-6;
+options.OptimalityTolerance = 10^-3;
 options.StepTolerance = 10^-6;
 tic
 PCbest = fmincon(@PCvFburn, PC0, [], [], [], [], lb, ub, [], options);

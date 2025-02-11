@@ -42,11 +42,15 @@ function [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % initial cleanup
-clc, 
 close all
 
 % call user-specified input aircraft
 Aircraft = InputAircraft;
+
+% if print outs enable clear command wondow
+if Aircraft.Settings.PrintOut == 1
+clc;
+end
 
 % call pre-specprocessing, it will fill in unspecified fields with NaNs if the user forgets one
 Aircraft = DataStructPkg.PreSpecProcessing(Aircraft);

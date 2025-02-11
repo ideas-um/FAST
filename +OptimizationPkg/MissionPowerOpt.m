@@ -5,25 +5,24 @@ function OptAircraft = MissionPowerOpt(Aircraft)
     
     % lets try not design range
     
-    n1= SizedHEA.Mission.Profile.SegBeg(2);
-    n2= SizedHEA.Mission.Profile.SegEnd(4)-1;
+    n1= Aircraft.Mission.Profile.SegBeg(2);
+    n2= Aircraft.Mission.Profile.SegEnd(4)-1;
     
-    PC0 = SizedHEA.Mission.History.SI.Power.PC(n1:n2, 4);
+    PC0 = Aircraft.Mission.History.SI.Power.PC(n1:n2, 4);
     b = length(PC0);
-    A = ones(1,b);
-    lb = zeros(1, b);
-    ub = ones(1, b);
+    lb = zeros(1, b)';
+    ub = ones(1, b)';
     
-    fburnOG = PCvFburn(PC0);
+    fburnOG = PCvFburn(PC0, Aircraft);
     
     options = optimoptions('fmincon','MaxIterations', 50 ,'Display','iter','Algorithm','interior-point');
     options.OptimalityTolerance = 10^-3;
     options.StepTolerance = 10^-6;
     tic
-    PCbest = fmincon(@(PC) PCvFburn(PC, Aircraft), PC0, [], [], [], [], lb, ub, @(PC) SOC_Constraint(PC, Aircraft), options);
+    PCbest = fmincon(@(PC0) PCvFburn(PC0, Aircraft), PC0, [], [], [], [], lb, ub, @(PC) SOC_Constraint(PC, Aircraft), options);
     t = toc 
     
-    fburnOpt = PCvFburn(PCbest);
+    fburnOpt = PCvFburn(PCbest, Aircraft);
     fdiff = (fburnOpt - fburnOG)/fburnOG;
     
     

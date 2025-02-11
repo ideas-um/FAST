@@ -215,7 +215,7 @@ if (any(PSType > 0))
         target = ThrustPS(Eng)';
 
         % run the regression
-        Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);
+        Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target,'Iteration',true,'Preprocessing',Aircraft.RegressionParams.WEngine);
         
         % get the first engine index (assume all engines are the same)
         ieng = find(Eng, 1);

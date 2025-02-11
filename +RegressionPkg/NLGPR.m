@@ -1,4 +1,4 @@
-function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,weights,prior)
+function [PostMu,PostVar] = NLGPR(DataStruct,IOspace,Target,varargin)
 %
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target)
 % [PostMu,PostVar] = NLGPR(datastruct,class,IOspace,target,weights)
@@ -49,26 +49,66 @@ function [PostMu,PostVar] = NLGPR(datastruct,IOspace,target,weights,prior)
 %    size: Dx1 array of doubles
 
 
-% Call Build Data Function (internal function)
-% Create Matrix of known data, build prior distribution,
-% and tune hyperparameters. If weights are prescribed, pass them into the
-% function
-switch nargin
-    case 5
-[DataMatrix,Prior,hypers] = ...
-    RegressionPkg.BuildData(datastruct,IOspace,target,weights,prior);
-    case 4
-[DataMatrix,Prior,hypers] = ...
-    RegressionPkg.BuildData(datastruct,IOspace,target,weights);
-    case 3
-[DataMatrix,Prior,hypers] = ...
-    RegressionPkg.BuildData(datastruct,IOspace,target);
+% Default values for settings
+
+Options.Weights = ones(1,length(IOspace)-1);
+Options.Prior = ones(length(Target),1) .* RegressionPkg.PriorCalculation(DataStruct,IOspace);
+Options.Iteration = false;
+Options.Preprocessing = NaN;
+
+OptionNames = fieldnames(Options);
+
+for ii = 1:2:length(varargin)
+    name = varargin{ii};
+    value = varargin{ii+1};
+
+    if any(strcmpi(name, OptionNames))
+        Options.(name) = value;
+    else
+        error('Regression, unknown setting: %s', name);
+    end
+end
+
+% Need to check that if iteration variable is set, information needed to
+% run the regression is provided
+if Options.Iteration 
+    if ~isstruct(Options.Preprocessing)
+    error('Regression Settings: If iteration is set to true, preprocessed data matrices must also be set')
+    end
+    
+    DataMatrix  = Options.Preprocessing.DataMatrix ;
+    HyperParams = Options.Preprocessing.HyperParams;
+    InverseTerm = Options.Preprocessing.InverseTerm;
+else % If not in an iteration, the Posterior variables will need to be calculated here
+
+    [DataMatrix,HyperParams,InverseTerm] =...
+    RegressionPkg.RegProcessing(DataStruct,IOspace, Options.Prior, Options.Weights);
+
+end
+
+% Initialize Posterior distribution(s)
+PostMu = zeros(size(Target,1),1);
+PostVar = PostMu;
+
+% I believe there is a way to do this more efficiently but right now I just
+% look through each target case. The math inside this is not that
+% cumbersome so it goes by pretty quick
+for i = 1:length(PostMu)
+[PostMu(i),PostVar(i)] = ...
+    RegressionPkg.BuildRegression(DataMatrix,Options.Prior(i),Target(i,:),HyperParams,InverseTerm);
 end
 
 
-% Call Posterior Function (internal function)
-% Calculate posterior mean and variance for each requested target
-[PostMu,PostVar] =...
-    RegressionPkg.CreatePosterior(DataMatrix,...
-    Prior,target,hypers);
 end
+
+
+
+
+
+
+
+
+
+
+
+

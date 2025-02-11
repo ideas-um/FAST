@@ -1,28 +1,17 @@
 
-function [mu_post,sig2_post] =...
-BuildRegression(data,mu_prior,target,hyperparams,InverseTerm)
+function [MuPost,Sig2Post] =...
+BuildRegression(DataMatrix,Prior,Target,HyperParams,InverseTerm)
 
-% sig2_prior = (mu_prior*5e-2)^2;
-% 
-% % INVERSE DATA MATRIX
-PS = size(data,1);
-% Kbarbar = zeros(PS);
-% for i = 1:PS
-%     for j = 1:PS
-%         Kbarbar(i,j) = RegressionPkg.SquareExKernel(data(i,1:end-1),...
-%             data(j,1:end-1),hyperparams);
-%     end
-% end
-% 
-% InverseTerm = inv(Kbarbar + sig2_prior.*eye(PS));
+
+PS = size(DataMatrix,1);
 
 Kbarstar = zeros(1,PS);
 for ii = 1:PS
-    Kbarstar(ii) = RegressionPkg.SquareExKernel(data(ii,1:end-1),target,hyperparams);
+    Kbarstar(ii) = RegressionPkg.SquareExKernel(DataMatrix(ii,1:end-1),Target,HyperParams);
 end
 
-mu_post = mu_prior + Kbarstar*InverseTerm*(data(:,end) - mu_prior);
+MuPost = Prior + Kbarstar*InverseTerm*(DataMatrix(:,end) - Prior);
 
-sig2_post = RegressionPkg.SquareExKernel(target,target,hyperparams)...
+Sig2Post = RegressionPkg.SquareExKernel(Target,Target,HyperParams)...
     - Kbarstar*InverseTerm*Kbarstar';
 end

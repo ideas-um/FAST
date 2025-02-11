@@ -1,9 +1,9 @@
-function  [DataMatrix,Prior,Std] = ...
-    BuildData(datastruct,IOspace,target,weights,given_prior)
+function  [DataMatrix,HyperParams] = ...
+    BuildData(datastruct,IOspace,weights)
 %
-% [DataMatrix,Prior,std] = BuildData(datastruct,class,IOspace,target)
-% [DataMatrix,Prior,std] = BuildData(datastruct,class,IOspace,target,weights)
-% [DataMatrix,Prior,std] = BuildData(datastruct,class,IOspace,target,weights,givenprior)
+% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target)
+% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target,weights)
+% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target,weights,givenprior)
 %
 % Written by Maxfield Arnson, marnson@umich.edu
 % last updated: 3 May 2024
@@ -16,14 +16,14 @@ function  [DataMatrix,Prior,Std] = ...
 %
 %
 % INPUTS:
-%     datastruct    - variable passed into the function by NLGPR(). It 
+%     datastruct    - variable passed into the function by NLGPR(). It
 %                     contains a historical database structure.
 %                     size/type/units: 1-by-1 / structure / []
 %
 %     IOspace       - cell array where each entry is a string array carrying
 %                     the structure path to each of the inputs. These
 %                     structure paths are listed in the read me for this
-%                     package: RegressionPkg.NLGPR. The last entry in this 
+%                     package: RegressionPkg.NLGPR. The last entry in this
 %                     cell array is the path for the desired output. N is
 %                     the number of inputs
 %                     size/type/units: 1-by-N+1 / cell array / []
@@ -38,7 +38,7 @@ function  [DataMatrix,Prior,Std] = ...
 %                     size/type/units: D-by-N / double / []
 %
 %     weights       - [OPTIONAL] tuning parameters which can be used to
-%                     change the impact each input has on the output. The 
+%                     change the impact each input has on the output. The
 %                     default is that each input is weighted equally. The
 %                     entered weights do not need to sum to a specific
 %                     number. They are all normalized by the sum of the
@@ -47,7 +47,7 @@ function  [DataMatrix,Prior,Std] = ...
 %                     size/type/units: 1-by-N / double / []
 %
 %     given_prior   - [OPTIONAL] value(s) to use as a guess for the desired output.
-%                     For example, a physical model may be used to inform 
+%                     For example, a physical model may be used to inform
 %                     the output of the regression. Each row in target
 %                     needs a guess. The default value for a prior is the
 %                     average of the data for the output parameter.
@@ -56,7 +56,7 @@ function  [DataMatrix,Prior,Std] = ...
 %
 % OUTPUTS:
 %     DataMatrix    - This is a large matrix which holds all of the
-%                     recorded data relevant to the input and output 
+%                     recorded data relevant to the input and output
 %                     parameters. Its size will vary depending on how much
 %                     data is stored in the historical database.
 %                     size/type/units: variable / double / []
@@ -68,10 +68,10 @@ function  [DataMatrix,Prior,Std] = ...
 %                     parameter/
 %                     size/type/units: D-by-1 / double / []
 %
-%     Std           - These are tuning parameters for each of the inputs
+%     HyperParams   - These are tuning parameters for each of the inputs
 %                     and the output, which are used in the regression. If
 %                     weights were given as inputs, they modify the values
-%                     in Std.
+%                     in HyperParams.
 %                     size/type/units: 1-by-N+1 / double / []
 %
 
@@ -79,34 +79,13 @@ function  [DataMatrix,Prior,Std] = ...
 
 
 
-%% Calculate Prior
-% This section creates prior distributions for each queried point. It
-% simply finds the mean of the target parameter and assigns it to a Dx1
-% array, (the same initial guess for every point). The for loop/if statement
-% excludes NaN values.
-
-[~,priordata] = RegressionPkg.SearchDB(datastruct,IOspace{end});
-priordata = cell2mat(priordata(:,2));
-c = 1;
-
-if sum(isnan(priordata)) > 0
-    for i = 1:length(priordata)
-        if isnan(priordata(i))
-            indexc(c) = i; c = c+1; %#ok<*AGROW> 
-        end
-    end
-    priordata(indexc) = [];
-end
-
-Prior = ones(size(target,1),1).*mean(priordata);
-
 %% Build Data Matrix (OG)
 % This section builds a matrix of relevant data depending on the parameters
 % that are known for the RegressionPkg.
 DataMatrix = [];
 for i = 1:length(IOspace)
     [~,IOiMat] = RegressionPkg.SearchDB(datastruct,IOspace{i});
-    DataMatrix = [DataMatrix,cell2mat(IOiMat(:,2))]; 
+    DataMatrix = [DataMatrix,cell2mat(IOiMat(:,2))];
 end
 
 
@@ -136,22 +115,24 @@ end
 % orders of magnitude, each one still contributes equally to the
 % predictions
 
-Std = zeros(1,length(IOspace));
+HyperParams = zeros(1,length(IOspace));
 for i = 1:length(IOspace)
     [~,ParameterI] = RegressionPkg.SearchDB(datastruct,IOspace{i});
     ParameterI = cell2mat(ParameterI(:,2));
     ParameterI=(ParameterI(~isnan(ParameterI))); % Exclude NaNs
-    Std(i) = var(ParameterI);
+    HyperParams(i) = var(ParameterI);
 end
 
-% if weights were prescribed, add additional tuning to the hyperparameters.
-switch nargin
 
-    case 5
-        weights = weights./sum(weights)*length(weights);
-        Std(1:end-1) = Std(1:end-1)./weights;
-        Prior = given_prior;
-    case 4
-        weights = weights./sum(weights)*length(weights);
-        Std(1:end-1) = Std(1:end-1)./weights;
+weights = weights./sum(weights)*length(weights);
+HyperParams(1:end-1) = HyperParams(1:end-1)./weights;
+
 end
+
+
+
+
+
+
+
+

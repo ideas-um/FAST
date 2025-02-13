@@ -147,18 +147,6 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 % gravimetric specific energy of battery (kWh/kg), not used here
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
-%{
-    % maximum extracted capacity and voltage
-    QMax = 2.6; % Ah
-    VMax = 3.6; % V
-    
-    % acceptable SOC threshold
-    MinSOC = 20;
-    
-    % assume a maximum c-rate
-    MaxAllowCRate = 5;
-%}
-
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
 Aircraft.Specs.Power.Eta.EG = 0.96;
@@ -181,7 +169,7 @@ Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
 Aircraft.Specs.Power.LamTSPS.Tko = 0.085;
-Aircraft.Specs.Power.LamTSPS.Clb = 0;
+Aircraft.Specs.Power.LamTSPS.Clb = 0.03;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;
 Aircraft.Specs.Power.LamTSPS.Lnd = 0;
@@ -214,9 +202,34 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 % coefficient for HEA engine analysis
 Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
-%% BATTERY OPERATION AND CONTROL %%
+%% BATTERY SETTINGS %%
+%%%%%%%%%%%%%%%%%%%%%%
 
-% battery degradation effect analysis
+% nominal cell voltage [V]
+Aircraft.Specs.Battery.NomVolCell = 3.6;
+
+% maxinum extracted voltage [V]
+Aircraft.Specs.Battery.MaxExtVolCell = 4.0880;
+
+% maxinum cell capacity [Ah]
+Aircraft.Specs.Battery.CapCell = 3;
+
+% internal resistance [Ohm]
+Aircraft.Specs.Battery.IntResist = 0.0199;
+
+% exponential voltage [V]
+Aircraft.Specs.Battery.expVol = 0.0986;
+
+% exponential capacity [(Ah)^-1]
+Aircraft.Specs.Battery.expCap = 30;
+
+% acceptable SOC threshold
+Aircraft.Specs.Battery.MinSOC = 20;
+
+% acceptable max c-rate during discharging
+Aircraft.Specs.Battery.MaxAllowCRate = 5;
+
+%%%% battery degradation effect analysis %%%
 Aircraft.Settings.Degradation = 1; % 1 = analysis with degradation effect; 0 = without degradation effect
 
 if Aircraft.Settings.Degradation == 1
@@ -225,7 +238,7 @@ if Aircraft.Settings.Degradation == 1
     Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2
     
     % grounding time (CAN BE SEPERATED WITH "charging time" LATER)
-    Aircraft.Specs.Battery.GroundT = 30*60; % in sec
+    Aircraft.Specs.Battery.GroundT = 60*60; % in sec
     
     % charging rate
     Aircraft.Specs.Battery.Cpower = -250*1000; % charging means negative rate in W

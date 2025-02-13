@@ -88,8 +88,8 @@ ValiColumn = find(any(Aircraft.Mission.History.SI.Power.Capacity ~= 0, 1));
 temp_act =  Aircraft.Specs.Battery.OpTemp + 273.15; % [k]      
 
 % Depth of Discharge of battery
-DOD = max(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)) - ... 
-      min(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn));           
+DOD = (max(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)) - ... 
+      min(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)))/100;           
 
 % C-rates during discharging %
 DisCCrate = mean(Aircraft.Mission.History.SI.Power.C_rate ...
@@ -108,14 +108,14 @@ for i = 2:length(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn))
         SOCValues(end+1, 1) = Aircraft.Mission.History.SI.Power.SOC(i,ValiColumn);
     end
 end
-mSOC = mean(SOCValues);
+mSOC = mean(SOCValues)/100;
 
 % Full Equivalent Cycles %
-QMax = 3; % nominal capacity for a single cell
+QMax = Aircraft.Specs.Battery.CapCell; % max capacity for a single cell
 
 FEC = (((max(Aircraft.Mission.History.SI.Power.Capacity(:,ValiColumn))-Aircraft.Mission.History.SI.Power.Capacity(end,ValiColumn))...
     + (max(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity)-min(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity)))) ...
-    / (QMax * Aircraft.Specs.Power.Battery.ParCells) ...
+    / (2* QMax * Aircraft.Specs.Power.Battery.ParCells) ...
     + CumulFECs; % flight FEC for this single mission (charge + discharge)
 
 %% THE FULL MODEL %%
@@ -123,13 +123,13 @@ FEC = (((max(Aircraft.Mission.History.SI.Power.Capacity(:,ValiColumn))-Aircraft.
 % MODEL FOR NMC LIB 
 if ChemType == 1
 
-    SOH = 100-beta_nmc * exp(coeff_T_nmc*((temp_act-temp_ref_nmc)/temp_ref_nmc) + coeff_DOD_nmc*DOD + ...
+    SOH = 100-beta_nmc * exp(coeff_T_nmc*((temp_act-temp_ref_nmc)/temp_act) + coeff_DOD_nmc*DOD + ...
         coeff_Cch_nmc*CCrate + coeff_Cdch_nmc*DisCCrate) * (1+coeff_mSOC_nmc*mSOC*(1-(mSOC/(2*mSOC_ref_nmc)))) * FEC^(alpha_opt_nmc);
 
 % MODEL FOR LFP LIB 
 elseif ChemType == 2
 
-    SOH = 100 - beta_lfp * exp(coeff_T_lfp*((temp_act-temp_ref_lfp)/temp_ref_lfp) + coeff_DOD_lfp*DOD + ...
+    SOH = 100 - beta_lfp * exp(coeff_T_lfp*((temp_act-temp_ref_lfp)/temp_act) + coeff_DOD_lfp*DOD + ...
         coeff_Cch_lfp*CCrate + coeff_Cdch_lfp*DisCCrate) * (1+coeff_mSOC_lfp*mSOC*(1-(mSOC/(2*mSOC_ref_lfp)))) * FEC^(alpha_opt_lfp);
 end
 % ----------------------------------------------------------

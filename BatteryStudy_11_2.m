@@ -114,7 +114,7 @@ end
 
 
 
-%% Conceptual Battery degradation study
+%% Conceptual Battery degradation study (没啥用)
 
 SOHss = [];
 FECss = 0;
@@ -148,32 +148,33 @@ FECs = [];
 Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
 FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end);
-for i = 1:1000
+for i = 1:100000
 
     Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
    
-    if Off_SizedERJ.Specs.Battery.SOH(end) < 0
-        break
-    end
 
     SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
     FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end); 
 
+    if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
+        break
+    end
 end
 
 
 plot(SOHs, 'LineWidth', 2);
 hold on
-plot(1:length(FECs), repmat(70, 1, length(FECs)), 'LineWidth', 2, 'LineStyle', '--', 'Color', 'r'); % Ensure horizontal line works
+yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
 hold off
 xlabel('Battery Cycling Times');
 ylabel("Battery SOH [%]");
+% xlim([0 FECs(end)]);
 grid on
 title('Battery Degradation')
 
 
 
-%%
+%% TEST degradation effect at different operation temperature
 
 clc;clear
 SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
@@ -186,28 +187,31 @@ SOHs_35 = [];
 
 SizedERJ.Specs.Battery.OpTemp = 35;
 
-Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
 
-for i = 1:1000
+for i = 1:length(SizedERJ.Specs.Battery.OpTemp)
 
-    Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-   
-    if Off_SizedERJ.Specs.Battery.SOH(end) < 0
-        break
-    end
-
+    Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
 
+    for i = 1:1000
+    
+        Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+       
+        if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
+            break
+        end
+    
+        SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+    
+    end
 end
-
 
 plot(SOHs_20, 'LineWidth', 2);
 hold on
 plot(SOHs_25, 'LineWidth', 2);
 plot(SOHs_30, 'LineWidth', 2);
 plot(SOHs_35, 'LineWidth', 2);
-plot(1:length(SOHs_20), repmat(70, 1, length(SOHs_20)), 'LineWidth', 2, 'LineStyle', '--', 'Color', 'r'); 
+yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
 hold off
 xlabel('Battery Cycling Times');
 ylabel("Battery SOH [%]");
@@ -215,3 +219,55 @@ grid on
 title('Battery Degradation');
 legend( "T=20°C", "T=25°C", "T=30°C", "T=35°C");
 
+%% Different charging power vs SOH
+SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+SizedERJ.Settings.Analysis.Type = -2;
+
+% Define charging power values from -100e3 to -250e3 with a step of -10e3
+Charging_P = -100e3:-20e3:-250e3;
+
+% Initialize storage array for cycle counts
+CycleCounts = zeros(size(Charging_P));
+
+% Loop over different charging power values
+for cp_idx = 1:length(Charging_P)
+    % Set battery charging power
+    SizedERJ.Specs.Battery.Cpower = Charging_P(cp_idx);
+
+    % Initialize cycle count
+    cycle_count = 0;
+
+    % Run the first cycle
+    Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+
+    % Check if SOH is already below 70% at start
+    if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
+        CycleCounts(cp_idx) = cycle_count;
+        continue; % Move to the next charging power level
+    end
+
+    % Run subsequent cycles
+    for i = 1:1000
+        Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        cycle_count = cycle_count + 1;
+
+        % Stop iterating when SOH reaches 70%
+        if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
+            break;
+        end
+    end
+
+    % Store the number of cycles before reaching SOH = 70%
+    CycleCounts(cp_idx) = cycle_count;
+end
+
+% Plot Charging Power vs Number of Cycles Until SOH = 70%
+figure;
+plot(Charging_P / 1e3, CycleCounts, 'o-', 'LineWidth', 2, 'MarkerSize', 8, 'Color', 'b');
+
+% Formatting
+xlabel('Charging Power (kW)', 'FontSize', 14);
+ylabel('Number of Cycles Until SOH = 70%', 'FontSize', 14);
+grid on;
+title('Battery Cycle Life vs Charging Power', 'FontSize', 14);
+set(gca, 'XDir', 'reverse'); % Reverse x-axis to show -100 kW to -250 kW

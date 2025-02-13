@@ -9,11 +9,11 @@ ERJ = AircraftSpecsPkg.ERJ175LR;
 
 % Changing Battery Specific Energy & Range
 ERJ.Specs.Power.SpecEnergy.Batt = 0.25;
-ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m");
+ERJ.Specs.Performance.Range = UnitConversionPkg.ConvLength(1000, "naut mi", "m");
 
 % Assume a set of takeoff power splits (LambdaTko)
 LambdaTko = 0:0.5:10;  % Takeoff power splits in % 
-LambdaClb = 0:0.5:10;   % Climbing power splits in % 
+LambdaClb = 0;   % Climbing power splits in % 
 nsplit = length(LambdaTko);
 nclb = length(LambdaClb);
 
@@ -26,7 +26,7 @@ EG_weight = NaN(nsplit, nclb);
 Batt_weight = NaN(nsplit, nclb);
 Max_crate = NaN(nsplit, nclb);
 CellPar = NaN(nsplit, nclb);
-
+CellSer = NaN(nsplit, nclb);
 
 %% SIZE THE AIRCRAFT %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -72,6 +72,7 @@ for tsplit = 1:nsplit
         EG_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Engines;
         Batt_weight(tsplit, csplit) = SizedERJ.Specs.Weight.Batt ; 
         CellPar(tsplit, csplit) = SizedERJ.Specs.Power.Battery.ParCells; 
+        CellSer(tsplit, csplit) = SizedERJ.Specs.Power.Battery.SerCells; 
 
         if LambdaTko(tsplit) == 0 && LambdaClb(csplit) == 0
             Max_crate(tsplit, csplit) = 0 ;
@@ -259,6 +260,8 @@ hold off;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure;
 hold on;
+
+yyaxis left;
 % Plot one line for each LambdaClb
 for csplit = 1:nclb
     % Only plot for non-NaN fuel burn values
@@ -279,6 +282,23 @@ title(title_text, 'FontSize', 14);
 legend('show','FontSize',12);
 grid on;
 hold off;
+%%%% Right Y-Axis: plotting Battery Cells (Parallel and Series)
+yyaxis right;
+plot(LambdaTko, CellPar, 'square', 'LineWidth', 2, 'MarkerSize', 6, 'DisplayName', 'Parallel Cells'); % Red circles
+hold on;
+plot(LambdaTko, CellSer, 'pentagram', 'LineWidth', 2,  'MarkerSize', 6, 'DisplayName', 'Series Cells'); % Blue circles
+ylabel('Battery Cells Count','FontSize',14);
+
+% Title and Legend
+title_text = sprintf('Battery Weight and Battery Cells vs Lambda Tko for Various Climb Power Splits\nat %.0f nmi Range and %.2f kWh/kg Battery Specific Energy', ...
+    UnitConversionPkg.ConvLength(SizedERJ.Specs.Performance.Range, "m", "naut mi"), ERJ.Specs.Power.SpecEnergy.Batt);
+title(title_text, 'FontSize', 14);
+
+legend('show','FontSize',12, 'Location', 'best'); % Ensures all legend labels appear
+grid on;
+hold off;
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Post process for Battery Parallel Cell # %%
@@ -398,3 +418,31 @@ grid on;
 hold off;
 
 
+
+
+
+% 
+% 
+% figure
+% yyaxis left;
+% plot(diff(Tko8_5_Clb_3.Mission.History.SI.Performance.Time), "LineWidth", 1.5, 'Color', 'b');
+% xlabel("Segment Points", "FontSize", 14);
+% ylabel("Time Difference [sec]", "FontSize", 14);
+% title("Time difference vs. SOC change rate", 'FontSize', 14);
+% 
+% yyaxis right
+% plot(diff(Tko8_5_Clb_3.Mission.History.SI.Power.SOC(:,2)), "LineWidth", 1.5, 'Color', 'r');
+% ylabel("SOC rate of change", "FontSize", 14);
+% legend("Time Difference", "SOC Rate of Change");
+% 
+% 
+% 
+% figure
+% plot(Tko8_5_Clb_3.Mission.History.SI.Power.SOC(:,2), "LineWidth", 1.5, 'Color', 'b');
+% hold on
+% plot(Tko8_5.Mission.History.SI.Power.SOC(:,2), "LineWidth", 1.5, 'Color', 'r');
+% hold off
+% xlabel("Segment Points", "FontSize", 14);
+% ylabel("SOC rate of change", "FontSize", 14);
+% title("SOC change rate of 3% vs. 0% power split", 'FontSize', 14);
+% legend("Clb Power Split 3%", "Clb Power Split 0%");

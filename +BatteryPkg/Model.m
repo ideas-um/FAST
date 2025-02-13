@@ -93,29 +93,29 @@ Time = Time ./ 3600;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % nominal cell voltage [V]
-VoTemp = 3.6 ;% 4.0880
+VoTemp = Aircraft.Specs.Battery.NomVolCell;
 
 % internal resistance [Ohm]
-ResistanceTemp = 0.0199;
+ResistanceTemp = Aircraft.Specs.Battery.IntResist;
 
 % compute the number of cells in the battery pack
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-A = 0.0986;
+A = Aircraft.Specs.Battery.expVol;
 
 % exponential capacity [(Ah)^-1]
-B = 30;
+B = Aircraft.Specs.Battery.expCap;
 
 % Determine maximum capacity [Ah] based on analysis type and degradation effect
 if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Settings.Degradation == 1
 
     % Off-design analysis with battery degradation effect
-    Q = 3 * Aircraft.Specs.Battery.SOH(end) / 100;
+    Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;
 else
     
     % Either on-design analysis or off-design without degradation effect
-    Q = 3;
+    Q = Aircraft.Specs.Battery.CapCell;
 end
 
 

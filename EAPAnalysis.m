@@ -206,7 +206,7 @@ AircraftHistory = cell(MaxIter, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % assume a maximum c-rate
-MaxAllowCRate = 5;
+MaxAllowCRate = Aircraft.Specs.Battery.MaxAllowCRate;
 
 % iterate until convergence
 while (iter < MaxIter)
@@ -325,7 +325,7 @@ while (iter < MaxIter)
         AircraftHistory{iter} = Aircraft;
         
         % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
-        save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
+        % save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
     end
 
     % Stop iteration early if the last three iterations produce the same

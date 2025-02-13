@@ -68,14 +68,14 @@ if (Aircraft.Settings.DetailedBatt == 1)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % maximum extracted capacity and voltage
-    VMax = 4.0880; % 3.6
-    QMax = 3; % 2.6
+    VMax = Aircraft.Specs.Battery.MaxExtVolCell;
+    QMax = Aircraft.Specs.Battery.CapCell;
 
     % acceptable SOC threshold
-    MinSOC = 20;
+    MinSOC = Aircraft.Specs.Battery.MinSOC;
     
     % assume a maximum c-rate
-    MaxAllowCRate = 5;
+    MaxAllowCRate = Aircraft.Specs.Battery.MaxAllowCRate;
     
     % ------------------------------------------------------
     
@@ -148,11 +148,8 @@ if (Aircraft.Settings.DetailedBatt == 1)
     dEbatt = diff(Ebatt);
     
     % compute the C-rate (power in segment / energy consumed in segment)
-    % C_rate = Pbatt(1:end-1) ./ (dEbatt);
     % C_rate = Aircraft.Mission.History.SI.Power.C_rate; 
     C_rate = Cbatt ./ (ExistBattCap); 
-    % C_rate = Pbatt(1:end-1) / (Ebatt_re(Batt)/3600); 
-    % C_rate = Pbatt(1:end-1) / (ExistBattCap * VMax * Nser); 
 
 
     % ignore all NaNs (set to 0)

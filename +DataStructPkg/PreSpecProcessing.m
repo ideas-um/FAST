@@ -82,6 +82,20 @@ if ~ isfield(Aircraft,"Specs")
     Aircraft.Specs.Power.Battery.ParCells = NaN;
     Aircraft.Specs.Power.Battery.SerCells =  NaN;
     Aircraft.Specs.Power.Battery.BegSOC = NaN;
+    Aircraft.Specs.Battery.NomVolCell = NaN;
+    Aircraft.Specs.Battery.MaxExtVolCell = NaN;
+    Aircraft.Specs.Battery.CapCell = NaN;
+    Aircraft.Specs.Battery.IntResist = NaN;
+    Aircraft.Specs.Battery.expVol = NaN;
+    Aircraft.Specs.Battery.expCap = NaN;
+    Aircraft.Specs.Battery.MinSOC = NaN;
+    Aircraft.Specs.Battery.MaxAllowCRate = NaN;
+    Aircraft.Specs.Battery.Chem = NaN;
+    Aircraft.Specs.Battery.GroundT = NaN;
+    Aircraft.Specs.Battery.Cpower = NaN;
+    Aircraft.Specs.Battery.FEC = NaN;
+    Aircraft.Specs.Battery.SOH = NaN;
+    Aircraft.Specs.Battery.OpTemp = NaN;
 
 
 else
@@ -452,6 +466,69 @@ else
                 Aircraft.Specs.Power.Battery.BegSOC = NaN;
             end
         end
+
+        
+        % battery
+        if ~isfield(Aircraft.Specs, "Battery")
+            Aircraft.Specs.Battery.NomVolCell = NaN;
+            Aircraft.Specs.Battery.MaxExtVolCell = NaN;
+            Aircraft.Specs.Battery.CapCell = NaN;
+            Aircraft.Specs.Battery.IntResist = NaN;
+            Aircraft.Specs.Battery.expVol = NaN;
+            Aircraft.Specs.Battery.expCap = NaN;
+            Aircraft.Specs.Battery.MinSOC = NaN;
+            Aircraft.Specs.Battery.MaxAllowCRate = NaN;
+            Aircraft.Specs.Battery.Chem = NaN;
+            Aircraft.Specs.Battery.GroundT = NaN;
+            Aircraft.Specs.Battery.Cpower = NaN;
+            Aircraft.Specs.Battery.FEC = NaN;
+            Aircraft.Specs.Battery.SOH = NaN;
+            Aircraft.Specs.Battery.OpTemp = NaN;
+        else
+            if ~isfield(Aircraft.Specs.Battery, "NomVolCell")
+                Aircraft.Specs.Battery.NomVolCell = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "MaxExtVolCell")
+                Aircraft.Specs.Battery.MaxExtVolCell = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "CapCell")
+                Aircraft.Specs.Battery.CapCell = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "IntResist")
+                Aircraft.Specs.Battery.IntResist = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "expVol")
+                Aircraft.Specs.Battery.expVol = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "expCap")
+                Aircraft.Specs.Battery.expCap = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "MinSOC")
+                Aircraft.Specs.Battery.MinSOC = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "MaxAllowCRate")
+                Aircraft.Specs.Battery.MaxAllowCRate = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "Chem")
+                Aircraft.Specs.Battery.Chem = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "GroundT")
+                Aircraft.Specs.Battery.GroundT = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "Cpower")
+                Aircraft.Specs.Battery.Cpower = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "FEC")
+                Aircraft.Specs.Battery.FEC = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "SOH")
+                Aircraft.Specs.Battery.SOH = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Battery, "OpTemp")
+                Aircraft.Specs.Battery.OpTemp = NaN;
+            end
+        end
+
     end
 end
 
@@ -471,6 +548,7 @@ if ~isfield(Aircraft,"Settings")
     Aircraft.Settings.VisualizeAircraft = NaN;
     Aircraft.Settings.Dir.Size = NaN;
     Aircraft.Settings.Dir.Oper = NaN;
+    Aircraft.Settings.Degradation = NaN;
 else
     if ~isfield(Aircraft.Settings,"TkoPoints")
         Aircraft.Settings.TkoPoints = NaN;
@@ -525,6 +603,9 @@ else
         if ~isfield(Aircraft.Settings.Dir,"Oper")
             Aircraft.Settings.Dir.Oper = NaN;
         end
+    end
+    if ~isfield(Aircraft.Settings, "Degradation")
+        Aircraft.Settings.Degradation = NaN;
     end
 end
 

@@ -146,7 +146,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
@@ -161,7 +161,7 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = .8;
+Aircraft.Specs.Power.PC.EM.Split = .35;
 Aircraft.Specs.Power.PC.EM.Alt =[0, 36000];
 
 % thrust splits (thrust / total thrust)

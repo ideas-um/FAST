@@ -122,11 +122,11 @@ for ips = 1:nps
         end
         
     elseif (PSType(ips) == 0) % electric motor
+
         Pav = Aircraft.Specs.Weight.EM/2 * Aircraft.Specs.Power.P_W.EM;
         PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
         PowerAv(:,[3,4]) = PC_EM.*repmat(Pav, npnt, 2);
         
-        % once available, input an electric motor model here
         
     elseif (PSType(ips) == 2) % fuel cell
         
@@ -276,6 +276,10 @@ if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
     Pav = Aircraft.Specs.Weight.EM/2 * Aircraft.Specs.Power.P_W.EM;
     PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
     PowerAv(:,[3,4]) = PC_EM.*repmat(Pav, npnt, 2);
+    if Aircraft.Settings.Analysis.Type < 0
+        PC_GT = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [1,2]);
+        PowerAv(:,[1,2]) = PC_GT.*PowerAv(:,[1,2]);
+    end
 end
 
 

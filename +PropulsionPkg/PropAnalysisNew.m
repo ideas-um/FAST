@@ -73,7 +73,8 @@ else
     % throw error
     error("ERROR - PropAnalysisNew: invalid aircraft class provided.");
     
-end
+
+]\\\\\\\\\\\\./end
 
 % ----------------------------------------------------------
 
@@ -265,6 +266,9 @@ for ipnt = 1:npnt
     if exist('PC_EM', 'var') 
         PreqPS(ipnt,[3,4]) = Pav_PS(ipnt, [3,4]);
         PreqPS(ipnt,[1,2]) = PreqTS(ipnt)./[.99, .99] - PreqPS(ipnt,[3,4]);
+        if Aircraft.Settings.Analysis.Type < 0
+            PreqPS(ipnt,[1,2]) = Pav_PS(ipnt, [1,2]);
+        end
     end
 
     %{

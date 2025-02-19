@@ -84,15 +84,20 @@ for ipar = 1:npar
     
     % remember the actual power split
     LamTSPS = SplitTSPS;
+    
+    if Aircraft.Settings.Analysis.Type > 0
+        % Compute the power code
+        PC_Eng = PoutEng./PavEng;
+        PC_GT_NaN = isnan(PC_EM);
+        PC_GT(PC_GT_NaN) = 0;
+    
+        PC_EM = PoutEM./PavEM;
+        PC_EM_NaN = isnan(PC_EM);
+        PC_EM(PC_EM_NaN) = 0;
 
-    % Compute the power code
-    PC_Eng = PoutEng./PavEng;
-    PC_EM = PoutEM./PavEM;
-    PC_EM_NaN = isnan(PC_EM);
-    PC_EM(PC_EM_NaN) = 0;
-
-    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
-    Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
+        Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, imain) = PC_Eng;
+        Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, isupp) = PC_EM;
+    end
     
 end
 

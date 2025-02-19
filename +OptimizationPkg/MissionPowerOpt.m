@@ -55,10 +55,10 @@ Aircraft.Settings.ConSOC = 0;
 n1= Aircraft.Mission.Profile.SegBeg(2);
 n2= Aircraft.Mission.Profile.SegEnd(4)-1;
 
-PC0 = Aircraft.Mission.History.SI.Power.PC(n1:n2, 4);
-b = length(PC0);
-lb = zeros(1, b)';
-ub = ones(1, b)';
+PC0 = Aircraft.Mission.History.SI.Power.PC(n1:n2, [1,3]);
+b = size(PC0);
+lb = zeros(b);
+ub = ones(b);
 
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,7 +71,15 @@ t = toc
 fburnOG = PCvFburn(PC0, Aircraft);
 fburnOpt = PCvFburn(PCbest, Aircraft);
 fdiff = (fburnOpt - fburnOG)/fburnOG;
-    
+pout = sprintf("Fuel Burn Reduction: %f", fdiff);
+disp(pout)
+
+n1= Aircraft.Mission.Profile.SegBeg(2);
+n2= Aircraft.Mission.Profile.SegEnd(4)-1;
+Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PCbest;
+Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PCbest;
+Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+OptAircraft = Aircraft;
     
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,11 +94,8 @@ function [fburn] = PCvFburn(PC, Aircraft)
 
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
-    npts = length(Aircraft.Mission.History.SI.Performance.Alt);
-    PC0 = zeros(npts,1);
-    PC0(1:(n1-1)) = ones(n1-1,1);
-    PC0(n1:n2) = PC;
-    Aircraft.Specs.Power.PC(:, [3,4]) = repmat(PC0,1,2);
+    Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PC;
+    Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PC;
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     
     fburn = Aircraft.Specs.Weight.Fuel;
@@ -104,14 +109,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 function [c, ceq] = SOC_Constraint(PC, Aircraft)
-    
+
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
-    npts = length(Aircraft.Mission.History.SI.Performance.Alt);
-    PC0 = zeros(npts,1);
-    PC0(1:(n1-1)) = ones(n1-1,1);
-    PC0(n1:n2) = PC;
-    Aircraft.Specs.Power.PC(:, [3,4]) = repmat(PC0,1,2);
+    Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PC;
+    Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PC;
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     
     SOC = Aircraft.Mission.History.SI.Power.SOC(:,2);

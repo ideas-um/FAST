@@ -73,8 +73,7 @@ else
     % throw error
     error("ERROR - PropAnalysisNew: invalid aircraft class provided.");
     
-
-]\\\\\\\\\\\\./end
+end
 
 % ----------------------------------------------------------
 

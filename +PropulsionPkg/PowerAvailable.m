@@ -28,6 +28,9 @@ SegsID = Aircraft.Mission.Profile.SegsID;
 SegBeg = Aircraft.Mission.Profile.SegBeg(SegsID);
 SegEnd = Aircraft.Mission.Profile.SegEnd(SegsID);
 
+% get segment type
+Seg    = Aircraft.Mission.Profile.Segs(SegsID);
+
 % aircraft performance history
 TAS  = Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd);
 Rho  = Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd);
@@ -107,6 +110,12 @@ for ips = 1:nps
             
             % get the available power from the gas-turbine engines
             PowerAv(:, ips) = ThrustAv(:, ips) .* TAS;
+
+            % for offf-design climb set power avalaible
+            if Aircraft.Settings.Analysis.Type < 0 && Seg == "Climb"
+                PC_GT = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, ips);
+                PowerAv(:, ips) = PowerAv(:, ips) .* PC_GT;
+            end
             
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
@@ -124,8 +133,8 @@ for ips = 1:nps
     elseif (PSType(ips) == 0) % electric motor
 
         Pav = Aircraft.Specs.Weight.EM/2 * Aircraft.Specs.Power.P_W.EM;
-        PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
-        PowerAv(:,[3,4]) = PC_EM.*repmat(Pav, npnt, 2);
+        PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, ips);
+        PowerAv(:,ips) = PC_EM.*Pav;
         
         
     elseif (PSType(ips) == 2) % fuel cell
@@ -276,11 +285,8 @@ if Aircraft.Specs.Power.LamTSPS.SLS ~= 0
     Pav = Aircraft.Specs.Weight.EM/2 * Aircraft.Specs.Power.P_W.EM;
     PC_EM = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [3,4]);
     PowerAv(:,[3,4]) = PC_EM.*repmat(Pav, npnt, 2);
-    if Aircraft.Settings.Analysis.Type < 0
-        PC_GT = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, [1,2]);
-        PowerAv(:,[1,2]) = PC_GT.*PowerAv(:,[1,2]);
-    end
 end
+
 
 
 %% STORE OUTPUTS IN THE AIRCRAFT STRUCTURE %%

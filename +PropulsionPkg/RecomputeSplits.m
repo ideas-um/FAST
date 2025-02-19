@@ -88,8 +88,8 @@ for ipar = 1:npar
     if Aircraft.Settings.Analysis.Type > 0
         % Compute the power code
         PC_Eng = PoutEng./PavEng;
-        PC_GT_NaN = isnan(PC_EM);
-        PC_GT(PC_GT_NaN) = 0;
+        PC_GT_NaN = isnan(PC_Eng);
+        PC_Eng(PC_GT_NaN) = 0;
     
         PC_EM = PoutEM./PavEM;
         PC_EM_NaN = isnan(PC_EM);

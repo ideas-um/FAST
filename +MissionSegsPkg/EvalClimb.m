@@ -310,6 +310,7 @@ while (iter < MaxIter)
         % update the rate of climb (0 gets overwritten by next segment)
         dh_dt = [diff(Alt) ./ dTime; 0];
         
+        
         % find points that exceed the maximum rate of climb
         irow = find(dh_dt > dh_dtMax);
         
@@ -323,6 +324,7 @@ while (iter < MaxIter)
             dTime = diff(Alt) ./ dh_dt(1:end-1);
             
         end
+        
         
         % compute the acceleration
         dV_dt = [diff(TAS) ./ dTime; 0];

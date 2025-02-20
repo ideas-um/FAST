@@ -201,7 +201,7 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 
 % number of control points in each segment
 Aircraft.Settings.TkoPoints = NaN;
-Aircraft.Settings.ClbPoints = 3;
+Aircraft.Settings.ClbPoints = NaN;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;
 

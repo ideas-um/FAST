@@ -28,7 +28,7 @@ function OptAircraft = MissionPowerOpt(Aircraft)
 
 % set up optimization algorithm and command window output
 % Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','sqp');
 
 % objective function convergence tolerance
 options.OptimalityTolerance = 10^-3;
@@ -69,17 +69,18 @@ PClast = [];
 fburn = [];
 SOC    = [];
 Ps = [];
+diffPC = [];
 g = 9.81;
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft), options);
+PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft), options);
 t = toc 
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-fburnOG = PCvFburn(PC0, Aircraft);
-fburnOpt = PCvFburn(PCbest, Aircraft);
+fburnOG = ObjFunc(PC0, Aircraft);
+fburnOpt = ObjFunc(PCbest, Aircraft);
 fdiff = (fburnOpt - fburnOG)/fburnOG;
 pout = sprintf("Fuel Burn Reduction: %f", fdiff);
 disp(pout)
@@ -90,6 +91,7 @@ Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PCbest;
 Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PCbest;
 Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 OptAircraft = Aircraft;
+disp(PCbest)
     
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,6 +146,10 @@ function [val] = ObjFunc(PC, Aircraft)
     % check if PC values changes
     if ~isequal(PC, PClast)
         [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft);
+        if ~isempty(PClast)
+            diffPC = PC - PClast;
+            %disp(diffPC)
+        end
         PClast = PC;
     end
     % return objective function value

@@ -296,12 +296,12 @@ while (iter < MaxIter)
     % compute the specific excess power
     Ps = (Pav - DV) ./ (Mass .* g);
 
-    %{
+    
     % check for invalid specific excess power values
-    if (any(Ps < 0))
+    if (any(Ps(1:end-1) < 0))
         warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
     end
-    %}
+    
             
     % compute time to fly, depending if rate of climb is given
     if (isnan(dh_dtReq))
@@ -317,7 +317,7 @@ while (iter < MaxIter)
         irow = find(dh_dt > dh_dtMax);
         
         % adjust points that exceed the maximum rate of climb
-        if (any(irow))
+        if (any(irow) && Aircraft.Settings.Analysis.Type > 0)
             
             % limit the rate of climb
             dh_dt(irow) = dh_dtMax;

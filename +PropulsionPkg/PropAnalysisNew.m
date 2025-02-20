@@ -88,6 +88,8 @@ end
 % get the segment id
 SegsID = Aircraft.Mission.Profile.SegsID;
 
+Seg = Aircraft.Mission.Profile.Segs(SegsID);
+
 % get the beginning and ending control point indices
 SegBeg = Aircraft.Mission.Profile.SegBeg(SegsID);
 SegEnd = Aircraft.Mission.Profile.SegEnd(SegsID);
@@ -265,7 +267,7 @@ for ipnt = 1:npnt
     if exist('PC_EM', 'var') 
         PreqPS(ipnt,[3,4]) = Pav_PS(ipnt, [3,4]);
         PreqPS(ipnt,[1,2]) = PreqTS(ipnt)./[.99, .99] - PreqPS(ipnt,[3,4]);
-        if Aircraft.Settings.Analysis.Type < 0
+        if Aircraft.Settings.Analysis.Type < 0 && Seg == "Climb"
             PreqPS(ipnt,[1,2]) = Pav_PS(ipnt, [1,2]);
         end
     end

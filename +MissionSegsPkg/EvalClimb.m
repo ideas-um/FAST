@@ -296,10 +296,12 @@ while (iter < MaxIter)
     % compute the specific excess power
     Ps = (Pav - DV) ./ (Mass .* g);
 
+    %{
     % check for invalid specific excess power values
     if (any(Ps < 0))
         warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
     end
+    %}
             
     % compute time to fly, depending if rate of climb is given
     if (isnan(dh_dtReq))

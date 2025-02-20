@@ -123,7 +123,7 @@ function [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft)
     % lift
     L = g .* m;
     % drag
-    D = L ./ Aircraft.Specs.Aero.L_D;
+    D = L ./ Aircraft.Specs.Aero.L_D.Clb;
     % rate of climb
     RC = Aircraft.Mission.History.SI.Performance.RC(n1:n2);
     % acceleration during climb

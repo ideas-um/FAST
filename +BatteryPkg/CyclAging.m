@@ -53,8 +53,8 @@ coeff_Cch_nmc  = 0.2553;    % Charge rate sensitivity factor
 coeff_Cdch_nmc = 0.1571;    % Discharge rate sensitivity factor
 coeff_mSOC_nmc = -0.0212;   % Middle state-of-charge sensitivity factor
 alpha_opt_nmc  = 0.915;     % Exponent for FEC effect
-temp_ref_nmc   = 293.15;       % Reference temperature [Kelvin]
-mSOC_ref_nmc   = 0.42;      % Reference middle state-of-charge (42%)
+temp_ref_nmc   = 293.15;    % Reference temperature [Kelvin]
+mSOC_ref_nmc   = 42;        % Reference middle state-of-charge (42%)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SET UP PARAMETERS FOR LFP LIB %
@@ -69,7 +69,7 @@ coeff_Cdch_lfp = 0.296;     % Discharge rate sensitivity factor
 coeff_mSOC_lfp = 0.0513;    % Middle state-of-charge sensitivity factor
 alpha_opt_lfp  = 0.869;     % Exponent for FEC effect
 temp_ref_lfp   = 293.15;    % Reference temperature [Kelvin]
-mSOC_ref_lfp   = 0.42;      % Reference middle state-of-charge (42%)
+mSOC_ref_lfp   = 42;        % Reference middle state-of-charge (42%)
 
 %%%%%%%%%%%%%%%%%%%%
 % ERROR FOR OTHERS %
@@ -89,7 +89,7 @@ temp_act =  Aircraft.Specs.Battery.OpTemp + 273.15; % [k]
 
 % Depth of Discharge of battery
 DOD = (max(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)) - ... 
-      min(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)))/100;           
+      min(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn)));           
 
 % C-rates during discharging %
 DisCCrate = mean(Aircraft.Mission.History.SI.Power.C_rate ...
@@ -101,14 +101,9 @@ CCrate = -mean(Aircraft.Mission.History.SI.Power.ChargedAC.C_rate ...
          (Aircraft.Mission.History.SI.Power.ChargedAC.C_rate~=0));
 
 % mean/median SOC %
-SOCValues = [];
-SOCValues(end+1, 1)=Aircraft.Mission.History.SI.Power.SOC(1,ValiColumn);
-for i = 2:length(Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn))
-    if Aircraft.Mission.History.SI.Power.SOC(i,ValiColumn) - Aircraft.Mission.History.SI.Power.SOC(i-1,ValiColumn) ~= 0
-        SOCValues(end+1, 1) = Aircraft.Mission.History.SI.Power.SOC(i,ValiColumn);
-    end
-end
-mSOC = mean(SOCValues)/100;
+SOCs = Aircraft.Mission.History.SI.Power.SOC(:,ValiColumn);
+active_mSOC = SOCs([true; diff(SOCs) ~= 0]); % Remove consecutive repeated SOC values
+mSOC = mean(active_mSOC); % Averaged SOCs
 
 % Full Equivalent Cycles %
 QMax = Aircraft.Specs.Battery.CapCell; % max capacity for a single cell

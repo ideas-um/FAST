@@ -146,22 +146,22 @@ SizedERJ.Settings.Analysis.Type=-2;
 SOHs = [];
 FECs = [];
 Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
-FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end);
+SOHs(end+1,1) = Off_SizedERJ.Specs.Battery.SOH(end);
+FECs(end+1,1) = Off_SizedERJ.Specs.Battery.FEC(end);
 for i = 1:100000
 
     Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
    
 
-    SOHs(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
-    FECs(end+1) = Off_SizedERJ.Specs.Battery.FEC(end); 
+    SOHs(end+1,1) = Off_SizedERJ.Specs.Battery.SOH(end);
+    FECs(end+1,1) = Off_SizedERJ.Specs.Battery.FEC(end); 
 
     if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
         break
     end
 end
 
-
+figure(1)
 plot(SOHs, 'LineWidth', 2);
 hold on
 yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
@@ -172,59 +172,82 @@ ylabel("Battery SOH [%]");
 grid on
 title('Battery Degradation')
 
+figure(2)
+plot(FECs, SOHs, 'LineWidth', 2);
+hold on
+yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
+hold off
+xlabel('FEC');
+ylabel("Battery SOH [%]");
+% xlim([0 FECs(end)]);
+grid on
 
 
 %% TEST degradation effect at different operation temperature
 
-clc;clear
+clc; clear;
+
+% Initialize Storage Arrays for SOH at Different Temperatures
+SOHs = cell(1,4);  % Cell array to store results for each temperature
+OpTemps = [20, 25, 30, 35]; % Battery operational temperatures
+
+% Initialize the SizedERJ aircraft model
 SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-SizedERJ.Settings.Analysis.Type=-2;
+SizedERJ.Settings.Analysis.Type = -2;
 
-SOHs_20 = [];
-SOHs_25 = [];
-SOHs_30 = [];
-SOHs_35 = [];
+% Loop over each operational temperature
+for temp_idx = 1:length(OpTemps)
+    % Set the battery operational temperature
+    SizedERJ.Specs.Battery.OpTemp = OpTemps(temp_idx);
 
-SizedERJ.Specs.Battery.OpTemp = 35;
+    % Initialize storage for this temperature
+    SOHs{temp_idx} = [];
 
-
-for i = 1:length(SizedERJ.Specs.Battery.OpTemp)
-
+    % Run the first cycle
     Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-    SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
+    SOHs{temp_idx}(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
 
-    for i = 1:1000
-    
+    % Continue cycling until SOH ≤ 70%
+    for i = 1:100000
         Off_SizedERJ = Main(Off_SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-       
+
+        % Stop iterating if SOH reaches 70%
         if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
-            break
+            break;
         end
-    
-        SOHs_35(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
-    
+
+        % Store SOH value
+        SOHs{temp_idx}(end+1) = Off_SizedERJ.Specs.Battery.SOH(end);
     end
 end
 
-plot(SOHs_20, 'LineWidth', 2);
-hold on
-plot(SOHs_25, 'LineWidth', 2);
-plot(SOHs_30, 'LineWidth', 2);
-plot(SOHs_35, 'LineWidth', 2);
-yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
-hold off
-xlabel('Battery Cycling Times');
-ylabel("Battery SOH [%]");
-grid on
-title('Battery Degradation');
-legend( "T=20°C", "T=25°C", "T=30°C", "T=35°C");
+% Plot SOH degradation for different temperatures
+figure; hold on;
+colors = {'b', 'g', 'm', 'r'}; % Colors for each temp
+line_styles = {'-', '--', '-.', ':'}; % Different line styles
+
+for temp_idx = 1:length(OpTemps)
+    plot(SOHs{temp_idx}, 'LineWidth', 2, 'Color', colors{temp_idx}, 'LineStyle', line_styles{temp_idx});
+end
+
+% Add a reference line at SOH = 70%
+yline(70, 'k--', 'LineWidth', 2); 
+
+% Formatting
+xlabel('Battery Cycling Times', 'FontSize', 14);
+ylabel('Battery SOH [%]', 'FontSize', 14);
+grid on;
+title('Battery Degradation at Different Operational Temperatures', 'FontSize', 14);
+legend("T = 20°C", "T = 25°C", "T = 30°C", "T = 35°C", 'Location', 'best');
+
+hold off;
 
 %% Different charging power vs SOH
 SizedERJ = Main(AircraftSpecsPkg.ERJ175LR, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 SizedERJ.Settings.Analysis.Type = -2;
 
 % Define charging power values from -100e3 to -250e3 with a step of -10e3
-Charging_P = -100e3:-20e3:-250e3;
+Charging_P = -100e3:-50e3:-250e3;
 
 % Initialize storage array for cycle counts
 CycleCounts = zeros(size(Charging_P));
@@ -271,3 +294,18 @@ ylabel('Number of Cycles Until SOH = 70%', 'FontSize', 14);
 grid on;
 title('Battery Cycle Life vs Charging Power', 'FontSize', 14);
 set(gca, 'XDir', 'reverse'); % Reverse x-axis to show -100 kW to -250 kW
+
+
+%%
+SOCValues = [];
+SOCValues(end+1, 1)=SizedERJ.Mission.History.SI.Power.SOC(1,2);
+for i = 2:length(SizedERJ.Mission.History.SI.Power.SOC(:,2))
+    if SizedERJ.Mission.History.SI.Power.SOC(i,2) - SizedERJ.Mission.History.SI.Power.SOC(i-1,2) ~= 0
+        SOCValues(end+1, 1) = SizedERJ.Mission.History.SI.Power.SOC(i,2);
+    end
+end
+mSOC = mean(SOCValues)
+
+a = SizedERJ.Mission.History.SI.Power.SOC(:,2)
+active_mSOC = a([true; diff(a) ~= 0]);
+mSOC = mean(active_mSOC)

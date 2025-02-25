@@ -28,10 +28,10 @@ function OptAircraft = MissionPowerOpt(Aircraft)
 
 % set up optimization algorithm and command window output
 % Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','sqp');
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
 
 % objective function convergence tolerance
-options.OptimalityTolerance = 10^-3;
+options.OptimalityTolerance = 10^-6;
 
 % step size convergence
 options.StepTolerance = 10^-6;
@@ -69,7 +69,7 @@ PClast = [];
 fburn = [];
 SOC    = [];
 Ps = [];
-diffPC = [];
+dh_dt = [];
 g = 9.81;
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,7 +101,7 @@ disp(PCbest)
 %  Function Evaluation        %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft)
+function [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft)
     % get climb beg and end indeces
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
@@ -119,21 +119,23 @@ function [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft)
 
     % check if enough power for desired climb profile
     % extract climb TAS
-    V = Aircraft.Mission.History.SI.Performance.TAS(n1:n2);
+    TAS = Aircraft.Mission.History.SI.Performance.TAS(n1:n2);
+    % rate of climb
+    dh_dt = Aircraft.Mission.History.SI.Performance.RC(n1:n2);
+    % get flight path angle
+    FPA = asind(dh_dt ./ TAS);
     % mass during climb
     m = Aircraft.Mission.History.SI.Weight.CurWeight(n1:n2);
     % lift
-    L = g .* m;
+    L = g .* m .*cosd(FPA);
     % drag
     D = L ./ Aircraft.Specs.Aero.L_D.Clb;
-    % rate of climb
-    RC = Aircraft.Mission.History.SI.Performance.RC(n1:n2);
     % acceleration during climb
-    a = Aircraft.Mission.History.SI.Performance.Acc(n1:n2);
+    dv_dt = Aircraft.Mission.History.SI.Performance.Acc(n1:n2);
     % power avaliable 
     TV = Aircraft.Mission.History.SI.Power.TV(n1:n2);
     % excess power 
-    Ps = D.* V + m.*g.*RC + m.*V.*a - TV;
+    Ps = D.* TAS + m.*g.*dh_dt + m.*TAS.*dv_dt - TV;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -145,11 +147,7 @@ end
 function [val] = ObjFunc(PC, Aircraft)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft);
-        if ~isempty(PClast)
-            diffPC = PC - PClast;
-            %disp(diffPC)
-        end
+        [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft);
         PClast = PC;
     end
     % return objective function value
@@ -165,14 +163,17 @@ end
 function [c, ceq] = Cons(PC, Aircraft)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [fburn, SOC, Ps] = FlyAircraft(PC, Aircraft);
+        [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft);
         PClast = PC;
     end
     % compute SOC constraint
     cSOC = 20 - SOC;
 
+    % compute RC constraint
+    cRC = dh_dt - Aircraft.Specs.Performance.RCMax;
+
     % out put constraints
-    c = [cSOC; Ps;];
+    c = [cSOC; cRC];
     ceq = [];
 
 end

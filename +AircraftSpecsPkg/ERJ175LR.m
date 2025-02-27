@@ -157,12 +157,12 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 
 % power-weight ratio for the electric motor and generator (kW/kg)
 % leave as NaN if an electric motor or generator isn't in the powertrain
-Aircraft.Specs.Power.P_W.EM = 10;
+Aircraft.Specs.Power.P_W.EM = NaN;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = .35;
-Aircraft.Specs.Power.PC.EM.Alt =[0, 36000];
+Aircraft.Specs.Power.PC.EM.Split = NaN; %.35;
+Aircraft.Specs.Power.PC.EM.Alt = NaN; %[0, 36000];
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;

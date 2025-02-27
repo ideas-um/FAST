@@ -1,4 +1,4 @@
-function OptAircraft = MissionPowerOpt(Aircraft)
+function [OptAircraft, t] = MissionPowerOpt(Aircraft)
 
 %
 % OptAicraft = MissionPowerOpt(Aircraft)
@@ -31,7 +31,7 @@ function OptAircraft = MissionPowerOpt(Aircraft)
 options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
 
 % objective function convergence tolerance
-options.OptimalityTolerance = 10^-6;
+options.OptimalityTolerance = 10^-3;
 
 % step size convergence
 options.StepTolerance = 10^-6;

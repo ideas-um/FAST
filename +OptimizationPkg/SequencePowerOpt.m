@@ -1,4 +1,4 @@
-function [MissTable, OptmizedAircraft] = SequencePowerOpt(Aircraft, Sequence)
+function [MissTable, PCOpt, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
 
 
 % number of missions to fly
@@ -46,9 +46,12 @@ Aircraft.Settings.ConSOC = 0;
 % no mission history table
 Aircraft.Settings.Table = 0;
 
+% designate space for optimized PC
+PCOpt = zeros(73, nflight*2);
+
 % iterate through missions
 for iflight = 1:nflight
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %                            %
     % extract flight performance %
     % parameters from the table  %
@@ -126,9 +129,66 @@ for iflight = 1:nflight
     % fly off deisgn mission
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
-    
+    % extract desired parmaters
+    %[TOGW, Fburn, Ebatt,...
+    %SOCi,SOC_TKO, SOC_TOC, SOCf,     ...
+    %TSFC_TKO, TSFC_TOC, TSFC_crs] = AnaylzeMiss(Aircraft);
+    Results = AnaylzeMiss(Aircraft);
 
+     % SAVE MISSION PERFORMANCE RESULTS 
+    %MissTable{iflight*3 - 2, :}= [iflight, "Non-Optimized", Range,...
+                            %GroundTimeMin, TOGW, Fburn, Ebatt,...
+                            %SOCi,SOC_TKO, SOC_TOC, SOCf,     ...
+                            %TSFC_TKO, TSFC_TOC, TSFC_crs] ;
+
+    % SAVE OPTIMIZED MISSION PERFORMANCE RESULTS 
+    MissTable{iflight * 3 - 2, :}= [iflight, "Non-Optimized", Range,...
+                                    GroundTimeMin, Results] ;
+
+    % ----------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % fly non-optimized aircraft %
+    % on mission and save        %
+    % performance parameters     %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [OptAC, t(iflight)] = OptimizationPkg.MissionPowerOpt(Aircraft);
+
+    % extract desired parmaters
+    %{
+    [TOGW2, Fburn2, Ebatt2,...
+    SOCi2,SOC_TKO2, SOC_TOC2, SOCf2,     ...
+    TSFC_TKO2, TSFC_TOC2, TSFC_crs2] = AnaylzeMiss(OptAC);
+
+    % SAVE OPTIMIZED MISSION PERFORMANCE RESULTS 
+    MissTable{iflight * 3 - 1, :}= [iflight, "Optimized", Range,...
+                                    GroundTimeMin, TOGW2, Fburn2, Ebatt2,...
+                                    SOCi2,SOC_TKO2, SOC_TOC2, SOCf2,     ...
+                                    TSFC_TKO2, TSFC_TOC2, TSFC_crs2] ;
+    %}
+    Results2 = AnaylzeMiss(OptAC);
+    MissTable{iflight * 3 - 1, :}= [iflight, "Optimized", Range,...
+                                    GroundTimeMin, Results2] ;
+
+    % ----------------------------------------------------------
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Compare nonoptimized to    %
+    %   optimized results and    %
+    %       prepare outputs      %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    dResults = PerDiff(Results, Results2);
+    % save % difference of results 
+    MissTable{iflight * 3, :}= [iflight, "% Diff", Range,...
+                                GroundTimeMin, dResults] ;
+    % save optimized aircraft struct
+    nameAC = sprintf("OptAircraft%d", iflight);
+    OptmizedAircraft.(nameAC) = OptAC;
+    %extract optimized powercode
+    PCOpt(:, iflight*2-1 : iflight*2) = OptAC.Specs.Power.PC(1:73, [1,3]);
 end
+
 
 end
 
@@ -139,7 +199,7 @@ end
 % Aircraft                   %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [] = AnaylzeMiss(Aircraft)
+function Results = AnaylzeMiss(Aircraft)
 
 %% EXTRACT MISSION SEGMENT INDECES %% 
 % get the number of points in each segment
@@ -170,7 +230,7 @@ TOGW = Aircraft.Specs.Weight.MTOW;
 Fburn = Aircraft.Mission.History.SI.Weight.Fburn(npnt);
 
 % main mission battery energy use
-BattE = Aircraft.Mission.History.SI.Energy.E_ES(npnt);
+EBatt = Aircraft.Mission.History.SI.Energy.E_ES(npnt, 2);
 
 % SOC after segement values
 SOCbeg = Aircraft.Mission.History.SI.Power.SOC(1, 2);
@@ -183,4 +243,11 @@ TSFC_tko = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(1     :EndTko))/EndTk
 TSFC_clb = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndTko:EndClb))/(EndClb-EndTko +1);
 TSFC_crs = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndClb:EndCrs))/(EndCrs-EndClb +1);
 
+% save results in a vector
+Results = [TOGW, Fburn, EBatt, SOCbeg, SOCtko, SOCclb, SOCf, TSFC_tko, TSFC_clb, TSFC_crs];
+
+end
+
+function d = PerDiff(a, b)
+d = (a-b)./a .* 100;
 end

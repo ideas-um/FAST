@@ -169,7 +169,7 @@ Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
 Aircraft.Specs.Power.LamTSPS.Tko = 0.085;
-Aircraft.Specs.Power.LamTSPS.Clb = 0;
+Aircraft.Specs.Power.LamTSPS.Clb = 0.03;
 Aircraft.Specs.Power.LamTSPS.Crs = 0;
 Aircraft.Specs.Power.LamTSPS.Des = 0;
 Aircraft.Specs.Power.LamTSPS.Lnd = 0;

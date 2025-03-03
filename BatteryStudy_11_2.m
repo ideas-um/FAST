@@ -111,6 +111,21 @@ else
     fprintf('Successfully loaded %d files from %s.\n', length(matFiles), loadFolder);
 end
 
+figure 
+crate = [];
+for i = 1:length(loadedData)
+    crate(end+1,1) = max(loadedData{i, 1}.Aircraft.Mission.History.SI.Power.C_rate) ; 
+end
+
+plot(1:length(loadedData),crate, "LineWidth", 2);
+
+figure 
+weight = [];
+for i = 1:length(loadedData)
+    weight(end+1,1) = max(loadedData{i, 1}.Aircraft.Specs.Weight.Batt) ; 
+end
+
+plot(1:length(loadedData),weight, "LineWidth", 2);
 
 
 
@@ -181,6 +196,7 @@ xlabel('FEC');
 ylabel("Battery SOH [%]");
 % xlim([0 FECs(end)]);
 grid on
+title('Battery Degradation')
 
 
 %% TEST degradation effect at different operation temperature

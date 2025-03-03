@@ -60,7 +60,7 @@ SOCSeries(1) = SOCBeg;
 
 % Calculate initial values for Voltage, Current, Pout, Capacity, and C_rate without altering SOC
 [VoltageSeries(1), CurrentSeries(1), PoutSeries(1), CapacitySeries(1), SOCSeries(2), C_rateSeries(1)] = ...
-    BatteryPkg.Model(Aircraft, ChrgRate, TimeStep, SOCBeg, ParCells, SerCells);
+    BatteryPkg.Charging(Aircraft, ChrgRate, TimeStep, SOCBeg, ParCells, SerCells);
 
 %% SIMULATE CHARGING %%
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -68,7 +68,7 @@ SOCSeries(1) = SOCBeg;
 for i = 2:numSteps
     % Update the charging model for each 1-second interval
     [VoltageSeries(i), CurrentSeries(i), PoutSeries(i), CapacitySeries(i), SOCSeries(i+1), C_rateSeries(i)] = ...
-        BatteryPkg.Model(Aircraft,ChrgRate, TimeStep, SOCSeries(i), ParCells, SerCells);
+        BatteryPkg.Charging(Aircraft,ChrgRate, TimeStep, SOCSeries(i), ParCells, SerCells);
 
     % minimum SOC is 0% (fully depleted) and can't be negative
     if (SOCSeries(i) < 0)
@@ -91,7 +91,7 @@ end
 
 % Add one more calculation for the last value of capacity due to issue
 % of Model.m, line 227
-[~, ~, ~, CapacitySeries(end + 1), ~, ~] = BatteryPkg.Model(Aircraft, ChrgRate, TimeStep, SOCSeries(end), ParCells, SerCells);
+[~, ~, ~, CapacitySeries(end + 1), ~, ~] = BatteryPkg.Charging(Aircraft, ChrgRate, TimeStep, SOCSeries(end), ParCells, SerCells);
 
 %% POST PROCESS %%
 %%%%%%%%%%%%%%%%%%
@@ -104,6 +104,7 @@ Aircraft.Mission.History.SI.Power.ChargedAC.CtrlPtsTimeStep = TimeStep;
 Aircraft.Mission.History.SI.Power.ChargedAC.SOCEnd          = SOCEnd;
 Aircraft.Mission.History.SI.Power.ChargedAC.SOC             = SOCSeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.Voltage         = VoltageSeries;
+Aircraft.Mission.History.SI.Power.ChargedAC.VolCell         = VoltageSeries./ SerCells;
 Aircraft.Mission.History.SI.Power.ChargedAC.Current         = CurrentSeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.P_in            = PoutSeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.Capacity        = CapacitySeries;

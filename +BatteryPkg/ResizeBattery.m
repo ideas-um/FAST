@@ -67,8 +67,8 @@ if (Aircraft.Settings.DetailedBatt == 1)
     %                            %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % maximum extracted capacity and voltage
-    VMax = Aircraft.Specs.Battery.MaxExtVolCell;
+    % Max capacity and Nominal voltage
+    VNom = Aircraft.Specs.Battery.NomVolCell;
     QMax = Aircraft.Specs.Battery.CapCell;
 
     % acceptable SOC threshold
@@ -147,8 +147,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % get the energy consumed by the battery during each segment
     dEbatt = diff(Ebatt);
     
-    % compute the C-rate (power in segment / energy consumed in segment)
-    % C_rate = Aircraft.Mission.History.SI.Power.C_rate; 
+    % compute the C-rate (current in segment / total capacity of battery pack)
     C_rate = Cbatt ./ (ExistBattCap); 
 
 
@@ -190,8 +189,8 @@ if (Aircraft.Settings.DetailedBatt == 1)
 %     % compute the required capacity (from E-PASS, not used)
 %     Qreq = Npar * QMax;
     
-    % compute the mass of the battery (multiply by 3600 to convert from hr to seconds)
-    Wbatt = QMax * Npar * VMax * Nser * 3600 ./ ebatt;
+    % compute the mass of the battery (multiply by 3600 to convert from Wh to Joules)
+    Wbatt = QMax * Npar * VNom * Nser * 3600 ./ ebatt;
     
     % ------------------------------------------------------
     

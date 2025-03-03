@@ -330,7 +330,7 @@ while (iter < MaxIter)
 
     % Stop iteration early if the last three iterations produce the same
     % results within the error tolerance to end Zig-zag
-    BattW_tol = 0.01;
+    BattW_tol = 0.1;
 
     % Find which elements in AircraftHistory are structures
     isStruct = cellfun(@isstruct, AircraftHistory);
@@ -338,22 +338,31 @@ while (iter < MaxIter)
     % Extract only the elements that are structures
     AircraftHistory = AircraftHistory(isStruct);
 
-    if length(AircraftHistory) >= 3
+    if length(AircraftHistory) >= 5
 
-        % Extract the this and second-to-last iterations
-        ThisIteration = AircraftHistory{iter};
-        Sec_2_LastIteration = AircraftHistory{iter-2};
+        % Extract the battery weights from the last 5 iterations
+        battWeights = zeros(1,5);
+        for k = 0:4
+            battWeights(5-k) = AircraftHistory{iter-k}.Specs.Weight.Batt;
+        end
 
-        % Ending with C-rate within limitation
-        if max(Aircraft.Mission.History.SI.Power.C_rate) < MaxAllowCRate
-
-        % Compare key metrics (Wbatt)
-            BattW_diff = abs(ThisIteration.Specs.Weight.Batt - Sec_2_LastIteration.Specs.Weight.Batt);
-
-            % Check if the differences are below a threshold
-            if BattW_diff < BattW_tol
-            break;
+        % Check if any two of the last five iterations are essentially equal (within tolerance)
+        repeatedFound = false;
+        for i = 1:4
+            for j = i+1:5
+                if abs(battWeights(i) - battWeights(j)) < BattW_tol
+                    repeatedFound = true;
+                    break;
+                end
             end
+            if repeatedFound
+                break;
+            end
+        end
+        
+        % If any pair is repeated within tolerance, stop iterating
+        if repeatedFound
+            break;
         end
     end
 
@@ -402,7 +411,7 @@ if Type > 0
         % Extract only the elements that are structures
         AircraftHistory = AircraftHistory(isStruct);
     
-        if numIterations < 3
+        if numIterations < 5
     
             % Use all available iterations
             lastAircraft = AircraftHistory; 
@@ -413,12 +422,12 @@ if Type > 0
                 maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
             end
         else
-            % Use the last 3 iterations if more than 3 interations available
-            lastAircraft = AircraftHistory(end-2:end);
-            maxC_rates = zeros(3, 1); % Initialize for the last 3 iterations
+            % Use the last 5 iterations if more than 5 interations available
+            lastAircraft = AircraftHistory(end-4:end);
+            maxC_rates = zeros(5, 1); % Initialize for the last 5 iterations
     
-            % Extract the max C-rate for each of the last 3 iterations
-            for i = 1:3
+            % Extract the max C-rate for each of the last 5 iterations
+            for i = 1:5
                 maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
             end
         end

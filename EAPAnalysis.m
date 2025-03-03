@@ -190,9 +190,31 @@ if Aircraft.Settings.PrintOut == 1
     fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1, "m", "ft") ^ 2);
 end 
 
+%%%% Save Sized Aircraft from Each Iterations %%%%
+% Define the folder where the files will be saved
+saveFolder = 'AircraftIterations';
+
+% Create the folder if it doesn't exist
+if ~exist(saveFolder, 'dir')
+    mkdir(saveFolder);
+else
+    % If the folder exists, clear all its previous results（may comment out this part if you don't want remove them）
+    files = dir(fullfile(saveFolder, '*.mat'));
+    for k = 1:length(files)
+        delete(fullfile(saveFolder, files(k).name)); % Delete each file
+    end
+end
+
+% Initialize storage for Aircraft structure history
+AircraftHistory = cell(MaxIter, 1); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% assume a maximum c-rate
+MaxAllowCRate = Aircraft.Specs.Battery.MaxAllowCRate;
+
 % iterate until convergence
 while (iter < MaxIter)
-           
+
     % clear mission history and/or size the aircraft after first iteration
     if (iter > 0)
         
@@ -246,10 +268,11 @@ while (iter < MaxIter)
         
         % resize the battery for power and energy
         Aircraft = BatteryPkg.ResizeBattery(Aircraft);
+        Aircraft = MissionSegsPkg.FlyMission(Aircraft);
         
         % find the difference between the new and old battery weight
         dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
-            
+       
     end
     
     % update mtow
@@ -305,6 +328,54 @@ while (iter < MaxIter)
         fprintf(1, "    Weg   = %.6e lbm   \n", UnitConversionPkg.ConvMass(Weg     , "kg", "lbm")    );
         fprintf(1, "    S     = %.6e ft^2\n\n", S * UnitConversionPkg.ConvLength(1 , "m" , "ft" ) ^ 2);
     end
+
+    if iter > 0
+        % Store the Aircraft structure at this iteration
+        AircraftHistory{iter} = Aircraft;
+        
+        % Save Aircraft structure to a MAT file for each iteration (Can comment out if you don't want)
+        % save(fullfile(saveFolder, sprintf('Aircraft_Iteration_%02d.mat', iter)), 'Aircraft');    
+    end
+
+    % Stop iteration early if the last three iterations produce the same
+    % results within the error tolerance to end Zig-zag
+    BattW_tol = 0.1;
+
+    % Find which elements in AircraftHistory are structures
+    isStruct = cellfun(@isstruct, AircraftHistory);
+
+    % Extract only the elements that are structures
+    AircraftHistory = AircraftHistory(isStruct);
+
+    if length(AircraftHistory) >= 5
+
+        % Extract the battery weights from the last 5 iterations
+        battWeights = zeros(1,5);
+        for k = 0:4
+            battWeights(5-k) = AircraftHistory{iter-k}.Specs.Weight.Batt;
+        end
+
+        % Check if any two of the last five iterations are essentially equal (within tolerance)
+        repeatedFound = false;
+        for i = 1:4
+            for j = i+1:5
+                if abs(battWeights(i) - battWeights(j)) < BattW_tol
+                    repeatedFound = true;
+                    break;
+                end
+            end
+            if repeatedFound
+                break;
+            end
+        end
+        
+        % If any pair is repeated within tolerance, stop iterating
+        if repeatedFound
+            break;
+        end
+    end
+
+
     % iterate
     iter = iter + 1;
     
@@ -319,7 +390,9 @@ while (iter < MaxIter)
         (~any(mtow_conv > EPS))  )
         break;
     end 
+
 end
+
 
 % print warning if maximum iterations reached
 if ((iter == MaxIter) && (Type > 0))
@@ -332,7 +405,57 @@ if ((iter == MaxIter) && (Type > 0))
     
 end
 
-
+%% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5% %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+if Type > 0
+    if Aircraft.Specs.Power.LamTSPS.Tko == 0 
+        % if conventional aircraft, do nothing
+    else
+        % Check the number of iterations in AircraftHistory
+        numIterations = length(AircraftHistory);
+    
+        % Find which elements in AircraftHistory are structures
+        isStruct = cellfun(@isstruct, AircraftHistory);
+    
+        % Extract only the elements that are structures
+        AircraftHistory = AircraftHistory(isStruct);
+    
+        if numIterations < 5
+    
+            % Use all available iterations
+            lastAircraft = AircraftHistory; 
+            maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
+    
+            % Extract the max C-rate for each available iteration
+            for i = 1:numIterations
+                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+            end
+        else
+            % Use the last 5 iterations if more than 5 interations available
+            lastAircraft = AircraftHistory(end-4:end);
+            maxC_rates = zeros(5, 1); % Initialize for the last 5 iterations
+    
+            % Extract the max C-rate for each of the last 5 iterations
+            for i = 1:5
+                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+            end
+        end
+    
+        % Find the structure where max(C-rate) < 5 and closest to 5
+        validIndices = find(maxC_rates < MaxAllowCRate); % Find indices where max C-rate is valid
+        if isempty(validIndices)
+            error('No structure found with max(C-rate) < 5.');
+        end
+    
+        % Get the index of the structure closest to 5
+        [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
+        selectedIndex = validIndices(bestIndex);
+    
+        % Output the final selected Aircraft structure
+        Aircraft = lastAircraft{selectedIndex};
+    
+    end
+end
 %% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -358,4 +481,25 @@ end
 
 % ----------------------------------------------------------
 
+%% Battery Degradation %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% grounding time
+GroundTime = Aircraft.Specs.Battery.GroundT;
+
+% LIB chemistry material
+BattChem = Aircraft.Specs.Battery.Chem;
+
+% battery charging rate in [W]
+Cpower = Aircraft.Specs.Battery.Cpower;
+
+% FEC
+FECs = Aircraft.Specs.Battery.FEC(end);
+
+if Type ~= 1 % Battery degradation only makes sense in off-design 
+    if Aircraft.Settings.Degradation == 1
+        [SOH, FEC] = BatteryPkg.CyclAging(Aircraft, BattChem, FECs, GroundTime, Cpower);
+        Aircraft.Specs.Battery.FEC(end+1,1) = FEC;
+        Aircraft.Specs.Battery.SOH(end+1,1) = SOH;
+    end
 end

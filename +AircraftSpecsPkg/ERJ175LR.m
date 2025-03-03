@@ -195,6 +195,56 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
 % coefficient for HEA engine analysis
 Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
+%% BATTERY SETTINGS %%
+%%%%%%%%%%%%%%%%%%%%%%
+
+% nominal cell voltage [V]
+Aircraft.Specs.Battery.NomVolCell = 3.6;
+
+% maxinum extracted voltage [V]
+Aircraft.Specs.Battery.MaxExtVolCell = 4.0880;
+
+% maxinum cell capacity [Ah]
+Aircraft.Specs.Battery.CapCell = 3;
+
+% internal resistance [Ohm]
+Aircraft.Specs.Battery.IntResist = 0.0199;
+
+% exponential voltage [V]
+Aircraft.Specs.Battery.expVol = 0.0986;
+
+% exponential capacity [(Ah)^-1]
+Aircraft.Specs.Battery.expCap = 30;
+
+% acceptable SOC threshold
+Aircraft.Specs.Battery.MinSOC = 20;
+
+% acceptable max c-rate during discharging
+Aircraft.Specs.Battery.MaxAllowCRate = 5;
+
+%%%% battery degradation effect analysis %%%
+Aircraft.Settings.Degradation = 1; % 1 = analysis with degradation effect; 0 = without degradation effect
+
+if Aircraft.Settings.Degradation == 1
+    
+    % battery chemistry material (ONLY "NMC" or "LFP" FOR NOW)
+    Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2
+    
+    % grounding time (CAN BE SEPERATED WITH "charging time" LATER)
+    Aircraft.Specs.Battery.GroundT = 60*60; % in sec
+    
+    % charging rate
+    Aircraft.Specs.Battery.Cpower = -250*1000; % charging means negative rate in W
+    
+    % battery Full Equivalent Cycles (FECs)
+    Aircraft.Specs.Battery.FEC = 0; % start with 0
+    
+    % battery State of Health (SoH)
+    Aircraft.Specs.Battery.SOH = 100; 
+
+    % battery operation temperature (for analysis only, will remove)
+    Aircraft.Specs.Battery.OpTemp = 35; % [°C]
+end
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

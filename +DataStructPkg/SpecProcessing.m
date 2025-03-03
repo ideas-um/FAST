@@ -41,6 +41,7 @@ Propulsion = Aircraft.Specs.Propulsion;
 Power = Aircraft.Specs.Power;
 Settings = Aircraft.Settings;
 Geometry = Aircraft.Geometry;
+Battery = Aircraft.Specs.Battery;
 
 % remember the sizing directory
 SizeDir = Aircraft.Settings.Dir.Size;
@@ -132,6 +133,20 @@ DefaultPropulsion.Thrust.Crs = NaN;
 DefaultPerformance.TOFL = NaN;
 DefaultPerformance.Vels.MaxOp = NaN;
 
+DefaultBattery.NomVolCell = NaN;
+DefaultBattery.MaxExtVolCell = NaN;
+DefaultBattery.CapCell = NaN;
+DefaultBattery.IntResist = NaN;
+DefaultBattery.expVol = NaN;
+DefaultBattery.expCap = NaN;
+DefaultBattery.MinSOC = NaN;
+DefaultBattery.MaxAllowCRate = NaN;
+DefaultBattery.Chem = NaN;
+DefaultBattery.GroundT = NaN;
+DefaultBattery.Cpower = NaN;
+DefaultBattery.FEC = NaN;
+DefaultBattery.SOH = NaN;
+DefaultBattery.OpTemp = NaN;
 
 %% Regressions and projections
 
@@ -344,6 +359,23 @@ DefaultPower.Battery.ParCells = NaN;
 DefaultPower.Battery.SerCells = NaN;
 DefaultPower.Battery.BegSOC   = NaN;
 
+% Define default battery parameters
+DefaultBattery.NomVolCell = 3.6;
+DefaultBattery.MaxExtVolCell = 4.0880;
+DefaultBattery.CapCell = 3;
+DefaultBattery.IntResist = 0.0199;
+DefaultBattery.expVol = 0.0986;
+DefaultBattery.expCap = 30;
+DefaultBattery.MinSOC = 20;
+DefaultBattery.MaxAllowCRate = 5;
+DefaultBattery.Chem = 1;
+DefaultBattery.GroundT = 60*60; % [s]
+DefaultBattery.Cpower = -250e3; % 250kW in charging
+DefaultBattery.FEC = 0;
+DefaultBattery.SOH = 100;
+DefaultBattery.OpTemp = 35; % 35 [°C], aging model with change it to Kelvin
+
+
 %% Default Settings
 DefaultSettings.TkoPoints = 10;
 DefaultSettings.ClbPoints = 10;
@@ -356,6 +388,8 @@ DefaultSettings.Analysis.Type = 1;       % 1 = on design. -1 = off design
 DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots
 DefaultSettings.Table = 0;
 DefaultSettings.VisualizeAircraft = 0;
+DefaultSettings.Degradation = 0;         % 1 = W/ degradation.
+
 
 % optimization settings.
 DefaultSettings.PowerOpt.DesPowSplit =  0;
@@ -552,6 +586,26 @@ for i = 1:length(Powerfields)
     end
 end
 
+% fieldnames
+
+% Overwrite NaNs in Battery structure
+Batteryfields = fieldnames(Battery);
+for i = 1:length(Batteryfields)
+    if isstruct(Battery.(Batteryfields{i}))
+        subfields = fieldnames(Battery.(Batteryfields{i}));
+        for j = 1:length(subfields)
+            if isnan(Battery.(Batteryfields{i}).(subfields{j}))
+                Battery.(Batteryfields{i}).(subfields{j}) = DefaultBattery.(Batteryfields{i}).(subfields{j});
+            end
+        end
+    elseif isnan(Battery.(Batteryfields{i}))
+        Battery.(Batteryfields{i}) = DefaultBattery.(Batteryfields{i});
+    end
+end
+
+
+
+
 
 % Overwrite NaNs in Settings structure
 Settingsfields = fieldnames(Settings);
@@ -628,6 +682,7 @@ Aircraft.Settings = Settings;
 Aircraft.Geometry = Geometry;
 Aircraft.HistData.AC = DataAC;
 Aircraft.HistData.Eng = DataEngine;
+Aircraft.Specs.Battery = Battery;
 
 %% Engine Specs
 

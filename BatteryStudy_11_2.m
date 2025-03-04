@@ -313,15 +313,32 @@ set(gca, 'XDir', 'reverse'); % Reverse x-axis to show -100 kW to -250 kW
 
 
 %%
-SOCValues = [];
-SOCValues(end+1, 1)=SizedERJ.Mission.History.SI.Power.SOC(1,2);
-for i = 2:length(SizedERJ.Mission.History.SI.Power.SOC(:,2))
-    if SizedERJ.Mission.History.SI.Power.SOC(i,2) - SizedERJ.Mission.History.SI.Power.SOC(i-1,2) ~= 0
-        SOCValues(end+1, 1) = SizedERJ.Mission.History.SI.Power.SOC(i,2);
-    end
-end
-mSOC = mean(SOCValues)
+% Define segment sizes (must sum to 100)
+segmentSizes = [10, 20, 10, 30, 30]; % Example: 10+20+10+30+30 = 100
 
-a = SizedERJ.Mission.History.SI.Power.SOC(:,2)
-active_mSOC = a([true; diff(a) ~= 0]);
-mSOC = mean(active_mSOC)
+% Pre-allocate the result array
+resultArray = zeros(1, 100);
+
+% Pre-allocate array to store the constant value for each segment
+segmentValues = zeros(1, length(segmentSizes));
+
+% Define the value for the first segment (fixed)
+segmentValues(1) = -700e3;
+
+% For the remaining segments, generate random constants.
+% For example, let the random value be between -700e3 and -250e3.
+for i = 2:length(segmentSizes)
+    segmentValues(i) = -700e3 + (-250e3 + 700e3)*rand;  
+    % This gives a random value in the interval [-700e3, -250e3]
+end
+
+% Fill in the resultArray using the segment sizes and their constant values.
+currentIndex = 1;
+for i = 1:length(segmentSizes)
+    numElements = segmentSizes(i);
+    resultArray(currentIndex:currentIndex+numElements-1) = segmentValues(i);
+    currentIndex = currentIndex + numElements;
+end
+
+% Display the result
+disp(resultArray);

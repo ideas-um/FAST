@@ -230,10 +230,10 @@ if Aircraft.Settings.Degradation == 1
     % battery chemistry material (ONLY "NMC" or "LFP" FOR NOW)
     Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2
     
-    % grounding time (CAN BE SEPERATED WITH "charging time" LATER)
-    Aircraft.Specs.Battery.GroundT = 60*60; % in sec
+    % Charging time 
+    Aircraft.Specs.Battery.ChrgTime = 60*60; % in sec
     
-    % charging rate
+    % charging rate (can be an array or scalar, or a function with output of a scalar or array)
     Aircraft.Specs.Battery.Cpower = -250*1000; % charging means negative rate in W
     
     % battery Full Equivalent Cycles (FECs)

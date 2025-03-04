@@ -1,4 +1,4 @@
-function [SOH, FEC] = CyclAging(Aircraft, ChemType, CumulFECs, GroundTime, ChrgRate)
+function [SOH, FEC] = CyclAging(Aircraft, ChemType, CumulFECs, ChargingTime, ChrgRate)
 
 % [Aircraft] = CyclAging(Aircraft)
 % written by Yipeng Liu, yipenglx@umich.edu
@@ -96,7 +96,7 @@ DisCCrate = mean(Aircraft.Mission.History.SI.Power.C_rate ...
          (Aircraft.Mission.History.SI.Power.C_rate~=0));
 
 % C-rates during charging %  %%%%%%%%% THIS PART CAN BE IMPROVED FURTHER IN THE FUTURE  %%%%%%%%%  
-Aircraft = BatteryPkg.GroundCharge(Aircraft, GroundTime, ChrgRate);
+Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargingTime, ChrgRate);
 CCrate = -mean(Aircraft.Mission.History.SI.Power.ChargedAC.C_rate ...
          (Aircraft.Mission.History.SI.Power.ChargedAC.C_rate~=0));
 

@@ -75,7 +75,7 @@ g = 9.81;
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft), options);
-t = toc 
+t = toc/60
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,19 +101,23 @@ disp(PCbest)
 %  Function Evaluation        %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft)
+function [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft)
     % get climb beg and end indeces
     n1= Aircraft.Mission.Profile.SegBeg(2);
     n2= Aircraft.Mission.Profile.SegEnd(4)-1;
     % input updated PC
     Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PC;
     Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PC;
-    % fly off design mission
-    Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-    
-    % fuel required for mission
-    fburn = Aircraft.Specs.Weight.Fuel;
 
+    try
+        % fly off design mission
+        Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        
+        % fuel required for mission
+        fburn = Aircraft.Specs.Weight.Fuel;
+    catch 
+        fburn = 1e10;
+    end
     % SOC for mission
     SOC = Aircraft.Mission.History.SI.Power.SOC(n1:n2,2);
 
@@ -147,8 +151,9 @@ end
 function [val] = ObjFunc(PC, Aircraft)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft);
+        [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft);
         PClast = PC;
+        %disp(PC)
     end
     % return objective function value
     val = fburn;
@@ -163,7 +168,7 @@ end
 function [c, ceq] = Cons(PC, Aircraft)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [fburn, SOC, Ps, dh_dt] = FlyAircraft(PC, Aircraft);
+        [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft);
         PClast = PC;
     end
     % compute SOC constraint

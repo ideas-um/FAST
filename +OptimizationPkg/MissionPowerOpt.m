@@ -119,7 +119,7 @@ function [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft)
         fburn = 1e10;
     end
     % SOC for mission
-    SOC = Aircraft.Mission.History.SI.Power.SOC(n1:n2,2);
+    SOC = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
 
     % check if enough power for desired climb profile
     % extract climb TAS
@@ -172,7 +172,7 @@ function [c, ceq] = Cons(PC, Aircraft)
         PClast = PC;
     end
     % compute SOC constraint
-    cSOC = Aircraft.Specs.Power.Battery.EndSOC - SOC;
+    cSOC = Aircraft.Specs.Battery.MinSOC - SOC;
 
     % compute RC constraint
     cRC = dh_dt - Aircraft.Specs.Performance.RCMax;

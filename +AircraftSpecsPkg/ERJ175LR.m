@@ -184,19 +184,22 @@ Aircraft.Specs.Power.LamPSES.Split = 0;
 Aircraft.Specs.Power.LamPSES.Alt = 0;
 Aircraft.Specs.Power.LamPSES.SLS = 0;
 
-% battery cells in series and parallel
-% (commented values used for electrified aircraft)
-Aircraft.Specs.Power.Battery.ParCells = 100;%100;
-Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
-
-% initial battery SOC (commented value used for electrified aircraft)
-Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
-
 % coefficient for HEA engine analysis
 Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS;
 
 %% BATTERY SETTINGS %%
 %%%%%%%%%%%%%%%%%%%%%%
+
+% battery cells in series and parallel
+% (commented values used for electrified aircraft)
+Aircraft.Specs.Battery.ParCells = 100;%100;
+Aircraft.Specs.Battery.SerCells = 62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = 100;%100;
+Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
+
+% initial battery SOC (commented value used for electrified aircraft)
+Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
+Aircraft.Specs.Battery.BegSOC = 100;%100;
 
 % nominal cell voltage [V]
 Aircraft.Specs.Battery.NomVolCell = 3.6;
@@ -218,6 +221,9 @@ Aircraft.Specs.Battery.expCap = 30;
 
 % acceptable SOC threshold
 Aircraft.Specs.Battery.MinSOC = 20;
+
+% intitial SOC
+Aircraft.Specs.Battery.BegSOC = 100;
 
 % acceptable max c-rate during discharging
 Aircraft.Specs.Battery.MaxAllowCRate = 5;

@@ -2,7 +2,7 @@ function [Aircraft] = PreSpecProcessing(Aircraft)
 %
 % [Aircraft] = PreSpecProcessing(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 13 dec 2024
+% last updated: 04 mar 2025
 %
 % Instantiate any variables not specified in an aircraft data structure.
 % This function allows users to neglect to assign NaN values to parameters
@@ -40,6 +40,7 @@ if ~ isfield(Aircraft,"Specs")
     Aircraft.Specs.Weight.Fuel = NaN;
     Aircraft.Specs.Weight.Batt = NaN;
     Aircraft.Specs.Weight.WairfCF = NaN;
+    Aircraft.Specs.Weight.EAP = NaN;
     Aircraft.Specs.Propulsion.Engine = NaN;
     Aircraft.Specs.Propulsion.NumEngines = NaN;
     Aircraft.Specs.Propulsion.T_W.SLS = NaN;
@@ -157,6 +158,7 @@ else
         Aircraft.Specs.Weight.Fuel = NaN;
         Aircraft.Specs.Weight.Batt = NaN;
         Aircraft.Specs.Weight.WairfCF = NaN;
+        Aircraft.Specs.Weight.EAP = NaN;
     else
         if ~isfield(Aircraft.Specs.Weight,"MTOW")
             Aircraft.Specs.Weight.MTOW = NaN;
@@ -175,6 +177,9 @@ else
         end
         if ~isfield(Aircraft.Specs.Weight,"WairfCF")
             Aircraft.Specs.Weight.WairfCF = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Weight,"EAP")
+            Aircraft.Specs.Weight.EAP = NaN;
         end
     end
 

@@ -3,7 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 13 dec 2024
+% last modified: 05 mar 2025
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
 % acceleration and maximum thrust/power from all power sources.
@@ -130,8 +130,8 @@ if (any(Batt))
 end
 
 % remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamDwn.Tko;
-Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = Aircraft.Specs.Power.LamUps.Tko;
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Tko, SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Tko, SegEnd - SegBeg + 1, 1);
 
 
 %% FLY TAKEOFF %%

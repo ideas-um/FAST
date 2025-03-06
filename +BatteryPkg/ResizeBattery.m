@@ -3,7 +3,7 @@ function [Aircraft] = ResizeBattery(Aircraft)
 % [Aircraft] = ResizeBattery(Aircraft)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 nov 2024
+% last updated: 11 dec 2024
 %
 % After an aircraft flies a mission, update its battery size. If a "simple"
 % battery model is used (not considering cells in series and parallel),
@@ -28,7 +28,7 @@ function [Aircraft] = ResizeBattery(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % find index associated with a battery
-Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
+Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
 % if there is no battery, return a zero battery weight
 if (all(~Batt, "all"))
@@ -90,14 +90,19 @@ if (Aircraft.Settings.DetailedBatt == 1)
     Nser = Aircraft.Specs.Power.Battery.SerCells;
     Npar = Aircraft.Specs.Power.Battery.ParCells;
     
+    % get the number of components and sources
+    ncomp = length(Aircraft.Specs.Propulsion.PropArch.Arch   );
+    nsrc  = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+    
     % SOC during flight
     SOC = Aircraft.Mission.History.SI.Power.SOC(:, Batt);
     
     % power consumed during flight
-    Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
-
-    % Current curing flight
-    Cbatt = Aircraft.Mission.History.SI.Power.Current(:, Batt);
+    Pbatt = Aircraft.Mission.History.SI.Power.Pout(:, [Batt, false(1, ncomp-nsrc)]);
+        
+    % Current during flight
+    Cbatt = Aircraft.Mission.History.SI.Power.Current(:, [Batt, false(1, ncomp-nsrc)]);
+    
     % ------------------------------------------------------
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,12 +152,16 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % get the energy consumed by the battery during each segment
     dEbatt = diff(Ebatt);
     
+
     % compute the C-rate (current in segment / total capacity of battery pack)
     C_rate = Cbatt ./ (ExistBattCap); 
 
 
     % ignore all NaNs (set to 0)
+
+
     C_rate(isnan(C_rate)) = 0;
+    C_rate(isinf(C_rate)) = 0;
     
     % check if the C-rate is exceeded
     ExceedCRate = abs(C_rate) > MaxAllowCRate;

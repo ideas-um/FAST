@@ -2,7 +2,7 @@ function [Aircraft] = ERJ190_E2()
 %
 % ERJ190_E2.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 09 jan 2024
+% updated 16 dec 2024
 %
 % define the embraer E190-E2 from "advanced 2030 single aisle aircraft
 % modeling" to be used for aircraft sizing/performance analysis.
@@ -128,7 +128,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.PropArch.Type = "C";
 
 % Number of engines
 Aircraft.Specs.Propulsion.NumEngines = 2;

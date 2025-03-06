@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 dec 2024
+% last updated: 06 mar 2025
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -242,10 +242,10 @@ for ipnt = 1:npnt
     end
     
     % evaluate the function handles for the current splits
-    Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % propagate the power downstream to the transmitters
-    Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', Splits(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
+    Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', SplitDwn(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
 
 end
 
@@ -277,10 +277,10 @@ Pout(:, TrnSnkIdx) = PoutTest;
 for ipnt = 1:npnt
         
     % evaluate the function handles for the current splits
-    Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % propagate the power downstream
-    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', Splits(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
+    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', SplitDwn(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
     
 end
 
@@ -303,12 +303,11 @@ itrn = nsrc + (1 : ntrn);
 for ipnt = 1:npnt
     
     % get the current downstream power split
-    Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % check for the power supplement
     Psupp(ipnt, itrn) = PropulsionPkg.PowerSupplementCheck( ...
-                        Pout(ipnt, itrn), Arch(itrn, itrn), Splits(itrn, itrn), ...
-                        EtaDwn(itrn, itrn), TrnType, EtaFan);
+                        Pout(ipnt, itrn), Arch(itrn, itrn), SplitDwn(itrn, itrn), EtaDwn(itrn, itrn), TrnType, EtaFan);
     
 end
 
@@ -459,8 +458,18 @@ if (any(Fuel))
         % find the propeller that the engine is connected to
         [~, iprop] = find(Arch(icol, :) & itrn);
         
-        % compute the thrust output from the propeller
-        TEng = Tout(ibeg:iend, iprop);
+        % check if the engine is connected to a propeller
+        if (~isempty(iprop))
+            
+            % get the thrust requirement from the propeller
+            TEng = Tout(ibeg:iend, iprop);
+            
+        else
+            
+            % no thrust from a propeller is provided
+            TEng = zeros(iend - ibeg + 1, 1);
+            
+        end
         
         % check for any NaN or Inf (especially at takeoff)
         TEng(isnan(TEng)) = 0;
@@ -527,11 +536,11 @@ if (any(Fuel))
             ielem = [ifuel, icol];
             
             % evaluate the function handles for the current splits
-            Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+            SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
             
             % temporary mass flow rate
             Tempdmdt = PropulsionPkg.PowerFlow([zeros(1, nfuel), MDotFuel(ipnt, HasEng(ieng))]', ...
-                       Arch(ielem, ielem)', Splits(ielem, ielem), EtaDwn(ielem, ielem), -1)';
+                       Arch(ielem, ielem)', SplitDwn(ielem, ielem), EtaDwn(ielem, ielem), -1)';
             
             % update the mass flow rates
             dmdt(ipnt, ifuel) = dmdt(ipnt, ifuel) + Tempdmdt(1:end-1)';

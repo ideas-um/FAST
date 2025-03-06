@@ -59,7 +59,7 @@ n1= Aircraft.Mission.Profile.SegBeg(2);
 n2= Aircraft.Mission.Profile.SegEnd(4)-1;
 
 % get starting point
-PC0 = Aircraft.Mission.History.SI.Power.PC(n1:n2, [1,3]);
+PC0 = Aircraft.Specs.Power.PC(n1:n2, [1,3]);
 b = size(PC0);
 lb = zeros(b);
 ub = ones(b);

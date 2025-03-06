@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 03 mar 2025
+% last updated: 06 mar 2025
 %
 % Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
@@ -295,7 +295,7 @@ elseif (strcmpi(ArchName, "SHE") == 1)
     SrcType = [1, 0];
     
     % transmitter type (1 = engine, 0 = electric motor, 2 = propeller/fan)
-    TrnType = [ones(1, NumEng), zeros(1, NumEng), repmat(3, 1, NumEng), repmat(2, 1, NumEng)];
+    TrnType = [ones(1, NumEng), repmat(3, 1, NumEng), zeros(1, NumEng), repmat(2, 1, NumEng)];
     
 elseif (strcmpi(ArchName, "TE" ) == 1)
     

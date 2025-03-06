@@ -1,7 +1,7 @@
 function [History] = MissionHistTable(Aircraft)
 %
 % [History] = MissionHistTable(Aircraft)
-% originally written by ???
+% originally written by Emma Cassidy, emmasmit@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
 % last updated: 11 mar 2024
 %
@@ -73,6 +73,11 @@ MyTable = table(Time                      , ... % time flown (min)
                 Power.LamPSPS             , ... % power -power  split
                 Power.LamPSES             , ... % power -energy split
                 Power.SOC                 , ... % state of charge
+                Power.PC                  , ... % power code
+                Power.Voltage             , ... % voltage V
+                Power.Current             , ... % current 
+                Power.Capacity            , ... % capacity
+                Power.C_rate              , ... % C-rate
                 Energy.KE       ./ 1.0e+06, ... % kinetic energy
                 Energy.PE       ./ 1.0e+06, ... % potential energy
                 Energy.E_ES     ./ 1.0e+06, ... % energy expended
@@ -114,6 +119,11 @@ MyTable.Properties.VariableNames = string(["Time (min)", ...
                                            "Power-Power Source Split", ...
                                            "Power-Energy Source Split", ...
                                            "State of Charge (%)", ...
+                                           "Power Code [GT EM] (%)", ...
+                                           "Battery Voltage (V)", ...
+                                           "Battery Current (A)", ...
+                                           "Battery Capacity",...
+                                           "Battery C Rate", ...
                                            "Kinetic Energy (MJ)", ...
                                            "Potential Energy (MJ)", ...
                                            "Energy Expended (MJ)", ...
@@ -125,7 +135,7 @@ History = table2timetable(MyTable);
 
 %% CREATE STACKED PLOTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-return
+
 % plot parts of the performance history
 figure;
 stackedplot(History, ["Distance (m)", "TAS (m/s)", "Altitude (m)"]);
@@ -133,23 +143,28 @@ title("AC Performance");
 
 % plot parts of the propulsion history
 figure;
-stackedplot(History, ["Available Thrust (kN)",  "Required Thrust (kN)"]);
+stackedplot(History, ["Available Thrust [TS] (kN)",  "Required Thrust [TS] (kN)"]);
 title("AC Thrust");
 
 % plot parts of the weight history
 figure;
-stackedplot(History, ["Weight (kg)", "Fuel Burn (kg)"]);
+stackedplot(History, ["Weight (kg)", "Total Fuel Burn (kg)"]);
 title("AC Weight");
 
 % plot parts of the power history
 figure;
-stackedplot(History, ["Available Power (MW)", "Required Power (MW)", "Output Power (MW)"]);
+stackedplot(History, ["Available Power [PS] (MW)", "Required Power [PS] (MW)", "Output Power [PS] (MW)"]);
 title("AC Power");
 
 % plot parts of the energy history
 figure;
 stackedplot(History, "Energy Expended (MJ)");
 title("AC Energy");
+
+% plot parts of the battery output history
+figure;
+stackedplot(History, ["State of Charge (%)", "Power Code [GT EM] (%)", "Battery C Rate", "Battery Capacity"]);
+title("AC Battery Output");
 
 % ----------------------------------------------------------
 

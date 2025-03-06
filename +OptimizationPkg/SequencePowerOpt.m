@@ -1,4 +1,4 @@
-function [OptSeqTable, fSOC_Opt, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
+function [OptSeqTable, SOC, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
 
 %% PRE-PROCESSING AND SETUP %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,14 +79,14 @@ ub = ones(b)*100;
 % save storage values
 fSOC_last = [];
 fburn = [];
-iSOC   = [];
+SOC   = [];
 OptmizedAircraft = [];
 g = 9.81;
 
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-fSOC_Opt = fmincon(@(PC0) ObjFunc(fSOC, Aircraft, Sequence), fSOC, [], [], [], [], lb, ub, @(fSOC) Cons(fSOC, Aircraft), options);
+fSOC_Opt = fmincon(@(PC0) ObjFunc(fSOC, Aircraft, Sequence), fSOC, [], [], [], [], lb, ub, [], options);
 t = toc/60
 
 %% Post-Processing %%
@@ -97,7 +97,7 @@ t = toc/60
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [fburn, iSOC] = FlySequence(fSOC, Aircraft, Sequence)
+function [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence)
     fburn = 0;
     % iterate through missions
     for iflight = 1:nflight
@@ -118,7 +118,11 @@ function [fburn, iSOC] = FlySequence(fSOC, Aircraft, Sequence)
         Alt = Sequence.ALTITUDE_m(iflight);
         
         % ground time (mimutes)
-        ChargeTimeMin = Sequence.GROUND_TIME(iflight) - 5;
+        if iflight < nflight
+            ChargeTimeMin = Sequence.GROUND_TIME(iflight+1) - 5;
+        else
+            ChargeTimeMin = 1e3;
+        end
         
         % payload
         Wpayload = Sequence.PAYLOAD_lb(iflight);
@@ -181,16 +185,23 @@ function [fburn, iSOC] = FlySequence(fSOC, Aircraft, Sequence)
         % run optimizer
         [OptAC, t(iflight)] = OptimizationPkg.MissionPowerOpt(Aircraft);
 
+        % save fuel burn
+        fburn = fburn + OptAC.Specs.Weight.Fuel;
+
+        % save SOC Change
+        SOC(iflight,1) = OptAC.Mission.History.SI.Power.SOC(1);
+        SOC(iflight,2) = OptAC.Mission.History.SI.Power.SOC(end);
+
+        % charge battery
+        OptAC = BatteryPkg.GroundCharge(OptAC, ChargeTime);
+
+        % assign charges SOC to begSOC for next flight
+        Aircraft.Specs.Battery.BegSOC = OptAC.Mission.History.SI.Power.ChargedAC.SOC(end);
+
         % save optimized aircraft struct
         nameAC = sprintf("OptAircraft%d", iflight);
         OptmizedAircraft.(nameAC) = OptAC;
     
-        % save fuel burn
-        fburn = fburn + OptAC.Specs.Weight.Fburn;
-
-        % charge battery
-        iSOC = BatteryPkg.GroundCharge(OptAC, ChargeTime, )
-
     end
 end
 
@@ -200,7 +211,7 @@ end
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    function [val] = ObjFunc(fSOC, Aircraft, Sequence)
+function [val] = ObjFunc(fSOC, Aircraft, Sequence)
     % check if PC values changes
     if ~isequal(fSOC, fSOC_last)
         [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence);
@@ -211,6 +222,9 @@ end
     val = fburn;
 end
 
+%{
 function d = PerDiff(a, b)
     d = (a-b)./a .* 100;
+end
+%}
 end

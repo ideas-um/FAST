@@ -26,6 +26,14 @@ function [Aircraft] = GroundCharge(Aircraft, ChrgTime, PowerStrategy)
 %                     parameters.
 %                     size/type/units: 1-by-1 / struct / []
 
+%% Check Inputs %%
+%%%%%%%%%%%%%%%%%%
+
+if nargin < 3
+%    assign charging power
+    PowerStrategy = Aircraft.Specs.Battery.Cpower;
+end
+
 %% A Dynamic Charging Power Strategy For Constant Power%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function outputs a dynamic charging power based on the different SOC.
@@ -139,5 +147,6 @@ Aircraft.Mission.History.SI.Power.ChargedAC.Current         = -CurrentSeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.P_in            = PoutSeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.Capacity        = CapacitySeries;
 Aircraft.Mission.History.SI.Power.ChargedAC.C_rate          = -C_rateSeries;
+
 
 end

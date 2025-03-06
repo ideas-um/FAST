@@ -72,8 +72,8 @@ Wbatt = Aircraft.Specs.Weight.Batt;
 W_S = Aircraft.Specs.Aero.W_S.SLS;
 
 % check for battery cells in series/parallel
-SerCells = Aircraft.Specs.Power.Battery.SerCells;
-ParCells = Aircraft.Specs.Power.Battery.ParCells;
+SerCells = Aircraft.Specs.Battery.SerCells;
+ParCells = Aircraft.Specs.Battery.ParCells;
 
 % if there are cells in series/parallel, use a detailed battery model
 if ((~isnan(SerCells)) && (~isnan(ParCells)))

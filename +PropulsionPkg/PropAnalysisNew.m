@@ -152,7 +152,7 @@ iend = npnt - 1;
 % fuel burn
 E_ES  = zeros(npnt, nes);
 Fburn = zeros(npnt, 1);
-SOC   = repmat(100, npnt, nes);
+SOC   = repmat(Aircraft.Specs.Battery.BegSOC, npnt, nes);
 
 % battery: get battery cell arrangement
 SerCells = Aircraft.Specs.Power.Battery.SerCells;

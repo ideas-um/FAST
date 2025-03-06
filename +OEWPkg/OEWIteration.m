@@ -50,7 +50,9 @@ Wem   = Aircraft.Specs.Weight.EM     ;
 Wpax  = Aircraft.Specs.Weight.Payload;
 Wcrew = Aircraft.Specs.Weight.Crew   ;
 Weng  = Aircraft.Specs.Weight.Engines;
-Weap = Aircraft.Specs.Weight.EAP     ;
+%Weap = Aircraft.Specs.Weight.EAP     ;
+Weap =                               0;
+
 
 % check for a calibration factor on OEW/airframe weight
 if (isfield(Aircraft.Specs.Weight, "WairfCF"))

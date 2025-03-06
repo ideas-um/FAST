@@ -25,7 +25,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 11 Nov 2024
+README last updated: 25 Jan 2025
 
 ## Learn More About FAST
 
@@ -34,6 +34,22 @@ For detailed information about FAST's features, visit our website: [IDEAS Lab We
 We also offer a series of tutorial videos on YouTube to help you get started with FAST and explore its capabilities. Check out our channel and subscribe for updates: [IDEAS Lab YouTube Channel](https://www.youtube.com/channel/UC5ntmOSA1_YWu1ljQ5hXn0Q).
 
 To stay informed about upcoming papers, new releases, and news about FAST, please sign up for [our newsletter here](https://forms.gle/b8sPXKnRAfi5ZsARA).
+
+## Please cite us when using FAST
+
+If you are using FAST in your work, please cite the following paper: [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. In AIAA SciTech 2025 Forum (p. 2374).](https://www.gokcincinar.com/publication/c-2025-scitech-pm/c-2025-SciTech-PM.pdf)
+
+Alternatively, you may use the information below when using BibTeX:
+
+```
+@inproceedings{mokotoff2025fast,
+  title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
+  author={Mokotoff, Paul and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
+  booktitle={AIAA SciTech 2025 Forum},
+  pages={2374},
+  year={2025}
+}
+```
 
 # (I) Installation Instructions
 

@@ -161,7 +161,7 @@ Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = .35;
+Aircraft.Specs.Power.PC.EM.Split = .3;
 Aircraft.Specs.Power.PC.EM.Alt = [0, 36000];
 
 % thrust splits (thrust / total thrust)
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = .085; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = .1; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0.085; %0.09;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.1; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;

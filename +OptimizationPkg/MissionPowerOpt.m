@@ -172,7 +172,7 @@ function [c, ceq] = Cons(PC, Aircraft)
         PClast = PC;
     end
     % compute SOC constraint
-    cSOC = 20 - SOC;
+    cSOC = Aircraft.Specs.Power.Battery.EndSOC - SOC;
 
     % compute RC constraint
     cRC = dh_dt - Aircraft.Specs.Performance.RCMax;

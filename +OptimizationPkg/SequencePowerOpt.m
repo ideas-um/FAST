@@ -8,17 +8,16 @@ nflight = height(Sequence);
 
 % setup a table large enough for all flights
 % note that 24 = number of data metrics returned (setup in varTypes/Names)
-sz = [nflight, 14];
+sz = [nflight, 13];
 
 % list the variable types to be returned in the table (24 total)
-varTypes = ["double", "string", "double", "double", "double",...
+varTypes = ["string", "double", "double", "double",...
             "double", "double", "double", "double", ...
             "double", "double", "double", "double", ...
              "double"                                  ] ;
 
 % list the variable names to be returned in the table (24 total)
 varNames = ["Segment"               , ...
-            "Type"                  , ...
             "Distance (nmi)"        , ...
             "Ground Time (min)"     , ...
             "TOGW (kg)"             , ...
@@ -65,16 +64,17 @@ Aircraft.Settings.Table = 0;
 options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
 
 % objective function convergence tolerance
-options.OptimalityTolerance = 10^-3;
+options.OptimalityTolerance = 10^-6;
 
 % step size convergence
 options.StepTolerance = 10^-6;
 
 % get starting point
-fSOC = 20.*ones(nflight,1);
+%fSOC = 20.*ones(nflight,1);
+fSOC = [80; 30; 40; 20]/100;
 b = size(fSOC);
-lb = ones(b)*19.5;
-ub = ones(b)*100;
+lb = ones(b)*19.5/100;
+ub = ones(b);
 
 % save storage values
 fSOC_last = [];
@@ -92,6 +92,15 @@ t = toc/60
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
+for iflight =1:nflight
+        nameAC = sprintf("OptAircraft%d", iflight);
+        Aircraft = OptmizedAircraft.(nameAC);
+        results = AnaylzeMiss(Aircraft);
+        
+        MissTable{iflight, :}= ["iflight", Sequence.DISTANCE(iflight),...
+                                Sequence.GROUND_TIME(iflight), results] ;
+end
+%MissTable{nflight+1, :} = {"Totals", sum(Sequence.DISTANCE), [], [], }
 
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,7 +182,7 @@ function [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence)
         Aircraft.Specs.Weight.Payload = Wpayload;
 
         % SOC depletion limit
-        Aircraft.Specs.Power.Battery.EndSOC = fSOC(iflight);
+        Aircraft.Specs.Battery.MinSOC = fSOC(iflight)*100;
 
         % ----------------------------------------------------------
         
@@ -227,4 +236,59 @@ function d = PerDiff(a, b)
     d = (a-b)./a .* 100;
 end
 %}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+%     Post Processing        %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function Results = AnaylzeMiss(Aircraft)
+
+%% EXTRACT MISSION SEGMENT INDECES %% 
+% get the number of points in each segment
+TkoPts = Aircraft.Settings.TkoPoints;
+ClbPts = Aircraft.Settings.ClbPoints;
+CrsPts = Aircraft.Settings.CrsPoints;
+DesPts = Aircraft.Settings.DesPoints;
+
+% number of points in the main mission
+npnt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
+
+% get the index of the last takeoff segment
+EndTko = Aircraft.Settings.TkoPoints;
+
+% get the index of the last climb segment
+EndClb = 2 * Aircraft.Settings.ClbPoints + EndTko - 2;
+
+% get the index of end of cruise
+EndCrs = EndClb + Aircraft.Settings.ClbPoints + Aircraft.Settings.CrsPoints + Aircraft.Settings.DesPoints - 3;
+
+% --------------------------------------------------------------------------------------------------------------------------
+%% EXTRACT MISSION SEGMENT INDECES %% 
+
+% takeoff gross weight
+TOGW = Aircraft.Specs.Weight.MTOW;
+
+% main mission fuelburn
+Fburn = Aircraft.Mission.History.SI.Weight.Fburn(npnt);
+
+% main mission battery energy use
+EBatt = Aircraft.Mission.History.SI.Energy.E_ES(npnt, 2);
+
+% SOC after segement values
+SOCbeg = Aircraft.Mission.History.SI.Power.SOC(1, 2);
+SOCtko = Aircraft.Mission.History.SI.Power.SOC(EndTko, 2);
+SOCclb = Aircraft.Mission.History.SI.Power.SOC(EndClb, 2);
+SOCf = Aircraft.Mission.History.SI.Power.SOC(npnt, 2);
+
+% mission seg TSFC values
+TSFC_tko = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(1     :EndTko))/EndTko            ;
+TSFC_clb = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndTko:EndClb))/(EndClb-EndTko +1);
+TSFC_crs = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndClb:EndCrs))/(EndCrs-EndClb +1);
+
+% save results in a vector
+Results = [TOGW, Fburn, EBatt, SOCbeg, SOCtko, SOCclb, SOCf, TSFC_tko, TSFC_clb, TSFC_crs];
+
+end
 end

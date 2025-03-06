@@ -396,57 +396,57 @@ if ((iter == MaxIter) && (Type > 0))
     
 end
 
-%% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5% %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-if Type > 0
-    if Aircraft.Specs.Power.LamTSPS.Tko == 0 
-        % if conventional aircraft, do nothing
-    else
-        % Check the number of iterations in AircraftHistory
-        numIterations = length(AircraftHistory);
-    
-        % Find which elements in AircraftHistory are structures
-        isStruct = cellfun(@isstruct, AircraftHistory);
-    
-        % Extract only the elements that are structures
-        AircraftHistory = AircraftHistory(isStruct);
-    
-        if numIterations < 5
-    
-            % Use all available iterations
-            lastAircraft = AircraftHistory; 
-            maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
-    
-            % Extract the max C-rate for each available iteration
-            for i = 1:numIterations
-                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
-            end
-        else
-            % Use the last 5 iterations if more than 5 interations available
-            lastAircraft = AircraftHistory(end-4:end);
-            maxC_rates = zeros(5, 1); % Initialize for the last 5 iterations
-    
-            % Extract the max C-rate for each of the last 5 iterations
-            for i = 1:5
-                maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
-            end
-        end
-    
-        % Find the structure where max(C-rate) < 5 and closest to 5
-        validIndices = find(maxC_rates < MaxAllowCRate); % Find indices where max C-rate is valid
-        if isempty(validIndices)
-            error('No structure found with max(C-rate) < 5.');
-        end
-    
-        % Get the index of the structure closest to 5
-        [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
-        selectedIndex = validIndices(bestIndex);
-    
-        % Output the final selected Aircraft structure
-        Aircraft = lastAircraft{selectedIndex};
-    
-    end
-end
+% %% choose the optimal aircraft from last three iteration within but closest to Crate_max = 5% %%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+% if Type > 0
+%     if Aircraft.Specs.Power.LamDwn.Tko == 0 
+%         % if conventional aircraft, do nothing
+%     else
+%         % Check the number of iterations in AircraftHistory
+%         numIterations = length(AircraftHistory);
+%     
+%         % Find which elements in AircraftHistory are structures
+%         isStruct = cellfun(@isstruct, AircraftHistory);
+%     
+%         % Extract only the elements that are structures
+%         AircraftHistory = AircraftHistory(isStruct);
+%     
+%         if numIterations < 5
+%     
+%             % Use all available iterations
+%             lastAircraft = AircraftHistory; 
+%             maxC_rates = zeros(numIterations, 1); % Initialize for the available iterations
+%     
+%             % Extract the max C-rate for each available iteration
+%             for i = 1:numIterations
+%                 maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+%             end
+%         else
+%             % Use the last 5 iterations if more than 5 interations available
+%             lastAircraft = AircraftHistory(end-4:end);
+%             maxC_rates = zeros(5, 1); % Initialize for the last 5 iterations
+%     
+%             % Extract the max C-rate for each of the last 5 iterations
+%             for i = 1:5
+%                 maxC_rates(i) = max(lastAircraft{i}.Mission.History.SI.Power.C_rate);
+%             end
+%         end
+%     
+%         % Find the structure where max(C-rate) < 5 and closest to 5
+%         validIndices = find(maxC_rates < MaxAllowCRate); % Find indices where max C-rate is valid
+%         if isempty(validIndices)
+%             error('No structure found with max(C-rate) < 5.');
+%         end
+%     
+%         % Get the index of the structure closest to 5
+%         [~, bestIndex] = max(maxC_rates(validIndices)); % Closest to 5 but < 5
+%         selectedIndex = validIndices(bestIndex);
+%     
+%         % Output the final selected Aircraft structure
+%         Aircraft = lastAircraft{selectedIndex};
+%     
+%     end
+% end
 %% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

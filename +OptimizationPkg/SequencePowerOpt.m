@@ -1,12 +1,14 @@
-function [MissTable, PCOpt, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
+function [OptSeqTable, fSOC_Opt, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
 
+%% PRE-PROCESSING AND SETUP %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % number of missions to fly
 nflight = height(Sequence);
 
 % setup a table large enough for all flights
 % note that 24 = number of data metrics returned (setup in varTypes/Names)
-sz = [nflight*3, 14];
+sz = [nflight, 14];
 
 % list the variable types to be returned in the table (24 total)
 varTypes = ["double", "string", "double", "double", "double",...
@@ -31,8 +33,14 @@ varNames = ["Segment"               , ...
             "Avg Crs TSFC"          ] ;
 
 % setup the table
-MissTable = table('Size', sz, 'VariableTypes', varTypes, ...
+OptSeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
                             'VariableNames', varNames) ;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% Aircraft  Settings         %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % run off design mission
 Aircraft.Settings.Analysis.Type = -2;
@@ -46,208 +54,163 @@ Aircraft.Settings.ConSOC = 0;
 % no mission history table
 Aircraft.Settings.Table = 0;
 
-% designate space for optimized PC
-PCOpt = zeros(73, nflight*2);
-
-% iterate through missions
-for iflight = 1:nflight
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %                            %
-    % extract flight performance %
-    % parameters from the table  %
-    %                            %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    % cruise speed
-    speed = Sequence.SPEED_mph(iflight);
-    
-    % mission range
-    Range = Sequence.DISTANCE(iflight); 
-
-    % cruise altitude
-    Alt = Sequence.ALTITUDE_m(iflight);
-    
-    % ground time (mimutes)
-    GroundTimeMin = Sequence.GROUND_TIME(iflight);
-    
-    % payload
-    Wpayload = Sequence.PAYLOAD_lb(iflight);
-
-    % ----------------------------------------------------------
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %                            %
-    % convert units              %
-    %                            %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % convert ground time from minutes to seconds
-    GroundTime = GroundTimeMin * 60;
-    
-    % convert speed from mph to m/s
-    speed = convvel(speed, 'mph', 'm/s');
-    
-    % convert mission range from naut mi to m
-    RangeM = UnitConversionPkg.ConvLength(Range, "naut mi", "m"); % convert to m
-    
-    % convert payload from lbm to kg
-    Wpayload = convmass(Wpayload, 'lbm', 'kg');
-    
-    % ----------------------------------------------------------
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %                            %
-    % update aircraft structure  %
-    % with the flight's          %
-    % performance parameters     %
-    %                            %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % mission range
-    Aircraft.Specs.Performance.Range = RangeM;
-
-    % convert speed from TAS to Mach
-    [~, ~, Mach] = MissionSegsPkg.ComputeFltCon(Alt, 0, "TAS", speed);
-    
-    % cruise speed
-    Aircraft.Specs.Performance.Vels.Crs = Mach;
-    
-    % cruise altitude
-    Aircraft.Specs.Performance.Alts.Crs = Alt;
-    
-    % payload
-    Aircraft.Specs.Weight.Payload = Wpayload;
-
-    % ----------------------------------------------------------
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % fly non-optimized aircraft %
-    % on mission and save        %
-    % performance parameters     %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % fly off deisgn mission
-    Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-
-    % extract desired parmaters
-    %[TOGW, Fburn, Ebatt,...
-    %SOCi,SOC_TKO, SOC_TOC, SOCf,     ...
-    %TSFC_TKO, TSFC_TOC, TSFC_crs] = AnaylzeMiss(Aircraft);
-    Results = AnaylzeMiss(Aircraft);
-
-     % SAVE MISSION PERFORMANCE RESULTS 
-    %MissTable{iflight*3 - 2, :}= [iflight, "Non-Optimized", Range,...
-                            %GroundTimeMin, TOGW, Fburn, Ebatt,...
-                            %SOCi,SOC_TKO, SOC_TOC, SOCf,     ...
-                            %TSFC_TKO, TSFC_TOC, TSFC_crs] ;
-
-    % SAVE OPTIMIZED MISSION PERFORMANCE RESULTS 
-    MissTable{iflight * 3 - 2, :}= [iflight, "Non-Optimized", Range,...
-                                    GroundTimeMin, Results] ;
-
-    % ----------------------------------------------------------
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % fly non-optimized aircraft %
-    % on mission and save        %
-    % performance parameters     %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [OptAC, t(iflight)] = OptimizationPkg.MissionPowerOpt(Aircraft);
-
-    % extract desired parmaters
-    %{
-    [TOGW2, Fburn2, Ebatt2,...
-    SOCi2,SOC_TKO2, SOC_TOC2, SOCf2,     ...
-    TSFC_TKO2, TSFC_TOC2, TSFC_crs2] = AnaylzeMiss(OptAC);
-
-    % SAVE OPTIMIZED MISSION PERFORMANCE RESULTS 
-    MissTable{iflight * 3 - 1, :}= [iflight, "Optimized", Range,...
-                                    GroundTimeMin, TOGW2, Fburn2, Ebatt2,...
-                                    SOCi2,SOC_TKO2, SOC_TOC2, SOCf2,     ...
-                                    TSFC_TKO2, TSFC_TOC2, TSFC_crs2] ;
-    %}
-    Results2 = AnaylzeMiss(OptAC);
-    MissTable{iflight * 3 - 1, :}= [iflight, "Optimized", Range,...
-                                    GroundTimeMin, Results2] ;
-
-    % ----------------------------------------------------------
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Compare nonoptimized to    %
-    %   optimized results and    %
-    %       prepare outputs      %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    dResults = PerDiff(Results, Results2);
-    % save % difference of results 
-    MissTable{iflight * 3, :}= [iflight, "% Diff", Range,...
-                                GroundTimeMin, dResults] ;
-    % save optimized aircraft struct
-    nameAC = sprintf("OptAircraft%d", iflight);
-    OptmizedAircraft.(nameAC) = OptAC;
-    %extract optimized powercode
-    PCOpt(:, iflight*2-1 : iflight*2) = OptAC.Specs.Power.PC(1:73, [1,3]);
-end
-
-
-end
-
-% ----------------------------------------------------------
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Post Process Off-Design    %
-% Aircraft                   %
+%                            %
+% Optimizer Settings         %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Results = AnaylzeMiss(Aircraft)
 
-%% EXTRACT MISSION SEGMENT INDECES %% 
-% get the number of points in each segment
-TkoPts = Aircraft.Settings.TkoPoints;
-ClbPts = Aircraft.Settings.ClbPoints;
-CrsPts = Aircraft.Settings.CrsPoints;
-DesPts = Aircraft.Settings.DesPoints;
+% set up optimization algorithm and command window output
+% Default - interior point w/ max 50 iterations
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
 
-% number of points in the main mission
-npnt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
+% objective function convergence tolerance
+options.OptimalityTolerance = 10^-3;
 
-% get the index of the last takeoff segment
-EndTko = Aircraft.Settings.TkoPoints;
+% step size convergence
+options.StepTolerance = 10^-6;
 
-% get the index of the last climb segment
-EndClb = 2 * Aircraft.Settings.ClbPoints + EndTko - 2;
+% get starting point
+fSOC = 20.*ones(nflight,1);
+b = size(fSOC);
+lb = ones(b)*19.5;
+ub = ones(b)*100;
 
-% get the index of end of cruise
-EndCrs = EndClb + Aircraft.Settings.ClbPoints + Aircraft.Settings.CrsPoints + Aircraft.Settings.DesPoints - 3;
+% save storage values
+fSOC_last = [];
+fburn = [];
+iSOC   = [];
+OptmizedAircraft = [];
+g = 9.81;
 
-% --------------------------------------------------------------------------------------------------------------------------
-%% EXTRACT MISSION SEGMENT INDECES %% 
+%% Run the Optimizer %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+tic
+fSOC_Opt = fmincon(@(PC0) ObjFunc(fSOC, Aircraft, Sequence), fSOC, [], [], [], [], lb, ub, @(fSOC) Cons(fSOC, Aircraft), options);
+t = toc/60
 
-% takeoff gross weight
-TOGW = Aircraft.Specs.Weight.MTOW;
+%% Post-Processing %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% main mission fuelburn
-Fburn = Aircraft.Mission.History.SI.Weight.Fburn(npnt);
 
-% main mission battery energy use
-EBatt = Aircraft.Mission.History.SI.Energy.E_ES(npnt, 2);
+%% Nested Functions %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% SOC after segement values
-SOCbeg = Aircraft.Mission.History.SI.Power.SOC(1, 2);
-SOCtko = Aircraft.Mission.History.SI.Power.SOC(EndTko, 2);
-SOCclb = Aircraft.Mission.History.SI.Power.SOC(EndClb, 2);
-SOCf = Aircraft.Mission.History.SI.Power.SOC(npnt, 2);
 
-% mission seg TSFC values
-TSFC_tko = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(1     :EndTko))/EndTko            ;
-TSFC_clb = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndTko:EndClb))/(EndClb-EndTko +1);
-TSFC_crs = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndClb:EndCrs))/(EndCrs-EndClb +1);
+function [fburn, iSOC] = FlySequence(fSOC, Aircraft, Sequence)
+    fburn = 0;
+    % iterate through missions
+    for iflight = 1:nflight
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %                            %
+        % extract flight performance %
+        % parameters from the table  %
+        %                            %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+        % cruise speed
+        speed = Sequence.SPEED_mph(iflight);
+        
+        % mission range
+        Range = Sequence.DISTANCE(iflight); 
+    
+        % cruise altitude
+        Alt = Sequence.ALTITUDE_m(iflight);
+        
+        % ground time (mimutes)
+        ChargeTimeMin = Sequence.GROUND_TIME(iflight) - 5;
+        
+        % payload
+        Wpayload = Sequence.PAYLOAD_lb(iflight);
+    
+        % ----------------------------------------------------------
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %                            %
+        % convert units              %
+        %                            %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % convert ground time from minutes to seconds
+        ChargeTime = ChargeTimeMin * 60;
+        
+        % convert speed from mph to m/s
+        speed = convvel(speed, 'mph', 'm/s');
+        
+        % convert mission range from naut mi to m
+        RangeM = UnitConversionPkg.ConvLength(Range, "naut mi", "m"); % convert to m
+        
+        % convert payload from lbm to kg
+        Wpayload = convmass(Wpayload, 'lbm', 'kg');
+        
+        % ----------------------------------------------------------
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %                            %
+        % update aircraft structure  %
+        % with the flight's          %
+        % performance parameters     %
+        %                            %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % mission range
+        Aircraft.Specs.Performance.Range = RangeM;
+    
+        % convert speed from TAS to Mach
+        [~, ~, Mach] = MissionSegsPkg.ComputeFltCon(Alt, 0, "TAS", speed);
+        
+        % cruise speed
+        Aircraft.Specs.Performance.Vels.Crs = Mach;
+        
+        % cruise altitude
+        Aircraft.Specs.Performance.Alts.Crs = Alt;
+        
+        % payload
+        Aircraft.Specs.Weight.Payload = Wpayload;
 
-% save results in a vector
-Results = [TOGW, Fburn, EBatt, SOCbeg, SOCtko, SOCclb, SOCf, TSFC_tko, TSFC_clb, TSFC_crs];
+        % SOC depletion limit
+        Aircraft.Specs.Power.Battery.EndSOC = fSOC(iflight);
 
+        % ----------------------------------------------------------
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Optimized HEA power for    %
+        %           mission          %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % run optimizer
+        [OptAC, t(iflight)] = OptimizationPkg.MissionPowerOpt(Aircraft);
+
+        % save optimized aircraft struct
+        nameAC = sprintf("OptAircraft%d", iflight);
+        OptmizedAircraft.(nameAC) = OptAC;
+    
+        % save fuel burn
+        fburn = fburn + OptAC.Specs.Weight.Fburn;
+
+        % charge battery
+        iSOC = BatteryPkg.GroundCharge(OptAC, ChargeTime, )
+
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+%  Objective Function        %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    function [val] = ObjFunc(fSOC, Aircraft, Sequence)
+    % check if PC values changes
+    if ~isequal(fSOC, fSOC_last)
+        [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence);
+        fSOC_last = fSOC;
+        %disp(PC)
+    end
+    % return objective function value
+    val = fburn;
 end
 
 function d = PerDiff(a, b)
-d = (a-b)./a .* 100;
+    d = (a-b)./a .* 100;
 end

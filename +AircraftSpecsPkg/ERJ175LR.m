@@ -251,7 +251,7 @@ end
 
 % number of control points in each segment
 Aircraft.Settings.TkoPoints = NaN;
-Aircraft.Settings.ClbPoints = 2;
+Aircraft.Settings.ClbPoints = NaN;
 Aircraft.Settings.CrsPoints = NaN;
 Aircraft.Settings.DesPoints = NaN;
 

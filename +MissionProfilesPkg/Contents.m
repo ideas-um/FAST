@@ -5,6 +5,7 @@
 % Functions
 % -------------------------------------------------------------------------
 % A320                          - MissionProfilesPkg.A320 is a function.
+% AEAProfile                    - MissionProfilesPkg.AEAProfile is a function.
 % ATR42_600                     - MissionProfilesPkg.ATR42_600 is a function.
 % ATRMissionBRE                 - MissionProfilesPkg.ATRMissionBRE is a function.
 % ATRMissionEPASS               - MissionProfilesPkg.ATRMissionEPASS is a function.
@@ -22,6 +23,7 @@
 % RegionalJetMission00          - MissionProfilesPkg.RegionalJetMission00 is a function.
 % RegionalJetMission01          - MissionProfilesPkg.RegionalJetMission01 is a function.
 % RegionalJetMission02          - MissionProfilesPkg.RegionalJetMission02 is a function.
+% TakeoffTestProfile            - MissionProfilesPkg.TakeoffTestProfile is a function.
 % TurbopropMission00            - MissionProfilesPkg.TurbopropMission00 is a function.
 % TurbopropMission01            - MissionProfilesPkg.TurbopropMission01 is a function.
 % TurbopropMission02            - MissionProfilesPkg.TurbopropMission02 is a function.

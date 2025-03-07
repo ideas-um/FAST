@@ -1,8 +1,9 @@
 function [Engine] = LEAP_1A26()
 %
-% [Engine] = CF34_8E5()
+% [Engine] = LEAP_1A26()
 % Written By Maxfield Arnson
-% Last Updated: 10/9/2023
+% modified by Paul Mokotoff, prmoko@umich.edu
+% Last Updated: 07 oct 2024
 %
 % Engine specification function for use with the EngineModelPkg
 %
@@ -46,7 +47,7 @@ Engine.BPR = 11;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 1600;
+Engine.Tt4Max = 1593;
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -54,7 +55,7 @@ Engine.TempLimit.Val = NaN;
 Engine.TempLimit.Type = NaN;
 
 % Design point thrust [N]
-Engine.DesignThrust = 106760;
+Engine.DesignThrust = 120640;
 
 
 
@@ -93,7 +94,7 @@ Engine.CoreFlow.PaxBleed = 0.03;
 Engine.CoreFlow.Leakage = 0.01;
 
 % Core Cooling Flow
-Engine.CoreFlow.Cooling = 0.1;
+Engine.CoreFlow.Cooling = 0.0;
 
 %% Sizing Limits
 
@@ -115,8 +116,11 @@ Engine.EtaPoly.CoreNozzle = 0.99;
 Engine.EtaPoly.Nozzles = 0.99;
 Engine.EtaPoly.Mixing = 0.0;
 
-
+%% Offdesign coefficient of BADA equation 
+Engine.Cff3    =  0.4006;
+Engine.Cff2    = -0.4323;
+Engine.Cff1    =  0.9946;
+Engine.Cffch   =  6.1*10^-7;
+Engine.HEcoeff =  1;
 
 end
-
-

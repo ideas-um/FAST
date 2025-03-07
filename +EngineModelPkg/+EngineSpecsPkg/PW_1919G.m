@@ -31,7 +31,7 @@ Engine.BPR = 12;
 
 % Combustion Temperature [K]
 % If unknown, 2000 is a good guess
-Engine.Tt4Max = 2200;
+Engine.Tt4Max = 2000;
 
 % Temperature Limits [K]
 % Not functional yet. Leave these values as NaN
@@ -78,7 +78,7 @@ Engine.CoreFlow.PaxBleed = 0.03;
 Engine.CoreFlow.Leakage = 0.01;
 
 % Core Cooling Flow
-Engine.CoreFlow.Cooling = 0.25;
+Engine.CoreFlow.Cooling = 0.0;
 
 %% Sizing Limits
 

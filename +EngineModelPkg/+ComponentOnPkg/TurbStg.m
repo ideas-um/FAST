@@ -117,6 +117,8 @@ A3 = OldState.MDot*sqrt(Tt2)/(Pt3*EngineModelPkg.IsenRelPkg.MassFlowParam(M3,g2)
 
 
 
+
+
 %% Output
 NewState=OldState;
 % MDot Constant
@@ -126,9 +128,14 @@ NewState.Mach = M3;
 [NewState.Ts,NewState.Cp,NewState.Cv,NewState.Gam] = ...
     EngineModelPkg.IsenRelPkg.NewGamma(NewState.Tt,NewState.Mach,g2);
 NewState.Ps = EngineModelPkg.IsenRelPkg.Ps_Pt(NewState.Pt,NewState.Mach,NewState.Gam);
-NewState.Area = OldState.MDot*sqrt(Tt2)/(Pt3*EngineModelPkg.IsenRelPkg.MassFlowParam(NewState.Mach,NewState.Gam));
+
+
+u3 = M3*sqrt(NewState.Ts*NewState.Gam*R);
+rho3 = NewState.Ps/NewState.Ts/R;
+NewState.Area = OldState.MDot/u3/rho3;
+
 NewState.Ri = OldState.Ri;
-NewState.Ro = sqrt(NewState.Ri^2+A3/pi);
+NewState.Ro = sqrt(NewState.Ri^2+NewState.Area/pi);
 
 
 

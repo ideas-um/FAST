@@ -23,8 +23,9 @@ Additional Contributors:
 - Nawa Khailany
 - Janki Patel
 - Michael Tsai
+- Vaibhav Rau
 
-README last updated: 14 Jun 2024
+README last updated: 25 Jan 2025
 
 ## Learn More About FAST
 
@@ -34,7 +35,27 @@ We also offer a series of tutorial videos on YouTube to help you get started wit
 
 To stay informed about upcoming papers, new releases, and news about FAST, please sign up for [our newsletter here](https://forms.gle/b8sPXKnRAfi5ZsARA).
 
-# (I) Additional Documentation
+## Please cite us when using FAST
+
+If you are using FAST in your work, please cite the following paper: [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. In AIAA SciTech 2025 Forum (p. 2374).](https://www.gokcincinar.com/publication/c-2025-scitech-pm/c-2025-SciTech-PM.pdf)
+
+Alternatively, you may use the information below when using BibTeX:
+
+```
+@inproceedings{mokotoff2025fast,
+  title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
+  author={Mokotoff, Paul and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
+  booktitle={AIAA SciTech 2025 Forum},
+  pages={2374},
+  year={2025}
+}
+```
+
+# (I) Installation Instructions
+
+FAST can be cloned from its [GitHub repository](https://github.com/ideas-um/FAST) and can be run directly in Matlab. As long as Matlab is installed on the user's computer, FAST can be run directly after cloning from the online repository.
+
+# (II) Additional Documentation
 
 For FAST's license, notices, and community contribution instructions, refer to the following files located in the main directory.
 
@@ -62,6 +83,7 @@ For additional documentation, see package-specific README files. These READMEs w
 - **+PropulsionPkg**: This package is responsible for creating the user's desired propulsion architecture and evaluating the propulsion system's performance during the mission analysis. It connects to the EngineModelPkg for evaluating an actual engine's performance.
 - **+RegressionPkg**: This package contains code that creates regressions to predict any unknown parameters about the aircraft configuration being designed.
 - **+RetrofitPkg**: This package contains code to run retrofit studies on an aircraft by electrifying its powertrain and replacing part of the payload with batteries.
+- **+TutorialsPkg**: This package contains Matlab scripts to accompany all the playlist of YouTube tutorial videos, which can be accessed using [this link](https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-).
 - **+UnitConversionPkg**: This package contains functions which perform unit conversions for use in FAST.
 - **+VisualizationPkg**: This package contains information about visualizing both the aircraft's outer mold line (as a wireframe) and its propulsion architecture (in a schematic).
 
@@ -95,11 +117,11 @@ to see more information on the aircraft visualization software. Additionally, th
 
 for more information on creating engine specification files for the engine model.
 
-# (II) FAST Overview
+# (III) FAST Overview
 
 FAST performs on- and off-design analysis of a user-prescribed aircraft on a user-prescribed mission profile. To run this tool, call the "Main" function with an aircraft specification function and a parametric mission profile. To do so, the user must:
 
-1. Prescribe their aircraft configuration via a function call. This can be achieved  by updating the example.m file provided in “AircraftSpecsPkg”. See this package for more instructions and examples. In the function, the user should:
+1. Prescribe their aircraft configuration via a function call. This can be achieved  by updating the example.m file provided in “AircraftSpecsPkg�?. See this package for more instructions and examples. In the function, the user should:
     - Select whether an on-design (+1, sizing and performance) analysis or off-design (-1, performance only) analysis should be performed, which is the second argument in the call to "EAPAnalysis". This is controlled by the variable: "Aircraft.Settings.Analysis.Type". The default is +1 (sizing and performance) if this value is not provided.
     - Select the maximum number of iterations to be performed during the analysis. The value must be a positive integer and is controlled by the following variable: "Aircraft.Settings.Analysis.MaxIter". The default is 50 iterations.
     - Select whether or not the mission profile should be plotted after the analysis has been completed. This is controlled by the following variable: "Aircraft.Settings.Plotting". The default is 0 (no plotting).
@@ -123,26 +145,38 @@ OutputAircraft = Main(AircraftSpecsPkg.AC, @MissionProfilesPkg.Miss);
 
 To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with the appropriate .m file that was created in the "AircraftSpecsPkg". Also, replace "Miss" in "MissionProfilesPkg.Miss" with the appropriate .m file in the "MissionProfilesPkg". In the function call above, "OutputAircraft" is the analyzed aircraft output and can be replaced with any Matlab-valid variable name. Note that an "@" is required before calling the mission profile, but it is not needed for the aircraft specification file (because it should have no input arguments).
 
-# (III) Requirements and Compatibility:
+# (IV) Requirements and Compatibility:
 
 1. The oldest Matlab version that this code has been successfully run on is R2019b.
 2. FAST requires no installation of additional toolboxes or packages. 
 
-# (IV) Notes:
+# (V) Notes:
 
 1. In the main sizing/performance analysis function, "EAPAnalysis", information about the weight of each component being sized is printed. To suppress these printouts, comment out any line containing a call to "fprintf". In a later version, the user will be given an option to indicate how much information should be printed to the command window.
 2. For off-design missions, the user can specify "Aircraft.Settings.Analysis.Type" to be either -1 or -2 (for more information about this, refer to "AircraftSpecsPkg.README", Section III.C.70).
 3. To run an off-design mission, a payload must be specified (via "Aircraft.Specs.Weight.Payload") rather than a number of passengers ("Aircraft.Specs.TLAR.MaxPax"). Thus, if the number of passengers changes, change the payload weight instead of the number of passengers. Refer to "AircraftSpecsPkg.README", Section III.C.19 to learn more about this.
 4. Please direct any questions, comments, suggestions, or success stories while using FAST to the listed Point of Contact at the beginning of this file.
 
-# (V) Disclaimers:
+# (VI) Disclaimers:
 
 1. When defining an aircraft in the "AircraftSpecsPkg" folder, many of the values will remain as `NaN`. For any values that remain as `NaN`, the regressions mentioned previously will attempt to approximate values for these variables. In some cases, this can lead to an unrealistic design, or one that is not able to converge. If possible, please try to define as much as possible about the aircraft. For any value in the "Aircraft.Settings" sub-structure that is not specified, a default value is internally provided.
 2. Some of the variables in the aircraft specification may have dependencies on each other. In the event that a dependency exists, the user will see a warning in the command window, indicating which variables will be prioritized and used to compute the others. If this warning appears, it does not mean that the design failed to converge or is deprecated. Instead, it means that excess information was supplied before the analysis began.
 3. During the mission evaluation, the thrust (for a turbojet or turbofan) or power (for a turboprop or piston aircraft) is lapsed by a power of the density ratio (density at altitude to density at sea level). For turbojets and turbofans, this exponent is set to 1. For turboprops or piston aircraft, this exponent is set to 0 (no lapse). Currently, the user is unable to specify the exponent. However, it can be modified inside the "EngineLapse" function, which is housed in the "PropulsionPkg" folder.
 4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST. Updates to this package are expected to commence in Spring/Summer 2024 and be released by the end of 2024.
+5. Currently, we are in the process of switching to a new off-design engine model. As a result of that, some of the engines provided in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to date. The engines that currently work are the LEAP-1A26, CF34-8E5, and any turboprop engine. If you want to use a turbofan engine not listed above, please refer to "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients that need to be provided to use the fuel flow equation. Additionally, due to this switch, please refrain from using the "+EngineModelPkg\TurbofanOffDesign" function or any functions that it calls within its routine.
 
-# (VI) Acknowledgments:
+# (VII) Testing FAST:
+
+Multiple unit tests are shipped with FAST to ensure that the code is operating correctly. In order to test FAST, run the following command:
+
+```matlab
+>> TestFAST();
+```
+
+If all of the tests run correctly, then FAST is up-to-date and can be ran. If some of the tests fail, please submit an issue on GitHub using the following link: [https://github.com/ideas-um/FAST/issues](https://github.com/ideas-um/FAST/issues).
+
+# (VIII) Acknowledgments:
+
 This work is sponsored by the NASA Aeronautics Research Mission Directorate and the Electrified Powertrain Flight Demonstration (EPFD) project, "Development of a Parametrically Driven Electrified Aircraft Design and Optimization Tool". The IDEAS Lab would like to thank Ralph Jansen, Andrew Meade, Karin Bozak, Amy Chicatelli, Noah Listgarten, Dennis Rohn, and Gaudy Bezos-O'Connor from the NASA EPFD project for supporting this work and providing valuable technical input and feedback throughout the duration of the project.
 
 Glenn Engineering and Research Support Contract (GEARS)

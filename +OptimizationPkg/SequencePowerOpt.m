@@ -1,4 +1,20 @@
-function [OptSeqTable, SOC, OptmizedAircraft, t] = SequencePowerOpt(Aircraft, Sequence)
+function [OptimizedAircraft, PCbest, t, OptSeqTable] = SequencePowerOpt(Aircraft, Sequence)
+%
+% OptAicraft = SequencePowerOpt(Aircraft)
+% written by Emma Cassidy, emmasmit@umich.edu
+% last updated: Feb 2024
+%
+% Optimize electric motor power code on an off-design mission for a
+% parallel-hybrid propulsion architecture.
+% The optimzer used is the built in fmincon with the interior point method.
+% See setup below to change optimizer paramteters.
+%
+%
+% INPUTS: 
+%   Aircraft - Aircraft struct with desired power code starting values and 
+%              desired mission conditions. 
+% OUTPUTS:
+%   OptAircraft - optimized aircraft struct with optimial power code
 
 %% PRE-PROCESSING AND SETUP %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,6 +53,22 @@ OptSeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
+% Optimizer Settings         %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% set up optimization algorithm and command window output
+% Default - interior point w/ max 50 iterations
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
+
+% objective function convergence tolerance
+options.OptimalityTolerance = 10^-3;
+
+% step size convergence
+options.StepTolerance = 10^-6;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
 % Aircraft  Settings         %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,60 +85,47 @@ Aircraft.Settings.ConSOC = 0;
 % no mission history table
 Aircraft.Settings.Table = 0;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% Optimizer Settings         %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% climb beg and end ctrl pt indeces
+n1= Aircraft.Mission.Profile.SegBeg(2);
+n2= Aircraft.Mission.Profile.SegEnd(4)-1;
 
-% set up optimization algorithm and command window output
-% Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
-
-% objective function convergence tolerance
-options.OptimalityTolerance = 10^-6;
-
-% step size convergence
-options.StepTolerance = 10^-6;
-
-% get starting point
-%fSOC = 20.*ones(nflight,1);
-fSOC = [80; 30; 40; 20]/100;
-b = size(fSOC);
-lb = ones(b)*19.5/100;
+% get intial power code
+PC = Aircraft.Specs.Power.PC(n1:n2, [1,3]);
+% expand across for each flight
+PC0 = repmat(PC, 1, nflight);
+b = size(PC0);
+lb = zeros(b);
 ub = ones(b);
 
 % save storage values
-fSOC_last = [];
+PClast = [];
 fburn = [];
-SOC   = [];
-OptmizedAircraft = [];
+SOC    = [];
+OptimizedAircraft = [];
+dh_dt = [];
 g = 9.81;
-
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-fSOC_Opt = fmincon(@(PC0) ObjFunc(fSOC, Aircraft, Sequence), fSOC, [], [], [], [], lb, ub, [], options);
+PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft, Sequence), options);
 t = toc/60
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-
 for iflight =1:nflight
         nameAC = sprintf("OptAircraft%d", iflight);
-        Aircraft = OptmizedAircraft.(nameAC);
+        Aircraft = OptimizedAircraft.(nameAC);
         results = AnaylzeMiss(Aircraft);
         
-        MissTable{iflight, :}= ["iflight", Sequence.DISTANCE(iflight),...
+        OptSeqTable{iflight, :}= ["iflight", Sequence.DISTANCE(iflight),...
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
-%MissTable{nflight+1, :} = {"Totals", sum(Sequence.DISTANCE), [], [], }
-
+disp(PCbest)
+    
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-function [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence)
+function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
     fburn = 0;
     % iterate through missions
     for iflight = 1:nflight
@@ -181,8 +200,11 @@ function [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence)
         % payload
         Aircraft.Specs.Weight.Payload = Wpayload;
 
-        % SOC depletion limit
-        Aircraft.Specs.Battery.MinSOC = fSOC(iflight)*100;
+        %--------------------------------------------------------------
+        % input design variables
+        PC_MISS = PC(:, iflight*2-1 : iflight*2);
+        Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PC_MISS;
+        Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PC_MISS;
 
         % ----------------------------------------------------------
         
@@ -191,58 +213,77 @@ function [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence)
         %           mission          %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
+
         % run optimizer
-        [OptAC, t(iflight)] = OptimizationPkg.MissionPowerOpt(Aircraft);
+        Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
         % save fuel burn
-        fburn = fburn + OptAC.Specs.Weight.Fuel;
+        fburn = fburn + Aircraft.Specs.Weight.Fuel;
 
-        % save SOC Change
-        SOC(iflight,1) = OptAC.Mission.History.SI.Power.SOC(1);
-        SOC(iflight,2) = OptAC.Mission.History.SI.Power.SOC(end);
+        % SOC for mission
+        SOC(iflight, :) = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
+
+        % rate of climb
+        dh_dt(iflight, :) = Aircraft.Mission.History.SI.Performance.RC(n1:n2+1);
 
         % charge battery
-        OptAC = BatteryPkg.GroundCharge(OptAC, ChargeTime);
+        Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
 
         % assign charges SOC to begSOC for next flight
-        Aircraft.Specs.Battery.BegSOC = OptAC.Mission.History.SI.Power.ChargedAC.SOC(end);
-
+        Aircraft.Specs.Battery.BegSOC = Aircraft.Mission.History.SI.Power.ChargedAC.SOC(end);
+        
         % save optimized aircraft struct
         nameAC = sprintf("OptAircraft%d", iflight);
-        OptmizedAircraft.(nameAC) = OptAC;
-    
+        OptimizedAircraft.(nameAC) = Aircraft;
     end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
-%  Objective Function        %
+% Objective Function         %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [val] = ObjFunc(fSOC, Aircraft, Sequence)
+function [val] = ObjFunc(PC, Aircraft, Sequence)
     % check if PC values changes
-    if ~isequal(fSOC, fSOC_last)
-        [fburn, SOC] = FlySequence(fSOC, Aircraft, Sequence);
-        fSOC_last = fSOC;
+    if ~isequal(PC, PClast)
+        [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence);
+        PClast = PC;
         %disp(PC)
     end
     % return objective function value
     val = fburn;
 end
 
-%{
-function d = PerDiff(a, b)
-    d = (a-b)./a .* 100;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% SOC Constraint             %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+function [c, ceq] = Cons(PC, Aircraft, Sequence)
+    % check if PC values changes
+    if ~isequal(PC, PClast)
+        [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence);
+        PClast = PC;
+    end
+    % compute SOC constraint
+    cSOC = Aircraft.Specs.Battery.MinSOC - SOC;
+
+    % compute RC constraint
+    cRC = dh_dt - Aircraft.Specs.Performance.RCMax;
+
+    % out put constraints
+    c = [cSOC; cRC];
+    ceq = [];
+
 end
-%}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
-%     Post Processing        %
+% Post Process               %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 function Results = AnaylzeMiss(Aircraft)
 
 %% EXTRACT MISSION SEGMENT INDECES %% 
@@ -291,4 +332,32 @@ TSFC_crs = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndClb:EndCrs))/(EndC
 Results = [TOGW, Fburn, EBatt, SOCbeg, SOCtko, SOCclb, SOCf, TSFC_tko, TSFC_clb, TSFC_crs];
 
 end
+
+function [] = PLotSeq(OptACs)
+        alt1 = OptACs.OptAircraft1.Mission.History.SI.Performance.Alt(1:73);
+        alt1(end) = 0;
+        t1 = OptACs.OptAircraft1.Mission.History.SI.Performance.Time(1:73);
+        
+        alt2 = OptACs.OptAircraft2.Mission.History.SI.Performance.Alt(1:73);
+        alt2(end) = 0;
+        t2 = OptACs.OptAircraft2.Mission.History.SI.Performance.Time(1:73) + t1(end) + 50*60;
+        
+        alt3 = OptACs.OptAircraft3.Mission.History.SI.Performance.Alt(1:73);
+        t3 = OptACs.OptAircraft3.Mission.History.SI.Performance.Time(1:73) + t2(end) + 85*60;
+        alt3(end) = 0;
+        alt4 = OptACs.OptAircraft4.Mission.History.SI.Performance.Alt(1:73);
+        t4 = OptACs.OptAircraft4.Mission.History.SI.Performance.Time(1:73)+t3(end)+ 71*60;
+        alt4(end) = 0;
+        alt = [alt1; alt2; alt3; alt4;];
+        t = [t1; t2; t3; t4]./60./60;
+        
+        figure;
+        plot(t, alt, "k", "LineWidth", 1)
+        xlabel("Time (hr)")
+        ylabel("Alt (m)")
+        title("Sequence Flight Profile")
+
 end
+
+end
+

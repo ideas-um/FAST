@@ -13,8 +13,8 @@ KnownCffch = cell2mat(KnownCffch(:,2));
 AvgCffch = ones(32,1).*mean(KnownCffch);
 ErrorReg = zeros(1,32);
 
-w = [2 1 1];
-
+w = [1 1 1];
+tic
 for ii = 1:32
 
     [CurStruct,Target] = RemoveN(ICAO_Known_Cffch,ii);
@@ -22,9 +22,10 @@ for ii = 1:32
 
     IOSpace = {["Thrust"],["OPR"],["BPR"],["Cffch"]};
 
-    PredictedCffch = RegressionPkg.NLGPR(CurStruct,IOSpace,Target,"Weights",w);
-    ErrorReg(ii) = (PredictedCffch - KnownCffch(ii))./ KnownCffch(ii)*100;
+    PredictedCffch(ii) = RegressionPkg.NLGPR(CurStruct,IOSpace,Target,"Weights",w);
+    ErrorReg(ii) = (PredictedCffch(ii) - KnownCffch(ii))./ KnownCffch(ii)*100;
 end
+toc
 
 
 ErrorMean = (AvgCffch - KnownCffch)./KnownCffch.*100;

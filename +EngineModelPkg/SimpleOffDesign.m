@@ -3,7 +3,7 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, Engin
 % [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx))
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% last updated: 05 Oct 2024
+% last updated: 11 dec 2024
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.
@@ -66,19 +66,22 @@ if     (ThrustReq < -1.0e-06)
     % therefore, no thrust from the engine is needed
     ThrustReq = 0;
 
-elseif (ThrustReq > Aircraft.Mission.History.SI.Power.Tav_PS(MissionIdx, EngineIdx))
+elseif (ThrustReq > Aircraft.Mission.History.SI.Power.Tav(MissionIdx, EngineIdx))
 
     % set the thrust required to the thrust available
-    ThrustReq = Aircraft.Mission.History.SI.Power.Tav_PS(MissionIdx, EngineIdx);
+    ThrustReq = Aircraft.Mission.History.SI.Power.Tav(MissionIdx, EngineIdx);
     
 end
 
 % convert to kN
 ThrustReq = ThrustReq / 1000;
 
+% get the number of sources in the powertrain
+nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+
 % get the design thrust and its supplement
-ThrustEng  = Aircraft.Specs.Propulsion.SLSThrust( EngineIdx);
-ThrustSupp = Aircraft.Specs.Propulsion.ThrustSupp(EngineIdx);
+ThrustEng  = Aircraft.Specs.Propulsion.SLSThrust( EngineIdx - nsrc);
+ThrustSupp = Aircraft.Specs.Propulsion.ThrustSupp(EngineIdx - nsrc);
 
 % find any thrust supplements < 0 (means power is siphoned off)
 isupp = find(ThrustSupp < 0); % not necessary now, but will be for vectorizing

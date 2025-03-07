@@ -2,7 +2,7 @@ function [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 %
 % [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 jun 2024
+% last updated: 11 dec 2024
 %
 % For a given aircraft, either:
 %
@@ -60,8 +60,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % check for fuel and batteries
-Fuel = Aircraft.Specs.Propulsion.PropArch.ESType == 1;
-Batt = Aircraft.Specs.Propulsion.PropArch.ESType == 0;
+Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
+Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
 % initial weights
 MTOW  = Aircraft.Specs.Weight.MTOW;

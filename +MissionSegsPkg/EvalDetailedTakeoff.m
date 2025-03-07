@@ -3,7 +3,7 @@ function [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % [Aircraft] = EvalDetailedTakeoff(Aircraft)
 % written by Nawa Khailany, nawakhai@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 24 jul 2024
+% last modified: 05 mar 2025
 %
 % Evaluate the takeoff segment. Assume maximum thrust/power from all
 % components in the propulsion system. In the detailed takeoff segment, the
@@ -103,43 +103,9 @@ Alt = repmat(Aircraft.Specs.Performance.Alts.Tko, npoint, 1);
 % total mass in each time
 Mass = repmat(MTOW, npoint, 1);
 
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% obtain any power splits    %
-% (ignore the "PowerOpt"     %
-% logical, currently is non- %
-% functional and deprecated) %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% assume thrust split comes from the aircraft specifications
-LamTS = repmat(Aircraft.Specs.Power.LamTS.Tko, npoint, 1);
-
-% assume energy/power/thrust splits come from the aircraft specifications
-LamTSPS = repmat(Aircraft.Specs.Power.LamTSPS.Tko, npoint, 1);
-LamPSPS = repmat(Aircraft.Specs.Power.LamPSPS.Tko, npoint, 1);
-LamPSES = repmat(Aircraft.Specs.Power.LamPSES.Tko, npoint, 1);
-
-% check if the power optimization structure is available
-if (isfield(Aircraft, "PowerOpt"))
-    
-    % check if the splits are available
-    if (isfield(Aircraft.PowerOpt, "Splits"))
-        
-        % get the thrust/power/energy splits
-        [LamTS, LamTSPS, LamPSPS, LamPSES] = OptimizationPkg.GetSplits( ...
-        Aircraft, SegBeg, SegEnd, LamTS, LamTSPS, LamPSPS, LamPSES);
-        
-    end
-end
-
-% remember the splits
-Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;
-Aircraft.Mission.History.SI.Power.LamPSPS(SegBeg:SegEnd, :) = LamPSPS;
-Aircraft.Mission.History.SI.Power.LamPSES(SegBeg:SegEnd, :) = LamPSES;
+% remember the power splits
+Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Tko, SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Tko, SegEnd - SegBeg + 1, 1);
 
 
 %% FLY TAKEOFF %%
@@ -328,7 +294,7 @@ Aircraft.Mission.History.SI.Power.Req(       SegBeg:SegEnd) = Preq;
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 
 % perform the propulsion analysis
-Aircraft = PropulsionPkg.PropAnalysisNew(Aircraft);
+Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
 
 
 %% FILL THE AIRCRAFT STRUCTURE %%

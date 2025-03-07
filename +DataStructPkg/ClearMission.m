@@ -2,7 +2,7 @@ function [Aircraft] = ClearMission(Aircraft, ielem)
 %
 % [Aircraft] = ClearMission(Aircraft, ielem)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 jun 2024
+% last updated: 12 dec 2024
 %
 % Reset all of the information from the Aircraft.Mission.History.SI.*
 % sub-structure to 0s. This is needed each time a mission is re-flown.
@@ -71,24 +71,15 @@ if (ielem == 0)
     % aircraft power as a function of time
     Aircraft.Mission.History.SI.Power.TV(      :, :) = 0;
     Aircraft.Mission.History.SI.Power.Req(     :, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamTS(   :, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamTSPS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamPSPS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamPSES( :, :) = 0;
+    Aircraft.Mission.History.SI.Power.LamUps(  :, :) = 0;
+    Aircraft.Mission.History.SI.Power.LamDwn(  :, :) = 0;
     Aircraft.Mission.History.SI.Power.SOC(     :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pav_TS(  :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pav_PS(  :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Preq_TS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Preq_PS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tav_TS(  :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tav_PS(  :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Treq_TS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Treq_PS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pout_TS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tout_TS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pout_PS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tout_PS( :, :) = 0;
-    Aircraft.Mission.History.SI.Power.P_ES(    :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Pav(     :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Preq(    :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Tav(     :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Treq(    :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Pout(    :, :) = 0;
+    Aircraft.Mission.History.SI.Power.Tout(    :, :) = 0;
     Aircraft.Mission.History.SI.Power.Voltage( :, :) = 0;
     Aircraft.Mission.History.SI.Power.Current( :, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(:, :) = 0;
@@ -137,24 +128,15 @@ else
     % aircraft power as a function of time
     Aircraft.Mission.History.SI.Power.TV(      ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Req(     ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamTS(   ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamTSPS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamPSPS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.LamPSES( ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.LamUps(  ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.LamDwn(  ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.SOC(     ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pav_TS(  ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pav_PS(  ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Preq_TS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Preq_PS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tav_TS(  ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tav_PS(  ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Treq_TS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Treq_PS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pout_TS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tout_TS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Pout_PS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.Tout_PS( ielem:end, :) = 0;
-    Aircraft.Mission.History.SI.Power.P_ES(    ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Pav(     ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Preq(    ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Tav(     ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Treq(    ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Pout(    ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Tout(    ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Voltage( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Current( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(ielem:end, :) = 0;

@@ -23,5 +23,5 @@ function [K] = SquareExKernel(x,y,hyperparams)
 % K = covariance between data set 1 and data set 2
 %   This output is normalized by the magnitude of hyperparams(N+1)
 
-K = hyperparams(end)*exp(-0.8*sum((x-y).^2./hyperparams(1:end-1)));
+K = hyperparams(end)*exp(-0.3*sum((x-y).^2./hyperparams(1:end-1)));
 end

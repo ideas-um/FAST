@@ -274,6 +274,9 @@ switch units
         Plane.Settings.Analysis.Type = "flag";
         Plane.Settings.Plotting = "flag";
 
+
+        Plane.Specs.Propulsion.Engine.DataTypeValidation = "data type";
+
         Plane.Overview = rmfield(Plane.Overview,"KeyWords");
 
     otherwise

@@ -146,7 +146,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = .1; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = .10; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0.1; %0.09;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.10; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -268,7 +268,7 @@ Aircraft.Settings.OEW.MaxIter = 50;
 Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
-Aircraft.Settings.Analysis.MaxIter = 20;
+Aircraft.Settings.Analysis.MaxIter = 30;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

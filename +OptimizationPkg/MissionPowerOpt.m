@@ -1,4 +1,4 @@
-function [OptAircraft, t] = MissionPowerOpt(Aircraft)
+function [OptAircraft] = MissionPowerOpt(Aircraft)
 
 %
 % OptAicraft = MissionPowerOpt(Aircraft)

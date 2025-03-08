@@ -27,7 +27,7 @@ nflight = height(Sequence);
 sz = [nflight, 13];
 
 % list the variable types to be returned in the table (24 total)
-varTypes = ["string", "double", "double", "double",...
+varTypes = ["double", "double", "double", "double",...
             "double", "double", "double", "double", ...
             "double", "double", "double", "double", ...
              "double"                                  ] ;
@@ -66,6 +66,9 @@ options.OptimalityTolerance = 10^-3;
 
 % step size convergence
 options.StepTolerance = 10^-6;
+
+% max function evaluations
+options.MaxFunctionEvaluations = 5000;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -117,7 +120,7 @@ for iflight =1:nflight
         Aircraft = OptimizedAircraft.(nameAC);
         results = AnaylzeMiss(Aircraft);
         
-        OptSeqTable{iflight, :}= ["iflight", Sequence.DISTANCE(iflight),...
+        OptSeqTable{iflight, :}= [iflight, Sequence.DISTANCE(iflight),...
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
 disp(PCbest)

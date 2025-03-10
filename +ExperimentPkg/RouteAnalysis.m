@@ -18,7 +18,7 @@ for k = 1:2
 
         Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
 
-        fburn(i,k) = Aircraft.Mission.History.SI.Weight.Fburn(73);
+        fburn(i,k) = Aircraft.Mission.History.SI.Weight.Fburn(74);
         eBatt(i,k) = Aircraft.Mission.History.SI.Energy.E_ES(end,2)/3600; % energy in watthr
         
     end

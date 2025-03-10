@@ -136,10 +136,9 @@ if (Aircraft.Settings.DetailedBatt == 1)
     ExistBattCap = QMax * Npar;
     
     % update number of cells in parallel (assume 1 cell per module, ./ Qmax is for aged cell capacity in EPASS, ./ 1 is for number of cells in parallel per module)
-    NparSOC = ceil(ceil((ExistBattCap + DeltaSOC .* QMax .* Npar) ./ QMax) ./ 1);
+    NparSOC = ceil(ceil((ExistBattCap + DeltaSOC * QMax * Npar) / QMax) / 1);
     
     % ------------------------------------------------------
-    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %                            %
     % check that the C-rate is   %
@@ -148,17 +147,13 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % too rapidly)               %
     %                            %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % get the energy consumed by the battery during each segment
-    dEbatt = diff(Ebatt);
-    
+   
 
     % compute the C-rate (current in segment / total capacity of battery pack)
     C_rate = Cbatt ./ (ExistBattCap); 
 
 
     % ignore all NaNs (set to 0)
-
 
     C_rate(isnan(C_rate)) = 0;
     C_rate(isinf(C_rate)) = 0;
@@ -176,10 +171,25 @@ if (Aircraft.Settings.DetailedBatt == 1)
         NparCrate = ceil(MaxCrate / MaxAllowCRate) * Npar;
         
     else
-        
-        NparCrate = 0;
-        
+        C_rate_SOC = Cbatt ./ (NparSOC * QMax);
+
+        % check if the C-rate_SOC is exceeded
+        ExceedCRate_2 = abs(C_rate_SOC) > MaxAllowCRate;
+
+        if (any(ExceedCRate_2))
+            % get the maximum C-rate
+            MaxCrate_2 = max(abs(C_rate_SOC));
+            
+            % get the required number of cells in parallel
+            NparCrate = ceil(MaxCrate_2 / MaxAllowCRate) * NparSOC;
+        else
+            NparCrate = 0;
+        end
+
     end
+
+
+
     % ------------------------------------------------------
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %                            %
@@ -218,7 +228,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     Aircraft.Specs.Power.Battery.ParCells = Npar;
 
     % remember the battery c-rates updated
-    % Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar);
+     % Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar);
 
 
 end

@@ -124,6 +124,9 @@ for iflight =1:nflight
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
 disp(PCbest)
+
+save("Opt_10ctrlpts_test.mat", "OptimizedAircraft");
+save("opttable.mat", "OptSeqTable");
     
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%

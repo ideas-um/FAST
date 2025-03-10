@@ -247,8 +247,6 @@ for itime = 1:ntime
     C_rate(itime) = Current(itime) ./ (Q * Parallel);
 end
 
-% remove the first SOC value
-SOC(1) = [];
 
 
 

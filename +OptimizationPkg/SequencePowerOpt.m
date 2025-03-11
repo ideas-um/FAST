@@ -224,7 +224,7 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
         Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
         % save fuel burn
-        fburn = fburn + Aircraft.Specs.Weight.Fuel;
+        fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(73);
 
         % SOC for mission
         SOC(iflight, :) = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
@@ -242,6 +242,7 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
         nameAC = sprintf("OptAircraft%d", iflight);
         OptimizedAircraft.(nameAC) = Aircraft;
     end
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -336,32 +337,6 @@ TSFC_crs = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndClb:EndCrs))/(EndC
 
 % save results in a vector
 Results = [TOGW, Fburn, EBatt, SOCbeg, SOCtko, SOCclb, SOCf, TSFC_tko, TSFC_clb, TSFC_crs];
-
-end
-
-function [] = PLotSeq(OptACs)
-        alt1 = OptACs.OptAircraft1.Mission.History.SI.Performance.Alt(1:73);
-        alt1(end) = 0;
-        t1 = OptACs.OptAircraft1.Mission.History.SI.Performance.Time(1:73);
-        
-        alt2 = OptACs.OptAircraft2.Mission.History.SI.Performance.Alt(1:73);
-        alt2(end) = 0;
-        t2 = OptACs.OptAircraft2.Mission.History.SI.Performance.Time(1:73) + t1(end) + 50*60;
-        
-        alt3 = OptACs.OptAircraft3.Mission.History.SI.Performance.Alt(1:73);
-        t3 = OptACs.OptAircraft3.Mission.History.SI.Performance.Time(1:73) + t2(end) + 85*60;
-        alt3(end) = 0;
-        alt4 = OptACs.OptAircraft4.Mission.History.SI.Performance.Alt(1:73);
-        t4 = OptACs.OptAircraft4.Mission.History.SI.Performance.Time(1:73)+t3(end)+ 71*60;
-        alt4(end) = 0;
-        alt = [alt1; alt2; alt3; alt4;];
-        t = [t1; t2; t3; t4]./60./60;
-        
-        figure;
-        plot(t, alt, "k", "LineWidth", 1)
-        xlabel("Time (hr)")
-        ylabel("Alt (m)")
-        title("Sequence Flight Profile")
 
 end
 

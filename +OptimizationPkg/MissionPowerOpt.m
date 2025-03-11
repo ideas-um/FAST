@@ -114,7 +114,7 @@ function [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft)
         Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
         
         % fuel required for mission
-        fburn = Aircraft.Specs.Weight.Fuel;
+        fburn = Aircraft.Mission.History.SI.Weight.Fburn(64);
     catch 
         fburn = 1e10;
     end

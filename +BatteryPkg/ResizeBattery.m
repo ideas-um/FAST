@@ -168,7 +168,20 @@ if (Aircraft.Settings.DetailedBatt == 1)
         
     else
         
-        NparCrate = 0;
+        C_rate_SOC = Cbatt ./ (NparSOC * QMax);
+
+        % check if the C-rate_SOC is exceeded
+        ExceedCRate_2 = abs(C_rate_SOC) > MaxAllowCRate;
+
+        if (any(ExceedCRate_2))
+            % get the maximum C-rate
+            MaxCrate_2 = max(abs(C_rate_SOC));
+            
+            % get the required number of cells in parallel
+            NparCrate = ceil(MaxCrate_2 / MaxAllowCRate) * NparSOC;
+        else
+            NparCrate = 0;
+        end
         
     end
     % ------------------------------------------------------

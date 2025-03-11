@@ -1,4 +1,4 @@
-function [SOH, FEC] = CyclAging(Aircraft, ChemType, CumulFECs, ChargingTime, ChrgRate)
+function [SOH, FEC, Aircraft] = CyclAging(Aircraft, ChemType, CumulFECs, ChargingTime, ChrgRate)
 
 % [Aircraft] = CyclAging(Aircraft)
 % written by Yipeng Liu, yipenglx@umich.edu
@@ -97,7 +97,7 @@ DisCCrate = mean(Aircraft.Mission.History.SI.Power.C_rate ...
 
 % C-rates during charging %  %%%%%%%%% THIS PART CAN BE IMPROVED FURTHER IN THE FUTURE  %%%%%%%%%  
 Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargingTime, ChrgRate);
-CCrate = -mean(Aircraft.Mission.History.SI.Power.ChargedAC.C_rate ...
+CCrate = mean(Aircraft.Mission.History.SI.Power.ChargedAC.C_rate ...
          (Aircraft.Mission.History.SI.Power.ChargedAC.C_rate~=0));
 
 % mean/median SOC %
@@ -108,13 +108,11 @@ mSOC = mean(active_mSOC); % Averaged SOCs
 % Full Equivalent Cycles %
 QMax = Aircraft.Specs.Battery.CapCell; % max capacity for a single cell
 
-FEC = (((max(Aircraft.Mission.History.SI.Power.Capacity(:,ValiColumn))-Aircraft.Mission.History.SI.Power.Capacity(end,ValiColumn))...
-    + (max(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity)-min(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity)))) ...
+FEC = ((max(Aircraft.Mission.History.SI.Power.Capacity(:,ValiColumn))-min(Aircraft.Mission.History.SI.Power.Capacity(Aircraft.Mission.History.SI.Power.Capacity(:,ValiColumn) ~= 0, ValiColumn))...
+    + (max(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity)-min(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity(Aircraft.Mission.History.SI.Power.ChargedAC.Capacity(:) ~= 0))))) ...
     / (2* QMax * Aircraft.Specs.Power.Battery.ParCells) ...
     + CumulFECs; % flight FEC for this single mission (charge + discharge)
-
 %% THE FULL MODEL %%
-
 % MODEL FOR NMC LIB 
 if ChemType == 1
 

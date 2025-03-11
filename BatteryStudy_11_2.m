@@ -160,6 +160,11 @@ SizedERJ.Settings.Analysis.Type=-2;
 
 SOHs = [];
 FECs = [];
+mSOC = [];
+dc_rate = [];
+c_rate = [];
+DOD = [];
+
 Off_SizedERJ = Main(SizedERJ, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 SOHs(end+1,1) = Off_SizedERJ.Specs.Battery.SOH(end);
 FECs(end+1,1) = Off_SizedERJ.Specs.Battery.FEC(end);
@@ -171,6 +176,17 @@ for i = 1:100000
     SOHs(end+1,1) = Off_SizedERJ.Specs.Battery.SOH(end);
     FECs(end+1,1) = Off_SizedERJ.Specs.Battery.FEC(end); 
 
+    % mean/median SOC %
+    SOCs = Off_SizedERJ.Mission.History.SI.Power.SOC(:,2);
+    active_mSOC = SOCs([true; diff(SOCs) ~= 0]); % Remove consecutive repeated SOC values
+    mSOC(end+1,1) = mean(active_mSOC); % Averaged SOCs
+    
+    c_rate(end+1,1) = mean(Off_SizedERJ.Mission.History.SI.Power.ChargedAC.C_rate(Off_SizedERJ.Mission.History.SI.Power.ChargedAC.C_rate~=0));
+    
+    dc_rate(end+1,1) = mean(Off_SizedERJ.Mission.History.SI.Power.C_rate(Off_SizedERJ.Mission.History.SI.Power.C_rate~=0));
+
+    DOD(end+1,1) = (max(Off_SizedERJ.Mission.History.SI.Power.SOC(:,2)) - min(Off_SizedERJ.Mission.History.SI.Power.SOC(:,2)));     
+
     if Off_SizedERJ.Specs.Battery.SOH(end) <= 70
         break
     end
@@ -181,7 +197,7 @@ plot(SOHs, 'LineWidth', 2);
 hold on
 yline(70, 'r--', 'LineWidth', 2); % More efficient way to plot a horizontal line at y=70
 hold off
-xlabel('Battery Cycling Times');
+xlabel('Flight Cycling Times');
 ylabel("Battery SOH [%]");
 % xlim([0 FECs(end)]);
 grid on
@@ -197,6 +213,34 @@ ylabel("Battery SOH [%]");
 % xlim([0 FECs(end)]);
 grid on
 title('Battery Degradation')
+
+figure(3)
+plot(mSOC, 'LineWidth', 2);
+xlabel('Flight Cycling Times');
+ylabel("Mean SOC");
+grid on
+title('Mean SOC')
+
+figure(4)
+plot(dc_rate, 'LineWidth', 2);
+ylabel('Discharge c_{rates}');
+xlabel("Flight Cycling Times");
+grid on
+title('Discharge c-rates')
+
+figure(5)
+plot(c_rate, 'LineWidth', 2);
+xlabel('Flight Cycling Times');
+ylabel("Charge c_{rate}");
+grid on
+title('Charge c-rates')
+
+figure(6)
+plot(DOD, 'LineWidth', 2);
+xlabel('Flight Cycling Times');
+ylabel("Depth of Discharge (DoD)");
+grid on
+title('Depth of Discharge (DoD)')
 
 
 %% TEST degradation effect at different operation temperature
@@ -313,32 +357,15 @@ set(gca, 'XDir', 'reverse'); % Reverse x-axis to show -100 kW to -250 kW
 
 
 %%
-% Define segment sizes (must sum to 100)
-segmentSizes = [10, 20, 10, 30, 30]; % Example: 10+20+10+30+30 = 100
-
-% Pre-allocate the result array
-resultArray = zeros(1, 100);
-
-% Pre-allocate array to store the constant value for each segment
-segmentValues = zeros(1, length(segmentSizes));
-
-% Define the value for the first segment (fixed)
-segmentValues(1) = -700e3;
-
-% For the remaining segments, generate random constants.
-% For example, let the random value be between -700e3 and -250e3.
-for i = 2:length(segmentSizes)
-    segmentValues(i) = -700e3 + (-250e3 + 700e3)*rand;  
-    % This gives a random value in the interval [-700e3, -250e3]
+SOCValues = [];
+SOCValues(end+1, 1)=SizedERJ.Mission.History.SI.Power.SOC(1,2);
+for i = 2:length(SizedERJ.Mission.History.SI.Power.SOC(:,2))
+    if SizedERJ.Mission.History.SI.Power.SOC(i,2) - SizedERJ.Mission.History.SI.Power.SOC(i-1,2) ~= 0
+        SOCValues(end+1, 1) = SizedERJ.Mission.History.SI.Power.SOC(i,2);
+    end
 end
+mSOC = mean(SOCValues)
 
-% Fill in the resultArray using the segment sizes and their constant values.
-currentIndex = 1;
-for i = 1:length(segmentSizes)
-    numElements = segmentSizes(i);
-    resultArray(currentIndex:currentIndex+numElements-1) = segmentValues(i);
-    currentIndex = currentIndex + numElements;
-end
-
-% Display the result
-disp(resultArray);
+a = SizedERJ.Mission.History.SI.Power.SOC(:,2)
+active_mSOC = a([true; diff(a) ~= 0]);
+mSOC = mean(active_mSOC)

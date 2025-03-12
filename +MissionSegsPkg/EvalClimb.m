@@ -3,7 +3,7 @@ function [Aircraft] = EvalClimb(Aircraft)
 % [Aircraft] = EvalClimb(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 05 mar 2025
+% last updated: 12 mar 2025
 %
 % Evaluate a climb segment by iterating over the power required. While
 % iterating over the power required, the drag and specific excess power
@@ -306,7 +306,7 @@ while (iter < MaxIter)
     Ps = (Pav - DV) ./ (Mass .* g);
 
     % check for invalid specific excess power values
-    if (any(Ps < 0))
+    if (any(Ps(1:end-1) < 0))
         warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
     end
             

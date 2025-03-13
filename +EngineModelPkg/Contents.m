@@ -21,3 +21,4 @@
 % EngineSpecsPkg               - EngineModelPkg.EngineSpecsPkg is a package.
 % IsenRelPkg                   - EngineModelPkg.IsenRelPkg is a package.
 % SpecHeatPkg                  - EngineModelPkg.SpecHeatPkg is a package.
+% SurrogateOffDesign           - EngineModelPkg.SurrogateOffDesignPkg is a package

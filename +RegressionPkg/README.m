@@ -22,17 +22,12 @@ function [] = README()
 %     Janki Patel
 %     Michael Tsai
 % 
-<<<<<<< Updated upstream
-% README last updated: 29 mar 2024
-=======
 % README last updated: 26 December 2024
->>>>>>> Stashed changes
 % 
 % -------------------------------------------------------------------------
 %
 % (I) Overview
 %
-<<<<<<< Updated upstream
 %       The regression package contains functions which perform the
 %       non-parametric Gaussian Process Regression used to predict aircraft
 %       characteristics during the aircraft sizing process. Users may
@@ -50,19 +45,6 @@ function [] = README()
 %       DataStructPkg.SpecProcessing. The developers recommend looking at
 %       lines 413 and 414 in that code for a simple one-input one-output
 %       example.
-=======
-%      The regression package contains functions which perform the
-%      non-parametric Gaussian Process Regression used to predict aircraft
-%      characteristics during the aircraft sizing process. Users may
-%      perform regressions on their own, or search the database for values
-%      they would like. Video tutorials are coming to FAST soon. If a
-%      user would like to use the regressions outside of the sizing code
-%      before the tutorial is released, the developers recommend reading
-%      the function documentation of the files in the regression package,
-%      as well as inspecting +DataStructPkg/SpecProcessing, which may yield
-%      some insights. Specifically lines 413 and 414, which will show a
-%      simple regression example. 
->>>>>>> Stashed changes
 %       
 % 
 % -------------------------------------------------------------------------
@@ -73,8 +55,6 @@ function [] = README()
 %
 % -------------------------------------------------------------------------
 %
-<<<<<<< Updated upstream
-=======
 % (III) Example Regression and Search function calls
 %
 %       (a) Regression
@@ -301,7 +281,6 @@ function [] = README()
 %
 % -------------------------------------------------------------------------
 %
->>>>>>> Stashed changes
 % end RegressionPkg.README
 %
 end

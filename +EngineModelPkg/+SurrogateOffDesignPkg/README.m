@@ -46,6 +46,6 @@ function [] = README()
 %
 % -------------------------------------------------------------------------
 %
-% end EngineModelPkg.SurrogateOffDesignpkg.README
+% end EngineModelPkg.SurrogateOffDesignPkg.README
 %
 end

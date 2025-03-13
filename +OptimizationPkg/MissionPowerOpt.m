@@ -28,7 +28,7 @@ function [OptAircraft] = MissionPowerOpt(Aircraft)
 
 % set up optimization algorithm and command window output
 % Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point', 'UseParallel',true);
 
 % objective function convergence tolerance
 options.OptimalityTolerance = 10^-3;

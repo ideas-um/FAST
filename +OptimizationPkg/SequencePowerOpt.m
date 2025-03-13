@@ -59,7 +59,7 @@ OptSeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
 
 % set up optimization algorithm and command window output
 % Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point');
+options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point', 'UseParallel',true);
 
 % objective function convergence tolerance
 options.OptimalityTolerance = 10^-3;
@@ -68,7 +68,7 @@ options.OptimalityTolerance = 10^-3;
 options.StepTolerance = 10^-6;
 
 % max function evaluations
-options.MaxFunctionEvaluations = 5000;
+options.MaxFunctionEvaluations = 10^4;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -89,8 +89,16 @@ Aircraft.Settings.ConSOC = 0;
 Aircraft.Settings.Table = 0;
 
 % climb beg and end ctrl pt indeces
-n1= Aircraft.Mission.Profile.SegBeg(2);
-n2= Aircraft.Mission.Profile.SegEnd(4)-1;
+% get the number of points in each segment
+TkoPts = Aircraft.Settings.TkoPoints;
+ClbPts = Aircraft.Settings.ClbPoints;
+CrsPts = Aircraft.Settings.CrsPoints;
+DesPts = Aircraft.Settings.DesPoints;
+
+% number of points in the main mission
+npt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
+n1= TkoPts;
+n2= TkoPts + 3 * (ClbPts - 1)-1;
 
 % get intial power code
 PC = Aircraft.Specs.Power.PC(n1:n2, [1,3]);
@@ -220,23 +228,30 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
 
-        % run optimizer
-        Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-
-        % save fuel burn
-        fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(73);
+        % fly mission
+        try
+            Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+             %save fuel burn
+            fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(npt);
+        catch
+            fburn = 10^9;
+        end
 
         % SOC for mission
-        SOC(iflight, :) = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
+        SOC(:, iflight) = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
 
         % rate of climb
-        dh_dt(iflight, :) = Aircraft.Mission.History.SI.Performance.RC(n1:n2+1);
-
-        % charge battery
-        Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
-
-        % assign charges SOC to begSOC for next flight
-        Aircraft.Specs.Battery.BegSOC = Aircraft.Mission.History.SI.Power.ChargedAC.SOC(end);
+        dh_dt(:, iflight) = Aircraft.Mission.History.SI.Performance.RC(n1:n2+1);
+        
+        try
+            % charge battery
+            Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
+    
+            % assign charges SOC to begSOC for next flight
+            Aircraft.Specs.Battery.BegSOC = Aircraft.Mission.History.SI.Power.ChargedAC.SOC(end);
+        catch
+            Aircraft.Specs.battery.BegSOC = 20;
+        end
         
         % save optimized aircraft struct
         nameAC = sprintf("OptAircraft%d", iflight);

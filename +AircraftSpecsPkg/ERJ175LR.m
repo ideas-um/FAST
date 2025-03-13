@@ -146,7 +146,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
@@ -240,7 +240,7 @@ if Aircraft.Settings.Degradation == 1
     Aircraft.Specs.Battery.ChrgTime = 60*60; % in sec
     
     % charging rate (can be an array or scalar, or a function with output of a scalar or array)
-    Aircraft.Specs.Battery.Cpower = -250*1000; % charging means negative rate in W
+    Aircraft.Specs.Battery.Cpower = -150*1000; % charging means negative rate in W
     
     % battery Full Equivalent Cycles (FECs)
     Aircraft.Specs.Battery.FEC = 0; % start with 0

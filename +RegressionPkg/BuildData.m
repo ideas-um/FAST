@@ -1,26 +1,22 @@
-function  [DataMatrix,HyperParams] = ...
-    BuildData(datastruct,IOspace,weights)
+function  [DataMatrix,HyperParams] = BuildData(DataStruct,IOSpace,Weights)
 %
-% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target)
-% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target,weights)
-% [DataMatrix,Prior,HyperParams] = BuildData(datastruct,class,IOspace,target,weights,givenprior)
+% [DataMatrix,HyperParams] = BuildData(Datastruct,IOspace,Weights)
 %
 % Written by Maxfield Arnson, marnson@umich.edu
-% last updated: 3 May 2024
+% last updated: 13 March 2025
 %
-% This function is used by the NLGPR function to create the relevant data
-% matrix depending on which parameters are known. Additionally, it creates
-% a prior distribution to default to in the case the regression does not
-% find relevant regression points. It also tunes the length scales in the
-% squared exponential covariance kernel using the IDEAS aircraft database.
+% This function is used by the RegProcessing() function to create the relevant data
+% matrix depending on which parameters are known. It also tunes the length 
+% scales in the squared exponential covariance kernel using the IDEAS 
+% Aerobase, applying any user specified weights.
 %
 %
 % INPUTS:
-%     datastruct    - variable passed into the function by NLGPR(). It
+%     DataStruct    - variable passed into the function by NLGPR(). It
 %                     contains a historical database structure.
 %                     size/type/units: 1-by-1 / structure / []
 %
-%     IOspace       - cell array where each entry is a string array carrying
+%     IOSpace       - cell array where each entry is a string array carrying
 %                     the structure path to each of the inputs. These
 %                     structure paths are listed in the read me for this
 %                     package: RegressionPkg.NLGPR. The last entry in this
@@ -28,16 +24,8 @@ function  [DataMatrix,HyperParams] = ...
 %                     the number of inputs
 %                     size/type/units: 1-by-N+1 / cell array / []
 %
-%     target        - values of each of the inputs. This is a matrix of
-%                     doubles where N is still the number of inputs and D
-%                     is the number of queried points the regression will
-%                     estimate an output for. Each row of the matrix is a
-%                     unique target point and each column in that row
-%                     should hold a numerical value for the inputs listed
-%                     in IOspace in the same order.
-%                     size/type/units: D-by-N / double / []
 %
-%     weights       - [OPTIONAL] tuning parameters which can be used to
+%     Weights       - tuning parameters which can be used to
 %                     change the impact each input has on the output. The
 %                     default is that each input is weighted equally. The
 %                     entered weights do not need to sum to a specific
@@ -46,12 +34,6 @@ function  [DataMatrix,HyperParams] = ...
 %                     0.5] for a regression using two inputs.
 %                     size/type/units: 1-by-N / double / []
 %
-%     given_prior   - [OPTIONAL] value(s) to use as a guess for the desired output.
-%                     For example, a physical model may be used to inform
-%                     the output of the regression. Each row in target
-%                     needs a guess. The default value for a prior is the
-%                     average of the data for the output parameter.
-%                     size/type/units: D-by-1 / double / []
 %
 %
 % OUTPUTS:
@@ -61,12 +43,6 @@ function  [DataMatrix,HyperParams] = ...
 %                     data is stored in the historical database.
 %                     size/type/units: variable / double / []
 %
-%     Prior         - This is the prior guess for all queried target
-%                     points. If a prior was provided as an input it simply
-%                     returns the input, otherwise it returns its default
-%                     value: the average of the data for the output
-%                     parameter/
-%                     size/type/units: D-by-1 / double / []
 %
 %     HyperParams   - These are tuning parameters for each of the inputs
 %                     and the output, which are used in the regression. If
@@ -82,14 +58,25 @@ function  [DataMatrix,HyperParams] = ...
 %% Build Data Matrix (OG)
 % This section builds a matrix of relevant data depending on the parameters
 % that are known for the RegressionPkg.
+
+% Initialize to an empty matrix
 DataMatrix = [];
-for i = 1:length(IOspace)
-    [~,IOiMat] = RegressionPkg.SearchDB(datastruct,IOspace{i});
+
+% for each parameter, build a column in the matrix with the values from
+% every aircraft in the FAST Aerobase
+for i = 1:length(IOSpace)
+    
+    % Pull out the parameter cell array
+    [~,IOiMat] = RegressionPkg.SearchDB(DataStruct,IOSpace{i});
+
+    % add a column, make sure to convert returned cell to a double
+    % first column of IOiMat is AC name, we want the parameter value
     DataMatrix = [DataMatrix,cell2mat(IOiMat(:,2))];
 end
 
 
-
+% The following nested for loop goes through the matrix and notes the row
+% index of every where that h
 c = 1;
 for i = 1:size(DataMatrix,1)
     for j = 1:size(DataMatrix,2)
@@ -99,6 +86,10 @@ for i = 1:size(DataMatrix,1)
     end
 end
 
+
+% in the case that there were no NaN entries, this try statement just
+% ensures an error is not thrown. otherwise this sets all the rows with NaN
+% entries to empty, removing them from the data matrix
 try
     DataMatrix(indexc,:) = [];
 catch
@@ -115,17 +106,29 @@ end
 % orders of magnitude, each one still contributes equally to the
 % predictions
 
-HyperParams = zeros(1,length(IOspace));
-for i = 1:length(IOspace)
-    [~,ParameterI] = RegressionPkg.SearchDB(datastruct,IOspace{i});
+% initialize the hyperparemeters
+HyperParams = zeros(1,length(IOSpace));
+
+% loop through each parameter and get the variance for hyperparameters. the
+% reason we dont just take the variance of each column of datamatrix is
+% because that calculation eliminates every row that has empty values, so
+% there may be some cross-elimination that is undesirable for individual
+% parameters
+for i = 1:length(IOSpace)
+    [~,ParameterI] = RegressionPkg.SearchDB(DataStruct,IOSpace{i});
     ParameterI = cell2mat(ParameterI(:,2));
     ParameterI=(ParameterI(~isnan(ParameterI))); % Exclude NaNs
     HyperParams(i) = var(ParameterI);
 end
 
+% Augment weights such that they are always scaled by the sum of their
+% total. This enforces that they cannot affect the absolute scale of the
+% regresison prediction. i.e. weights of [1, 2] are the same as [2, 4] for
+% a two input regression
+Weights = Weights./sum(Weights)*length(Weights);
 
-weights = weights./sum(weights)*length(weights);
-HyperParams(1:end-1) = HyperParams(1:end-1)./weights;
+% Weight the hyperparameters 
+HyperParams(1:end-1) = HyperParams(1:end-1)./Weights;
 
 end
 

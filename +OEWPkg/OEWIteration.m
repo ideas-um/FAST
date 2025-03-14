@@ -145,7 +145,7 @@ switch Class
                   ["Specs", "Weight"    , "Airframe"     ]}   ;
               
              % estimate the new airframe weight with a regression
-            WframeNew = RegressionPkg.NLGPR(TurbofanAC, IO, target, 'Iteration', true, 'Preprocessing',Aircraft.RegressionParams.OEW);
+            WframeNew = RegressionPkg.NLGPR(TurbofanAC, IO, target, 'Preprocessing',Aircraft.RegressionParams.OEW);
 
             % update the airframe weight with a calibration factor
             WframeNew = WframeNew * FrameCF;

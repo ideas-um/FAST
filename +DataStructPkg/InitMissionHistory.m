@@ -2,7 +2,8 @@ function [Aircraft] = InitMissionHistory(Aircraft)
 %
 % [Aircraft] = InitMissionHistory(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 dec 2024
+% last updated: 17 mar 2025
+% updated by Miranda Stockhausen, mstockha@umich.edu
 %
 % Initialize all arrays to zeros in the mission history for both SI and
 % English units (although only SI units are currently used).

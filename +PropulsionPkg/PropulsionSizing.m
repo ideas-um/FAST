@@ -97,7 +97,7 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
 end
 
 % get the power/thrust split function handles
-OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
+OperDwn = Aircraft.Specs.Propulsion.PowerManagement.Dwn;
 
 % get the power splits
 Splits = PropulsionPkg.EvalSplit(OperDwn, LamDwn);

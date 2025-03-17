@@ -2,7 +2,8 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 06 mar 2025
+% last updated: 17 mar 2025
+% updated by Miranda Stockhausen, mstockha@umich.edu
 %
 % Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
@@ -29,6 +30,9 @@ Specs = Aircraft.Specs;
 
 % get the aircraft class
 aclass = Specs.TLAR.Class;
+
+% get the segment id
+SegsID = Aircraft.Mission.Profile.SegsID;
 
 % check for a specified propulsion architecture
 if (isfield(Specs.Propulsion.PropArch, "Type"))
@@ -64,14 +68,14 @@ if     (strcmpi(ArchName, "C"  ) == 1)
             zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink connects to nothing
         
     % upstream operational matrix
-    OperUps = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @() ...
               [zeros(     1, 1), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % split fuel evenly amongst gas-turbine engines
                zeros(NumEng, 1), zeros(             NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % each gas-turbine engine sends all power to one propeller/fan
                zeros(NumEng, 1), zeros(             NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % all propellers/fans send their power to the sink
                zeros(     1, 1), zeros(                  1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink sends no power
            
     % downstream operational matrix
-    OperDwn = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @() ...
               [zeros(     1, 1), zeros(     1, NumEng), zeros(                  1, NumEng), zeros(     1, 1); ... % the fuel is not powered by anything
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % all gas-turbine engines are powered by fuel
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % each propeller/fan is powered by a gas-turbine engine
@@ -118,14 +122,14 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
             zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink connects to nothing
         
     % upstream operational matrix
-    OperUps = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @() ...
               [zeros(     1, 1), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % split battery evenly amongst electric motors
                zeros(NumEng, 1), zeros(             NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % each electric motor sends all power to one propeller/fan
                zeros(NumEng, 1), zeros(             NumEng, NumEng), zeros(NumEng, NumEng),  ones(NumEng, 1); ... % all propellers/fans send their power to the sink
                zeros(     1, 1), zeros(                  1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink sends no power
            
     % downstream operational matrix
-    OperDwn = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @() ...
               [zeros(     1, 1), zeros(     1, NumEng), zeros(                  1, NumEng), zeros(     1, 1); ... % the battery is not powered by anything
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % all electric motors are powered by battery
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % each propeller/fan is powered by an electric motor
@@ -174,7 +178,7 @@ elseif (strcmpi(ArchName, "PHE") == 1)
             zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink does not connect to anything
         
     % upstream power splits
-    OperUps = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @() ...
               [zeros(     1, 1), zeros(     1, 1), repmat(1 / NumEng,      1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel powers the gas-turbine engines
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery powers the electric motors
                zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, 1); ... % each gas-turbine engine spins a propeller/fan
@@ -183,7 +187,7 @@ elseif (strcmpi(ArchName, "PHE") == 1)
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink does not connect to anything
            
     % downstream power splits
-    OperDwn = @(lam) ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @(lam) ...
               [zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng)            , zeros(     1, NumEng)      , zeros(                  1, NumEng), zeros(     1, 1); ... % the fuel requires nothing
                zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng)            , zeros(     1, NumEng)      , zeros(                  1, NumEng), zeros(     1, 1); ... % the battery requires nothing
                 ones(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng)      , zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % the gas-turbine engines are powered by the fuel
@@ -240,7 +244,7 @@ elseif (strcmpi(ArchName, "SHE") == 1)
             
         
     % upstream power splits
-    OperUps = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @() ...
               [zeros(     1, 1), zeros(     1, 1), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel splits its power evenly amongst the gas-turbine engines
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % battery splits its power evenly amongst the electric motors
                zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines each power an electric generator
@@ -250,7 +254,7 @@ elseif (strcmpi(ArchName, "SHE") == 1)
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink sends no power
            
     % downstream power splits
-    OperDwn = @(lam) ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @(lam) ...
               [zeros(     1, 1),  zeros(          1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, 1); ... % fuel requires no power
                zeros(     1, 1),  zeros(          1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng),  zeros(                 1, NumEng), zeros(     1, 1); ... % battery requires no power
                 ones(NumEng, 1),  zeros(     NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines require fuel
@@ -308,7 +312,7 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
             zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink connects to nothing
         
     % upstream power splits
-    OperUps = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @() ...
               [zeros(     1, 1), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1); ... % fuel sends all its power to the gas-turbine engines
                zeros(NumEng, 1),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines send all their power to the electic generators
                zeros(NumEng, 1),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, 1); ... % electric generators send all their power to the electric motors
@@ -317,7 +321,7 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
                zeros(     1, 1),  zeros(                 1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, 1)] ;   % the sink powers nothing
            
     % downstream power splits
-    OperDwn = @() ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @() ...
               [zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(                  1, NumEng), zeros(     1, 1); ... % fuel requires no power
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines require fuel
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % electric generators require the gas-turbine engines
@@ -372,7 +376,7 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
             zeros(       1, 1), zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, 1)] ;   % the sink powers nothing
         
     % upstream power splits
-    OperUps = @(lam) ...
+    Aircraft.Specs.Propulsion.PowerManagement.Ups = @(lam) ...
               [zeros(       1, 1), repmat(1 / NumEng,        1, NumEng), zeros(       1, NumEng)            , zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, NumEng)      , zeros(       1, 1); ... % fuel powers the gas-turbine engines
                zeros(  NumEng, 1), zeros(               NumEng, NumEng),   eye(  NumEng, NumEng) * (1 - lam), zeros(  NumEng, NumEng), zeros(  NumEng, NumEng),   eye(  NumEng, NumEng) * lam, zeros(  NumEng, 1); ... % gas-turbine engines power the electric generators and "outboard" propellers/fans
                zeros(  NumEng, 1), zeros(               NumEng, NumEng), zeros(  NumEng, NumEng)            ,   eye(  NumEng, NumEng), zeros(  NumEng, NumEng), zeros(  NumEng, NumEng)      , zeros(  NumEng, 1); ... % electric generators power the electric motors
@@ -381,7 +385,7 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
                zeros(       1, 1), zeros(                    1, NumEng), zeros(       1, NumEng)            , zeros(       1, NumEng), zeros(       1, NumEng), zeros(       1, NumEng)      , zeros(       1, 1)] ;   % the sink powers nothing
            
     % downstream power splits
-    OperDwn = @(lam) ...
+    Aircraft.Specs.Propulsion.PowerManagement.Dwn = @(lam) ...
               [zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), zeros(                          1, NumEng), zeros(                    1, NumEng), zeros(     1, 1); ... % fuel requires nothing
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(                     NumEng, NumEng), zeros(               NumEng, NumEng), zeros(NumEng, 1); ... % gas-turbine engines reuqire fuel
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(                     NumEng, NumEng), zeros(               NumEng, NumEng), zeros(NumEng, 1); ... % electric generators require gas-turbine engines
@@ -445,11 +449,14 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
                            
     % check for the operational matrices
-    HaveOper = isfield(Specs.Propulsion.PropArch, ["OperUps"; "OperDwn"]);
+    for i = 1:length(SegsID)
+        HaveOper = isfield(Specs.Propulsion.PowerManagement(i), ["Ups"; "Dwn"]);
     
-    % confirm that they're all present
-    if (sum(HaveOper) ~= 2)
-        error("ERROR - CreatePropArch: check that 'OperUps' and 'OperDwn' in 'Specs.Propulsion.PropArch' are initialized.");
+        % confirm that they're all present
+        if (sum(HaveOper) ~= 2)
+            error("ERROR - CreatePropArch: check that 'Ups' and 'Dwn' in 'Specs.Propulsion.PowerManagement' are initialized.");
+        end
+
     end
     
     % check for the efficiencies
@@ -469,8 +476,12 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
     
     % get number of arguments for each (potential) split
-    Aircraft.Settings.nargOperUps = nargin(Aircraft.Specs.Propulsion.PropArch.OperUps);
-    Aircraft.Settings.nargOperDwn = nargin(Aircraft.Specs.Propulsion.PropArch.OperDwn);
+for i = 1:length(SegsID)
+    OperUps = Aircraft.Specs.Propulsion.PowerManagement(i).Ups;
+    OperDwn = Aircraft.Specs.Propulsion.PowerManagement(i).Dwn;
+    Aircraft.Settings.nargOperUps(i) = nargin(OperUps);
+    Aircraft.Settings.nargOperDwn(i) = nargin(OperDwn);
+end
     
     % ------------------------------------------------------
     
@@ -484,8 +495,8 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     Arch = Specs.Propulsion.PropArch.Arch;
     
     % get the operational matrices
-    OperUps = Specs.Propulsion.PropArch.OperUps;
-    OperDwn = Specs.Propulsion.PropArch.OperDwn;
+    OperUps = Aircraft.Specs.Propulsion.PowerManagement.Ups;
+    OperDwn = Aircraft.Specs.Propulsion.PowerManagement.Dwn;
     
     % get the efficiency matrices
     EtaUps = Specs.Propulsion.PropArch.EtaUps;
@@ -516,27 +527,31 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
     
     % get the size of the downstream matrix
-    [nrow, ncol] = size(OperDwn);
+    for i = 1:length(SegsID)
+        [nrow, ncol] = size(Aircraft.Specs.Propulsion.PowerManagement(i).Dwn);
     
-    % check for the same number of rows/columns in the downstream matrix
-    if (nrow ~= ncol)
+        % check for the same number of rows/columns in the downstream matrix
+        if (nrow ~= ncol)
         
-        % throw an error
-        error("ERROR - CreatePropArch: the downstream operational matrix must be square.");
+            % throw an error
+            error("ERROR - CreatePropArch: the downstream operational matrix must be square.");
         
+        end
     end
     
     % get the size of the upstream matrix
-    [nrow, ncol] = size(OperUps);
+    for i = 1:length(SegsID)
+        [nrow, ncol] = size(Aircraft.Specs.Propulsion.PowerManagement(i).Dwn);
     
-    % check for the same number of rows/columns in the upstream matrix
-    if (nrow ~= ncol)
+        % check for the same number of rows/columns in the upstream matrix
+        if (nrow ~= ncol)
         
-        % throw an error
-        error("ERROR - CreatePropArch: the upstream operational matrix must be square.");
+            % throw an error
+            error("ERROR - CreatePropArch: the upstream operational matrix must be square.");
         
+        end
     end
-    
+
     % get the size of the upstream efficiency matrix
     [nrow, ncol] = size(EtaUps);
     
@@ -614,8 +629,8 @@ end
 Aircraft.Specs.Propulsion.PropArch.Arch = Arch;
 
 % remember the operation
-Aircraft.Specs.Propulsion.PropArch.OperUps = OperUps;
-Aircraft.Specs.Propulsion.PropArch.OperDwn = OperDwn;
+Aircraft.Specs.Propulsion.PowerManagement.Ups = Aircraft.Specs.Propulsion.PowerManagement.Ups;
+Aircraft.Specs.Propulsion.PowerManagement.Dwn = Aircraft.Specs.Propulsion.PowerManagement.Dwn;
 
 % remember the efficiencies
 Aircraft.Specs.Propulsion.PropArch.EtaUps = EtaUps;
@@ -626,9 +641,12 @@ Aircraft.Specs.Propulsion.PropArch.SrcType = SrcType;
 Aircraft.Specs.Propulsion.PropArch.TrnType = TrnType;
 
 % get number of arguments for each (potential) split
-Aircraft.Settings.nargOperUps = nargin(Aircraft.Specs.Propulsion.PropArch.OperUps);
-Aircraft.Settings.nargOperDwn = nargin(Aircraft.Specs.Propulsion.PropArch.OperDwn);
-
+for i = 1:length(SegsID)
+    OperUps = Aircraft.Specs.Propulsion.PowerManagement(i).Ups;
+    OperDwn = Aircraft.Specs.Propulsion.PowerManagement(i).Dwn;
+    Aircraft.Settings.nargOperUps(i) = nargin(OperUps);
+    Aircraft.Settings.nargOperDwn(i) = nargin(OperDwn);
+end
 % ----------------------------------------------------------
     
 end

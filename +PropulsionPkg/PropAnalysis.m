@@ -45,7 +45,7 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
 % get the downstream operational matrix
-OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
+OperDwn = Aircraft.Specs.Propulsion.PowerManagement.Dwn;
 
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
@@ -98,6 +98,9 @@ SegEnd = Aircraft.Mission.Profile.SegEnd(SegsID);
 
 % mission ID
 MissID = Aircraft.Mission.Profile.MissID;
+
+% mission power strategy index
+StratIndex = Aircraft.Mission.PowerStrategyIndex; 
 
 % ----------------------------------------------------------
 

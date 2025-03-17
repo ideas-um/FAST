@@ -528,7 +528,7 @@ end
     
     % get the size of the downstream matrix
     for i = 1:length(SegsID)
-        [nrow, ncol] = size(Aircraft.Specs.Propulsion.PowerManagement(i).Dwn);
+        [nrow, ncol] = size(OperDwn(i));
     
         % check for the same number of rows/columns in the downstream matrix
         if (nrow ~= ncol)
@@ -541,7 +541,7 @@ end
     
     % get the size of the upstream matrix
     for i = 1:length(SegsID)
-        [nrow, ncol] = size(Aircraft.Specs.Propulsion.PowerManagement(i).Dwn);
+        [nrow, ncol] = size(OperUps(i));
     
         % check for the same number of rows/columns in the upstream matrix
         if (nrow ~= ncol)

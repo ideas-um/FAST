@@ -21,6 +21,10 @@ function [Aircraft] = InitMissionHistory(Aircraft)
 %% INITIALIZE VARIABLES FOR MISSION HISTORY %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% get the number of segments
+SegsID = Aircraft.Mission.Profile.SegsID;
+nsegsID = length(SegsID);
+
 % get the number of points in the mission profile
 npnt = Aircraft.Mission.Profile.SegEnd(end);
 
@@ -43,8 +47,10 @@ ZeroTrn = zeros(npnt, ntrn);
 ZeroComps = zeros(npnt, ncomp);
 
 % array of zeros for energy/power/thrust splits
-ZeroOperUps = zeros(npnt, max(1, Aircraft.Settings.nargOperUps));
-ZeroOperDwn = zeros(npnt, max(1, Aircraft.Settings.nargOperDwn));
+for i = 1:nsegsID
+    ZeroOperUps(i) = zeros(npnt, max(1, Aircraft.Settings.nargOperUps(i)));
+    ZeroOperDwn(i) = zeros(npnt, max(1, Aircraft.Settings.nargOperDwn(i)));
+end
 
 % performance sub-structure
 Performance = struct("Time", ZeroScalar, ...

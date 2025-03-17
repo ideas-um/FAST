@@ -1,12 +1,26 @@
-
-
-opt = MakeTTable(OptimizedAircraft);
+load("SeqOptAC.mat")
+Case1 = OptimizedAircraft;
+case1 = AnalyzeAC(Case1, seq);
+load("Opt_singlemiss.mat")
+Case2 = ACs;
+case2 = AnalyzeAC(Case2, seq);
+load("NonOptHEA.mat")
+Case3 = ACs;
+case3 = AnalyzeAC(Case3, seq);
+load("Conv.mat")
+Case4 = ACs;
+case4 = AnalyzeAC(Case4, seq);
 
 
 figure;
 subplot(6,1,1)
 % plot alt and TAS v time
-
+plot(case1.Time, case1.Alt, "-k", LineWidth=2)
+ylabel("Alt (m)")
+hold on
+yyaxis right
+plot(case1.Time, case1.TAS, "-b", LineWidth=2)
+ylabel("TAS (m/s)")
 % plot fburn
 
 % plot GT PC
@@ -17,12 +31,93 @@ subplot(6,1,1)
 
 % plot SOC
 
+set(gca, "FontSize", 13)
+
+function [result] = AnalyzeAC(air, seq)
+AC = fieldnames(air);
+n = length(AC);
+
+time = [];
+alt = [];
+TAS = [];
+fburn = [];
+GTPC = [];
+EMPC = [];
+battE = [];
+SOC = [];
+ground = [];
 
 
+for i = 1:n
+    % get ac from struct
+    Aircraft = air.(AC{i}); 
+    
+    % extract mission points
+    TkoPts = Aircraft.Settings.TkoPoints;
+    ClbPts = Aircraft.Settings.ClbPoints;
+    CrsPts = Aircraft.Settings.CrsPoints;
+    DesPts = Aircraft.Settings.DesPoints;
+    
+    % number of points in the main mission
+    npt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
 
+    if i > 1
+        ground = seq.GROUND_TIME(i-1);
+    end
+    
+    % get desired values
+    t = Aircraft.Mission.History.SI.Performance.Time(1:npt)./60;
+    fuel = Aircraft.Mission.History.SI.Weight.Fburn(1:npt);
+    if i > 1
+    t = t +time(end)+ground;
+    fuel = fuel + fburn(end);
+    end
+    a = Aircraft.Mission.History.SI.Performance.Alt(1:npt);
+    a(end) = 0;
+    v = Aircraft.Mission.History.SI.Performance.TAS(1:npt);
+    v(end) = 0;
+    GT = Aircraft.Mission.History.SI.Power.PC(1:npt, 1);
+
+    % only hea catergories
+    if Aircraft.Settings.DetailedBatt == 1
+        EM =  Aircraft.Mission.History.SI.Power.PC(1:npt, 3);
+         E = Aircraft.Mission.History.SI.Energy.E_ES(1:npt, 2);
+         if i >1
+         E = E + battE(end);
+         end
+         c =  Aircraft.Mission.History.SI.Power.SOC(1:npt);
+    else
+        EM =[];
+        E = [];
+        c = [];
+    end
+
+    time = [time; t];
+    alt = [alt; a];
+    TAS = [TAS; v];
+    fburn = [fburn; fuel];
+    GTPC = [GTPC; GT];
+    EMPC = [EMPC;EM];
+    battE = [battE; E];
+    SOC = [SOC; c];
+
+end
+
+time = time./60;
+
+result = struct('Time', time, 'Alt', alt,'TAS', TAS, 'fburn', fburn, 'GTPC', GTPC, 'EMPC', EMPC, 'BattE', battE, 'SOC', SOC);
+end
 
 
 function [History] = MakeTTable(OptACs)
+TkoPts = Aircraft.Settings.TkoPoints;
+ClbPts = Aircraft.Settings.ClbPoints;
+CrsPts = Aircraft.Settings.CrsPoints;
+DesPts = Aircraft.Settings.DesPoints;
+
+% number of points in the main mission
+npt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
+
 fburn1 = OptACs.Aircraft1.Mission.History.SI.Weight.Fburn(1:73);
 fburn2 = OptACs.Aircraft2.Mission.History.SI.Weight.Fburn(1:73) + fburn1(end);
 fburn3 = OptACs.Aircraft3.Mission.History.SI.Weight.Fburn(1:73) + fburn2(end);

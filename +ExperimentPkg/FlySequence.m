@@ -42,6 +42,9 @@ SeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
 % run off design mission
 Aircraft.Settings.Analysis.Type = -2;
 
+% mark optimization
+Aircraft.Settings.Analysis.PowerOpt = 0;
+
 % turn off FAST print outs
 Aircraft.Settings.PrintOut = 0;
 
@@ -148,19 +151,22 @@ for iflight = 1:nflight
     % Optimized HEA power for    %
     %           mission          %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ %   Aircraft.Specs.Power.PC(10:36, [3,4]) = 0.05;
+%Aircraft.Mission.History.SI.Power.PC(10:36, [3,4]) = 0.05;
     
 
     % fly mission
-    try
-        %Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-        Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
+    %try
+        Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        %Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
          %save fuel burn
         fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(npt);
-    catch
-        fburn = 10^9;
-    end
+    %catch
+     %   fburn = 10^9;
+    %end
 
-
+if ~isnan(Aircraft.Specs.Power.Battery.ParCells) 
     try
         % charge battery
         Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
@@ -170,6 +176,7 @@ for iflight = 1:nflight
     catch
         Aircraft.Specs.Battery.BegSOC = 20;
     end
+end
     
     % save optimized aircraft struct
     nameAC = sprintf("Aircraft%d", iflight);
@@ -187,8 +194,8 @@ for iflight =1:nflight
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
 
-save("Opt_single miss.mat", "ACs");
-save("opttable.mat", "SeqTable");
+save("Conv.mat", "ACs");
+save("convtab.mat", "SeqTable");
 
 %% ANALYZE AIRCRAFT %%
 function Results = AnaylzeMiss(Aircraft)
@@ -217,6 +224,8 @@ TOGW = Aircraft.Specs.Weight.MTOW;
 % main mission fuelburn
 Fburn = Aircraft.Mission.History.SI.Weight.Fburn(npnt);
 
+if ~isnan(Aircraft.Specs.Power.Battery.ParCells) 
+
 % main mission battery energy use
 EBatt = Aircraft.Mission.History.SI.Energy.E_ES(npnt, 2);
 
@@ -225,7 +234,15 @@ SOCbeg = Aircraft.Mission.History.SI.Power.SOC(1, 2);
 SOCtko = Aircraft.Mission.History.SI.Power.SOC(EndTko, 2);
 SOCclb = Aircraft.Mission.History.SI.Power.SOC(EndClb, 2);
 SOCf = Aircraft.Mission.History.SI.Power.SOC(npnt, 2);
-
+else
+% main mission battery energy use
+EBatt = NaN;
+% SOC 
+SOCbeg = NaN;
+SOCtko = NaN;
+SOCclb = NaN;
+SOCf = NaN;
+end
 % mission seg TSFC values
 TSFC_tko = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(1     :EndTko))/EndTko            ;
 TSFC_clb = sum(Aircraft.Mission.History.SI.Propulsion.TSFC(EndTko:EndClb))/(EndClb-EndTko +1);

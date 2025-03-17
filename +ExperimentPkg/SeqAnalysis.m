@@ -21,7 +21,16 @@ hold on
 yyaxis right
 plot(case1.Time, case1.TAS, "-b", LineWidth=2)
 ylabel("TAS (m/s)")
+
+
 % plot fburn
+subplot(6,1,2)
+hold on
+plot(case1.Time, case1.fburn, LineWidth=2)
+plot(case2.Time, case2.fburn, LineWidth=2)
+plot(case3.Time, case3.fburn, LineWidth=2)
+plot(case4.Time, case4.fburn, LineWidth=2)
+% add percent diff of fuel
 
 % plot GT PC
 

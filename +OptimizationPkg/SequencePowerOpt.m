@@ -231,6 +231,7 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
         % fly mission
         try
             Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+            %Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
              %save fuel burn
             fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(npt);
         catch
@@ -260,6 +261,7 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
 
 end
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
 % Objective Function         %

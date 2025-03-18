@@ -12,9 +12,10 @@ Case4 = ACs;
 case4 = AnalyzeAC(Case4, seq);
 
 case1.diff = (case1.fburn-case4.fburn)./case4.fburn.*100;
-case2.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
+case2.diff = (case2.fburn-case4.fburn)./case4.fburn.*100;
 case3.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
 %%
+font = 10;
 figure;
 subplot(3,2,1)
 % plot alt and TAS v time
@@ -24,19 +25,20 @@ hold on
 yyaxis right
 plot(case1.Time, case1.TAS, "-b", LineWidth=2)
 ylabel("TAS (m/s)")
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 ax = gca;
 ax.YColor = 'b';
 
 % plot fburn
 subplot(3,2,2)
+plot(case1.Time, case1.fburn, LineWidth=1.5)
 hold on
-plot(case1.Time, case1.diff, LineWidth=1.5)
-plot(case2.Time, case2.diff, LineWidth=1.5)
-plot(case3.Time, case3.diff, LineWidth=1.5)
+plot(case2.Time, case2.fburn, LineWidth=1.5)
+plot(case3.Time, case3.fburn, LineWidth=1.5)
+yline(0,"--k")
 ylabel("Fuel Burn % Difference wrt Case 4")
 legend("Case 1", "Case 2", "Case 3")
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 % plot GT PC
 subplot(3,2,3)
 hold on
@@ -46,7 +48,7 @@ plot(case3.Time, case3.GTPC, LineWidth=1.5)
 plot(case3.Time, case4.GTPC, LineWidth=1.5)
 ylabel("Gas Turbine Power Code (%)")
 legend("Case 1", "Case 2", "Case 3", "Case 4")
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 % plot EM PC
 subplot(3,2,4)
 hold on
@@ -55,7 +57,7 @@ plot(case2.Time, case2.EMPC, LineWidth=1.5)
 plot(case3.Time, case3.EMPC, LineWidth=1.5)
 ylabel("Electric Motor Power Code (%)")
 legend("Case 1", "Case 2", "Case 3")
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 % plot batt E
 
 subplot(3,2,5)
@@ -65,7 +67,7 @@ plot(case2.Time, case2.BattE, LineWidth=1.5)
 plot(case3.Time, case3.BattE, LineWidth=1.5)
 ylabel("Battery Energy Used (kWh)")
 legend("Case 1", "Case 2", "Case 3")
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 % plot SOC
 subplot(3,2,6)
 hold on
@@ -75,7 +77,7 @@ plot(case3.Time, case3.SOC, LineWidth=1.5)
 ylabel("SOC (%)")
 legend("Case 1", "Case 2", "Case 3")
 
-set(gca, "FontSize", 13)
+set(gca, "FontSize", font)
 %%
 function [result] = AnalyzeAC(air, seq)
 AC = fieldnames(air);
@@ -119,6 +121,7 @@ for i = 1:n
     v = Aircraft.Mission.History.SI.Performance.TAS(1:npt);
     v(end) = 0;
     GT = Aircraft.Mission.History.SI.Power.PC(1:npt, 1);
+    GT(end) = 0;
 
     % only hea catergories
     if Aircraft.Settings.DetailedBatt == 1

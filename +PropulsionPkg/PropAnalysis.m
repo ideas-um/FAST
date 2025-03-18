@@ -44,9 +44,6 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 % get the propulsion architecture
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
-% get the downstream operational matrix
-OperDwn = Aircraft.Specs.Propulsion.PowerManagement.Dwn;
-
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
 
@@ -100,7 +97,10 @@ SegEnd = Aircraft.Mission.Profile.SegEnd(SegsID);
 MissID = Aircraft.Mission.Profile.MissID;
 
 % mission power strategy index
-StratIndex = Aircraft.Mission.PowerStrategyIndex; 
+StratIndex = Aircraft.Mission.PowerStrategyIndex(SegsID);
+
+% get the downstream operational matrix
+OperDwn = Aircraft.Specs.Propulsion.PowerManagement(StratIndex).Dwn;
 
 % ----------------------------------------------------------
 
@@ -244,11 +244,11 @@ for ipnt = 1:npnt
         
     end
     
-    % evaluate the function handles for the current splits
-    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    % % evaluate the function handles for the current splits
+    % SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % propagate the power downstream to the transmitters
-    Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', SplitDwn(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
+    Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', OperDwn(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
 
 end
 
@@ -279,11 +279,11 @@ Pout(:, TrnSnkIdx) = PoutTest;
 % loop through points to propagate power to the sources
 for ipnt = 1:npnt
         
-    % evaluate the function handles for the current splits
-    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    % % evaluate the function handles for the current splits
+    % SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % propagate the power downstream
-    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', SplitDwn(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
+    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', OperDwn(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
     
 end
 
@@ -305,12 +305,12 @@ itrn = nsrc + (1 : ntrn);
 % engine
 for ipnt = 1:npnt
     
-    % get the current downstream power split
-    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    % % get the current downstream power split
+    % SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
     % check for the power supplement
     Psupp(ipnt, itrn) = PropulsionPkg.PowerSupplementCheck( ...
-                        Pout(ipnt, itrn), Arch(itrn, itrn), SplitDwn(itrn, itrn), EtaDwn(itrn, itrn), TrnType, EtaFan);
+                        Pout(ipnt, itrn), Arch(itrn, itrn), OperDwn(itrn, itrn), EtaDwn(itrn, itrn), TrnType, EtaFan);
     
 end
 
@@ -360,7 +360,8 @@ if (any(Batt))
                 Pout(BattDeplete:end, icol) = 0;
                 
                 % zero the splits
-                LamDwn(BattDeplete:end, :) = 0;
+                % LamDwn(BattDeplete:end, :) = 0;
+                % I do not know how to create equivalent check here!!
                 
                 % change the SOC (prior index is last charge > 20%)
                 SOC(BattDeplete:end, icol) = SOC(BattDeplete - 1, icol);
@@ -538,12 +539,12 @@ if (any(Fuel))
             % get the appropriate elements
             ielem = [ifuel, icol];
             
-            % evaluate the function handles for the current splits
-            SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+            % % evaluate the function handles for the current splits
+            % SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
             
             % temporary mass flow rate
             Tempdmdt = PropulsionPkg.PowerFlow([zeros(1, nfuel), MDotFuel(ipnt, HasEng(ieng))]', ...
-                       Arch(ielem, ielem)', SplitDwn(ielem, ielem), EtaDwn(ielem, ielem), -1)';
+                       Arch(ielem, ielem)', OperDwn(ielem, ielem), EtaDwn(ielem, ielem), -1)';
             
             % update the mass flow rates
             dmdt(ipnt, ifuel) = dmdt(ipnt, ifuel) + Tempdmdt(1:end-1)';

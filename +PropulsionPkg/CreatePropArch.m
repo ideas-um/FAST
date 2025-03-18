@@ -32,7 +32,7 @@ Specs = Aircraft.Specs;
 aclass = Specs.TLAR.Class;
 
 % get the segment id
-SegsID = Aircraft.Mission.Profile.SegsID;
+NumStrats = Aircraft.Specs.Propulsion.NumStrats;
 
 % check for a specified propulsion architecture
 if (isfield(Specs.Propulsion.PropArch, "Type"))
@@ -449,7 +449,7 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
                            
     % check for the operational matrices
-    for i = 1:length(SegsID)
+    for i = 1:NumStrats
         HaveOper = isfield(Specs.Propulsion.PowerManagement(i), ["Ups"; "Dwn"]);
     
         % confirm that they're all present
@@ -476,7 +476,7 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     end
     
     % get number of arguments for each (potential) split
-for i = 1:length(SegsID)
+for i = 1:NumStrats
     OperUps = Aircraft.Specs.Propulsion.PowerManagement(i).Ups;
     OperDwn = Aircraft.Specs.Propulsion.PowerManagement(i).Dwn;
     Aircraft.Settings.nargOperUps(i) = nargin(OperUps);
@@ -527,7 +527,7 @@ end
     end
     
     % get the size of the downstream matrix
-    for i = 1:length(SegsID)
+    for i = 1:NumStrats
         [nrow, ncol] = size(OperDwn(i));
     
         % check for the same number of rows/columns in the downstream matrix
@@ -540,7 +540,7 @@ end
     end
     
     % get the size of the upstream matrix
-    for i = 1:length(SegsID)
+    for i = 1:NumStrats
         [nrow, ncol] = size(OperUps(i));
     
         % check for the same number of rows/columns in the upstream matrix
@@ -641,7 +641,7 @@ Aircraft.Specs.Propulsion.PropArch.SrcType = SrcType;
 Aircraft.Specs.Propulsion.PropArch.TrnType = TrnType;
 
 % get number of arguments for each (potential) split
-for i = 1:length(SegsID)
+for i = 1:NumStrats
     OperUps = Aircraft.Specs.Propulsion.PowerManagement(i).Ups;
     OperDwn = Aircraft.Specs.Propulsion.PowerManagement(i).Dwn;
     Aircraft.Settings.nargOperUps(i) = nargin(OperUps);

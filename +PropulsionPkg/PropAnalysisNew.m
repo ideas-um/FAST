@@ -270,6 +270,8 @@ for ipnt = 1:npnt
         if Aircraft.Settings.Analysis.Type < 0 && Seg == "Climb"
             PreqPS(ipnt,[1,2]) = Pav_PS(ipnt, [1,2]);
         end
+    else
+        PreqPS(ipnt, :) = PreqDr(ipnt, :) * (SplitPSPS ./ EtaPSPS);
     end
 
     %{
@@ -635,6 +637,7 @@ Aircraft.Mission.History.SI.Propulsion.TSFC(    SegBeg:SegEnd, :) = SFC     ;
 Aircraft.Mission.History.SI.Propulsion.MDotFuel(SegBeg:SegEnd, :) = MDotFuel;
 
 % power quantities
+if Aircraft.Settings.DetailedBatt == 1
 Aircraft.Mission.History.SI.Power.PC(  SegBeg:SegEnd, [3,4]) = PC_EM;
 Aircraft.Mission.History.SI.Power.SOC(     SegBeg:SegEnd, :) = SOC;
 Aircraft.Mission.History.SI.Power.Voltage( SegBeg:SegEnd, :) = V  ;
@@ -644,7 +647,7 @@ Aircraft.Mission.History.SI.Power.C_rate(  SegBeg:SegEnd, :) = C_rate(:,2);
 Aircraft.Mission.History.SI.Power.V_cell(  SegBeg:SegEnd, :) = V ./ SerCells;   % Find Voltage per cell
 Aircraft.Mission.History.SI.Power.Cur_cell(SegBeg:SegEnd, :) = I ./ ParCells;   % Find Current per cell
 Aircraft.Mission.History.SI.Power.Cap_cell(SegBeg:SegEnd, :) = Q ./ ParCells;   % Find Capacity per cell
-
+end
 % splits
 Aircraft.Mission.History.SI.Power.LamTS(  SegBeg:SegEnd, :) = LamTS  ;
 Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd, :) = LamTSPS;

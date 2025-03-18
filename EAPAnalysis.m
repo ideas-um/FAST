@@ -72,8 +72,8 @@ Wbatt = Aircraft.Specs.Weight.Batt;
 W_S = Aircraft.Specs.Aero.W_S.SLS;
 
 % check for battery cells in series/parallel
-SerCells = Aircraft.Specs.Battery.SerCells;
-ParCells = Aircraft.Specs.Battery.ParCells;
+SerCells = Aircraft.Specs.Power.Battery.SerCells;
+ParCells = Aircraft.Specs.Power.Battery.ParCells;
 
 % if there are cells in series/parallel, use a detailed battery model
 if ((~isnan(SerCells)) && (~isnan(ParCells)))
@@ -496,8 +496,8 @@ Cpower = Aircraft.Specs.Battery.Cpower;
 % FEC
 FECs = Aircraft.Specs.Battery.FEC(end);
 
-if Type ~= 1 % Battery degradation only makes sense in off-design 
-    if Aircraft.Settings.Degradation == 1
+if Type ~= 1  % Battery degradation only makes sense in off-design 
+    if Aircraft.Settings.Degradation == 1 && Aircraft.Settings.DetailedBatt == 1
         [SOH, FEC] = BatteryPkg.CyclAging(Aircraft, BattChem, FECs, GroundTime, Cpower);
         Aircraft.Specs.Battery.FEC(end+1,1) = FEC;
         Aircraft.Specs.Battery.SOH(end+1,1) = SOH;

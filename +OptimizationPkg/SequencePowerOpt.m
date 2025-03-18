@@ -59,7 +59,7 @@ OptSeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
 
 % set up optimization algorithm and command window output
 % Default - interior point w/ max 50 iterations
-options = optimoptions('fmincon','MaxIterations', 100 ,'Display','iter','Algorithm','interior-point', 'UseParallel',true);
+options = optimoptions('fmincon','MaxIterations', 200 ,'Display','iter','Algorithm','interior-point', 'UseParallel',true);
 
 % objective function convergence tolerance
 options.OptimalityTolerance = 10^-3;
@@ -68,7 +68,7 @@ options.OptimalityTolerance = 10^-3;
 options.StepTolerance = 10^-6;
 
 % max function evaluations
-options.MaxFunctionEvaluations = 10^4;
+options.MaxFunctionEvaluations = 10^6;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                            %
@@ -87,6 +87,7 @@ Aircraft.Settings.ConSOC = 0;
 
 % no mission history table
 Aircraft.Settings.Table = 0;
+
 
 % climb beg and end ctrl pt indeces
 % get the number of points in each segment
@@ -112,28 +113,29 @@ ub = ones(b);
 PClast = [];
 fburn = [];
 SOC    = [];
-OptimizedAircraft = [];
+%OptimizedAircraft = [];
 dh_dt = [];
 g = 9.81;
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft, Sequence), options);
+%PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft, Sequence), options);
 t = toc/60
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
+load("SeqOptAC.mat")
 for iflight =1:nflight
-        nameAC = sprintf("OptAircraft%d", iflight);
+        nameAC = sprintf("Aircraft%d", iflight);
         Aircraft = OptimizedAircraft.(nameAC);
         results = AnaylzeMiss(Aircraft);
         
         OptSeqTable{iflight, :}= [iflight, Sequence.DISTANCE(iflight),...
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
-disp(PCbest)
 
-save("Opt_10ctrlpts_test.mat", "OptimizedAircraft");
+
+save("SeqOptAC.mat", "OptimizedAircraft");
 save("opttable.mat", "OptSeqTable");
     
 %% Nested Functions %%
@@ -255,7 +257,7 @@ function [fburn, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence)
         end
         
         % save optimized aircraft struct
-        nameAC = sprintf("OptAircraft%d", iflight);
+        nameAC = sprintf("Aircraft%d", iflight);
         OptimizedAircraft.(nameAC) = Aircraft;
     end
 

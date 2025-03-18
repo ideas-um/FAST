@@ -112,7 +112,7 @@ for ips = 1:nps
             PowerAv(:, ips) = ThrustAv(:, ips) .* TAS;
 
             % for offf-design climb set power avalaible
-            if Aircraft.Settings.Analysis.Type < 0 && Seg == "Climb"
+            if Aircraft.Settings.Analysis.Type < 0 && Seg == "Climb" && Aircraft.Settings.Analysis.PowerOpt == 1
                 PC_GT = Aircraft.Mission.History.SI.Power.PC(SegBeg:SegEnd, ips);
                 PowerAv(:, ips) = PowerAv(:, ips) .* PC_GT;
             end

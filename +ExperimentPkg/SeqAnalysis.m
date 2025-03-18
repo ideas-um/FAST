@@ -11,9 +11,12 @@ load("Conv.mat")
 Case4 = ACs;
 case4 = AnalyzeAC(Case4, seq);
 
-
+case1.diff = (case1.fburn-case4.fburn)./case4.fburn.*100;
+case2.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
+case3.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
+%%
 figure;
-subplot(6,1,1)
+subplot(3,2,1)
 % plot alt and TAS v time
 plot(case1.Time, case1.Alt, "-k", LineWidth=2)
 ylabel("Alt (m)")
@@ -21,27 +24,59 @@ hold on
 yyaxis right
 plot(case1.Time, case1.TAS, "-b", LineWidth=2)
 ylabel("TAS (m/s)")
-
+set(gca, "FontSize", 13)
+ax = gca;
+ax.YColor = 'b';
 
 % plot fburn
-subplot(6,1,2)
+subplot(3,2,2)
 hold on
-plot(case1.Time, case1.fburn, LineWidth=2)
-plot(case2.Time, case2.fburn, LineWidth=2)
-plot(case3.Time, case3.fburn, LineWidth=2)
-plot(case4.Time, case4.fburn, LineWidth=2)
-% add percent diff of fuel
-
+plot(case1.Time, case1.diff, LineWidth=1.5)
+plot(case2.Time, case2.diff, LineWidth=1.5)
+plot(case3.Time, case3.diff, LineWidth=1.5)
+ylabel("Fuel Burn % Difference wrt Case 4")
+legend("Case 1", "Case 2", "Case 3")
+set(gca, "FontSize", 13)
 % plot GT PC
-
+subplot(3,2,3)
+hold on
+plot(case1.Time, case1.GTPC, LineWidth=1.5)
+plot(case2.Time, case2.GTPC, LineWidth=1.5)
+plot(case3.Time, case3.GTPC, LineWidth=1.5)
+plot(case3.Time, case4.GTPC, LineWidth=1.5)
+ylabel("Gas Turbine Power Code (%)")
+legend("Case 1", "Case 2", "Case 3", "Case 4")
+set(gca, "FontSize", 13)
 % plot EM PC
-
+subplot(3,2,4)
+hold on
+plot(case1.Time, case1.EMPC, LineWidth=1.5)
+plot(case2.Time, case2.EMPC, LineWidth=1.5)
+plot(case3.Time, case3.EMPC, LineWidth=1.5)
+ylabel("Electric Motor Power Code (%)")
+legend("Case 1", "Case 2", "Case 3")
+set(gca, "FontSize", 13)
 % plot batt E
 
+subplot(3,2,5)
+hold on
+plot(case1.Time, case1.BattE, LineWidth=1.5)
+plot(case2.Time, case2.BattE, LineWidth=1.5)
+plot(case3.Time, case3.BattE, LineWidth=1.5)
+ylabel("Battery Energy Used (kWh)")
+legend("Case 1", "Case 2", "Case 3")
+set(gca, "FontSize", 13)
 % plot SOC
+subplot(3,2,6)
+hold on
+plot(case1.Time, case1.SOC, LineWidth=1.5)
+plot(case2.Time, case2.SOC, LineWidth=1.5)
+plot(case3.Time, case3.SOC, LineWidth=1.5)
+ylabel("SOC (%)")
+legend("Case 1", "Case 2", "Case 3")
 
 set(gca, "FontSize", 13)
-
+%%
 function [result] = AnalyzeAC(air, seq)
 AC = fieldnames(air);
 n = length(AC);
@@ -69,10 +104,8 @@ for i = 1:n
     
     % number of points in the main mission
     npt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
-
-    if i > 1
-        ground = seq.GROUND_TIME(i-1);
-    end
+        
+    ground = seq.GROUND_TIME(i);
     
     % get desired values
     t = Aircraft.Mission.History.SI.Performance.Time(1:npt)./60;
@@ -90,11 +123,11 @@ for i = 1:n
     % only hea catergories
     if Aircraft.Settings.DetailedBatt == 1
         EM =  Aircraft.Mission.History.SI.Power.PC(1:npt, 3);
-         E = Aircraft.Mission.History.SI.Energy.E_ES(1:npt, 2);
+         E = Aircraft.Mission.History.SI.Energy.E_ES(1:npt, 2)./3600./100;
          if i >1
          E = E + battE(end);
          end
-         c =  Aircraft.Mission.History.SI.Power.SOC(1:npt);
+         c =  Aircraft.Mission.History.SI.Power.SOC(1:npt,2);
     else
         EM =[];
         E = [];

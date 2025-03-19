@@ -25,7 +25,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 SegsID = Aircraft.Mission.Profile.SegsID;
 
 % find the power management strategy for the segment
-PowerStrat = Aircraft.Mission.PowerStrategyIndex(SegsID)
+PowerStrategyIndex = Aircraft.Mission.Profile.PowerStrategyIndex(SegsID);
 
 % get the beginning and ending control point indices
 SegBeg = Aircraft.Mission.Profile.SegBeg(SegsID);
@@ -69,7 +69,7 @@ Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
 % get the operational matrices
-OperUps = Aircraft.Specs.Propulsion.PowerManagement(PowerStrat).Ups;
+OperUps = Aircraft.Specs.Propulsion.PowerManagement(PowerStrategyIndex).Ups;
 
 % % get the upstream power splits
 % LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
@@ -163,15 +163,15 @@ idx = (nsrc + 1) : ncomp;
 % loop through points to get the power available
 for ipnt = 1:npnt
     
-    % % evaluate the function handles for the current splits
-    % Lambda = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
+    % evaluate the function handles for the current splits
+    Lambda = PropulsionPkg.EvalSplit(OperUps, 0);
 
     % get the initial power available
     Pav(ipnt, :) = [zeros(1, nsrc), PowerAv(ipnt, :), zeros(1, nsnk)];
     
-    % % propagate the power upstream
-    % Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
-    Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), OperUps(idx, idx), EtaUps(idx, idx), +1)';
+    % propagate the power upstream
+    Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
+    %Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), OperUps(idx, idx), EtaUps(idx, idx), +1)';
                
 end
 

@@ -15,51 +15,72 @@ case1.diff = (case1.fburn-case4.fburn)./case4.fburn.*100;
 case2.diff = (case2.fburn-case4.fburn)./case4.fburn.*100;
 case3.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
 %%
-font = 10;
+font = 12;
 figure;
-subplot(3,2,1)
-% plot alt and TAS v time
-plot(case1.Time, case1.Alt, "-k", LineWidth=2)
-ylabel("Alt (m)")
-hold on
-yyaxis right
-plot(case1.Time, case1.TAS, "-b", LineWidth=2)
-ylabel("TAS (m/s)")
-set(gca, "FontSize", font)
-ax = gca;
-ax.YColor = 'b';
 
+% Create the first subplot
+ax1 = subplot(4, 1, 1);
+% Plot alt and TAS v time
+plot(case2.Time, case2.Alt, "-k", 'LineWidth', 2);
+ylabel("Alt (m)");
+hold on;
+yyaxis right;
+plot(case2.Time, case2.TAS, "-b", 'LineWidth', 2);
+ylabel("TAS (m/s)");
+ax1.YColor = 'k'; 
+yyaxis right; 
+ax1.YColor = 'b'; 
+set(ax1, "FontSize", font);
+
+% Create the second subplot
+ax2 = subplot(4, 1, 2);
+hold on;
+plot(case1.Time, case1.GTPC, 'LineWidth', 1.5);
+plot(case2.Time, case2.GTPC, 'LineWidth', 1.5);
+plot(case3.Time, case3.GTPC, 'LineWidth', 1.5);
+plot(case4.Time, case4.GTPC, 'LineWidth', 1.5); 
+ylabel("GT PC (%)");
+legend("Case 1", "Case 2", "Case 3", "Case 4", 'FontSize', font);
+set(ax2, "FontSize", font);
+
+% Create the third subplot
+ax3 = subplot(4, 1, 3);
+hold on;
+plot(case1.Time, case1.EMPC, 'LineWidth', 1.5);
+plot(case2.Time, case2.EMPC, 'LineWidth', 1.5);
+plot(case3.Time, case3.EMPC, 'LineWidth', 1.5);
+ylabel("EM PC (%)");
+legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
+set(ax3, "FontSize", font);
+
+% Create the fourth subplot
+ax4 = subplot(4, 1, 4);
+hold on;
+plot(case1.Time, case1.SOC, 'LineWidth', 1.5);
+plot(case2.Time, case2.SOC, 'LineWidth', 1.5);
+plot(case3.Time, case3.SOC, 'LineWidth', 1.5);
+ylabel("SOC (%)");
+xlabel("Time (hr)");
+legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
+set(ax4, "FontSize", font);
+
+% Link the x-axes of all subplots explicitly
+linkaxes([ax1, ax2, ax3, ax4], 'x');
+
+%%
+%{
 % plot fburn
 subplot(3,2,2)
-plot(case1.Time, case1.fburn, LineWidth=1.5)
+plot(case1.Time, case1.diff, LineWidth=1.5)
 hold on
-plot(case2.Time, case2.fburn, LineWidth=1.5)
-plot(case3.Time, case3.fburn, LineWidth=1.5)
+plot(case2.Time, case2.diff, LineWidth=1.5)
+plot(case3.Time, case3.diff, LineWidth=1.5)
 yline(0,"--k")
 ylabel("Fuel Burn % Difference wrt Case 4")
 legend("Case 1", "Case 2", "Case 3")
 set(gca, "FontSize", font)
-% plot GT PC
-subplot(3,2,3)
-hold on
-plot(case1.Time, case1.GTPC, LineWidth=1.5)
-plot(case2.Time, case2.GTPC, LineWidth=1.5)
-plot(case3.Time, case3.GTPC, LineWidth=1.5)
-plot(case3.Time, case4.GTPC, LineWidth=1.5)
-ylabel("Gas Turbine Power Code (%)")
-legend("Case 1", "Case 2", "Case 3", "Case 4")
-set(gca, "FontSize", font)
-% plot EM PC
-subplot(3,2,4)
-hold on
-plot(case1.Time, case1.EMPC, LineWidth=1.5)
-plot(case2.Time, case2.EMPC, LineWidth=1.5)
-plot(case3.Time, case3.EMPC, LineWidth=1.5)
-ylabel("Electric Motor Power Code (%)")
-legend("Case 1", "Case 2", "Case 3")
-set(gca, "FontSize", font)
-% plot batt E
 
+% plot batt E
 subplot(3,2,5)
 hold on
 plot(case1.Time, case1.BattE, LineWidth=1.5)
@@ -68,16 +89,7 @@ plot(case3.Time, case3.BattE, LineWidth=1.5)
 ylabel("Battery Energy Used (kWh)")
 legend("Case 1", "Case 2", "Case 3")
 set(gca, "FontSize", font)
-% plot SOC
-subplot(3,2,6)
-hold on
-plot(case1.Time, case1.SOC, LineWidth=1.5)
-plot(case2.Time, case2.SOC, LineWidth=1.5)
-plot(case3.Time, case3.SOC, LineWidth=1.5)
-ylabel("SOC (%)")
-legend("Case 1", "Case 2", "Case 3")
-
-set(gca, "FontSize", font)
+%}
 %%
 function [result] = AnalyzeAC(air, seq)
 AC = fieldnames(air);
@@ -126,7 +138,7 @@ for i = 1:n
     % only hea catergories
     if Aircraft.Settings.DetailedBatt == 1
         EM =  Aircraft.Mission.History.SI.Power.PC(1:npt, 3);
-         E = Aircraft.Mission.History.SI.Energy.E_ES(1:npt, 2)./3600./100;
+         E = Aircraft.Mission.History.SI.Energy.E_ES(1:npt, 2)./3600./1000;
          if i >1
          E = E + battE(end);
          end

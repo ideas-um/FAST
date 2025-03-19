@@ -54,9 +54,20 @@ Aircraft.Settings.ConSOC = 0;
 % no mission history table
 Aircraft.Settings.Table = 0;
 
+% 
+Aircraft.Settings.Analysis.PowerOpt = 1;
+
 % climb beg and end ctrl pt indeces
-n1= Aircraft.Mission.Profile.SegBeg(2);
-n2= Aircraft.Mission.Profile.SegEnd(4)-1;
+% get the number of points in each segment
+TkoPts = Aircraft.Settings.TkoPoints;
+ClbPts = Aircraft.Settings.ClbPoints;
+CrsPts = Aircraft.Settings.CrsPoints;
+DesPts = Aircraft.Settings.DesPoints;
+
+% number of points in the main mission
+npt = TkoPts + 3 * (ClbPts - 1) + CrsPts - 1 + 3 * (DesPts - 1);
+n1= TkoPts;
+n2= TkoPts + 3 * (ClbPts - 1)-1;
 
 % get starting point
 PC0 = Aircraft.Specs.Power.PC(n1:n2, [1,3]);
@@ -102,9 +113,6 @@ disp(PCbest)
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft)
-    % get climb beg and end indeces
-    n1= Aircraft.Mission.Profile.SegBeg(2);
-    n2= Aircraft.Mission.Profile.SegEnd(4)-1;
     % input updated PC
     Aircraft.Specs.Power.PC(n1:n2, [1,3]) = PC;
     Aircraft.Specs.Power.PC(n1:n2, [2,4]) = PC;
@@ -114,12 +122,15 @@ function [fburn, SOC, dh_dt] = FlyAircraft(PC, Aircraft)
         Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
         
         % fuel required for mission
-        fburn = Aircraft.Mission.History.SI.Weight.Fburn(64);
+        fburn = Aircraft.Mission.History.SI.Weight.Fburn(npt);
+        % SOC for mission
+        SOC = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
     catch 
         fburn = 1e10;
+        % SOC for mission
+        SOC = -1*Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
     end
-    % SOC for mission
-    SOC = Aircraft.Mission.History.SI.Power.SOC(n1:n2+1,2);
+    
 
     % check if enough power for desired climb profile
     % extract climb TAS

@@ -121,7 +121,7 @@ Aircraft.Specs.Weight.Batt = 0;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "PHE";
+Aircraft.Specs.Propulsion.Arch.Type = "C";
 
 % get the engine
 Aircraft.Specs.Propulsion.Engine = EngineModelPkg.EngineSpecsPkg.CF34_8E5;
@@ -157,12 +157,12 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 
 % power-weight ratio for the electric motor and generator (kW/kg)
 % leave as NaN if an electric motor or generator isn't in the powertrain
-Aircraft.Specs.Power.P_W.EM = 10;
+Aircraft.Specs.Power.P_W.EM = NaN;%10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = .3;
-Aircraft.Specs.Power.PC.EM.Alt = [0, 36000];
+Aircraft.Specs.Power.PC.EM.Split = 0;%.3;
+Aircraft.Specs.Power.PC.EM.Alt = 0;%[0, 36000];
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = .10; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = 0;%.10; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0;
-Aircraft.Specs.Power.LamTSPS.SLS = 0.10; %0.09;
+Aircraft.Specs.Power.LamTSPS.SLS =0;% 0.10; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -192,10 +192,10 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 
 % battery cells in series and parallel
 % (commented values used for electrified aircraft)
-Aircraft.Specs.Battery.ParCells = 100;%100;
-Aircraft.Specs.Battery.SerCells = 62;% 62;
-Aircraft.Specs.Power.Battery.ParCells = 100;%100;
-Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
+%Aircraft.Specs.Battery.ParCells = NaN;%100;%100;
+%Aircraft.Specs.Battery.SerCells = NaN;%62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = NaN;%100;%100;
+Aircraft.Specs.Power.Battery.SerCells = NaN;%62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
 Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
@@ -275,6 +275,9 @@ Aircraft.Settings.Analysis.MaxIter = 30;
 %     -1 for off-design mode (aircraft performance           )
 Aircraft.Settings.Analysis.Type = +1;
 
+% power optimaztion
+Aircraft.Settings.Analysis.PowerOpt = 0;
+
 % constrain SOC from 20% to 100% for off design 
 Aircraft.Settings.ConSOC = 1; 
 
@@ -286,7 +289,7 @@ Aircraft.Settings.Plotting = 0;
 % make a tble of mission history
 %     1 for make table
 %     0 for no table
-Aircraft.Settings.Table = 1;
+Aircraft.Settings.Table = 0;
 
 % sizing comamand window output
 %   1 output weights

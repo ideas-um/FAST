@@ -320,7 +320,7 @@ while (iter < MaxIter)
         irow = find(dh_dt > dh_dtMax);
         
         % adjust points that exceed the maximum rate of climb
-        if (any(irow) && Aircraft.Settings.Analysis.Type > 0)
+        if (any(irow) && Aircraft.Settings.Analysis.PowerOpt ==0)
             
             % limit the rate of climb
             dh_dt(irow) = dh_dtMax;

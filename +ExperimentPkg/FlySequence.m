@@ -152,14 +152,14 @@ for iflight = 1:nflight
     %           mission          %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- %   Aircraft.Specs.Power.PC(10:36, [3,4]) = 0.05;
+ Aircraft.Specs.Power.PC(10:36, [3,4]) = 0.05;
 %Aircraft.Mission.History.SI.Power.PC(10:36, [3,4]) = 0.05;
     
 
     % fly mission
     %try
-        Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-        %Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
+        %Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+        Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
          %save fuel burn
         fburn = fburn + Aircraft.Mission.History.SI.Weight.Fburn(npt);
     %catch
@@ -194,8 +194,8 @@ for iflight =1:nflight
                                 Sequence.GROUND_TIME(iflight), results] ;
 end
 
-save("Conv.mat", "ACs");
-save("convtab.mat", "SeqTable");
+save("Opt_singlemiss.mat", "ACs");
+save("single.mat", "SeqTable");
 
 %% ANALYZE AIRCRAFT %%
 function Results = AnaylzeMiss(Aircraft)

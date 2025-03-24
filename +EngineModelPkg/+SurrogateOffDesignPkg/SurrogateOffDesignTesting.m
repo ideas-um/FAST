@@ -167,8 +167,10 @@ ErrorMean3 = (AvgCff3 - KnownCff3)./KnownCff3.*100;
 
 figure(2)
 
+FS = 16
+
 subplot(1,3,1)
-scatter(KnownCff1,ErrorMean1,'c')
+scatter(KnownCff1,ErrorMean1,'r')
 hold on
 scatter(KnownCff1,ErrorReg1,'k')
 grid on
@@ -179,9 +181,11 @@ legend('C_{ff,123} = Average from Data','C_{ff,123} = Regression')
 ylabel('Error [%]')
 xlabel('True C_{ff,1}')
 ylim([-100 450])
+ax = gca;
+ax.FontSize = FS;
 
 subplot(1,3,2)
-scatter(KnownCff2,ErrorMean2,'c')
+scatter(KnownCff2,ErrorMean2,'r')
 hold on
 scatter(KnownCff2,ErrorReg2,'k')
 grid on
@@ -189,9 +193,11 @@ hold on
 yline(0)
 xlabel('True C_{ff,2}')
 ylim([-100 450])
+ax = gca;
+ax.FontSize = FS;
 
 subplot(1,3,3)
-scatter(KnownCff3,ErrorMean3,'c')
+scatter(KnownCff3,ErrorMean3,'r')
 hold on
 scatter(KnownCff3,ErrorReg3,'k')
 grid on
@@ -199,6 +205,9 @@ hold on
 yline(0)
 xlabel('True C_{ff,3}')
 ylim([-100 450])
+
+ax = gca;
+ax.FontSize = FS;
 
 
 

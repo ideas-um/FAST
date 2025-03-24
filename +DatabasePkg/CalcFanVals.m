@@ -282,6 +282,71 @@ switch unitsflag
             Plane.Settings.DataTypeValidation = "Training";
         end
 
+        %% Aircraft design group
+
+        b = UnitConversionPkg.ConvLength(Plane.Specs.Aero.Span,'m','ft');
+        th = UnitConversionPkg.ConvLength(Plane.Specs.Aero.Height,'m','ft');
+
+
+        ADG = NaN;
+
+
+        if b < 262 && th < 80
+            ADG = "VI";
+            bpercent = b/262;
+            thpercent = th/80;
+        end
+
+        if b < 214 && th < 66
+            ADG = "V";
+            bpercent = b/214;
+            thpercent = th/66;
+        end
+        if b < 171 && th < 60
+            ADG = "IV";
+            bpercent = b/171;
+            thpercent = th/60;
+        end
+        if b < 118 && th < 45
+            ADG = "III";
+            bpercent = b/118;
+            thpercent = th/45;
+        end
+        if b < 79 && th < 30
+            ADG = "II";
+            bpercent = b/79;
+            thpercent = th/30;
+        end
+        if b < 49 && th < 20
+            ADG = "I";
+            bpercent = b/49;
+            thpercent = th/20;
+        end
+
+        if isnan(b) || isnan(th)
+            bpercent = NaN;
+            thpercent = NaN;
+        end
+
+
+        if bpercent > thpercent
+            ADGPercent = bpercent;
+            ADGLimitor = "Wingspan";
+        elseif bpercent == thpercent
+            ADGPercent = bpercent;
+            ADGLimitor = "Both";
+        elseif bpercent < thpercent
+            ADGPercent = thpercent;
+            ADGLimitor = "TailHeight";
+        else
+            ADGPercent = NaN;
+            ADGLimitor = NaN;
+        end
+
+        Plane.Specs.TLAR.ADG = ADG;
+        Plane.Specs.TLAR.ADGPercent = ADGPercent;
+        Plane.Specs.TLAR.ADGLimitor = ADGLimitor;
+
 
     case "Units"
         Plane.Specs.Performance.Range = "m";
@@ -310,7 +375,12 @@ switch unitsflag
         Plane.Specs.Power.SpecEnergy.Fuel = "kWh/kg";
 
 
-        Plane.Specs.TLAR.Class = "flag";
+
+        Plane.Specs.TLAR.Class = "flag";        
+        Plane.Specs.TLAR.ADG = "Category I through VI";
+        Plane.Specs.TLAR.ADGPercent = "Percent";
+        Plane.Specs.TLAR.ADGLimitor = "Type";
+
         Plane.Specs.Propulsion.Arch.Type = "flag";
         Plane.Specs.Propulsion.Eta.Prop = "efficiency";
         Plane.Specs.Performance.Alts.Tko = "m";

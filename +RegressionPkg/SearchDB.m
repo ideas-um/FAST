@@ -60,7 +60,7 @@ function [NewStruct,OutputCell] = SearchDB(MainStruct,SubstructList,DesVel)
 %% Initialization
 StructFields = fieldnames(MainStruct);
 NewIncluded = cell(1,2);
-Included = {};
+Included = cell(0,2);
 
 %% Create the list of values
 % first switch case parses inputs, decides if we need to match a value or
@@ -109,7 +109,7 @@ try
                 case 1 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
                         CurVal = MainStruct.(StructFields{ii}).(SubstructList(1));
-                        if CurVal == DesVel
+                        if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
                             Included = [Included; NewIncluded];
@@ -118,7 +118,7 @@ try
                 case 2 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
                         CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2));
-                        if CurVal == DesVel
+                        if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
                             Included = [Included; NewIncluded];
@@ -127,7 +127,7 @@ try
                 case 3 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
                         CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3));
-                        if CurVal == DesVel
+                        if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
                             Included = [Included; NewIncluded];
@@ -136,7 +136,7 @@ try
                 case 4 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
                         CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3)).(SubstructList(4));
-                        if CurVal == DesVel
+                        if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
                             Included = [Included; NewIncluded];
@@ -162,6 +162,8 @@ catch
 end
 
 %% Create new output structure
+NewStruct = struct();
+
 for ii = 1:size(OutputCell,1)
     NewStruct.(Included{ii}) = MainStruct.(Included{ii});
 end

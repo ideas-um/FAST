@@ -21,11 +21,11 @@ figure;
 % Create the first subplot
 ax1 = subplot(4, 1, 1);
 % Plot alt and TAS v time
-plot(case2.Time, case2.Alt, "-k", 'LineWidth', 2);
+plot(case1.Time, case1.Alt, "-k", 'LineWidth', 2);
 ylabel("Alt (m)");
 hold on;
 yyaxis right;
-plot(case2.Time, case2.TAS, "-b", 'LineWidth', 2);
+plot(case1.Time, case1.TAS, "-b", 'LineWidth', 2);
 ylabel("TAS (m/s)");
 ax1.YColor = 'k'; 
 yyaxis right; 

@@ -121,7 +121,7 @@ Aircraft.Specs.Weight.Batt = 0;
 %     (5) "PHE" = parallel hybrid electric
 %     (6) "SHE" = series hybrid electric
 %     (7) "O"   = other architecture (specified by the user)
-Aircraft.Specs.Propulsion.Arch.Type = "C";
+Aircraft.Specs.Propulsion.Arch.Type = "PHE";
 
 % get the engine
 Aircraft.Specs.Propulsion.Engine = EngineModelPkg.EngineSpecsPkg.CF34_8E5;
@@ -146,7 +146,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;
@@ -157,12 +157,12 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 
 % power-weight ratio for the electric motor and generator (kW/kg)
 % leave as NaN if an electric motor or generator isn't in the powertrain
-Aircraft.Specs.Power.P_W.EM = NaN;%10;
+Aircraft.Specs.Power.P_W.EM = 10;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % EM Power code (only works for PHE right now)
-Aircraft.Specs.Power.PC.EM.Split = 0;%.3;
-Aircraft.Specs.Power.PC.EM.Alt = 0;%[0, 36000];
+Aircraft.Specs.Power.PC.EM.Split = .3;
+Aircraft.Specs.Power.PC.EM.Alt = [0, 36000];
 
 % thrust splits (thrust / total thrust)
 Aircraft.Specs.Power.LamTS.Split = 0;
@@ -170,9 +170,9 @@ Aircraft.Specs.Power.LamTS.Alt = 0;
 Aircraft.Specs.Power.LamTS.SLS = 0;
 
 % power splits between power/thrust sources (electric power / total power)
-Aircraft.Specs.Power.LamTSPS.Split = 0;%.10; %{.09, .01};
+Aircraft.Specs.Power.LamTSPS.Split = .10; %{.09, .01};
 Aircraft.Specs.Power.LamTSPS.Alt = 0;
-Aircraft.Specs.Power.LamTSPS.SLS =0;% 0.10; %0.09;
+Aircraft.Specs.Power.LamTSPS.SLS = 0.10; %0.09;
 
 % power splits between power/power sources (electric power / total power)
 Aircraft.Specs.Power.LamPSPS.Split = 0;
@@ -194,8 +194,8 @@ Aircraft.Specs.Propulsion.Engine.HEcoeff = 1 +  Aircraft.Specs.Power.LamTSPS.SLS
 % (commented values used for electrified aircraft)
 %Aircraft.Specs.Battery.ParCells = NaN;%100;%100;
 %Aircraft.Specs.Battery.SerCells = NaN;%62;% 62;
-Aircraft.Specs.Power.Battery.ParCells = NaN;%100;%100;
-Aircraft.Specs.Power.Battery.SerCells = NaN;%62;% 62;
+Aircraft.Specs.Power.Battery.ParCells = 100;%100;
+Aircraft.Specs.Power.Battery.SerCells = 62;% 62;
 
 % initial battery SOC (commented value used for electrified aircraft)
 Aircraft.Specs.Power.Battery.BegSOC = 100;%100;
@@ -240,7 +240,7 @@ if Aircraft.Settings.Degradation == 1
     Aircraft.Specs.Battery.ChrgTime = 60*60; % in sec
     
     % charging rate (can be an array or scalar, or a function with output of a scalar or array)
-    Aircraft.Specs.Battery.Cpower = -150*1000; % charging means negative rate in W
+    Aircraft.Specs.Battery.Cpower = -500*1000; % charging means negative rate in W
     
     % battery Full Equivalent Cycles (FECs)
     Aircraft.Specs.Battery.FEC = 0; % start with 0

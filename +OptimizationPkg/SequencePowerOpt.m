@@ -88,6 +88,8 @@ Aircraft.Settings.ConSOC = 0;
 % no mission history table
 Aircraft.Settings.Table = 0;
 
+Aircraft.Settings.Analysis.PowerOpt = 1;
+
 
 % climb beg and end ctrl pt indeces
 % get the number of points in each segment
@@ -119,12 +121,12 @@ g = 9.81;
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-%PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft, Sequence), options);
+PCbest = fmincon(@(PC0) ObjFunc(PC0, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC0) Cons(PC0, Aircraft, Sequence), options);
 t = toc/60
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
-load("SeqOptAC.mat")
+
 for iflight =1:nflight
         nameAC = sprintf("Aircraft%d", iflight);
         Aircraft = OptimizedAircraft.(nameAC);
@@ -135,7 +137,7 @@ for iflight =1:nflight
 end
 
 
-save("SeqOptAC.mat", "OptimizedAircraft");
+save("SeqOptAC_future.mat", "OptimizedAircraft");
 save("opttable.mat", "OptSeqTable");
     
 %% Nested Functions %%

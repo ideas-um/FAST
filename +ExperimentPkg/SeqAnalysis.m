@@ -1,14 +1,19 @@
 load("SeqOptAC.mat")
 Case1 = OptimizedAircraft;
+disp("Case 1")
 case1 = AnalyzeAC(Case1, seq);
-load("Opt_singlemiss.mat")
-Case2 = ACs;
+load("SeqOptAC_future.mat")
+Case2 = OptimizedAircraft;
+disp("Case 2")
 case2 = AnalyzeAC(Case2, seq);
+
 load("NonOptHEA.mat")
 Case3 = ACs;
+disp("Case 3")
 case3 = AnalyzeAC(Case3, seq);
 load("Conv.mat")
 Case4 = ACs;
+disp("Case 4")
 case4 = AnalyzeAC(Case4, seq);
 
 case1.diff = (case1.fburn-case4.fburn)./case4.fburn.*100;
@@ -37,10 +42,11 @@ ax2 = subplot(4, 1, 2);
 hold on;
 plot(case1.Time, case1.GTPC, 'LineWidth', 1.5);
 plot(case2.Time, case2.GTPC, 'LineWidth', 1.5);
-plot(case3.Time, case3.GTPC, 'LineWidth', 1.5);
-plot(case4.Time, case4.GTPC, 'LineWidth', 1.5); 
+%plot(case3.Time, case3.GTPC, 'LineWidth', 1.5);
+%plot(case4.Time, case4.GTPC, 'LineWidth', 1.5); 
 ylabel("GT PC (%)");
-legend("Case 1", "Case 2", "Case 3", "Case 4", 'FontSize', font);
+legend("Current HEA", "Advanced HEA", 'FontSize', font);
+%legend("Case 1", "Case 2", "Case 3", "Case 4", 'FontSize', font);
 set(ax2, "FontSize", font);
 
 % Create the third subplot
@@ -48,9 +54,9 @@ ax3 = subplot(4, 1, 3);
 hold on;
 plot(case1.Time, case1.EMPC, 'LineWidth', 1.5);
 plot(case2.Time, case2.EMPC, 'LineWidth', 1.5);
-plot(case3.Time, case3.EMPC, 'LineWidth', 1.5);
+%plot(case3.Time, case3.EMPC, 'LineWidth', 1.5);
 ylabel("EM PC (%)");
-legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
+%legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
 set(ax3, "FontSize", font);
 
 % Create the fourth subplot
@@ -58,10 +64,10 @@ ax4 = subplot(4, 1, 4);
 hold on;
 plot(case1.Time, case1.SOC, 'LineWidth', 1.5);
 plot(case2.Time, case2.SOC, 'LineWidth', 1.5);
-plot(case3.Time, case3.SOC, 'LineWidth', 1.5);
+%plot(case3.Time, case3.SOC, 'LineWidth', 1.5);
 ylabel("SOC (%)");
 xlabel("Time (hr)");
-legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
+%legend("Case 1", "Case 2", "Case 3", 'FontSize', font);
 set(ax4, "FontSize", font);
 
 % Link the x-axes of all subplots explicitly
@@ -123,6 +129,8 @@ for i = 1:n
     
     % get desired values
     t = Aircraft.Mission.History.SI.Performance.Time(1:npt)./60;
+    disp(t(37))
+    disp(t(73))
     fuel = Aircraft.Mission.History.SI.Weight.Fburn(1:npt);
     if i > 1
     t = t +time(end)+ground;

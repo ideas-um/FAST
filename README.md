@@ -1,6 +1,6 @@
 # README
 
-Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Environmentally-friendly Aircraft Systems Laboratory
+Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Efficient Aerospace Systems Laboratory
 
 Future Aircraft Sizing Tool (FAST), a MATLAB-based aircraft sizing toolbox for electrified aircraft concepts with any propulsion architecture.
 

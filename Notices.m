@@ -1,7 +1,7 @@
 function [] = Notices()
 %
 % Copyright 2024 The Regents of the University of Michigan,
-% The Integrated Design of Environmentally-friendly Aircraft Systems
+% The Integrated Design of Efficient Aerospace Systems
 % Laboratory
 %
 % Written by the IDEAS Lab at the University of Michigan.

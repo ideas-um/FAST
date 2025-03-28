@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 sep 2024
+% last updated: 19 dec 2024
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -92,6 +92,13 @@ OperPSES = Aircraft.Specs.Propulsion.Oper.PSES;
 % remember the SLS thrust available in each power source
 ThrustAv = repmat(Aircraft.Specs.Propulsion.SLSThrust, npnt, 1);
  PowerAv = repmat(Aircraft.Specs.Propulsion.SLSPower , npnt, 1);
+
+% get the series connections
+ips = find(sum(PSPS - eye(nps), 2) > 0);
+
+% set the power/thrust available to 0 (depends on downstream connection)
+ThrustAv(:, ips) = 0;
+ PowerAv(:, ips) = 0;
  
 % loop through all power sources
 for ips = 1:nps
@@ -234,6 +241,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % allocate memory for the available thrust source power
+PowerPS = zeros(npnt, nps);
 PowerTS = zeros(npnt, nts);
 
 % loop through points to get power outputs by thrust/power sources
@@ -253,14 +261,15 @@ for ipnt = 1:npnt
     DrivingPower = PactES(ipnt, :) * (UpPSES .* EtaPSES)';
     
     % propagate the power available from the driving PS to the driven PS
-    DrivenPower  = DrivingPower    * (UpPSPS .* EtaPSPS)';
+    PowerPS(ipnt, :)  = DrivingPower    * (UpPSPS .* EtaPSPS)';
     
     % propagate the power from driven PS to the TS
-    PowerTS(ipnt, :) = DrivenPower * (UpTSPS .* EtaTSPS)';
+    PowerTS(ipnt, :) = PowerPS(ipnt, :) * (UpTSPS .* EtaTSPS)';
            
 end
 
 % convert the power available to thrust available
+ThrustPS = PowerPS ./ TAS;
 ThrustTS = PowerTS ./ TAS;
 
 % consolidate power from thrust sources into a scalar value
@@ -271,8 +280,8 @@ TVPower = PowerTS * ones(nts, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % remember the thrust and power available for the power sources
-Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :) = PowerAv ;
-Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = ThrustAv;
+Aircraft.Mission.History.SI.Power.Pav_PS(SegBeg:SegEnd, :) =  PowerPS;
+Aircraft.Mission.History.SI.Power.Tav_PS(SegBeg:SegEnd, :) = ThrustPS;
 
 % remember the thrust and power available for the power sources
 Aircraft.Mission.History.SI.Power.Pav_TS(SegBeg:SegEnd, :) = PowerTS ;

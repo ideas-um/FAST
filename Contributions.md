@@ -1,6 +1,6 @@
 # **How to Contribute**
 
-Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Environmentally-friendly Aircraft Systems Laboratory
+Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Efficient Aerospace Systems Laboratory
 
 How to Contribute to FAST
 

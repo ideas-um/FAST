@@ -1,7 +1,7 @@
 function [] = EULA()
 %
 % Copyright 2024 The Regents of the University of Michigan,
-% The Integrated Design of Environmentally-friendly Aircraft Systems
+% The Integrated Design of Efficient Aerospace Systems
 % Laboratory
 % 
 % Licensed under the Apache License, Version 2.0 (the "License");

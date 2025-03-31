@@ -1,7 +1,7 @@
 function [] = README()
 %
 % Copyright 2024 The Regents of the University of Michigan,
-% The Integrated Design of Environmentally-friendly Aircraft Systems
+% The Integrated Design of Efficient Aerospace Systems
 % Laboratory
 % 
 % Future Aircraft Sizing Tool (FAST), a MATLAB-based aircraft sizing
@@ -341,7 +341,35 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (V) Notes:
+% (V) Reporting Bugs/Issues:
+%
+%     To report any bugs/issues, please use the GitHub Issues feature on
+%     the repository: https://github.com/ideas-um/FAST/issues. Upon
+%     reaching the website, use the "New issue" button to create the issue.
+%     Please provide a written description of the issue encountered along
+%     with any additional scripts/files being ran in FAST. It is important
+%     that any additional scripts/files are uploaded so the FAST developers
+%     and maintainers can replicate the issue encountered.
+%
+%     Additionally, you are welcome to fix any bugs encountered on your
+%     own. After the fix has been made, please submit a pull request and a
+%     FAST developer/maintainer will review your request.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (VI) Additional User Support:
+%
+%     Should additional support be needed (beyond reporting bugs or issues
+%     with the software), please email the point of contact at the
+%     beginning of this README file.
+%
+%
+% -------------------------------------------------------------------------
+%
+%
+% (VII) Notes:
 %
 %     (1) In the main sizing/performance analysis function, "EAPAnalysis",
 %         information about the weight of each component being sized is
@@ -370,7 +398,7 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (VI) Disclaimers:
+% (VIII) Disclaimers:
 %
 %     (1) When defining an aircraft in the "AircraftSpecsPkg" folder, many
 %         of the values will remain as NaN. For any values that remain as
@@ -422,7 +450,7 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (VII) Testing FAST:
+% (IX) Testing FAST:
 %
 % Multiple unit tests are shipped with FAST to ensure that the code is
 % operating correctly. In order to test FAST, run the following command:
@@ -437,7 +465,7 @@ function [] = README()
 % -------------------------------------------------------------------------
 %
 %
-% (VIII) Acknowledgments:
+% (X) Acknowledgments:
 %
 % This work is sponsored by the NASA Aeronautics Research Mission
 % Directorate and the Electrified Powertrain Flight Demonstration (EPFD)

@@ -1,7 +1,7 @@
 function [] = Contributions()
 %
 % Copyright 2024 The Regents of the University of Michigan,
-% The Integrated Design of Environmentally-friendly Aircraft Systems
+% The Integrated Design of Efficieny Aerospace Systems
 % Laboratory
 % 
 % How to Contribute to FAST

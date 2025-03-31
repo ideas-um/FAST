@@ -4,7 +4,7 @@
 
 # README
 
-Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Environmentally-friendly Aircraft Systems Laboratory
+Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Efficient Aerospace Systems Laboratory
 
 Future Aircraft Sizing Tool (FAST), a MATLAB-based aircraft sizing toolbox for electrified aircraft concepts with any propulsion architecture.
 
@@ -150,14 +150,24 @@ To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with 
 1. The oldest Matlab version that this code has been successfully run on is R2019b.
 2. FAST requires no installation of additional toolboxes or packages. 
 
-# (V) Notes:
+# (V) Reporting Bugs/Issues:
+
+To report any bugs/issues, please use the [GitHub Issues feature on the repository](https://github.com/ideas-um/FAST/issues). Upon reaching the website, use the "New issue" button to create the issue. Please provide a written description of the issue encountered along with any additional scripts/files being ran in FAST. It is important that any additional scripts/files are uploaded so the FAST developers and maintainers can replicate the issue encountered. 
+
+Additionally, you are welcome to fix any bugs encountered on your own. After the fix has been made, please submit a pull request and a FAST developer/maintainer will review your request.
+
+# (VI) Additional User Support:
+
+Should additional support be needed (beyond reporting bugs or issues with the software), please email the point of contact at the beginning of this README file.
+
+# (VII) Notes:
 
 1. In the main sizing/performance analysis function, "EAPAnalysis", information about the weight of each component being sized is printed. To suppress these printouts, comment out any line containing a call to "fprintf". In a later version, the user will be given an option to indicate how much information should be printed to the command window.
 2. For off-design missions, the user can specify "Aircraft.Settings.Analysis.Type" to be either -1 or -2 (for more information about this, refer to "AircraftSpecsPkg.README", Section III.C.70).
 3. To run an off-design mission, a payload must be specified (via "Aircraft.Specs.Weight.Payload") rather than a number of passengers ("Aircraft.Specs.TLAR.MaxPax"). Thus, if the number of passengers changes, change the payload weight instead of the number of passengers. Refer to "AircraftSpecsPkg.README", Section III.C.19 to learn more about this.
 4. Please direct any questions, comments, suggestions, or success stories while using FAST to the listed Point of Contact at the beginning of this file.
 
-# (VI) Disclaimers:
+# (VIII) Disclaimers:
 
 1. When defining an aircraft in the "AircraftSpecsPkg" folder, many of the values will remain as `NaN`. For any values that remain as `NaN`, the regressions mentioned previously will attempt to approximate values for these variables. In some cases, this can lead to an unrealistic design, or one that is not able to converge. If possible, please try to define as much as possible about the aircraft. For any value in the "Aircraft.Settings" sub-structure that is not specified, a default value is internally provided.
 2. Some of the variables in the aircraft specification may have dependencies on each other. In the event that a dependency exists, the user will see a warning in the command window, indicating which variables will be prioritized and used to compute the others. If this warning appears, it does not mean that the design failed to converge or is deprecated. Instead, it means that excess information was supplied before the analysis began.
@@ -165,7 +175,7 @@ To run an aircraft that was created, replace "AC" in "AircraftSpecsPkg.AC" with 
 4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST. Updates to this package are expected to commence in Spring/Summer 2024 and be released by the end of 2024.
 5. Currently, we are in the process of switching to a new off-design engine model. As a result of that, some of the engines provided in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to date. The engines that currently work are the LEAP-1A26, CF34-8E5, and any turboprop engine. If you want to use a turbofan engine not listed above, please refer to "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients that need to be provided to use the fuel flow equation. Additionally, due to this switch, please refrain from using the "+EngineModelPkg\TurbofanOffDesign" function or any functions that it calls within its routine.
 
-# (VII) Testing FAST:
+# (IX) Testing FAST:
 
 Multiple unit tests are shipped with FAST to ensure that the code is operating correctly. In order to test FAST, run the following command:
 
@@ -175,7 +185,7 @@ Multiple unit tests are shipped with FAST to ensure that the code is operating c
 
 If all of the tests run correctly, then FAST is up-to-date and can be ran. If some of the tests fail, please submit an issue on GitHub using the following link: [https://github.com/ideas-um/FAST/issues](https://github.com/ideas-um/FAST/issues).
 
-# (VIII) Acknowledgments:
+# (X) Acknowledgments:
 
 This work is sponsored by the NASA Aeronautics Research Mission Directorate and the Electrified Powertrain Flight Demonstration (EPFD) project, "Development of a Parametrically Driven Electrified Aircraft Design and Optimization Tool". The IDEAS Lab would like to thank Ralph Jansen, Andrew Meade, Karin Bozak, Amy Chicatelli, Noah Listgarten, Dennis Rohn, and Gaudy Bezos-O'Connor from the NASA EPFD project for supporting this work and providing valuable technical input and feedback throughout the duration of the project.
 

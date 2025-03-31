@@ -5,7 +5,3 @@
 % Functions
 % -------------------------------------------------------------------------
 % OEWIteration                 - OEWPkg.OEWIteration is a function.
-%
-% Scripts
-% -------------------------------------------------------------------------
-% OEWTestingAndValidation      - OEWPkg.OEWTestingAndValidation is a script.

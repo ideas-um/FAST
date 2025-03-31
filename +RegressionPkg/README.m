@@ -26,44 +26,42 @@ function [] = README()
 % 
 % -------------------------------------------------------------------------
 %
-% (I) Overview
+% (I)  Overview
 %
-%       The regression package contains functions which perform the
-%       non-parametric Gaussian Process Regression used to predict aircraft
-%       characteristics during the aircraft sizing process. Users may
-%       perform regressions on their own, or search the database for values
-%       they would like. Tutorials are coming to FAST soon, as well as
-%       updated functional documentation for the regression package. If a
-%       user would like to use the regressions outside of the sizing code
-%       before the tutorial is released, they may inspect the existing
-%       function documentation in the following files
+%      The regression package contains functions which perform the
+%      non-parametric Gaussian Process Regression used to predict aircraft
+%      characteristics during the aircraft sizing process. Users may
+%      perform regressions on their own, or search the database for values
+%      they would like. Tutorials are coming to FAST soon, as well as
+%      updated functional documentation for the regression package. If a
+%      user would like to use the regressions outside of the sizing code
+%      before the tutorial is released, they may inspect the existing
+%      function documentation in the following files
 %
-%       RegressionPkg.NLGPR
-%       RegressionPkg.SearchDB
+%      RegressionPkg.NLGPR
+%      RegressionPkg.SearchDB
 %
-%       And look for example regression calls in
-%       DataStructPkg.SpecProcessing. The developers recommend looking at
-%       lines 413 and 414 in that code for a simple one-input one-output
-%       example.
+%      And look for example regression calls in
+%      DataStructPkg.SpecProcessing. The developers recommend looking at
+%      lines 413 and 414 in that code for a simple one-input one-output
+%      example.
 %       
 % 
 % -------------------------------------------------------------------------
-% (II) Warning
+%
+% (II)  Warning
 %
 %       This package contains information that is essential to FAST's
 %       functionality, and should not be altered by end users.
 %
 % -------------------------------------------------------------------------
 %
-% (III) Example Regression and Search function calls
+% (III) Appendix of Database Variables
 %
-%       (a) Regression
-%       (b) Search
+%       This list will contain all of the string arrays that are necessary
+%       to identify database variables. These string arrays are used in the
+%       SearchDB, NLGPR, and BuildData functions.
 %
-% -------------------------------------------------------------------------
-%
-% (IV)  Appendix of Database Variables (TURBOFAN)
-%       
 %       These variables are listed as they should be input into the
 %       Regression function, RegressionPkg.NLGPR for the Input/Output
 %       space. This format is also used for the SearchDB function. To
@@ -135,7 +133,6 @@ function [] = README()
 %           using the aircraft database will be biased towards engines 
 %           which are used more frequently. 
 % 
-% 
 %           ["Specs",   "Propulsion",   "Engine",   "Manufacturer"        ]
 %           ["Specs",   "Propulsion",   "Engine",   "EIS"                 ]
 %           ["Specs",   "Propulsion",   "Engine",   "AlternateDesignation"]
@@ -179,8 +176,6 @@ function [] = README()
 %           ["Specs",   "Propulsion",   "Engine",   "TurbEntryTemp"       ]
 %           ["Specs",   "Propulsion",   "Engine",   "References"          ]
 %           ["Specs",   "Propulsion",   "Engine",   "PresPerStage"        ]
-% 
-% 
 % 
 %       (e) Performance Variables
 % 
@@ -276,8 +271,6 @@ function [] = README()
 %           ["Settings",   "Analysis          "]
 %           ["Settings",   "Plotting          "]
 %           ["Settings",   "DataTypeValidation"]
-% 
-% 
 %
 % -------------------------------------------------------------------------
 %

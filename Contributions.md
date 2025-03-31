@@ -34,7 +34,33 @@ In each function that is shipped with FAST, a specific function header is create
 
 All function headers must be formatted as:
 
->!(MDScreenshots/FunctionHeader.png)
+```matlab
+%
+% [OutArg1, ..., OutArgN] = FunctionName(InArg1, ..., InArgN)
+% written by <Author Name>, <Author Email>
+% last updated: <dd> <mmm> <yyyy>
+%
+% <function description>
+%
+% INPUTS:
+%     InArg1  - <input description>
+%               size/type/units: <size> / <type> / [<units>]
+%
+%     ...
+%
+%     InArgN  - <input description>
+%               size/type/units: <size> / <type> / [<units>]
+%
+% OUTPUTS:
+%     OutArg1 - <output description>
+%               size/type/units: <size> / <type> / [<units>]
+%
+%     ...
+%
+%     OutArgN - <output description>
+%               size/type/units: <size> / <type> / [<units>]
+%
+```
 
 All InArg* and OutArg* names should be replaced with the appropriate input and output variable names, respectively. Additionally, any text enclosed with \<brackets\> needs to be updated by the user.
 
@@ -50,8 +76,17 @@ All input and output arguments must be listed, along with a description of what 
 
 Some examples of input/output descriptions are:
 
->!(MDScreenshots/ExampleIO.png)
+```matlab
+Density  - the density at the current altitude.
+           size/type/units: n-by-1 / double / [kg/m^3]
 
+Lambda   - the power split.
+           size/type/units: 1-by-1 / double / [%]
+
+Aircraft - a data strcture containing information about
+           the aircraft being analyzed.
+           size/type/units: 1-by-1 / struct / []
+```
 
 ### Variable Naming
 
@@ -67,11 +102,21 @@ When writing code in FAST, please note the variable naming conventions that are 
 - When printing any warnings, errors, messages to the command line, etc., please use strings (delineated by " ") not character arrays (delineated by ' ').
 - If multiple equations are on consecutive lines, please try to vertically align them, if appropriate. Two examples are:
 
->!(MDScreenshots/Vertical01.png)
+```matlab
+% compute the power to overcome altitude and acceleration
+dPE_dt = Mass .* g   .* dh_dt;
+dKE_dt = Mass .* TAS .* dV_dt;
+```
 
 or
 
->!(MDScreenshots/Vertical02.png)
+```matlab
+% store the information
+Performance.Dist(SegBeg:SegEnd) = Dist ;
+Performance.EAS( SegBeg:SegEnd) = EAS  ;
+Performance.RC(  SegBeg:SegEnd) = dh_dt;
+Performance.Acc( SegBeg:SegEnd) = dV_dt;
+```
 
 ### Using Sections and Sub-Sections:
 
@@ -79,11 +124,25 @@ Sections and sub-sections are a useful way to divide a function into smaller, mo
 
 Sections are denoted with two percent signs (%%) at the beginning and end of the section name, followed by another line of percent signs matching the length of the line above it. All letters in a section header should be UPPERCASE. An example is:
 
->!(MDScreenshots/Header01.png)
+```matlab
+%% AIRCRAFT ANALYSIS %%
+%%%%%%%%%%%%%%%%%%%%%%%
+```
 
 Also, there should be two blank lines in-between successive sections. For example:
 
->!(MDScreenshots/Header02.png)
+```matlab
+%% AIRCRAFT ANALYSIS %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+<code>
+
+
+%% NEW SECTION STARTS HERE %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<code>
+```
 
 When providing a name for a section, try to make it a short, concise summary of what that code block does or what its purpose is.
 
@@ -93,13 +152,38 @@ Sub-sections are used within sections of code to convey a little more detail abo
 
 Sub-sections are formatted as a "block" of percent signs (%) that is always 30 percent signs (%) wide. An example is:
 
->!(MDScreenshots/SubHeader01.png)
+```matlab
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% <sub-section description   %
+%  goes here>                %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+```
 
 Notice that the sub-section comment can be multiple lines long, if needed (unlike section comments, which are much more concise). Please make sure to include a line of space between the lines of percent signs (as shown in the example above).
 
 If multiple sub-sections are used within a section, then a divider should be included. A divider is a commented line with many dashes (-) that stop after the 60th character in the line has been reached. An example of this is:
 
->!(MDScreenshots/SubHeader02.png)
+```matlab
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% first sub-section          %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<code>
+
+% --------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% second sub-section         %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<code>
+```
 
 Both the sub-section headers and dividers should be indented if they are displayed within "for", "if", etc. blocks. Section headers, however, should not be nested (and therefore, never indented).
 

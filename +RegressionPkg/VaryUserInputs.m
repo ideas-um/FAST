@@ -1,17 +1,18 @@
 function [known, unknown] = VaryUserInputs(Aircraft,FanPropFlag)
+%
 % function [known, unknown] = VaryUserInputs(Aircraft)
 % GPR pre-processing function
 % Written by Maxfield Arnson
 %
 % This low level function is called while preprocessing user inputs before
-% they are sized by main and eapSizing. Based on a user input file, it
+% they are sized by main and EAPAnalysis. Based on a user input file, it
 % decides which fields are independent and dependent variables for the
 % Gaussian process regression.
 %
 %
 % INPUTS:
 % Aircraft = the structure defined by the user after running an
-%   initialization function, such as CustomAircraft()
+%   initialization function, such as ERJ175LR()
 %
 %
 % OUTPUTS:

@@ -2,7 +2,7 @@ function [Aircraft] = Example()
 %
 % [Aircraft] = Example()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 28 mar 2024
+% last updated: 31 may 2024
 %
 % Provide an example aircraft definition for the user. Here, the Embraer 
 % E190-E2 is defined from "Advanced 2030 Single Aisle Aircraft Modeling for
@@ -130,7 +130,7 @@ Aircraft.Specs.Weight.EG = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % ** REQUIRED ** propulsion system architecture, either:
-%     (1) "AC"  = conventional
+%     (1) "C"  = conventional
 %     (2) "E"   = fully electric
 %     (3) "TE"  = fully turboelectric
 %     (4) "PE"  = partially turboelectric
@@ -199,16 +199,16 @@ Aircraft.Specs.Power.Battery.BegSOC   = NaN;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % points in takeoff segment
-Aircraft.Settings.TkoPoints = NaN;
+Aircraft.Settings.TkoPoints = 3;
 
 % points in climb   segment
-Aircraft.Settings.ClbPoints = NaN;
+Aircraft.Settings.ClbPoints = 5;
 
 % points in cruise  segment
-Aircraft.Settings.CrsPoints = NaN;
+Aircraft.Settings.CrsPoints = 5;
 
 % points in descent  segment
-Aircraft.Settings.DesPoints = NaN;
+Aircraft.Settings.DesPoints = 5;
 
 % maximum iterations when sizing OEW
 Aircraft.Settings.OEW.MaxIter = NaN;
@@ -220,9 +220,9 @@ Aircraft.Settings.OEW.Tol = NaN;
 Aircraft.Settings.Analysis.MaxIter = NaN;
 
 % on design/off design analysis
-% 1  = on design
-% -2 = off design
-Aircraft.Settings.Analysis.Type = NaN;
+% +1 = on design
+% -1 = off design
+Aircraft.Settings.Analysis.Type = +1;
 
 % plot results
 % 0 = no plotting

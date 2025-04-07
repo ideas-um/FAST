@@ -2,7 +2,7 @@ function [Aircraft] = EvalCruise(Aircraft)
 %
 % [Aircraft] = EvalCruise(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2025
+% last updated: 07 apr 2025
 %
 % Evaluate a cruise segment by iterating over the aircraft's mass. Climb/
 % descent and accelerations are allowed in the segment.
@@ -288,15 +288,9 @@ while (iter < MaxIter)
     
     % compute the specific excess power (ncases)
     Ps = (Pav - DV) ./ (Mass .* g);
-    
-    % check if any specific power values are < 0
-    irow = find(Ps < 0);
-    
-    % check for specific excess power values
-    if (any(irow))
         
-        % set negative specific power to 0
-        Ps(irow) = 0;
+    % check for specific excess power values
+    if (any(Ps(1:end-1) < 0))
         
         % throw warning
         warning('Excess Power (Ps) < 0 for some segments in cruise.');

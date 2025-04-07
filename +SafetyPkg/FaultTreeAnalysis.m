@@ -1,6 +1,6 @@
-function [Pfail, FailModes] = FindMinimumCutSets(Arch, Components, RemoveSrc)
+function [Pfail, FailModes] = FaultTreeAnalysis(Arch, Components, RemoveSrc)
 %
-% [Pfail, FailModes] = FindMinimumCutSets(Arch, Components, RemoveSrc)
+% [Pfail, FailModes] = FaultTreeAnalysis(Arch, Components, RemoveSrc)
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 13 dec 2024
 %

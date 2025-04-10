@@ -1,12 +1,12 @@
 function [Architecture] = PropulsionArchitecture(B_PSES, B_PSPS, B_TSPS)
 %
-% [Architecture] = PropulsionArchitecture(B_PSES, B_PSPS, B_TSPS)
+% PropulsionArchitecture.m
 % written by Nawa Khailany, nawakhai@umich.edu
-% modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 22 mar 2024
+% last modified by Nawa Khailany, nawakhai@umich.edu
+% last updated: 22 Jun 2024
 %
-% Given a propulsion archictecture, identify the unique thrust/power/energy
-% sources and their connections. Then, use these sources and connections to
+% given a propulsion archictecture, identify the unique thrust/power/energy
+% sources and their connections. then, use these sources and connections to
 % create an architecture that can be plotted graphically.
 %
 % For the matrix inputs below, nes, nps, and nts are the number of energy
@@ -35,7 +35,6 @@ function [Architecture] = PropulsionArchitecture(B_PSES, B_PSPS, B_TSPS)
 %     Architecture - structure with the unique thrust/power/energy
 %                    sources and their connections.
 %                    size/type/units: 1-by-1 / struct / []
-%
 
 
 %% PRE-PROCESSING %%
@@ -85,13 +84,13 @@ for i = 1:NumComponents
                 ToLeave = [ToLeave; j + NumESources];
 
                 % print statement
-                fprintf('%s connects to %s\n',['PowerSource_' , num2str(j)], ...
+                fprintf('%s is powered by %s\n',['PowerSource_' , num2str(j)], ...
                                               ['EnergySource_', num2str(i)])   ;
  
             else
                 
                 % print statement
-                fprintf('%s does not connect to %s\n',['PowerSource_' , num2str(j)], ...
+                fprintf('%s is not powered by %s\n',['PowerSource_' , num2str(j)], ...
                                                       ['EnergySource_', num2str(i)])   ;
                                                   
             end
@@ -123,13 +122,13 @@ for i = 1:NumComponents
                 ToLeave = [ToLeave; j + NumESources];
 
                 % print statement
-                fprintf('%s connects to %s\n',['PowerSource_', num2str(j)]              , ...
+                fprintf('%s is powered by %s\n',['PowerSource_', num2str(j)]              , ...
                                               ['PowerSource_', num2str(i - NumESources)])   ;
 
             else
                 
                 % print statement
-                fprintf('%s does not connect to %s\n',['PowerSource_', num2str(j)]              , ...
+                fprintf('%s is not powered by %s\n',['PowerSource_', num2str(j)]              , ...
                                                       ['PowerSource_', num2str(i - NumESources)])   ;
 
             end
@@ -165,26 +164,52 @@ for i = 1:NumComponents
 
         % loop through all thrust sources
         for j = 1:NumTSources
+
+            if NumTSources == 1
             
-            % check for a connections
-            if B_TSPS(j, i - NumESources - NumPSources)
-                
-                % add the connection (from power source to thrust source)
-                ToEnter = [ToEnter; i - NumPSources];
-
-                % add the connection
-                Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving = [Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving; i];
-
-                % print statement
-                fprintf('%s is driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
-                                               ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
-              
-            else
-                
-                % print statement
-                fprintf('%s is not driven by %s\n',['ThrustSource_',num2str(j)]                           , ...
-                                                   ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
-
+                for k = 1:NumPSources
+                    % check for a connections
+                    if B_TSPS(j, i - NumESources - NumPSources + k - 1)
+                        
+                        % add the connection (from power source to thrust source)
+                        ToEnter = [ToEnter; i - NumPSources + k - 1];
+        
+                        % add the connection
+                        Architecture.Index.(['x', num2str(i - NumPSources + k - 1)]).Leaving = [Architecture.Index.(['x', num2str(i - NumPSources + k - 1)]).Leaving; i];
+        
+                        % print statement
+                        fprintf('%s is powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                                                       ['PowerSource_',num2str(i - NumESources - NumPSources + k - 1)])   ;
+                      
+                    else
+                        
+                        % print statement
+                        fprintf('%s is not powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                                                           ['PowerSource_',num2str(i - NumESources - NumPSources + k - 1)])   ;
+        
+                    end
+                end
+            else 
+                % check for a connections
+                    if B_TSPS(j, i - NumESources - NumPSources)
+                        
+                        % add the connection (from power source to thrust source)
+                        ToEnter = [ToEnter; i - NumPSources];
+        
+                        % add the connection
+                        Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving = [Architecture.Index.(['x', num2str(i - NumPSources)]).Leaving; i];
+        
+                        % print statement
+                        fprintf('%s is powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                                                       ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
+                      
+                    else
+                        
+                        % print statement
+                        fprintf('%s is not powered by %s\n',['ThrustSource_',num2str(j)]                           , ...
+                                                           ['PowerSource_',num2str(i - NumESources - NumPSources)])   ;
+        
+                    end
             end
         end
 

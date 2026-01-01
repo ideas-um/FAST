@@ -122,7 +122,7 @@ elseif EngSpecFun.Visualize == 1
 
     if EngSpecFun.Mach > 0.2
         target = 5*EngSpecFun.DesignThrust;
-    else 
+    else
         target = EngSpecFun.DesignThrust;
     end
 

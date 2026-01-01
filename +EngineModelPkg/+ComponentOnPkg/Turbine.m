@@ -95,9 +95,9 @@ Choked = false;
 for ii = 2:NStages
     Tt3 = CurState.Tt - dT;
     [CurState,Pi(ii),Tau(ii)] = EngineModelPkg.ComponentOnPkg.TurbStg(CurState,Tt3,TurbRPM,Choked,EtaPoly);
-    TurbineObject.States.("Stage_"+ii) = CurState;
+    TurbineObject.States.(['Stage_',num2str(ii)]) = CurState;
 end
-TurbineObject.States.Exit = TurbineObject.States.("Stage_"+NStages);
+TurbineObject.States.Exit = TurbineObject.States.(['Stage_',num2str(NStages)]);
 
 CPR = cumprod(Pi); CPR = CPR(end);
 CTR = cumprod(Tau); CTR = CTR(end);

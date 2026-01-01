@@ -142,7 +142,7 @@ if (any(TrnType > 0 & TrnType ~= 2))
 
         % predict engine weight using the design thrust
         TurbofanEngines = Aircraft.HistData.Eng;
-        IO = {["Thrust_Max"],["DryWeight"]};
+        IO = {{"Thrust_Max"},{"DryWeight"}};
 
         % row vector can have multiple targets for a single input
         target = Tdwn(Eng);
@@ -185,9 +185,9 @@ if (any(TrnType > 0 & TrnType ~= 2))
 
         % Predict Engine Weight using SLS power
         TurbopropEngines = Aircraft.HistData.Eng;
-        [~,WengReg] = RegressionPkg.SearchDB(TurbopropEngines,["DryWeight"]);
+        [~,WengReg] = RegressionPkg.SearchDB(TurbopropEngines,{"DryWeight"});
         WengReg = cell2mat(WengReg(:,2));
-        [~,PowReg] = RegressionPkg.SearchDB(TurbopropEngines,["Power_SLS"]);
+        [~,PowReg] = RegressionPkg.SearchDB(TurbopropEngines,{"Power_SLS"});
         PowReg = cell2mat(PowReg(:,2));
         cind = [];
         for ii = 1:length(PowReg)

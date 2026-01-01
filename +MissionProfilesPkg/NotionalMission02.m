@@ -2,7 +2,7 @@ function [Aircraft] = NotionalMission02(Aircraft)
 %
 % NotionalMission02.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 apr 2024
+% last updated: 26 Sep 2025
 %
 % Define a typical mission with a design and time-based reserve mission
 % (see below). Note that this mission is not very detailed and could impact
@@ -51,15 +51,15 @@ VelCrs = Aircraft.Specs.Performance.Vels.Crs;
 % define the targets (in m or min)
 Mission.Target.Valu = [Range; 45];
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Dist"; "Time"];
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'; 'Time'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Cruise"; "Descent"; "Climb"; "Cruise"; "Descent"; "Landing"];
+Mission.Segs = {'Takeoff'; 'Climb'; 'Cruise'; 'Descent'; 'Climb'; 'Cruise'; 'Descent'; 'Landing'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [        1;       1;        1;        1;        2;        2;         2;         2];
@@ -75,9 +75,9 @@ Mission.ClbRate = [   NaN;    NaN;    NaN;          NaN;          NaN;          
 Mission.VelBeg  = [     0; VelTko; VelCrs;       VelCrs; 1.2 * VelTko; 1.5 * VelTko; 1.5 * VelTko; 1.2 * VelTko];
 Mission.VelEnd  = [VelTko; VelCrs; VelCrs; 1.2 * VelTko; 1.5 * VelTko; 1.5 * VelTko; 1.2 * VelTko;            0];
 
-% define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["TAS"; "TAS" ; "Mach"; "Mach"; "TAS"; "TAS"; "TAS"; "TAS"];
-Mission.TypeEnd = ["TAS"; "Mach"; "Mach";  "TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
+% define the speed types (either 'TAS', 'EAS', or 'Mach')
+Mission.TypeBeg = {'TAS'; 'TAS' ; 'Mach'; 'Mach'; 'TAS'; 'TAS'; 'TAS'; 'TAS'};
+Mission.TypeEnd = {'TAS'; 'Mach'; 'Mach';  'TAS'; 'TAS'; 'TAS'; 'TAS'; 'TAS'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

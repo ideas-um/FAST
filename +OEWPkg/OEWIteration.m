@@ -142,11 +142,11 @@ switch Class
             target = [S, T, EIS, MTOW];
             
             % list parts of the aircraft structure to use in the regression
-            IO = {["Specs", "Aero"      , "S"            ], ...
-                  ["Specs", "Propulsion", "Thrust", "SLS"], ...
-                  ["Specs", "TLAR"      , "EIS"          ], ...
-                  ["Specs", "Weight"    , "MTOW"         ], ...
-                  ["Specs", "Weight"    , "Airframe"     ]}   ;
+            IO = {{"Specs", "Aero"      , "S"            }, ...
+                  {"Specs", "Propulsion", "Thrust", "SLS"}, ...
+                  {"Specs", "TLAR"      , "EIS"          }, ...
+                  {"Specs", "Weight"    , "MTOW"         }, ...
+                  {"Specs", "Weight"    , "Airframe"     }}   ;
               
              % estimate the new airframe weight with a regression
             WframeNew = RegressionPkg.NLGPR(TurbofanAC, IO, target, 'Preprocessing',Aircraft.RegressionParams.OEW);
@@ -178,9 +178,9 @@ switch Class
         P_W = Aircraft.Specs.Power.P_W.SLS;
 
         % Create Linear Airframe and MTOW fit
-        [~,af] = RegressionPkg.SearchDB(TurbopropAC,["Specs","Weight","Airframe"]);
+        [~,af] = RegressionPkg.SearchDB(TurbopropAC,{"Specs","Weight","Airframe"});
         af = cell2mat(af(:,2));
-        [~,mtow] = RegressionPkg.SearchDB(TurbopropAC,["Specs","Weight","MTOW"]);
+        [~,mtow] = RegressionPkg.SearchDB(TurbopropAC,{"Specs","Weight","MTOW"});
         mtow = cell2mat(mtow(:,2));
         cind = [];
         for ii = 1:length(mtow)
@@ -192,7 +192,7 @@ switch Class
         mtow(cind) = [];
 
         % function to estimate airframe weight as a function of MTOW
-        Airframe_f_of_MTOW = polyfit(mtow,af,1);
+        Airframe_f_of_MTOW = customlinearfit(mtow,af);
 
         % run iteration
         while ((err > Tol) && (iter < MaxIter))
@@ -281,4 +281,24 @@ Aircraft.Specs.Aero.S = S;
 
 % ----------------------------------------------------------
 
+end
+
+function [polyfits] = customlinearfit(x,y)
+% this is a helper function which does a LSR on y from x
+% Needed for octave compatibility
+
+x = x(:); 
+y = y(:);
+
+mx = mean(x); 
+my = mean(y);
+
+
+Sxx = sum((x-mx).^2);
+Sxy = sum((x-mx).*(y-my));
+
+a = Sxy / Sxx;          % slope
+b = my - a*mx;          % intercept
+
+polyfits = [a,b];
 end

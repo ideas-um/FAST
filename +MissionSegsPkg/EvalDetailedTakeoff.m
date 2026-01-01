@@ -66,7 +66,7 @@ AltEnd = Aircraft.Mission.Profile.AltEnd(SegsID);
 V_tko = Aircraft.Mission.Profile.VelEnd(SegsID);
 
 % ending velocity type (beginning one is not needed)
-vtype = Aircraft.Mission.Profile.TypeEnd(SegsID);
+vtype = Aircraft.Mission.Profile.TypeEnd{SegsID};
 
 % ----------------------------------------------------------
 
@@ -314,7 +314,9 @@ Aircraft.Mission.History.SI.Energy.PE(SegBeg:SegEnd) = PE; % J
 Aircraft.Mission.History.SI.Energy.KE(SegBeg:SegEnd) = KE; % J
 
 % current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Takeoff";
+for iseg = SegBeg:SegEnd
+    Aircraft.Mission.History.Segment(iseg) = {'Takeoff'};
+end
 
 % ----------------------------------------------------------
 

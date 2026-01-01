@@ -62,8 +62,8 @@ VelBeg = Aircraft.Mission.Profile.VelBeg(SegsID);
 VelEnd = Aircraft.Mission.Profile.VelEnd(SegsID);
 
 % beginning and ending speed types
-TypeBeg = Aircraft.Mission.Profile.TypeBeg(SegsID);
-TypeEnd = Aircraft.Mission.Profile.TypeEnd(SegsID);
+TypeBeg = Aircraft.Mission.Profile.TypeBeg{SegsID};
+TypeEnd = Aircraft.Mission.Profile.TypeEnd{SegsID};
 
 % get the target
 target = Aircraft.Mission.Profile.CrsTarget;
@@ -395,7 +395,9 @@ Aircraft.Mission.History.SI.Energy.PE(  SegBeg:SegEnd) = PE   ;
 Aircraft.Mission.History.SI.Energy.KE(  SegBeg:SegEnd) = KE   ;
 
 % current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Cruise";
+for iseg = SegBeg:SegEnd
+    Aircraft.Mission.History.Segment(iseg) = {'Cruise'};
+end
 
 % ----------------------------------------------------------
 

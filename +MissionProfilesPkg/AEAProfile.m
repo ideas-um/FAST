@@ -2,7 +2,7 @@ function [Aircraft] = AEAProfile(Aircraft)
 %
 % NotionalMission02.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 23 apr 2024
+% last updated: 26 Sep 2025
 %
 % Define a typical mission with a design and time-based reserve mission
 % (see below). Note that this mission is not very detailed and could impact
@@ -51,15 +51,15 @@ VelCrs = 0.747;
 % define the targets (in m or min)
 Mission.Target.Valu = [Range];
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Dist"];
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Cruise"; "Descent"];
+Mission.Segs = {'Takeoff'; 'Climb'; 'Cruise'; 'Descent'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [        1;       1;        1;        1];
@@ -75,9 +75,9 @@ Mission.ClbRate = [   NaN;    NaN;    NaN;          NaN];
 Mission.VelBeg  = [     0; VelTko; VelCrs;       VelCrs];
 Mission.VelEnd  = [VelTko; VelCrs; VelCrs; 1.2 * VelTko];
 
-% define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["TAS"; "TAS" ; "Mach"; "Mach"];
-Mission.TypeEnd = ["TAS"; "Mach"; "Mach";  "TAS"];
+% define the speed types (either 'TAS', 'EAS', or 'Mach')
+Mission.TypeBeg = {'TAS'; 'TAS' ; 'Mach'; 'Mach'};
+Mission.TypeEnd = {'TAS'; 'Mach'; 'Mach';  'TAS'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

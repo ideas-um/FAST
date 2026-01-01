@@ -78,25 +78,25 @@ try
                         % names of included aircraft/engines
                         NewIncluded{1} = StructFields{ii}; 
                         % values of desired parameter
-                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList(1));
+                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList{1});
                         Included = [Included; NewIncluded];
                     end
                 case 2 % #substructs
                     for ii = 1:length(StructFields)
                         NewIncluded{1} = StructFields{ii};
-                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2));
+                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2});
                         Included = [Included; NewIncluded];
                     end
                 case 3 % #substructs
                     for ii = 1:length(StructFields)
                         NewIncluded{1} = StructFields{ii};
-                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3));
+                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2}).(SubstructList{3});
                         Included = [Included; NewIncluded];
                     end
                 case 4 % #substructs
                     for ii = 1:length(StructFields)
                         NewIncluded{1} = StructFields{ii};
-                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3)).(SubstructList(4));
+                        NewIncluded{2} = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2}).(SubstructList{3}).(SubstructList{4});
                         Included = [Included; NewIncluded];
                     end
             end
@@ -108,7 +108,7 @@ try
             switch length(SubstructList)
                 case 1 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
-                        CurVal = MainStruct.(StructFields{ii}).(SubstructList(1));
+                        CurVal = MainStruct.(StructFields{ii}).(SubstructList{1});
                         if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
@@ -117,7 +117,7 @@ try
                     end
                 case 2 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
-                        CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2));
+                        CurVal = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2});
                         if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
@@ -126,7 +126,7 @@ try
                     end
                 case 3 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
-                        CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3));
+                        CurVal = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2}).(SubstructList{3});
                         if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
@@ -135,7 +135,7 @@ try
                     end
                 case 4 % #substructs
                     for ii = 1:length(fieldnames(MainStruct))
-                        CurVal = MainStruct.(StructFields{ii}).(SubstructList(1)).(SubstructList(2)).(SubstructList(3)).(SubstructList(4));
+                        CurVal = MainStruct.(StructFields{ii}).(SubstructList{1}).(SubstructList{2}).(SubstructList{3}).(SubstructList{4});
                         if isequal(CurVal, DesVel)
                             NewIncluded{1} = StructFields{ii};
                             NewIncluded{2} = CurVal;
@@ -152,9 +152,9 @@ catch
     invalidlist = "";
     for ii = 1:length(SubstructList)
         if ii == length(SubstructList)
-           invalidlist = invalidlist + SubstructList(ii); 
+           invalidlist = invalidlist + SubstructList{ii}; 
         else
-        invalidlist = invalidlist + SubstructList(ii) + ", ";
+        invalidlist = invalidlist + SubstructList{ii} + ", ";
         end
     end
 

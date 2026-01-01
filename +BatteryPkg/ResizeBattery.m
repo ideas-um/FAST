@@ -31,7 +31,7 @@ function [Aircraft] = ResizeBattery(Aircraft)
 Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
 % if there is no battery, return a zero battery weight
-if (all(~Batt, "all"))
+if all(~Batt(:))
     
     % return zero battery weight
     Aircraft.Specs.Weight.Batt = 0;

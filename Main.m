@@ -137,18 +137,18 @@ if ((nargout > 1) && (Aircraft.Settings.Table == 0))
     
 end
 
-% check if a table should be made
-if (Aircraft.Settings.Table == 1)
-    
-    % make the table
-    MissionHistory = MissionHistTable(Aircraft);
-    
-else
-    
-    % return an empty table
-    MissionHistory = table();
-    
-end
+% check if a table should be made TODO: table function
+% if (Aircraft.Settings.Table == 1)
+%     
+%     % make the table
+%     MissionHistory = MissionHistTable(Aircraft);
+%     
+% else
+%     
+%     % return an empty table
+%     MissionHistory = table();
+%     
+% end
 
 % ----------------------------------------------------------
 end

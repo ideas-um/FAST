@@ -2,7 +2,7 @@ function [Aircraft] = BRECruise00(Aircraft)
 %
 % [Aircraft] = BRECruise00(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 26 Sep 2025
 %
 % Fly the entire mission using only the Breguet Range-based cruise segment
 % (see below) with no reserves.
@@ -26,35 +26,35 @@ function [Aircraft] = BRECruise00(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the targets (in m or min)
-Mission.Target.Valu = UnitConversionPkg.ConvLength(1650, "naut mi", "m");
+Mission.Target.Valu = UnitConversionPkg.ConvLength(1650, 'naut mi', 'm');
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = "Dist";
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = "CruiseBRE";
+Mission.Segs = {'CruiseBRE'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = 1;
 
 % define the starting/ending altitudes (in m)
-Mission.AltBeg = UnitConversionPkg.ConvLength(35000, "ft", "m");
-Mission.AltEnd = UnitConversionPkg.ConvLength(35000, "ft", "m");
+Mission.AltBeg = UnitConversionPkg.ConvLength(35000, 'ft', 'm');
+Mission.AltEnd = UnitConversionPkg.ConvLength(35000, 'ft', 'm');
 
 % define the climb rate (in m/s)
 Mission.ClbRate =  NaN;
 
 % define the starting/ending speeds (in m/s or mach)
-Mission.VelBeg = UnitConversionPkg.ConvVel(460, "kts", "m/s");
-Mission.VelEnd = UnitConversionPkg.ConvVel(460, "kts", "m/s");
+Mission.VelBeg = UnitConversionPkg.ConvVel(460, 'kts', 'm/s');
+Mission.VelEnd = UnitConversionPkg.ConvVel(460, 'kts', 'm/s');
 
-% define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = "TAS";
-Mission.TypeEnd = "TAS";
+% define the speed types (either 'TAS', 'EAS', or 'Mach')
+Mission.TypeBeg = {'TAS'};
+Mission.TypeEnd = {'TAS'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

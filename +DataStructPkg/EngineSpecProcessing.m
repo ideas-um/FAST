@@ -2,7 +2,7 @@ function [Aircraft] = EngineSpecProcessing(Aircraft)
 %
 % [Aircraft] = EngineSpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated 24 apr 2024
+% last updated 17 sept 2025
 %
 % This function only creates and engine in the case that a
 % user did not provide an engine specification file. If so, this
@@ -62,13 +62,13 @@ if ~isstruct(Aircraft.Specs.Propulsion.Engine)
             %% Regressions
             % Perform regressions on OPR, FPR, BPR, and RPM
             [TwoSpoolData,~] = RegressionPkg.SearchDB(Data,"LPCStages",0);
-            [LPRPM,~] = RegressionPkg.NLGPR(TwoSpoolData,{["Thrust_SLS"],["LP100"]},Engine.DesignThrust);
-            [HPRPM,~] = RegressionPkg.NLGPR(TwoSpoolData,{["Thrust_SLS"],["HP100"]},Engine.DesignThrust);
+            [LPRPM,~] = RegressionPkg.NLGPR(TwoSpoolData,{{"Thrust_SLS"},{"LP100"}},Engine.DesignThrust);
+            [HPRPM,~] = RegressionPkg.NLGPR(TwoSpoolData,{{"Thrust_SLS"},{"HP100"}},Engine.DesignThrust);
             Engine.RPMs = [LPRPM, HPRPM];
 
-            [Engine.OPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["OPR_SLS"]},Engine.DesignThrust);
-            [Engine.BPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["BPR"]},Engine.DesignThrust);
-            [Engine.FPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["FPR"]},Engine.DesignThrust);
+            [Engine.OPR,~] = RegressionPkg.NLGPR(Data,{{"Thrust_SLS"},{"OPR_SLS"}},Engine.DesignThrust);
+            [Engine.BPR,~] = RegressionPkg.NLGPR(Data,{{"Thrust_SLS"},{"BPR"}},Engine.DesignThrust);
+            [Engine.FPR,~] = RegressionPkg.NLGPR(Data,{{"Thrust_SLS"},{"FPR"}},Engine.DesignThrust);
         case "Turboprop"
 
             %% Default Values
@@ -95,9 +95,9 @@ if ~isstruct(Aircraft.Specs.Propulsion.Engine)
             %% Regressions
 
             % Perform regressions on OPR and RPM
-            [Engine.OPR,~] = RegressionPkg.NLGPR(Data,{["Power_SLS"],["OPR_SLS"]},Engine.ReqPower);
-            [IPRPM,~] = RegressionPkg.NLGPR(Data,{["Power_SLS"],["IPMaxTO"]},Engine.ReqPower);
-            [HPRPM,~] = RegressionPkg.NLGPR(Data,{["Power_SLS"],["HPMaxTO"]},Engine.ReqPower);
+            [Engine.OPR,~] = RegressionPkg.NLGPR(Data,{{"Power_SLS"},{"OPR_SLS"}},Engine.ReqPower);
+            [IPRPM,~] = RegressionPkg.NLGPR(Data,{{"Power_SLS"},{"IPMaxTO"}},Engine.ReqPower);
+            [HPRPM,~] = RegressionPkg.NLGPR(Data,{{"Power_SLS"},{"HPMaxTO"}},Engine.ReqPower);
             Engine.RPMs = [HPRPM,IPRPM];
 
     end

@@ -67,8 +67,8 @@ VelBeg = Aircraft.Mission.Profile.VelBeg(SegsID);
 VelEnd = Aircraft.Mission.Profile.VelEnd(SegsID);
 
 % beginning and ending speed types
-TypeBeg = Aircraft.Mission.Profile.TypeBeg(SegsID);
-TypeEnd = Aircraft.Mission.Profile.TypeEnd(SegsID);
+TypeBeg = Aircraft.Mission.Profile.TypeBeg{SegsID};
+TypeEnd = Aircraft.Mission.Profile.TypeEnd{SegsID};
 
 % rate of climb (if prescribed)
 dh_dtReq = Aircraft.Mission.Profile.ClbRate(SegsID);
@@ -121,7 +121,7 @@ Alt = linspace(AltBeg, AltEnd, npoint)'; % m
                                            TypeEnd, VelEnd); %#ok<ASGLU>
 
 % update the ending velocity type to match the beginning's type
-VelEnd = eval(strcat(TypeBeg, "End"));
+VelEnd = eval(strcat(TypeBeg, 'End'));
 
 % create a linearly spaced array of velocities (matches beginning's type)
 VelSeg = linspace(VelBeg, VelEnd, npoint)';
@@ -349,7 +349,7 @@ while (iter < MaxIter)
 
         % adjust points when the required acceleration can't be realized
         if (any(dV_dt - dV_dtMax > EPS06))
-            
+
             % assume maximum acceleration at all points
             dV_dt = dV_dtMax;
         
@@ -473,7 +473,9 @@ Aircraft.Mission.History.SI.Energy.PE(SegBeg:SegEnd) = PE;
 Aircraft.Mission.History.SI.Energy.KE(SegBeg:SegEnd) = KE;
 
 % current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Climb";
+for iseg = SegBeg:SegEnd
+    Aircraft.Mission.History.Segment(iseg) = {'Climb'};
+end
 
 % ----------------------------------------------------------
 

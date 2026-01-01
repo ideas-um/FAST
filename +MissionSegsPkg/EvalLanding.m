@@ -44,7 +44,7 @@ AltLand = Aircraft.Mission.Profile.AltBeg(SegsID);
 VLand = Aircraft.Mission.Profile.VelBeg(SegsID);
 
 % get the velocity type
-VType = Aircraft.Mission.Profile.TypeBeg(SegsID);
+VType = Aircraft.Mission.Profile.TypeBeg{SegsID};
 
 % ----------------------------------------------------------
 
@@ -239,7 +239,9 @@ Aircraft.Mission.History.SI.Energy.PE(SegBeg:SegEnd) = PE;
 Aircraft.Mission.History.SI.Energy.KE(SegBeg:SegEnd) = KE;
 
 % current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Landing";
+for iseg = SegBeg:SegEnd
+    Aircraft.Mission.History.Segment(iseg) = {'Landing'};
+end
 
 % ----------------------------------------------------------
 

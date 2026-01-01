@@ -2,7 +2,7 @@ function [Aircraft] = BRECruise01(Aircraft)
 %
 % [Aircraft] = BRECruise01(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 26 Sep 2025
 %
 % Fly all missions using only the Breguet Range-based cruise segment (see
 % below) with a distance-based reserve mission.
@@ -26,35 +26,35 @@ function [Aircraft] = BRECruise01(Aircraft)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the targets (in m or min)
-Mission.Target.Valu = UnitConversionPkg.ConvLength([1650; 100], "naut mi", "m");
+Mission.Target.Valu = UnitConversionPkg.ConvLength([1650; 100], 'naut mi', 'm');
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Dist"; "Dist"];
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'; 'Dist'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["CruiseBRE"; "CruiseBRE"];
+Mission.Segs = {'CruiseBRE'; 'CruiseBRE'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [          1;           2];
 
 % define the starting/ending altitudes (in m)
-Mission.AltBeg = UnitConversionPkg.ConvLength([35000; 35000], "ft", "m");
-Mission.AltEnd = UnitConversionPkg.ConvLength([35000; 35000], "ft", "m");
+Mission.AltBeg = UnitConversionPkg.ConvLength([35000; 35000], 'ft', 'm');
+Mission.AltEnd = UnitConversionPkg.ConvLength([35000; 35000], 'ft', 'm');
 
 % define the climb rate (in m/s)
 Mission.ClbRate = [  NaN;   NaN];
 
 % define the starting/ending speeds (in m/s or mach)
-Mission.VelBeg = UnitConversionPkg.ConvVel([460; 460], "kts", "m/s");
-Mission.VelEnd = UnitConversionPkg.ConvVel([460; 460], "kts", "m/s");
+Mission.VelBeg = UnitConversionPkg.ConvVel([460; 460], 'kts', 'm/s');
+Mission.VelEnd = UnitConversionPkg.ConvVel([460; 460], 'kts', 'm/s');
 
-% define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["TAS"; "TAS"];
-Mission.TypeEnd = ["TAS"; "TAS"];
+% define the speed types (either 'TAS', 'EAS', or 'Mach')
+Mission.TypeBeg = {'TAS'; 'TAS'};
+Mission.TypeEnd = {'TAS'; 'TAS'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

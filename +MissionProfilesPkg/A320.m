@@ -2,7 +2,7 @@ function [Aircraft] = A320(Aircraft)
 %
 % [Aircraft] = A320(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 28 feb 2023
+% last updated: 26 Sep 2025
 %
 % define an A320(Neo) design mission
 % (see below).
@@ -40,19 +40,19 @@ function [Aircraft] = A320(Aircraft)
 Ranges = UnitConversionPkg.ConvLength([3400/3; 3400/3; 3400/3; 200],'naut mi', 'm');
 Mission.Target.Valu = [Ranges; 30];
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Dist"; "Dist"; "Dist"; "Dist"; "Time"];
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'; 'Dist'; 'Dist'; 'Dist'; 'Time'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Climb"; "Cruise";
-    "Climb"; "Cruise"; 
-    "Climb"; "Cruise"; "Descent"; 
-    "Climb"; "Cruise"; "Descent"; 
-    "Cruise"; "Descent"; "Landing"];
+Mission.Segs = {'Takeoff'; 'Climb'; 'Climb'; 'Cruise';
+    'Climb'; 'Cruise'; 
+    'Climb'; 'Cruise'; 'Descent'; 
+    'Climb'; 'Cruise'; 'Descent'; 
+    'Cruise'; 'Descent'; 'Landing'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [ 1; 1; 1; 1;
@@ -95,17 +95,17 @@ Mission.VelEnd  = [ 0.3; UnitConversionPkg.ConvVel(250,'kts','m/s'); 0.78; 0.78;
     0.3; 0.3; 0];
 
 % define the speed types
-Mission.TypeBeg = [ "Mach"; "Mach"; "TAS"; "Mach";
-    "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach"];
+Mission.TypeBeg = {'Mach'; 'Mach'; 'TAS'; 'Mach';
+    'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach'};
 
-Mission.TypeEnd = [ "Mach"; "TAS"; "Mach"; "Mach";
-    "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach";
-    "Mach"; "Mach"; "Mach"];
+Mission.TypeEnd = {'Mach'; 'TAS'; 'Mach'; 'Mach';
+    'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach';
+    'Mach'; 'Mach'; 'Mach'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

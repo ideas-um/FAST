@@ -32,27 +32,27 @@ values.mtow = Aircraft.Specs.Weight.MTOW;
 values.ws = Aircraft.Specs.Aero.W_S.SLS;
         values.ldcr = Aircraft.Specs.Aero.L_D.Crs;
 
-names.vto  = ["Specs","Performance","Vels","Tko"];
-names.vcr  = ["Specs","Performance","Vels","Crs"];
-names.hcr  = ["Specs","Performance","Alts","Crs"];
-names.mtow = ["Specs","Weight","MTOW"];
-names.ws = ["Specs","Aero","W_S","SLS"];
-        names.ldcr = ["Specs","Aero","L_D","Crs"];
+names.vto  = {"Specs","Performance","Vels","Tko"};
+names.vcr  = {"Specs","Performance","Vels","Crs"};
+names.hcr  = {"Specs","Performance","Alts","Crs"};
+names.mtow = {"Specs","Weight","MTOW"};
+names.ws = {"Specs","Aero","W_S","SLS"};
+        names.ldcr = {"Specs","Aero","L_D","Crs"};
 
 %% Assign class specific parameters from the aircraft struct
 switch FanPropFlag
     case "Turbofan"
         values.tw  = Aircraft.Specs.Propulsion.T_W.SLS;
         values.tsls  = Aircraft.Specs.Propulsion.Thrust.SLS;
-        names.tw  = ["Specs","Propulsion","T_W","SLS"];
-        names.tsls  = ["Specs","Propulsion","Thrust","Crs"];
+        names.tw  = {"Specs","Propulsion","T_W","SLS"};
+        names.tsls  = {"Specs","Propulsion","Thrust","Crs"};
 
 
     case "Turboprop"
         values.pw = Aircraft.Specs.Power.P_W.SLS;
         values.psls  = Aircraft.Specs.Power.SLS;      
-        names.pw = ["Specs","Power","P_W","SLS"];
-        names.psls  = ["Specs","Power","Crs"];     
+        names.pw = {"Specs","Power","P_W","SLS"};
+        names.psls  = {"Specs","Power","Crs"};     
 end
 
 %% Initialize known and unknown parameters
@@ -76,10 +76,10 @@ end
 
 %% Remove missing values from the initialized known structure
 % these were added as placeholders
-known.values = rmmissing(known.values);
+known.values = known.values(~isnan(known.values));
 
 % add fuel weight to the unknowns since this is not user specified
-unknown{end+1} = ["Specs","Weight","Fuel"];
+unknown{end+1} = {"Specs","Weight","Fuel"};
 
 end
 

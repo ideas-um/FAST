@@ -3,7 +3,7 @@ function [Aircraft] = ParametricRegional(Aircraft)
 % [Aircraft] = ParametricRegional(Aircraft)
 % orignally written by Emma Smith, emmasmit@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 26 Sep 2025
 %
 % Parametric mission for a regional jet.             
 % 
@@ -41,14 +41,14 @@ AltTko = Aircraft.Specs.Performance.Alts.Tko;
 AltCrs = Aircraft.Specs.Performance.Alts.Crs;
 
 % start and end of constant EAS climb alt
-AltClb     =          UnitConversionPkg.ConvLength(3000, "ft", "m");
-AltClb2Crs = AltCrs - UnitConversionPkg.ConvLength(1000, "ft", "m");
+AltClb     =          UnitConversionPkg.ConvLength(3000, 'ft', 'm');
+AltClb2Crs = AltCrs - UnitConversionPkg.ConvLength(1000, 'ft', 'm');
 
 % Reserve mission altitudes - assume descent follows same path as climb
-ResAltBeg     =             UnitConversionPkg.ConvLength( 1500, "ft", "m");
-ResAltClb     =             UnitConversionPkg.ConvLength( 3000, "ft", "m");
-ResAltCrs     =             UnitConversionPkg.ConvLength(10000, "ft", "m");
-ResAltClb2Crs = ResAltCrs - UnitConversionPkg.ConvLength( 1000, "ft", "m");
+ResAltBeg     =             UnitConversionPkg.ConvLength( 1500, 'ft', 'm');
+ResAltClb     =             UnitConversionPkg.ConvLength( 3000, 'ft', 'm');
+ResAltCrs     =             UnitConversionPkg.ConvLength(10000, 'ft', 'm');
+ResAltClb2Crs = ResAltCrs - UnitConversionPkg.ConvLength( 1000, 'ft', 'm');
 
 % takeoff and cruise speeds
 VelTko = Aircraft.Specs.Performance.Vels.Tko; % TAS
@@ -58,13 +58,13 @@ VelCrs = Aircraft.Specs.Performance.Vels.Crs; % Mach
 VelApr = 1.2 * VelTko; % TAS
 
 % climb & descent is constant EAS
-VelClb = UnitConversionPkg.ConvVel(200, "kts", "m/s"); %EAS
-VelDes = UnitConversionPkg.ConvVel(200, "kts", "m/s"); %EAS
+VelClb = UnitConversionPkg.ConvVel(200, 'kts', 'm/s'); %EAS
+VelDes = UnitConversionPkg.ConvVel(200, 'kts', 'm/s'); %EAS
 
 % reserve speeds
-ResVelClb = UnitConversionPkg.ConvVel(200, "kts", "m/s"); %EAS
-ResVelDes = UnitConversionPkg.ConvVel(200, "kts", "m/s"); %EAS
-ResVelCrs = UnitConversionPkg.ConvVel(250, "kts", "m/s"); %TAS
+ResVelClb = UnitConversionPkg.ConvVel(200, 'kts', 'm/s'); %EAS
+ResVelDes = UnitConversionPkg.ConvVel(200, 'kts', 'm/s'); %EAS
+ResVelCrs = UnitConversionPkg.ConvVel(250, 'kts', 'm/s'); %TAS
 
 
 %% DEFINE THE MISSION TARGETS %%
@@ -73,15 +73,15 @@ ResVelCrs = UnitConversionPkg.ConvVel(250, "kts", "m/s"); %TAS
 % define the targets (in m or min)
 Mission.Target.Valu = [Range; 45];
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = ["Dist"; "Time"];
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'; 'Time'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Climb"; "Climb"; "Cruise"; "Descent"; "Descent"; "Descent"; "Climb"; "Climb"; "Climb"; "Cruise"; "Descent"; "Descent"; "Descent"; "Landing"];
+Mission.Segs = {'Takeoff'; 'Climb'; 'Climb'; 'Climb'; 'Cruise'; 'Descent'; 'Descent'; 'Descent'; 'Climb'; 'Climb'; 'Climb'; 'Cruise'; 'Descent'; 'Descent'; 'Descent'; 'Landing'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [        1;       1;       1;       1;        1;         1;         1;         1;       2;       2;       2;        2;         2;         2;         2;         2];
@@ -94,9 +94,9 @@ Mission.AltEnd = [AltTko; AltClb; AltClb2Crs;     AltCrs; AltCrs; AltClb2Crs;   
 Mission.VelBeg = [     0; VelTko;     VelClb;     VelClb; VelCrs;     VelCrs;     VelDes;    VelDes;    VelApr;     ResVelClb;     ResVelClb; ResVelCrs; ResVelCrs;     ResVelDes; ResVelDes; VelApr];
 Mission.VelEnd = [VelTko; VelClb;     VelClb;     VelCrs; VelCrs;     VelDes;     VelDes;    VelApr; ResVelClb;     ResVelClb;     ResVelCrs; ResVelCrs; ResVelDes;     ResVelDes;    VelApr;      0];
 
-% define the speed types (either "TAS, "EAS", or "Mach")
-Mission.TypeBeg = [ "TAS";  "TAS";     "EAS";      "EAS"; "Mach";     "Mach";      "EAS";     "EAS";     "TAS";         "EAS";         "EAS";     "TAS";     "TAS";         "EAS";     "EAS";  "TAS"];
-Mission.TypeEnd = [ "TAS";  "EAS";     "EAS";     "Mach"; "Mach";      "EAS";      "EAS";     "TAS";     "EAS";         "EAS";         "TAS";     "TAS";     "EAS";         "EAS";     "TAS";  "TAS"];
+% define the speed types (either 'TAS, 'EAS', or 'Mach')
+Mission.TypeBeg = { 'TAS';  'TAS';     'EAS';      'EAS'; 'Mach';     'Mach';      'EAS';     'EAS';     'TAS';         'EAS';         'EAS';     'TAS';     'TAS';         'EAS';     'EAS';  'TAS'};
+Mission.TypeEnd = { 'TAS';  'EAS';     'EAS';     'Mach'; 'Mach';      'EAS';      'EAS';     'TAS';     'EAS';         'EAS';         'TAS';     'TAS';     'EAS';         'EAS';     'TAS';  'TAS'};
 
 % define a climb rate
 Mission.ClbRate = [  NaN;    NaN;        NaN;        NaN;    NaN;        NaN;        NaN;       NaN;       NaN;           NaN;           NaN;       NaN;       NaN;           NaN;       NaN;    NaN];

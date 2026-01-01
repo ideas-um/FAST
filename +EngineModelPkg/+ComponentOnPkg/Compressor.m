@@ -87,7 +87,7 @@ while CurPi < CPR && i < 100
         EngineModelPkg.ComponentOnPkg.CompStg(CurState,EtaPoly,StagePR,CompRPM,Fan);
     CurPi = cumprod(Pi); CurPi = CurPi(end);
     
-    CompressorObject.States.("Stage_" + i) = CurState;
+    CompressorObject.States.(['Stage_', num2str(i)]) = CurState;
     
 loading = CurState.Cp*(CurState.Tt*(Tau(i)-1))/(CompRPM/60*2*pi*0.5*(CurState.Ro+CurState.Ri))^2;
 
@@ -99,7 +99,7 @@ i = i+1;
 end
 
 NStages = i-1;
-CompressorObject.States.Exit = CompressorObject.States.("Stage_" + NStages);
+CompressorObject.States.Exit = CompressorObject.States.(['Stage_', num2str(NStages)]);
 
 PiComp = CurPi;
 TauComp = cumprod(Tau); TauComp = TauComp(end);
@@ -108,7 +108,7 @@ CompWork = cumsum(StageWork); CompWork = CompWork(end);
 
 %% Remove map fields from output state
 State3 = CompressorObject.States.Exit;
-State3 = rmfield(State3,["Zeta","Eta","Psi","Phi","MNorm","Rp","NNorm"]);
+State3 = rmfield(State3,{'Zeta','Eta','Psi','Phi','MNorm','Rp','NNorm'});
 
 %% Calculate adiabatic Efficiency
 

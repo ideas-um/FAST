@@ -2,7 +2,7 @@ function [Aircraft] = NotionalMission00(Aircraft)
 %
 % [Aircraft] = NotionalMission00(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 28 mar 2024
+% last updated: 26 Sep 2025
 %
 % Define a typical mission with a design mission only (no reserves, see
 % below). Note that this mission is not very detailed and could impact
@@ -52,15 +52,15 @@ VelCrs = Aircraft.Specs.Performance.Vels.Crs;
 % define the targets (in m or min)
 Mission.Target.Valu = Range;
 
-% define the target types ("Dist" or "Time")
-Mission.Target.Type = "Dist";
+% define the target types ('Dist' or 'Time')
+Mission.Target.Type = {'Dist'};
 
 
 %% DEFINE THE MISSION SEGMENTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the segments
-Mission.Segs = ["Takeoff"; "Climb"; "Cruise"; "Descent"; "Landing"];
+Mission.Segs = {'Takeoff'; 'Climb'; 'Cruise'; 'Descent'; 'Landing'};
 
 % define the mission id (segments in same mission must be consecutive)
 Mission.ID   = [        1;       1;        1;         1;         1];
@@ -76,9 +76,9 @@ Mission.ClbRate = [   NaN;    NaN;    NaN;    NaN;    NaN];
 Mission.VelBeg  = [     0; VelTko; VelCrs;       VelCrs; 1.2 * VelTko];
 Mission.VelEnd  = [VelTko; VelCrs; VelCrs; 1.2 * VelTko;            0];
 
-% define the speed types (either "TAS", "EAS", or "Mach")
-Mission.TypeBeg = ["TAS";  "TAS"; "Mach"; "Mach"; "TAS"];
-Mission.TypeEnd = ["TAS"; "Mach"; "Mach";  "TAS"; "TAS"];
+% define the speed types (either 'TAS', 'EAS', or 'Mach')
+Mission.TypeBeg = {'TAS';  'TAS'; 'Mach'; 'Mach'; 'TAS'};
+Mission.TypeEnd = {'TAS'; 'Mach'; 'Mach';  'TAS'; 'TAS'};
 
 
 %% REMEMBER THE MISSION PROFILE %%

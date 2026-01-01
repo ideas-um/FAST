@@ -449,24 +449,27 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
         error("ERROR - CreatePropArch: check that 'Arch' in 'Specs.Propulsion.PropArch' is initialized.");
     end
                            
-    % check for the operational matrices
-    HaveOper = isfield(Specs.Propulsion.PropArch, ["OperUps"; "OperDwn"]);
+    % check for the operational matrices (repeated for GNU compatibility)
+    HaveOper(1) = isfield(Specs.Propulsion.PropArch, "OperUps");
+    HaveOper(2) = isfield(Specs.Propulsion.PropArch,"OperDwn");
     
     % confirm that they're all present
     if (sum(HaveOper) ~= 2)
         error("ERROR - CreatePropArch: check that 'OperUps' and 'OperDwn' in 'Specs.Propulsion.PropArch' are initialized.");
     end
     
-    % check for the efficiencies
-    HaveEtas = isfield(Specs.Propulsion.PropArch, ["EtaUps"; "EtaDwn"]);
+    % check for the efficiencies (repeated for GNU compatibility)
+    HaveEtas(1) = isfield(Specs.Propulsion.PropArch, "EtaUps");
+    HaveEtas(2) = isfield(Specs.Propulsion.PropArch, "EtaDwn");
     
     % confirm that they're all present
-    if (HaveEtas ~= 1)
+    if (sum(HaveEtas) ~= 2)
         error("ERROR - CreatePropArch: check that 'EtaUps' and 'EtaDwn' in 'Specs.Propulsion.PropArch' are initialized.");
     end
     
-    % check for the component types
-    HaveType = isfield(Specs.Propulsion.PropArch, ["SrcType", "TrnType"]);
+    % check for the component types (repeated for GNU compatibility)
+    HaveType(1) = isfield(Specs.Propulsion.PropArch, "SrcType");
+    HaveType(2) = isfield(Specs.Propulsion.PropArch, "TrnType");
     
     % confirm that they're all present
     if (sum(HaveType) ~= 2)

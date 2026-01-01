@@ -48,7 +48,7 @@ SegPts = ones(nsegs, 1);
 for isegs = 1:nsegs
     
     % get the segment name
-    SegName = Mission.Segs(isegs);
+    SegName = Mission.Segs{isegs};
     
     % check for a valid segment name
     if     ((strcmpi(SegName,         "Takeoff") == 1) || ...
@@ -142,7 +142,7 @@ for itarget = 1:ntarget
         end
         
         % get the target name
-        TarName = Mission.Target.Type(itarget);
+        TarName = Mission.Target.Type{itarget};
         
         % check for valid name
         if ((strcmp(TarName, "Dist") == 0) && ...
@@ -272,9 +272,9 @@ end
 for itype = 1:nTypeBeg
     
     % check for a valid beginning type
-    if ((strcmp(Mission.TypeBeg(itype), "TAS" ) == 0) && ...
-        (strcmp(Mission.TypeBeg(itype), "EAS" ) == 0) && ...
-        (strcmp(Mission.TypeBeg(itype), "Mach") == 0) )
+    if ((strcmp(Mission.TypeBeg{itype}, "TAS" ) == 0) && ...
+        (strcmp(Mission.TypeBeg{itype}, "EAS" ) == 0) && ...
+        (strcmp(Mission.TypeBeg{itype}, "Mach") == 0) )
     
         % return error
         error("ERROR - ProcessProfile: beginning airspeed type %d must be 'TAS', 'EAS', or 'Mach'.", ...
@@ -283,9 +283,9 @@ for itype = 1:nTypeBeg
     end
     
     % check for a valid ending type
-    if ((strcmp(Mission.TypeEnd(itype), "TAS" ) == 0) && ...
-        (strcmp(Mission.TypeEnd(itype), "EAS" ) == 0) && ...
-        (strcmp(Mission.TypeEnd(itype), "Mach") == 0) )
+    if ((strcmp(Mission.TypeEnd{itype}, "TAS" ) == 0) && ...
+        (strcmp(Mission.TypeEnd{itype}, "EAS" ) == 0) && ...
+        (strcmp(Mission.TypeEnd{itype}, "Mach") == 0) )
     
         % return error
         error("ERROR - ProcessProfile: ending airspeed type %d must be 'TAS', 'EAS', or 'Mach'.", ...

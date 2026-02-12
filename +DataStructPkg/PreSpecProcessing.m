@@ -2,7 +2,7 @@ function [Aircraft] = PreSpecProcessing(Aircraft)
 %
 % [Aircraft] = PreSpecProcessing(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 19 jun 2025
+% last updated: 12 feb 2026
 %
 % Instantiate any variables not specified in an aircraft data structure.
 % This function allows users to neglect to assign NaN values to parameters
@@ -250,7 +250,17 @@ else
         Aircraft.Specs.Power.P_W.EM = NaN;
         Aircraft.Specs.Power.P_W.EG = NaN;
         Aircraft.Specs.Power.LamDwn.SLS = NaN;
+        Aircraft.Specs.Power.LamDwn.Tko = NaN;
+        Aircraft.Specs.Power.LamDwn.Clb = NaN;
+        Aircraft.Specs.Power.LamDwn.Crs = NaN;
+        Aircraft.Specs.Power.LamDwn.Des = NaN;
+        Aircraft.Specs.Power.LamDwn.Lnd = NaN;
         Aircraft.Specs.Power.LamUps.SLS = NaN;
+        Aircraft.Specs.Power.LamUps.Tko = NaN;
+        Aircraft.Specs.Power.LamUps.Clb = NaN;
+        Aircraft.Specs.Power.LamUps.Crs = NaN;
+        Aircraft.Specs.Power.LamUps.Des = NaN;
+        Aircraft.Specs.Power.LamUps.Lnd = NaN;
         Aircraft.Specs.Power.Battery.ParCells = NaN;
         Aircraft.Specs.Power.Battery.SerCells =  NaN;
         Aircraft.Specs.Power.Battery.BegSOC = NaN;

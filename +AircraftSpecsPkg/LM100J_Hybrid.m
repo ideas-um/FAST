@@ -2,7 +2,7 @@ function [Aircraft] = LM100J_Hybrid()
 %
 % [Aircraft] = LM100J_Hybrid()
 % originally written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 dec 2024
+% last updated: 20 jun 2025
 %
 % Define the LM100J from Lockheed Martins' Brochure with the NASA-specified
 % propulsion architecture.
@@ -321,36 +321,6 @@ Aircraft.Settings.Analysis.Type = +1;
 % 0 = no plotting
 % 1 = plotting
 Aircraft.Settings.Plotting = 0;
-
-% ----------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            %
-% power split optimization   %
-% settings                   %
-%                            %
-% comment the lines below if %
-% the power optimization is  %
-% not being used             %
-%                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% % optimization settings
-% Aircraft.PowerOpt.Settings.DesnTS   = 1;
-% Aircraft.PowerOpt.Settings.OperTS   = 0;
-% Aircraft.PowerOpt.Settings.DesnTSPS = 0;
-% Aircraft.PowerOpt.Settings.OperTSPS = 0;
-% Aircraft.PowerOpt.Settings.DesnPSPS = 0;
-% Aircraft.PowerOpt.Settings.OperPSPS = 0;
-% Aircraft.PowerOpt.Settings.DesnPSES = 0;
-% Aircraft.PowerOpt.Settings.OperPSES = 0;
-% 
-% % power optimization tolerance and iteration limits
-% Aircraft.PowerOpt.Tol     = 1.0e-02;
-% Aircraft.PowerOpt.MaxIter = 2      ;
-% 
-% % optimization objective function, if optimization is requested
-% Aircraft.PowerOpt.ObjFun = "FuelBurn";
 
 % ----------------------------------------------------------
 

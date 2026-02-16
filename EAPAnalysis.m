@@ -2,7 +2,7 @@ function [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 %
 % [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 09 jan 2026
 %
 % For a given aircraft, either:
 %
@@ -163,8 +163,11 @@ EPS = 1.0e-3;
 iter = 0;
 
 
-%% SIZE THE AIRCRAFT %%
-%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% SIZE THE AIRCRAFT          %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initialize new MTOW if off-design
 if Type < 0
@@ -325,8 +328,11 @@ if ((iter == MaxIter) && (Type > 0))
 end
 
 
-%% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                          %
+% DELETE UNNECESSARY VARIABLES FROM THE STRUCTURE          %
+%                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % length of the aircraft
 if (isfield(Aircraft, "LengthSet"))
@@ -346,6 +352,33 @@ end
 % scaled geometry
 if (isfield(Aircraft, "TempParts"))
     Aircraft = rmfield(Aircraft, "TempParts");
+end
+
+% ----------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              %
+% Battery Degradation          %
+%                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% grounding time
+GroundTime = Aircraft.Specs.Battery.GroundT;
+
+% LIB chemistry material
+BattChem = Aircraft.Specs.Battery.Chem;
+
+% battery charging rate in [W]
+Cpower = Aircraft.Specs.Battery.Cpower;
+
+% FEC
+FECs = Aircraft.Specs.Battery.FEC(end);
+
+if Type ~= 1 % Battery degradation only makes sense in off-design 
+    if Aircraft.Specs.Battery.Degradation == 1
+        [SOH, FEC, Aircraft] = BatteryPkg.CyclAging(Aircraft, BattChem, FECs, GroundTime, Cpower);
+        Aircraft.Specs.Battery.FEC(end+1,1) = FEC;
+        Aircraft.Specs.Battery.SOH(end+1,1) = SOH;
+    end
 end
 
 % ----------------------------------------------------------

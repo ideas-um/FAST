@@ -2,7 +2,7 @@ function [heat] = CpJetA(T_low,T_high)
 %
 % [heat] = CpJetA(T_low,T_high)
 % Written by Maxfield Arnson
-% Updated 10/9/2023
+% Updated 19 nov 2025
 %
 % This function returns the specific heat required to raise vaporized Jet-A
 % from T_low to T_high. An S curve was fitted to the data referenced at the
@@ -103,6 +103,6 @@ heat = (T_high*(C+L) + L*log(exp(k*(y-T_high))+1)/k) -(T_low*(C+L) + L*log(exp(k
 % f = gcf;
 % f.Position = [100 500 600 500];
 % 
-% print(f, '../EAP/DB_Paper_Scripts/cpjet','-dpdf')
+% print(f, 'cpcurve_jetA','-dpdf')
 
 end

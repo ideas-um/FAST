@@ -2,11 +2,21 @@ function [] = README()
 %
 % EAP power management optimization for FAST
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 27 mar 2024
+% last updated: 08 Sep 2025
 % 
 % 
 % ------------------------------------------------------------
 % 
+%
+% Warning:
+% --------
+%
+% This tool is currently deprecated and had worked on a previous version of
+% FAST. Changes have not been made since Spring 2024.
+%
+%
+% ----------------------------------------------------------
+%
 % 
 % Background:
 % --------------------
@@ -118,13 +128,8 @@ function [] = README()
 % ------------------------------------------------------------
 % 
 % 
-% Notes and warnings:
-% --------------------
-%
-% 0) This tool is currently deprecated and had worked on a
-%    previous version of FAST. Additional updates are expected
-%    to be worked on in Spring/Summer 2024 with an intended
-%    release of these features by the end of 2024.
+% Additional Notes and warnings:
+% ------------------------------
 % 
 % 1) When using the operational power split optimization, make
 %    sure to provide an electric motor weight and battery

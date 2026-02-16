@@ -2,10 +2,10 @@ function [SizedAircraft] = Tutorial002()
 %
 % [] = Tutorial002()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 jun 2024
+% last updated: 08 sep 2025
 %
 % This is a tutorial for sizing an aircraft in FAST. The Example aircraft
-% specification file is run with the ERJ mission profile.
+% specification file is run with a parametric regional jet mission profile.
 %
 % INPUTS:
 %     none

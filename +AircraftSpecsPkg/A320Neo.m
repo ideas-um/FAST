@@ -3,7 +3,7 @@ function [Aircraft] = A320Neo()
 % [Aircraft] = A320Neo()
 % written by Max Arnson, marnson@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% last updated: 06 jan 2026
+% last updated: 16 feb 2026
 % 
 % create a baseline model of the A320neo WV054. this version uses a 
 % conventional propulsion architecture.

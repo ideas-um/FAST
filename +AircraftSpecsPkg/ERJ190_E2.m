@@ -2,7 +2,7 @@ function [Aircraft] = ERJ190_E2()
 %
 % ERJ190_E2.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 15 aug 2025
+% last updated: 16 feb 2026
 %
 % define the embraer E190-E2 from "advanced 2030 single aisle aircraft
 % modeling" to be used for aircraft sizing/performance analysis.

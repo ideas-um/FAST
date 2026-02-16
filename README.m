@@ -20,12 +20,15 @@ function [] = README()
 %
 % Additional Contributors:
 %     Huseyin Acar
+%     Yi-Chih (Arenas) Wang
+%     Miranda Stockhausen
+%     Emma Cassidy
 %     Nawa Khailany
 %     Janki Patel
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 25 Jan 2025
+% README last updated: 20 Jan 2026
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -41,22 +44,99 @@ function [] = README()
 %
 % Please cite us when using FAST
 %
-% If you are using FAST in your work, please cite the following paper: 
-% Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future
-% Aircraft Sizing Tool for Conventional and Electrified Aircraft Design.
-% In AIAA SciTech 2025 Forum (p. 2374).
+% If you are using FAST in your work, please cite the following papers.
+% Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited
+% if you are only using FAST's regressions and/or Aerobase. Paper 5 may be
+% cited if you are only using FAST's integrated visualization capabilities.
+% Paper 6 may be cited for the graph-based methodology used in the
+% propulsion system analysis.
 %
-% A copy of this paper may be found at the following link: 
-% https://www.gokcincinar.com/publication/c-2025-scitech-pm/c-2025-SciTech-PM.pdf
+% 1) Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A
+%    Future Aircraft Sizing Tool for Conventional and Electrified Aircraft
+%    Design. Journal of Aircraft (article in advance).
+%    https://doi.org/10.2514/1.C038452
 %
-% Alternatively, you may use the information below when using BibTeX:
+% 2) Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A
+%    Future Aircraft Sizing Tool for Conventional and Electrified Aircraft
+%    Design. In AIAA SciTech Forum (p. 2374).
+%    https://doi.org/10.2514/6.2025-2374
 %
-% @inproceedings{mokotoff2025fast,
+% 3) Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends
+%    and Future Projections of Key Performance Parameters in Aircraft
+%    Design. Journal of Aircraft (article in advance).
+%    https://doi.org/10.2514/1.C038340
+%
+% 4) Arnson, M., Aljaber, R., & Cinar, G. (2025). Predicting Aircraft
+%    Design Parameters Using Gaussian Process Regressions on Historical
+%    Data. In AIAA SciTech Forum (p. 1287).
+%    https://doi.org/10.2514/6.2025-1287
+%
+% 5) Khailany, N., Mokotoff, P. R., & Cinar, G. (2025). Aircraft Geometry
+%    and Propulsion Architecture Visualization for the Future Aircraft
+%    Sizing Tool (FAST). In AIAA SciTech Forum (p. 1288).
+%    https://doi.org/10.2514/6.2025-1288
+%
+% 6) Mokotoff, P. R., & Cinar, G. (2025). A Graph-Based Framework for
+%    Advanced Aircraft Propulsion System Analysis. Aerospace Science and
+%    Technology, 168(110798). https://doi.org/10.1016/j.ast.2025.110798
+%
+% Alternatively, you may use the following BibTeX entries:
+%
+% @article{mokotoff2025afast,
+%   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
+%   author={Mokotoff, Paul R and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
+%   journal={Journal of Aircraft},
+%   pages={1--18},
+%   year={2025},
+%   publisher={American Institute of Aeronautics and Astronautics},
+%   doi={https://doi.org/10.2514/1.C038452}
+% }
+%
+% @inproceedings{mokotoff2025bfast,
 %   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
 %   author={Mokotoff, Paul and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
 %   booktitle={AIAA SciTech 2025 Forum},
 %   pages={2374},
-%   year={2025}
+%   year={2025},
+%   doi={https://doi.org/10.2514/6.2025-2374}
+% }
+%
+% @article{acar2025historical,
+%   title={Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design},
+%   author={Acar, Huseyin and Arnson, Maxfield and Tsai, Michael and Cinar, Gokcin},
+%   journal={Journal of Aircraft},
+%   pages={1--23},
+%   year={2025},
+%   publisher={American Institute of Aeronautics and Astronautics},
+%   doi={https://doi.org/10.2514/1.C038340}
+% }
+%
+% @inproceedings{arnson2025predicting,
+%   title={Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data},
+%   author={Arnson, Maxfield G and Aljaber, Rawan and Cinar, Gokcin},
+%   booktitle={AIAA SciTech 2025 Forum},
+%   pages={1287},
+%   year={2025},
+%   doi={https://doi.org/10.2514/6.2025-1287}
+% }
+%
+% @inproceedings{khailany2025aircraft,
+%   title={Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST)},
+%   author={Khailany, Nawa and Mokotoff, Paul and Cinar, Gokcin},
+%   booktitle={AIAA SciTech 2025 Forum},
+%   pages={1288},
+%   year={2025},
+%   doi={https://doi.org/10.2514/6.2025-1288}
+% }
+%
+% @article{mokotoff2025graph,
+%   title={A graph-based framework for advanced aircraft propulsion system analysis},
+%   author={Mokotoff, Paul R and Cinar, Gokcin},
+%   journal={Aerospace Science and Technology},
+%   pages={110798},
+%   year={2025},
+%   publisher={Elsevier},
+%   doi={https://doi.org/10.1016/j.ast.2025.110798}
 % }
 % 
 % -------------------------------------------------------------------------
@@ -112,85 +192,89 @@ function [] = README()
 %                    This package contains the battery model which is
 %                    called during the mission analysis for fully or hybrid
 %                    electric aircraft.
+%
+%             (c) +CostPkg
+%                    This packages contains functions for estimating
+%                    aircraft related costs.
 % 
-%             (c) +DatabasePkg
+%             (d) +DatabasePkg
 %                    This package contains the IDEAS Lab historical
 %                    database. It also contains functions which help
 %                    convert the original database format (MS Excel sheet)
 %                    into the FAST format (Matlab data structures).
 % 
-%             (d) +DataStructPkg
+%             (e) +DataStructPkg
 %                    This package contains functions which process aircraft
 %                    data structures when calling FAST.
 % 
-%             (e) +EngineModelPkg
+%             (f) +EngineModelPkg
 %                    This package contains the gas turbine engine models
 %                    used while running FAST. It is one of the largest
 %                    packages and inspecting additional documentation is
 %                    recommended if a user has more questions regarding the
 %                    gas turbine engine models.
 % 
-%             (f) +MissionProfilesPkg
+%             (g) +MissionProfilesPkg
 %                    This package is analagous to the AircraftSpecsPkg, as
 %                    it contains specific mission profiles. The
 %                    documentation will guide users in calling pre-made
 %                    mission profiles 
 % 
-%             (g) +MissionSegsPkg
+%             (h) +MissionSegsPkg
 %                    This package is responsible for all aircraft
 %                    performance-related functionality while performing the
 %                    mission analysis (i.e., processing and flying the
 %                    mission).
 %
-%             (h) +OEWPkg
+%             (i) +OEWPkg
 %                    This package determines the aircraft's airframe and 
 %                    propulsion system weights.
 % 
-%             (i) +OptimizationPkg
+%             (j) +OptimizationPkg
 %                    This package contains information about running EAP
 %                    power management optimization, which is focused on
 %                    optimizing in the sizing loop to determine the optimum
 %                    electrified powertrain component sizes and usage
 %                    during flight.
 % 
-%             (j) +PlotPkg
+%             (k) +PlotPkg
 %                    This package contains information about plotting the
 %                    mission history upon the user's request. It creates
 %                    subplots to show the time-based history of multiple
 %                    aircraft performance and system-level parameters.
 % 
-%             (k) +ProjectionPkg
+%             (l) +ProjectionPkg
 %                    This package contains code to project the value of
 %                    certain Key Performance Parameters (KPP) into the
 %                    future using S-curves.
 % 
-%             (l) +PropulsionPkg
+%             (m) +PropulsionPkg
 %                    This package is responsible for creating the user's
 %                    desired propulsion architecture and evaluating the
 %                    propulsion system's performance during the mission
 %                    analysis. It connects to the EngineModelPkg for
 %                    evaluating an actual engine's performance.
 % 
-%             (m) +RegressionPkg
+%             (n) +RegressionPkg
 %                    This package contains code that creates regressions to
 %                    predict any unknown parameters about the aircraft
 %                    configuration being designed.
 % 
-%             (n) +RetrofitPkg
+%             (o) +RetrofitPkg
 %                    This package contains code to run retrofit studies on
 %                    an aircraft by electrifying its powertrain and
 %                    replacing part of the payload with batteries.
 %
-%             (o) +TutorialsPkg
+%             (p) +TutorialsPkg
 %                     This package contains Matlab scripts to accompany all
 %                     the playlist of YouTube tutorial videos, which can be
 %                     accessed using this link: https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-
 % 
-%             (p) +UnitConversionPkg
+%             (q) +UnitConversionPkg
 %                    This package contains functions which perform unit
 %                    conversions for use in FAST.
 % 
-%             (q) +VisualizationPkg
+%             (r) +VisualizationPkg
 %                    This package contains information about visualizing
 %                    both the aicraft's outer mold line(as a wireframe) and
 %                    its propulsion architecture (in a schematic).
@@ -278,10 +362,9 @@ function [] = README()
 %                 should refer to the examples in "CreatePropArch" and the
 %                 following paper:
 %
-%                     Cinar, G., Garcia, E., & Mavris, D. N. (2020). A
-%                     framework for electrified propulsion architecture and
-%                     operation analysis. Aircraft Engineering and
-%                     Aerospace Technology, 92(5), 675-684.
+%                     Mokotoff, P. and Cinar, G. (2025). Graph Theory-based
+%                     propulsion system analysis. Aerospace Science and
+%                     Technology, 110798. https://doi.org/10.1016/j.ast.2025.110798
 %
 %         It is okay if some information is unknown about the aircraft. The
 %         user can either set the value to NaN or just not include it.
@@ -429,9 +512,7 @@ function [] = README()
 %         function, which is housed in the "PropulsionPkg" folder.
 % 
 %     (4) The "OptimizationPkg" is currently deprecated and only runs on
-%         previous versions of FAST. Updates to this package are expected
-%         to commence in Spring/Summer 2024 and be released by the end of
-%         2024.
+%         previous versions of FAST.
 %
 %     (5) Currently, we are in the process of switching to a new off-design
 %         engine model. As a result of that, some of the engines provided

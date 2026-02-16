@@ -1,7 +1,9 @@
 function [OffDesignInfo] = TF_OD_MapMaker(OnDesignEngine)
 % Turbofan Off-Design Map Maker
-% you should not be using this function. it is for internal use and is
-% called inside of TurbofanOffDesign
+% this function is not currently used in FAST and is in (potential) development
+% for future versions. The developers do not recommend using it. It was replaced by the SimpleOffDesign() function.
+% written by Max Arnson, marnson@umich.edu
+
 
 
 OffParams.FlightCon.Mach = OnDesignEngine.Specs.Mach;

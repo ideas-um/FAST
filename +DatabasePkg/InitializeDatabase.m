@@ -1,21 +1,29 @@
 function [DatabaseStruct] = InitializeDatabase()
-% [] = InitalizeDatabase()
+% [DatabaseStruct] = InitalizeDatabase()
 %
 % Written By Maxfield Arnson; marnson@umich.edu
-% Last updated 11/20/2023
+% Last updated 19 nov 2025
 %
 % This function reads in the IDEAS Lab database and writes the data to the
 % aircraft structures that are used in the FAST sizing code. These are
-% stored in the DatabasesV2 package in IDEAS_DB.mat. In addition, it
+% stored in the DatabasesPkg directory in IDEAS_DB.mat. In addition, it
 % calculates useful ratios for the aircraft structures such as thrust to
-% weight and wingloading for each of the aircraft. It has no inputs and no
-% outputs.
+% weight and wingloading for each of the aircraft.
 %
 % It also creates excel files intended to be used as an inputs in the JMP
 % application for data analysis. These files are located in the
-% DatabasesV2 Package.
+% DatabasePkg directory.
 %
+% INPUTS:
 %
+%   none
+%
+% OUTPUTS:
+% 
+%   DatabaseStruct = structure containing the IDEAS Databases. This variable is created so that when the function 
+%    is called, the databases load into the workspace. This variable is identical to those output into the
+%    IDEAS_DB.mat file, which this function creates by default.
+
 
 
 %% Read in AC Data, assign variables
@@ -23,7 +31,7 @@ function [DatabaseStruct] = InitializeDatabase()
 % Fans
 [~,~,RawTF] = xlsread(fullfile("+DatabasePkg", "EAP_Databases_Offline.xlsx"),'Jet Aircraft');
 
-for ii = 8:size(RawTF,2) % change upper value later on
+for ii = 8:size(RawTF,2)
     if isnan(RawTF{2,ii})
         continue
     end
@@ -47,7 +55,7 @@ end
 % Props
 [~,~,RawTP] = xlsread(fullfile("+DatabasePkg", "EAP_Databases_Offline.xlsx"),'Propeller Aircraft');
 
-for ii = 8:size(RawTP,2) % change upper value later on
+for ii = 8:size(RawTP,2)
     if isnan(RawTP{2,ii})
         continue
     end
@@ -160,7 +168,6 @@ for ii = 5:size(RawTPE,2)
 end
 
 % validation vs training
-
 PropEngineFields = fieldnames(TurbopropEngines);
 
 for ii = 1:length(PropEngineFields)
@@ -240,7 +247,6 @@ PropUnitsReference = DatabasePkg.CalcPropVals(PropUnitsReference,"Units");
 %% Create JMP Files
 % these are excel sheets
 
-
 % Fans
 [JMPCellFans] = DatabasePkg.StructTreeSearch(FanUnitsReference);
 for mm = 1:length(FanFields)
@@ -272,7 +278,7 @@ writecell(JMPCellProps, fullfile("+DatabasePkg", "JMPInputSheetPROPS.xlsx"))
 
 %% Write Databases to .mat file
 
-%save(fullfile("+DatabasePkg", "IDEAS_DB.mat"),'TurbofanAC','TurbofanEngines','TurbopropAC','TurbopropEngines','FanUnitsReference','PropUnitsReference')
+save(fullfile("+DatabasePkg", "IDEAS_DB.mat"),'TurbofanAC','TurbofanEngines','TurbopropAC','TurbopropEngines','FanUnitsReference','PropUnitsReference')
 
 %Output to a Variable
 DatabaseStruct.TurbofanAC = TurbofanAC;
@@ -285,10 +291,3 @@ DatabaseStruct.PropUnitsReference = PropUnitsReference;
 disp('Databases successfully initialized.')
 
 end
-
-
-
-
-
-
-

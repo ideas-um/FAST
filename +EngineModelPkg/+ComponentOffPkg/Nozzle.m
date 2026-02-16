@@ -9,6 +9,7 @@ M2 = M1;
 
 prime = 1;
 iter = 0;
+
 while abs(prime) > 1e-5 && iter < 10
 
     A2guess = EngineModelPkg.IsenRelPkg.A_Astar(Astar,M2,g);
@@ -17,7 +18,9 @@ while abs(prime) > 1e-5 && iter < 10
 
 
     M2 = M2 - fx/prime;
+
     iter = iter + 1;
+
 end
 
 if M2 > 1

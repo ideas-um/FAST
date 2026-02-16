@@ -2,7 +2,7 @@ function [Aircraft] = RegionalJetMission00(Aircraft)
 %
 % [Aircraft] = RegionalJetMission00(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 08 sep 2025
 %
 % Define a typical mission with a design mission only (no reserves, see
 % below). This profile contains altitudes and speeds for a regional jet.
@@ -62,9 +62,6 @@ Mission.VelEnd = UnitConversionPkg.ConvVel([140; 460; 460; 160;   0], "kts", "m/
 % define the speed types (either "TAS", "EAS", or "Mach")
 Mission.TypeBeg = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
 Mission.TypeEnd = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
-
-% operational splits to optimize (only needed if running an optimization)
-Mission.PowerOpt = [   1;     0;     0;     0;     0];
 
 
 %% REMEMBER THE MISSION PROFILE %%

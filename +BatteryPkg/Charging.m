@@ -1,11 +1,13 @@
-function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Charging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 %
-% [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+% [Voltage, Current, Pout, Capacity, SOC, C_rate] = Charging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 jul 2024
+% modified by Yipeng Liu, yipenglx@umich.edu
 %
-% Model (dis)charging for a Lithium-ion battery.
+% last updated: 21 oct 2025
+%
+% Model charging dynamics for a Lithium-ion battery.
 %
 % INPUTS:
 %     Preq     - power required by the battery.
@@ -21,13 +23,16 @@ function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Par
 %                set this variable to 1.
 %                size/type/units: 1-by-1 / integer / []
 %
-%    Series    - number of cells connceted in series. for a single cell,
+%     Series   - number of cells connceted in series. for a single cell,
 %                set this variable to 1.
 %                size/type/units: 1-by-1 / integer / []
 %
 % OUTPUTS:
 %     Voltage  - battery voltage as a function of time.
 %                size/type/units: n-by-1 / double / [V]
+%
+%     Current  - battery current as a function of time.
+%                size/type/units: n-by-1 / double / [A]
 %
 %     Pout     - battery output power.
 %                size/type/units: n-by-1 / double / [W]
@@ -39,6 +44,8 @@ function [Voltage, Current, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Par
 %                charge) and 100% (fully charged).
 %                size/type/units: n-by-1 / double / [%]
 %
+%     C_rate   - Rate of (dis)charge. 
+%                size/type/units: n-by-1 / double / [C]
 
 
 %% PROCESS INPUTS %%
@@ -66,7 +73,7 @@ elseif ((npreq >  1) && (ntime == 1))
 elseif (npreq ~= ntime)
     
     % throw an error
-    error("ERROR - Model: required power and time are different sizes.");
+    error("ERROR - Charging: required power and time are different sizes.");
         
 end
 
@@ -74,7 +81,7 @@ end
 if     (nsocs >  1)
     
     % throw an error
-    error("ERROR - Model: initial SOC must be a scalar or an empty array.");
+    error("ERROR - Charging: initial SOC must be a scalar or an empty array.");
     
 elseif (nsocs == 0)
     
@@ -90,23 +97,32 @@ Time = Time ./ 3600;
 %% BATTERY QUANTITIES FOR A LITHIUM ION CELL %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% nominal cell voltage [V]
-VoTemp = 4.0880;
+% Max cell voltage [V]
+VoTemp = Aircraft.Specs.Battery.MaxExtVolCell; % 4.0880V
 
 % internal resistance [Ohm]
-ResistanceTemp = 0.0199;
+ResistanceTemp = Aircraft.Specs.Battery.IntResist;
 
 % compute the number of cells in the battery pack
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-A = 0.0986;
+A = Aircraft.Specs.Battery.ExpVol;
 
 % exponential capacity [(Ah)^-1]
-B = 30;
+B = Aircraft.Specs.Battery.ExpCap;
 
-% maximum capacity
-Q = 3;
+% Determine maximum capacity [Ah] based on analysis type and degradation effect
+if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Specs.Battery.Degradation == 1
+
+    % Off-design analysis with battery degradation effect
+    Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;
+else
+    
+    % Either on-design analysis or off-design without degradation effect
+    Q = Aircraft.Specs.Battery.CapCell;
+end
+
 
 % discharge curve slope (taken from E-PASS)
 DischargeCurveSlope = 0.29732;
@@ -115,8 +131,8 @@ DischargeCurveSlope = 0.29732;
 PolarizedVoTemp = 0.0011;
 
 
-%% MODEL BATTERY (DIS)CHARGING %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% MODEL BATTERY CHARGING %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get the SOC
 SOC      = repmat(SOCBeg, ntime, 1);
@@ -124,7 +140,7 @@ Current  = zeros(         ntime, 1);
 Capacity = zeros(         ntime, 1);
 Voltage  = zeros(         ntime, 1);
 Pout     = zeros(         ntime, 1);
-
+C_rate   = zeros(         ntime, 1);
 % loop through all points
 for itime = 1:ntime
     
@@ -147,7 +163,8 @@ for itime = 1:ntime
     end
         
     % compute the cold cell voltage
-    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp .* DischargedCapacityStart ./ (SOC(itime) / 100) - DischargeCurveSlope .* DischargedCapacityStart);
+    VoltageCellCold = VoTemp + (A .* exp(-B .* DischargedCapacityStart) - PolarizedVoTemp .* DischargedCapacityStart ./ (SOC(itime) / 100) ...
+        - DischargeCurveSlope .* DischargedCapacityStart);
     
     % solve the polynomial to find the minimum current
     CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell];
@@ -210,10 +227,10 @@ for itime = 1:ntime
     
     % compute the cell voltage
     VoltageCell = VoltageCellCold + VoltageCellHot .* CurrBatt;
-    
+
     % compute the pack voltage
     Voltage(itime) = VoltageCell * Series;
-    
+
     % update the capacity
     DischargedCapacity = CurrBatt * Time(itime);
     
@@ -221,11 +238,18 @@ for itime = 1:ntime
     SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q;
     
     % update the capacity
-    Capacity(itime) = Q * SOC(itime) / 100 * Series * Parallel;
+    Capacity(itime) = Q * SOC(itime) / 100 * Parallel;
     
+    % check if capacity is exceed (Q * Parallel is the max capacity a battery pack can have)
+    if (Capacity(itime) > (Q * Parallel))
+        Capacity(itime) = (Q * Parallel);
+    end
+
     % compute the power output
     Pout(itime) = Voltage(itime) * Current(itime);
     
+    % compute the c-rate
+    C_rate(itime) = Current(itime) ./ (Q * Parallel);
 end
 
 % remove the first SOC value

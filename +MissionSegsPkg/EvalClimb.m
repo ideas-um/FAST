@@ -3,7 +3,7 @@ function [Aircraft] = EvalClimb(Aircraft)
 % [Aircraft] = EvalClimb(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 23 jun 2025
+% last updated: 16 feb 2026
 %
 % Evaluate a climb segment by iterating over the power required. While
 % iterating over the power required, the drag and specific excess power
@@ -287,12 +287,12 @@ while (iter < MaxIter)
     
     % compute the power available
     Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
+
+    % for full throttle, recompute the operational power splits
+    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
     
     % get the power available
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
-    
-    % for full throttle, recompute the operational power splits
-    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
 
     % ------------------------------------------------------
 

@@ -20,12 +20,15 @@ Principal Authors:
 
 Additional Contributors:
 - Hüseyin Acar
+- Yi-Chih (Arenas) Wang
+- Miranda Stockhausen
+- Emma Cassidy
 - Nawa Khailany
 - Janki Patel
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 25 Jan 2025
+README last updated: 20 Jan 2026
 
 ## Learn More About FAST
 
@@ -37,17 +40,83 @@ To stay informed about upcoming papers, new releases, and news about FAST, pleas
 
 ## Please cite us when using FAST
 
-If you are using FAST in your work, please cite the following paper: [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. In AIAA SciTech 2025 Forum (p. 2374).](https://www.gokcincinar.com/publication/c-2025-scitech-pm/c-2025-SciTech-PM.pdf)
+If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited if you are only using FAST's integrated visualization capabilities. Paper 6 may be cited for the graph-based methodology used in the propulsion system analysis.
+
+1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038452)
+1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. In AIAA SciTech Forum (p. 2374).](https://doi.org/10.2514/6.2025-2374)
+1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038340)
+1. [Arnson, M., Aljaber, R., & Cinar, G. (2025). Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data. In AIAA SciTech Forum (p. 1287).](https://doi.org/10.2514/6.2025-1287)
+1. [Khailany, N., Mokotoff, P. R., & Cinar, G. (2025). Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST). In AIAA SciTech Forum (p. 1288).](https://doi.org/10.2514/6.2025-1288)
+1. [Mokotoff, P. R., & Cinar, G. (2025). A Graph-Based Framework for Advanced Aircraft Propulsion System Analysis. Aerospace Science and Technology, 168(110798).](https://doi.org/10.1016/j.ast.2025.110798)
 
 Alternatively, you may use the information below when using BibTeX:
 
 ```
-@inproceedings{mokotoff2025fast,
+@article{mokotoff2025afast,
+  title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
+  author={Mokotoff, Paul R and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
+  journal={Journal of Aircraft},
+  pages={1--18},
+  year={2025},
+  publisher={American Institute of Aeronautics and Astronautics},
+  doi={https://doi.org/10.2514/1.C038452}
+}
+```
+
+```
+@inproceedings{mokotoff2025bfast,
   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
   author={Mokotoff, Paul and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
   booktitle={AIAA SciTech 2025 Forum},
   pages={2374},
-  year={2025}
+  year={2025},
+  doi={https://doi.org/10.2514/6.2025-2374}
+}
+```
+
+```
+@article{acar2025historical,
+  title={Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design},
+  author={Acar, Huseyin and Arnson, Maxfield and Tsai, Michael and Cinar, Gokcin},
+  journal={Journal of Aircraft},
+  pages={1--23},
+  year={2025},
+  publisher={American Institute of Aeronautics and Astronautics},
+  doi={https://doi.org/10.2514/1.C038340}
+}
+```
+
+```
+@inproceedings{arnson2025predicting,
+  title={Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data},
+  author={Arnson, Maxfield G and Aljaber, Rawan and Cinar, Gokcin},
+  booktitle={AIAA SciTech 2025 Forum},
+  pages={1287},
+  year={2025},
+  doi={https://doi.org/10.2514/6.2025-1287}
+}
+```
+
+```
+@inproceedings{khailany2025aircraft,
+  title={Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST)},
+  author={Khailany, Nawa and Mokotoff, Paul and Cinar, Gokcin},
+  booktitle={AIAA SciTech 2025 Forum},
+  pages={1288},
+  year={2025},
+  doi={https://doi.org/10.2514/6.2025-1288}
+}
+```
+
+```
+@article{mokotoff2025graph,
+  title={A graph-based framework for advanced aircraft propulsion system analysis},
+  author={Mokotoff, Paul R and Cinar, Gokcin},
+  journal={Aerospace Science and Technology},
+  pages={110798},
+  year={2025},
+  publisher={Elsevier},
+  doi={https://doi.org/10.1016/j.ast.2025.110798}
 }
 ```
 
@@ -71,6 +140,7 @@ For additional documentation, see package-specific README files. These READMEs w
 
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
+- **+CostPkg**: This packages contains functions for estimating aircraft related costs.
 - **+DatabasePkg**: This package contains the IDEAS Lab historical database. It also contains functions which help convert the original database format (MS Excel sheet) into the FAST format (Matlab data structures).
 - **+DataStructPkg**: This package contains functions which process aircraft data structures when calling FAST.
 - **+EngineModelPkg**: This package contains the gas turbine engine models used while running FAST. It is one of the largest packages and inspecting additional documentation is recommended if a user has more questions regarding the gas turbine engine models.
@@ -129,7 +199,7 @@ FAST performs on- and off-design analysis of a user-prescribed aircraft on a use
     - Select whether or not a geometry of the aircraft should be created. This is controlled by the variable: "Aircraft.Settings.VisualizeAircraft". The default is 0 (no geometry created).
     - Prescribe an aircraft architecture by either using a preset one (given in "CreatePropArch" within the "PropulsionPkg") or define their own. To learn more about how to define a propulsion architecture, the user should refer to the examples in "CreatePropArch" and the following paper:
 
-        > Cinar, G., Garcia, E., & Mavris, D. N. (2020). A framework for electrified propulsion architecture and operation analysis. Aircraft Engineering and Aerospace Technology, 92(5), 675-684.
+        > Mokotoff, P. and Cinar, G. (2025). [Graph Theory-based propulsion system analysis](https://doi.org/10.1016/j.ast.2025.110798). Aerospace Science and Technology, 110798.
 
     It is acceptable if some information is unknown about the aircraft. The user can either set the value to `NaN` or omit it. During the analysis preprocessing, any unknown information about the aircraft will be estimated using historical regressions from a database of over 450 aircraft.
 
@@ -172,8 +242,9 @@ Should additional support be needed (beyond reporting bugs or issues with the so
 1. When defining an aircraft in the "AircraftSpecsPkg" folder, many of the values will remain as `NaN`. For any values that remain as `NaN`, the regressions mentioned previously will attempt to approximate values for these variables. In some cases, this can lead to an unrealistic design, or one that is not able to converge. If possible, please try to define as much as possible about the aircraft. For any value in the "Aircraft.Settings" sub-structure that is not specified, a default value is internally provided.
 2. Some of the variables in the aircraft specification may have dependencies on each other. In the event that a dependency exists, the user will see a warning in the command window, indicating which variables will be prioritized and used to compute the others. If this warning appears, it does not mean that the design failed to converge or is deprecated. Instead, it means that excess information was supplied before the analysis began.
 3. During the mission evaluation, the thrust (for a turbojet or turbofan) or power (for a turboprop or piston aircraft) is lapsed by a power of the density ratio (density at altitude to density at sea level). For turbojets and turbofans, this exponent is set to 1. For turboprops or piston aircraft, this exponent is set to 0 (no lapse). Currently, the user is unable to specify the exponent. However, it can be modified inside the "EngineLapse" function, which is housed in the "PropulsionPkg" folder.
-4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST. Updates to this package are expected to commence in Spring/Summer 2024 and be released by the end of 2024.
+4. The "OptimizationPkg" is currently deprecated and only runs on previous versions of FAST.
 5. Currently, we are in the process of switching to a new off-design engine model. As a result of that, some of the engines provided in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to date. The engines that currently work are the LEAP-1A26, CF34-8E5, and any turboprop engine. If you want to use a turbofan engine not listed above, please refer to "+EngineModelPkg\SimpleOffDesign" for the necessary coefficients that need to be provided to use the fuel flow equation. Additionally, due to this switch, please refrain from using the "+EngineModelPkg\TurbofanOffDesign" function or any functions that it calls within its routine.
+6. We are still expanding the battery state of health model so using degredation on analysis for battery may be inaccurate.
 
 # (IX) Testing FAST:
 

@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 jun 2025
+% last updated: 16 feb 2026
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -84,6 +84,9 @@ ntrn = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
 % get the number of sinks
 nsnk = ncomp - nsrc - ntrn;
 
+% get the sink indices
+isnk = (nsrc + ntrn + 1) : ncomp;
+
 
 %% COMPUTE THE POWER AVAILABLE FOR THE TRANSMITTERS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,6 +94,9 @@ nsnk = ncomp - nsrc - ntrn;
 % remember the SLS thrust/power available in each transmitter
 ThrustAv = repmat(Aircraft.Specs.Propulsion.SLSThrust, npnt, 1);
  PowerAv = repmat(Aircraft.Specs.Propulsion.SLSPower , npnt, 1);
+ 
+% remember the SLS power separately
+SLSPower = Aircraft.Specs.Propulsion.SLSPower;
 
 % get indices for transmitters
 itrn = (1:ntrn) + nsrc;
@@ -103,25 +109,25 @@ UpTrn = find(sum(Arch(itrn, itrn), 1) > 0);
 PowerAv(:, UpTrn) = 0; %#ok<FNDSB>
  
 % loop through all transmitters
-for itrn = 1:ntrn
+for jtrn = 1:ntrn
     
     % check for the proper power source
-    if     (TrnType(itrn) == 1) % engine
+    if     (TrnType(jtrn) == 1) % engine
         
         % get the thrust/power available based on the aircraft class
         if      (strcmpi(aclass, "Turbofan" ) == 1)
                 
             % lapse the SLS thrust
-            ThrustAv(:, itrn) = PropulsionPkg.EngineLapse(ThrustAv(:, itrn), aclass, Rho);
+            ThrustAv(:, jtrn) = PropulsionPkg.EngineLapse(ThrustAv(:, jtrn), aclass, Rho);
             
             % get the available power from the gas-turbine engines
-            PowerAv(:, itrn) = ThrustAv(:, itrn) .* TAS;
+            PowerAv(:, jtrn) = ThrustAv(:, jtrn) .* TAS;
             
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
             % lapse the SLS power
-            PowerAv(:, itrn) = PropulsionPkg.EngineLapse(PowerAv(:, itrn), aclass, Rho);
+            PowerAv(:, jtrn) = PropulsionPkg.EngineLapse(PowerAv(:, jtrn), aclass, Rho);
                 
         else
             
@@ -130,26 +136,26 @@ for itrn = 1:ntrn
             
         end
         
-    elseif (TrnType(itrn) == 0) % electric motor
+    elseif (TrnType(jtrn) == 0) % electric motor
         
         % once available, input an electric motor model here
-        
-    elseif (TrnType(itrn) == 2) % fuel cell
+
+    elseif (TrnType(jtrn) == 2) % fuel cell
         
         % once available, input a fuel cell model here
         
-    elseif (TrnType(itrn) == 3) % electric generator
+    elseif (TrnType(jtrn) == 3) % electric generator
         
         % once available, input an electric generator model here
         
-    elseif (TrnType(itrn) == 4) % cables
+    elseif (TrnType(jtrn) == 4) % cables
         
         % once available, input a cable model here
         
     else
         
         % throw an error
-        error("ERROR - PowerAvailable: invalid power source type in position %d.", itrn);
+        error("ERROR - PowerAvailable: invalid power source type in position %d.", jtrn);
         
     end
 end
@@ -167,6 +173,12 @@ idx = (nsrc + 1) : ncomp;
 % loop through points to get the power available
 for ipnt = 1:npnt
 
+    % find all upstream transmitters and propellers
+    UpTrn = find(sum(Lambda(itrn, itrn), 1) > 0 | (TrnType == 2));
+    
+    % assume no power available at the propellers yet (need to propagate)
+    PowerAv(ipnt, UpTrn) = 0; %#ok<FNDSB>
+    
     % get the initial power available
     Pav(ipnt, :) = [zeros(1, nsrc), PowerAv(ipnt, :), zeros(1, nsnk)];
     
@@ -186,7 +198,29 @@ for ipnt = 1:npnt
     
     % propagate the power upstream
     Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
-               
+    
+    % check that the component is not overloaded
+    Overload = Pav(ipnt, itrn) > SLSPower;
+    
+    % suppress component overloads
+    if (any(Overload))
+        
+        % get the indices
+        TempIdx = find(Overload);
+        
+        % update the power available
+        Pav(ipnt, TempIdx + nsrc) = SLSPower(TempIdx);
+        
+        % get the sink inputs
+        [TempTrn, ~] = find(Arch(:, isnk));
+        
+        % get a temporary index
+        TempIdx = [TempTrn', isnk];
+        
+        % re-compute the power at the sink(s)
+        Pav(ipnt, TempIdx) = PropulsionPkg.PowerFlow(Pav(ipnt, TempIdx)', Arch(TempIdx, TempIdx), Lambda(TempIdx, TempIdx), EtaUps(TempIdx, TempIdx), +1)';
+        
+    end
 end
 
 % convert the power available to thrust available

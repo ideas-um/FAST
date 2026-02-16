@@ -18,11 +18,15 @@ function [] = README()
 %
 % Additional Contributors:
 %     Huseyin Acar
+%     Yi-Chih (Arenas) Wang
+%     Miranda Stockhausen
+%     Emma Cassidy
 %     Nawa Khailany
 %     Janki Patel
 %     Michael Tsai
+%     Vaibhav Rau
 % 
-% README last updated: 3 apr 2024
+% README last updated: 08 Sep 2025
 % 
 % -------------------------------------------------------------------------
 %

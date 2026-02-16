@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 nov 2025
+% last updated: 16 feb 2026
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -258,13 +258,13 @@ end
 if (isfield(Aircraft.Specs.Propulsion.PropArch, "CableConns"  ) && ...
     isfield(Aircraft.Specs.Propulsion.PropArch, "CableLengths") )
     
-    % get the cable lengths and connections
-    CabCon = Aircraft.Specs.Propulsion.PropArch.CableConns  ;
-    CabLen = Aircraft.Specs.Propulsion.PropArch.CableLengths;
-    
     % check if cables are explicitly provided
     if (any(Cab))
 
+        % get the cable lengths and connections
+        CabCon = Aircraft.Specs.Propulsion.PropArch.CableConns  ;
+        CabLen = Aircraft.Specs.Propulsion.PropArch.CableLengths;
+        
         % get the number of connections from the cables
         [ndwn, ~] = size(CabCon);
         
@@ -298,6 +298,7 @@ if (isfield(Aircraft.Specs.Propulsion.PropArch, "CableConns"  ) && ...
     
     % compute the weight of the cables
     Aircraft.Specs.Weight.Cables = sum(Wcab, "all");
+
     
 else
     

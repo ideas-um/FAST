@@ -169,6 +169,7 @@ while abs(fprimex) > 1e-10 && iter < 100
     Tt39new = Tt39old - (fx-mfuel)^2/fprimex;
 
     Tt39old = Tt39new;
+    iter = iter+1;
 
     iter = iter+1;
 %     scatter(iter,fx)

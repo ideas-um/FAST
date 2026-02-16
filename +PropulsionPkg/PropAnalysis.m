@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 jun 2025
+% last updated: 16 feb 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -374,7 +374,7 @@ if (any(Batt))
         if (DetailedBatt == 1)
             
             % power available from the battery
-            [V(ibeg:iend, icol), I(ibeg:iend, icol), Pout(ibeg:iend, icol),  Q(ibeg+1:iend+1, icol), SOC(ibeg+1:iend+1, icol)] = BatteryPkg.Model(...
+            [V(ibeg:iend, icol), I(ibeg:iend, icol), PBatt,  Q(ibeg+1:iend+1, icol), SOC(ibeg:iend+1, icol)] = BatteryPkg.Discharging(Aircraft,...
              Pout(ibeg:iend, icol), dt, SOC(1, icol), ParCells, SerCells);
             
             % check if the SOC falls below 20%
@@ -466,7 +466,7 @@ if (any(Fuel))
         EngFun = @(EngSpec, EMPower) EngineModelPkg.TurbopropNonlinearSizing(EngSpec, EMPower);
 
         % get the BSFC from the engine sizing
-        GetSFC = @(SizedEngine) SizedEngine.BSFC_Imp;
+        GetSFC = @(SizedEngine) SizedEngine.BSFC;
         
         % get the fuel flow rate
         MDot = @(OffDesignEng) OffDesignEng.Fuel.MDot;

@@ -102,7 +102,7 @@ Aircraft.Specs.Weight.Fuel = 0;
 % battery weight (lbm), leave NaN for propulsion systems without batteries
 Aircraft.Specs.Weight.Batt = 36e3;
 
-Aircraft.Specs.Weight.WairfCF = 1.07;
+Aircraft.Specs.Weight.WairfCF = 0.87;
 
 
 %% PROPULSION %%
@@ -214,7 +214,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.8;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.8*0.7;
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = NaN;
@@ -229,8 +229,8 @@ Aircraft.Specs.Power.P_W.EM = NaN;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % battery cells in series and parallel 
-Aircraft.Specs.Power.Battery.ParCells =  100;
-Aircraft.Specs.Power.Battery.SerCells = 2000;
+Aircraft.Specs.Power.Battery.ParCells =  NaN;
+Aircraft.Specs.Power.Battery.SerCells = NaN;
 
 % initial battery SOC
 Aircraft.Specs.Power.Battery.BegSOC = 100;

@@ -4,6 +4,10 @@ function [Aircraft] = Tutorial007()
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 07 jun 2024
 %
+% WARNING: this tutorial is depracated and will be updated in a future
+% release of FAST. Please refer to the CHANGELOG.md file (version 0.2.0
+% updates) to learn how propulsion architectures are now defined.
+%
 % This is a tutorial for creating a new propulsion architecture and storing
 % it in an aircraft structure. Hard-coded power splits are provided for
 % instructional purposes. See the following variables to specify the power

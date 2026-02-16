@@ -290,7 +290,7 @@ while abs(prime) > 1e-7 && iter < 100
     if iter > 150
         error('Engine Model Off Design; Failure to converge on mach number during state estimation')
     end
-
+    
 end
 
 

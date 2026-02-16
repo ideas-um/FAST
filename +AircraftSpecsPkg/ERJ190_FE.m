@@ -153,7 +153,7 @@ Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 Aircraft.Specs.Power.SpecEnergy.Fuel = (43.2e+6) / (3.6e+6);
 
 % gravimetric specific energy of battery (kWh/kg)
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
+Aircraft.Specs.Power.SpecEnergy.Batt = 0.5;
 
 % electric motor efficiency
 Aircraft.Specs.Power.Eta.EM = 0.96;

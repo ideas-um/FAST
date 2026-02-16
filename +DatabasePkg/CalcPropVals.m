@@ -2,7 +2,7 @@ function [Plane] = CalcPropVals(Plane,units)
 %
 % [Plane] = CalcPropVals(Plane,units)
 % Written by Maxfield Arnson
-% Updated 10/19/2023
+% Updated 19 nov 2025
 %
 % This function takes an aircraft structure from the IDEAS database and
 % processes it to add additional fields that can be calculated from the raw
@@ -51,6 +51,7 @@ function [Plane] = CalcPropVals(Plane,units)
 % Taper Ratio
 % Aspect Ratio
 % Cruise L/D
+% Airplane Design Group
 
 switch units
     case "Vals"
@@ -172,6 +173,71 @@ switch units
             Plane.Specs.Weight.Payload = Plane.Specs.Weight.MaxPayload;
         end
 
+        %% Aircraft design group
+
+        b = UnitConversionPkg.ConvLength(Plane.Specs.Aero.Span,'m','ft');
+        th = UnitConversionPkg.ConvLength(Plane.Specs.Aero.Height,'m','ft');
+
+
+        ADG = NaN;
+
+
+        if b < 262 && th < 80
+            ADG = "VI";
+            bpercent = b/262;
+            thpercent = th/80;
+        end
+
+        if b < 214 && th < 66
+            ADG = "V";
+            bpercent = b/214;
+            thpercent = th/66;
+        end
+        if b < 171 && th < 60
+            ADG = "IV";
+            bpercent = b/171;
+            thpercent = th/60;
+        end
+        if b < 118 && th < 45
+            ADG = "III";
+            bpercent = b/118;
+            thpercent = th/45;
+        end
+        if b < 79 && th < 30
+            ADG = "II";
+            bpercent = b/79;
+            thpercent = th/30;
+        end
+        if b < 49 && th < 20
+            ADG = "I";
+            bpercent = b/49;
+            thpercent = th/20;
+        end
+
+        if isnan(b) || isnan(th)
+            bpercent = NaN;
+            thpercent = NaN;
+        end
+
+
+        if bpercent > thpercent
+            ADGPercent = bpercent;
+            ADGLimitor = "Wingspan";
+        elseif bpercent == thpercent
+            ADGPercent = bpercent;
+            ADGLimitor = "Both";
+        elseif bpercent < thpercent
+            ADGPercent = thpercent;
+            ADGLimitor = "TailHeight";
+        else
+            ADGPercent = NaN;
+            ADGLimitor = NaN;
+        end
+
+        Plane.Specs.TLAR.ADG = ADG;
+        Plane.Specs.TLAR.ADGPercent = ADGPercent;
+        Plane.Specs.TLAR.ADGLimitor = ADGLimitor;
+
         %% FAST Inputs
         % These allow aircraft in the database to be directly sized by the
         % FAST tool. They assign flags and values that are only used by
@@ -197,12 +263,20 @@ switch units
         Plane.Specs.Power.SpecEnergy.Batt = NaN;
         Plane.Specs.Power.Eta.EM = NaN;
         Plane.Specs.Power.Eta.EG = NaN;
-        Plane.Specs.Power.Phi.SLS = 0.00;
-        Plane.Specs.Power.Phi.Tko = 0.00;
-        Plane.Specs.Power.Phi.Clb = 0.00;
-        Plane.Specs.Power.Phi.Crs = 0.00;
-        Plane.Specs.Power.Phi.Des = 0.00;
-        Plane.Specs.Power.Phi.Lnd = 0.00;
+
+        Plane.Specs.Power.LamDwn.SLS = 0;
+        Plane.Specs.Power.LamDwn.Tko = 0;
+        Plane.Specs.Power.LamDwn.Clb = 0;
+        Plane.Specs.Power.LamDwn.Crs = 0;
+        Plane.Specs.Power.LamDwn.Des = 0;
+        Plane.Specs.Power.LamDwn.Lnd = 0;
+        Plane.Specs.Power.LamUps.SLS = 0;
+        Plane.Specs.Power.LamUps.Tko = 0;
+        Plane.Specs.Power.LamUps.Clb = 0;
+        Plane.Specs.Power.LamUps.Crs = 0;
+        Plane.Specs.Power.LamUps.Des = 0;
+        Plane.Specs.Power.LamUps.Lnd = 0;
+
         Plane.Specs.Propulsion.T_W.SLS = Plane.Specs.Power.P_W.SLS/Plane.Specs.Performance.Vels.Tko/9.81;
         Plane.Specs.Power.P_W.EM = NaN;
         Plane.Specs.Power.P_W.EG = NaN;
@@ -237,7 +311,13 @@ switch units
         Plane.Specs.Aero.L_D.Crs = "ratio";
         Plane.Specs.Aero.AR = "ratio";
 
+
+
         Plane.Specs.TLAR.Class = "flag";
+        Plane.Specs.TLAR.ADG = "Category I through VI";
+        Plane.Specs.TLAR.ADGPercent = "Percent";
+        Plane.Specs.TLAR.ADGLimitor = "Type";
+
         Plane.Specs.Propulsion.Arch.Type = "flag";
         Plane.Specs.Propulsion.Eta.Prop = "efficiency";
         Plane.Specs.Performance.Alts.Tko = "m";
@@ -253,12 +333,20 @@ switch units
         Plane.Specs.Power.SpecEnergy.Fuel = "kWh/kg";
         Plane.Specs.Power.Eta.EM = "efficiency";
         Plane.Specs.Power.Eta.EG = "efficiency";
-        Plane.Specs.Power.Phi.SLS = "ratio";
-        Plane.Specs.Power.Phi.Tko = "ratio";
-        Plane.Specs.Power.Phi.Clb = "ratio";
-        Plane.Specs.Power.Phi.Crs = "ratio";
-        Plane.Specs.Power.Phi.Des = "ratio";
-        Plane.Specs.Power.Phi.Lnd = "ratio";
+
+        Plane.Specs.Power.LamDwn.SLS = "ratio";
+        Plane.Specs.Power.LamDwn.Tko = "ratio";
+        Plane.Specs.Power.LamDwn.Clb = "ratio";
+        Plane.Specs.Power.LamDwn.Crs = "ratio";
+        Plane.Specs.Power.LamDwn.Des = "ratio";
+        Plane.Specs.Power.LamDwn.Lnd = "ratio";
+        Plane.Specs.Power.LamUps.SLS = "ratio";
+        Plane.Specs.Power.LamUps.Tko = "ratio";
+        Plane.Specs.Power.LamUps.Clb = "ratio";
+        Plane.Specs.Power.LamUps.Crs = "ratio";
+        Plane.Specs.Power.LamUps.Des = "ratio";
+        Plane.Specs.Power.LamUps.Lnd = "ratio";
+
         Plane.Specs.Propulsion.T_W.SLS = "ratio";
         Plane.Specs.Power.P_W.EM = "kW/kg";
         Plane.Specs.Power.P_W.EG = "kW/kg";

@@ -3,7 +3,7 @@ function [Aircraft] = LM100J_Conventional()
 % [Aircraft] = LM100J_Conventional()
 % originally written by Max Arnson marnson@umich.edu
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 dec 2024
+% last updated: 20 jun 2025
 %
 % Define the LM100J from Lockheed Martins' Brochure.
 %
@@ -199,11 +199,9 @@ Aircraft.Specs.Power.Battery.BegSOC   = NaN;
 
 % m-file preset for aircraft (if empty, single aisle twb)
 Aircraft.Geometry.Preset = @(Aircraft) VisualizationPkg.GeometrySpecsPkg.LM100JNominalGeometry(Aircraft);
-%Aircraft.Preset = NaN;
 
 % Fuselage length (if empty, then use regression)
 Aircraft.Geometry.LengthSet = UnitConversionPkg.ConvLength(100.17, "ft", "m");
-%Aircraft.LengthSet = NaN;
 
 % ----------------------------------------------------------
 

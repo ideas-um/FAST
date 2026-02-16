@@ -8,6 +8,7 @@
 % AE2100_D3              - EngineModelPkg.EngineSpecsPkg.AE2100_D3 is a function.
 % AE3007A                - EngineModelPkg.EngineSpecsPkg.AE3007A is a function.
 % Allison_250_C30G       - EngineModelPkg.EngineSpecsPkg.Allison_250_C30G is a function.
+% CeRAS                  - EngineModelPkg.EngineSpecsPkg.CeRAS is a function.
 % CF6_80C2_B7F           - EngineModelPkg.EngineSpecsPkg.CF6_80C2_B7F is a function.
 % CF34_8E5               - EngineModelPkg.EngineSpecsPkg.CF34_8E5 is a function.
 % ExampleTF              - EngineModelPkg.EngineSpecsPkg.ExampleTF is a function.

@@ -5,6 +5,10 @@ function [] = Tutorial011(iarch)
 % adapted from Nawa Khailany
 % last updated: 25 jun 2024
 %
+% WARNING: this tutorial is depracated and will be updated in a future
+% release of FAST. Please refer to the CHANGELOG.md file (version 0.2.0
+% updates) to learn how propulsion architectures are now defined.
+%
 % This tutorial is for visualizing propulsion architectures. Before
 % creating your own propulsion architectures, the user is encouraged to
 % read the following reference to understand how the matrices for each

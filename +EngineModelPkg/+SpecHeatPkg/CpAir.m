@@ -2,7 +2,7 @@ function [heat] = CpAir(T_low,T_high)
 %
 % [heat] = CpAir(T_low,T_high)
 % Written by Maxfield Arnson
-% Updated 10/5/2023
+% Updated 19 nov 2025
 %
 % This function does one of two things depending on the inputs. If one
 % input, it returns the specific heat at constant pressure (Cp) of air. if two
@@ -171,10 +171,6 @@ end
 % f = gcf;
 % f.Position = [100 500 600 500];
 % 
-% print(f, '../EAP/DB_Paper_Scripts/cpcurve','-dpdf')
-
-
-
+% print(f, 'cpcurve_air','-dpdf')
 
 end
-

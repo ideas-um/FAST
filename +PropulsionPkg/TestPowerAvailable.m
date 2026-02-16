@@ -2,7 +2,7 @@ function [Success] = TestPowerAvailable()
 %
 % [Success] = TestPowerAvailable()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 sep 2024
+% last updated: 19 jun 2025
 %
 % Generate simple test cases to confirm that the power available function
 % is working properly.
@@ -70,33 +70,36 @@ TestIn.Mission.History.SI.Power.TV = zeros(2, 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [82, 18];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,  0];
+TestIn.Specs.Propulsion.SLSPower  = [82, 18, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,  0,   0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [1, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = eye(2);
-TestIn.Specs.Propulsion.PropArch.PSES = eye(2);
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0] ;
 
-% create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @(lambda) [1 - lambda, lambda];
-TestIn.Specs.Propulsion.Oper.PSPS = @() eye(2);
-TestIn.Specs.Propulsion.Oper.PSES = @() eye(2);
+% create the upstream operational matrix
+TestIn.Specs.Propulsion.PropArch.OperUps = @(Lambda) ...
+    [0, 0, 1, 0, 0     , 0; ...
+     0, 0, 0, 1, 0     , 0; ...
+     0, 0, 0, 0, 1     , 0; ...
+     0, 0, 0, 0, Lambda, 0; ...
+     0, 0, 0, 0, 0     , 1; ...
+     0, 0, 0, 0, 0     , 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(   2);
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(6, 6);
 
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = repmat(0.18, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(        2, 1);
+% define the upstream power split
+TestIn.Mission.History.SI.Power.LamUps = [1; 1];
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType = [1, 0   ];
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 0, 2];
 
 % ----------------------------------------------------------
 
@@ -131,34 +134,8 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [82, 18];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,  0];
-
-% create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [1, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = eye(2);
-TestIn.Specs.Propulsion.PropArch.PSES = eye(2);
-
-% create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [1, 0];
-TestIn.Specs.Propulsion.Oper.PSPS = @() eye(2);
-TestIn.Specs.Propulsion.Oper.PSES = @() eye(2);
-
-% create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(   2);
-
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
-
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% re-define the upstream power split
+TestIn.Mission.History.SI.Power.LamUps = [0; 0];
 
 % ----------------------------------------------------------
 
@@ -194,33 +171,40 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [82, 100];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,   0];
+TestIn.Specs.Propulsion.SLSPower  = [82, 82, 18, 100, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,  0,  0,   0,   0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1      ];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1, 0; 0, 1];
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 0, 1, 0, 0, 0, 0, 0; ...
+     0, 0, 0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0, 0, 0; ...
+     0, 0, 0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @(lambda) [1, 0; 1 - lambda, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @(lambda) [1, 0; 0,  lambda   ];
+TestIn.Specs.Propulsion.PropArch.OperUps = @(Lambda) ...
+    [0, 0, 1, 0, 0, 0     , 0, 0; ...
+     0, 0, 0, 0, 1, 0     , 0, 0; ...
+     0, 0, 0, 1, 0, 0     , 0, 0; ...
+     0, 0, 0, 0, 0, 1     , 0, 0; ...
+     0, 0, 0, 0, 0, Lambda, 0, 0; ...
+     0, 0, 0, 0, 0, 0     , 1, 0; ...
+     0, 0, 0, 0, 0, 0     , 0, 1; ...
+     0, 0, 0, 0, 0, 0     , 0, 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(   2);
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(8, 8);
 
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = repmat(0.18, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = repmat(0.18, 2, 1);
+% define the power splits
+TestIn.Mission.History.SI.Power.LamUps = [1; 1];
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType = [1,       0   ];
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 3, 4, 0, 2];
 
 % ----------------------------------------------------------
 
@@ -255,34 +239,8 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [82, 100];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,   0];
-
-% create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1      ];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1, 0; 0, 1];
-
-% create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @(lambda) [1, 0; 1 - lambda, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @() [1, 0; 0, 0];
-
-% create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(   2);
-
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = repmat(0.18, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(        2, 1);
-
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% re-define the power splits
+TestIn.Mission.History.SI.Power.LamUps = [0; 0];
 
 % ----------------------------------------------------------
 
@@ -318,33 +276,41 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [93.52, 18.00];
-TestIn.Specs.Propulsion.SLSThrust = [ 0   ,  0   ];
+TestIn.Specs.Propulsion.SLSPower  = [93.52, 11.52, 6.48, 18, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0   ,  0   , 0   ,  0,   0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [1, 1      ];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1, 0; 0, 1];
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 0, 1, 0, 0, 0, 0, 0; ...
+     0, 0, 0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @(lambda) [1 - lambda, lambda];
-TestIn.Specs.Propulsion.Oper.PSPS = @(lambda) [1, 0; lambda, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @(lambda) [1, 0; 0, lambda];
+TestIn.Specs.Propulsion.PropArch.OperUps = @(Lam1, Lam2) ...
+    [0, 0, 1, 0   , 0, 0   , 0     , 0; ...
+     0, 0, 0, 0   , 1, 0   , 0     , 0; ...
+     0, 0, 0, Lam2, 0, 0   , 1-Lam2, 0; ...
+     0, 0, 0, 0   , 0, 1   , 0     , 0; ...
+     0, 0, 0, 0   , 0, Lam1, 0     , 0; ...
+     0, 0, 0, 0   , 0, 0   , 1     , 0; ...
+     0, 0, 0, 0   , 0, 0   , 0     , 1; ...
+     0, 0, 0, 0   , 0, 0   , 0     , 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(   2);
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(8, 8);
 
 % power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = repmat(0.18, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = repmat(0.64, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = repmat(0.36, 2, 1);
+TestIn.Mission.History.SI.Power.LamUps = [0, 11.52/93.52; ...
+                                          1, 11.52/93.52] ;
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType = [1,       0   ];
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 3, 4, 0, 2];
 
 % ----------------------------------------------------------
 
@@ -361,7 +327,7 @@ TestOut = PropulsionPkg.PowerAvailable(TestIn);
 TestValue = TestOut.Mission.History.SI.Power.TV;
 
 % list the correct values of the output
-TrueValue = repmat(100, 2, 1);
+TrueValue = [93.52; 100];
 
 % run the test
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
@@ -380,33 +346,36 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = repmat(50, 1, 2);
-TestIn.Specs.Propulsion.SLSThrust = zeros(     1, 2);
+TestIn.Specs.Propulsion.SLSPower  = [50, 50, 50, 50];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,  0,  0,  0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = eye(2);
-TestIn.Specs.Propulsion.PropArch.PSPS = eye(2);
-TestIn.Specs.Propulsion.PropArch.PSES = eye(2);
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 1, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() ones(1, 2) ./ 2;
-TestIn.Specs.Propulsion.Oper.TSPS = @() eye(2);
-TestIn.Specs.Propulsion.Oper.PSPS = @() eye(2);
-TestIn.Specs.Propulsion.Oper.PSES = @() eye(2);
+TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+    [0, 0.5, 0.5, 0, 0, 0; ...
+     0, 0  , 0  , 1, 0, 0; ...
+     0, 0  , 0  , 0, 1, 0; ...
+     0, 0  , 0  , 0, 0, 1; ...
+     0, 0  , 0  , 0, 0, 1; ...
+     0, 0  , 0  , 0, 0, 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(2);
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(6, 6);
 
 % power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamUps = [0; 0];
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 1];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType =  1          ;
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 1, 2, 2];
 
 % ----------------------------------------------------------
 
@@ -442,33 +411,36 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [37, 63, 100];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,  0,   0];
+TestIn.Specs.Propulsion.SLSPower  = [37, 63, 100, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,  0,   0,   0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 0, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0, 0; 0, 1, 0; 1, 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1; 1; 0];
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 1, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @(lambda) [1, 0, 0; 0, 1, 0; lambda, 1 - lambda, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @() [1; 1; 0];
+TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+    [0, 1/3, 2/3, 0, 0, 0; ...
+     0, 0  , 0  , 1, 0, 0; ...
+     0, 0  , 0  , 1, 0, 0; ...
+     0, 0  , 0  , 0, 1, 0; ...
+     0, 0  , 0  , 0, 0, 1; ...
+     0, 0  , 0  , 0, 0, 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 3);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   3);
-TestIn.Specs.Propulsion.Eta.PSES = ones(3, 1);
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(6, 6);
 
 % power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(        2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = repmat(0.37, 2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(        2, 1);
+TestIn.Mission.History.SI.Power.LamUps = [0; 0];
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 1, 1];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType =  0          ;
+TestIn.Specs.Propulsion.PropArch.TrnType = [0, 0, 0, 2];
 
 % ----------------------------------------------------------
 
@@ -504,33 +476,42 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [160, 100];
-TestIn.Specs.Propulsion.SLSThrust = [  0,   0];
+TestIn.Specs.Propulsion.SLSPower  = [160, 100, 100, 100];
+TestIn.Specs.Propulsion.SLSThrust = [  0,   0,   0,   0];
 
 % create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1; 0];
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 1, 0, 0, 0, 0; ...
+     0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @() [1, 0; 1, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @() [1; 0];
+TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+    [0, 1, 0, 0, 0, 0; ...
+     0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0] ;
 
 % create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = [1.0, 1.0];
-TestIn.Specs.Propulsion.Eta.PSPS = [1.0, 1.0; 0.625, 1.0];
-TestIn.Specs.Propulsion.Eta.PSES = [0.4; 1.0];
+TestIn.Specs.Propulsion.PropArch.EtaUps = ...
+    [1, 0.4, 1    , 1, 1, 1; ...
+     1, 1  , 0.625, 1, 1, 1; ...
+     1, 1  , 1    , 1, 1, 1; ...
+     1, 1  , 1    , 1, 1, 1; ...
+     1, 1  , 1    , 1, 1, 1; ...
+     1, 1  , 1    , 1, 1, 1] ;
 
 % power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
+TestIn.Mission.History.SI.Power.LamUps = [0; 0];
 
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% source/transmitter types
+TestIn.Specs.Propulsion.PropArch.SrcType =  1          ;
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 3, 0, 2];
 
 % ----------------------------------------------------------
 
@@ -566,33 +547,11 @@ itest = itest + 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [60, 100];
-TestIn.Specs.Propulsion.SLSThrust = [ 0,   0];
+TestIn.Specs.Propulsion.SLSPower  = [60, 100, 100, 100];
+TestIn.Specs.Propulsion.SLSThrust = [ 0,   0,   0,   0];
 
-% create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1; 0];
-
-% create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @() [1, 0; 1, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @() [1; 0];
-
-% create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(2, 1);
-
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
-
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% re-define the efficiency matrices (assume perfect effciency)
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(6, 6);
 
 % ----------------------------------------------------------
 
@@ -627,34 +586,9 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% set the SLS power and thrust (thrust can be arbitrary for prop aircraft)
-TestIn.Specs.Propulsion.SLSPower  = [100, 60];
-TestIn.Specs.Propulsion.SLSThrust = [  0,  0];
-
-% create the propulsion architecture
-TestIn.Specs.Propulsion.PropArch.TSPS = [0, 1];
-TestIn.Specs.Propulsion.PropArch.PSPS = [1, 0; 1, 1];
-TestIn.Specs.Propulsion.PropArch.PSES = [1; 0];
-
-% create the operational matrices
-TestIn.Specs.Propulsion.Oper.TS   = @() 1;
-TestIn.Specs.Propulsion.Oper.TSPS = @() [0, 1];
-TestIn.Specs.Propulsion.Oper.PSPS = @() [1, 0; 1, 1];
-TestIn.Specs.Propulsion.Oper.PSES = @() [1; 0];
-
-% create the efficiency matrices
-TestIn.Specs.Propulsion.Eta.TSPS = ones(1, 2);
-TestIn.Specs.Propulsion.Eta.PSPS = ones(   2);
-TestIn.Specs.Propulsion.Eta.PSES = ones(2, 1);
-
-% power split mission history
-TestIn.Mission.History.SI.Power.LamTS   = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamTSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSPS = ones(2, 1);
-TestIn.Mission.History.SI.Power.LamPSES = ones(2, 1);
-
-% power source types
-TestIn.Specs.Propulsion.PropArch.PSType = [1, 0];
+% reset the SLS power and thrust (thrust can be arbitrary for prop aircraft)
+TestIn.Specs.Propulsion.SLSPower  = [100, 60, 60, 60];
+TestIn.Specs.Propulsion.SLSThrust = [  0,  0,  0,  0];
 
 % ----------------------------------------------------------
 
@@ -717,7 +651,7 @@ function [Pass] = CheckTest(TestValue, TrueValue, Tol)
 %
 % [Pass] = CheckTest(TestValue, TrueValue, Tol)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 22 may 2024
+% last updated: 08 may 2025
 %
 % Helper function to check if a test passed.
 %
@@ -737,10 +671,10 @@ function [Pass] = CheckTest(TestValue, TrueValue, Tol)
 %
 
 % compute the relative tolerance
-RelTol = abs(TestValue - TrueValue) ./ TrueValue;
+AbsTol = abs(TestValue - TrueValue);
 
 % check the tolerance
-if (any(RelTol > Tol))
+if (any(AbsTol > Tol, "all"))
     
     % the test fails
     Pass = 0;

@@ -211,7 +211,7 @@ Aircraft.Specs.Propulsion.InletArea = [NaN(1, 3), repmat(1.4914, 1, 2), NaN];
 Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 
 % gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
+Aircraft.Specs.Power.SpecEnergy.Batt = NaN;
 
 % downstream power splits
 Aircraft.Specs.Power.LamDwn.SLS = [];
@@ -230,15 +230,15 @@ Aircraft.Specs.Power.LamUps.Des = [];
 Aircraft.Specs.Power.LamUps.Lnd = [];
 
 % electric motor and generator efficiencies, not used here just in HEA one
-Aircraft.Specs.Power.Eta.EM = 0.96;
-Aircraft.Specs.Power.Eta.EG = 0.96;
+Aircraft.Specs.Power.Eta.EM = NaN;
+Aircraft.Specs.Power.Eta.EG = NaN;
 
 % power-weight ratio for the aircraft (kW/kg, if a turboprop)
 Aircraft.Specs.Power.P_W.SLS = NaN;
 
 % power-weight ratio for the electric motor and generator (kW/kg)
 % leave as NaN if an electric motor or generator isn't in the powertrain
-Aircraft.Specs.Power.P_W.EM = 10;
+Aircraft.Specs.Power.P_W.EM = NaN;
 Aircraft.Specs.Power.P_W.EG = NaN;
 
 % battery cells in series and parallel
@@ -273,7 +273,7 @@ Aircraft.Settings.OEW.MaxIter = 50;
 Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
-Aircraft.Settings.Analysis.MaxIter = 50;
+Aircraft.Settings.Analysis.MaxIter = 30;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

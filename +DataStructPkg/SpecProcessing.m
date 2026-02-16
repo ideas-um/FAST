@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 19 jun 2025
+% last updated: 16 feb 2025
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -41,9 +41,6 @@ Propulsion = Aircraft.Specs.Propulsion;
 Power = Aircraft.Specs.Power;
 Settings = Aircraft.Settings;
 Geometry = Aircraft.Geometry;
-
-% remember the sizing directory
-SizeDir = Aircraft.Settings.Dir.Size;
 
 % remove the engine field for the regressions
 Engine = Propulsion.Engine;
@@ -89,10 +86,6 @@ if isnan(TLAR.EIS)
     TLAR.EIS = 2021;
 end
 
-future = 0;
-if TLAR.EIS > 2021
-    future  = 1;
-end
 
 %% Pre-Regression Initializatons
 switch TLAR.Class
@@ -134,8 +127,6 @@ DefaultPerformance.Vels.MaxOp = NaN;
 
 
 %% Regressions and projections
-
-
 
 load(fullfile("+DatabasePkg", "IDEAS_DB.mat"))
 switch TLAR.Class
@@ -179,26 +170,14 @@ for i = 1:length(unknowns)
         [DefaultWeight.MTOW,~] = ...
             RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
     elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","T_W","SLS"])
-        %             if future
-        %                 [DefaultPropulsion.T_W.SLS] = ...
-        %                     Projection.KPPProjection(TLAR.Class, TLAR.EIS, 'Total Takeoff T/ MTOW');
-        %             else
         [DefaultPropulsion.T_W.SLS,~] = ...
             RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-        %             end
+
 
 
     elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","Thrust","SLS"])
         [DefaultPropulsion.Thrust.SLS,~] = ...
             RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-        %         elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","Engine","TSFC_SLS"])
-        %             if future
-        %                 [DefaultPropulsion.TSFC] = ...
-        %                     Projection.KPPProjection(TLAR.Class, TLAR.EIS, 'Cruise SFC');
-        %             else
-        %                 [DefaultPropulsion.TSFC,~] = ...
-        %                     RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-        %             end
     elseif length(Output) == 4 && isequal(Output,["Specs","Power","P_W","SLS"])
         [DefaultPower.P_W.SLS,~] = ...
             RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
@@ -213,8 +192,6 @@ for i = 1:length(unknowns)
             RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
     end
 end
-
-
 
 
 %% Variables that use regression values
@@ -265,35 +242,24 @@ DefaultAero.L_D.Des = DefaultAero.L_D.Clb; % set descent L/D to Clb value
 
 %% Set Default Variable Values
 
-% Default_TLAR.EIS = 2021;                   % already specified
-% Default_TLAR.Class = 'Turbofan';           *required*
-%Default_TLAR.MaxPax = 150;                     % switch case
-% DefaultPerformance.Vels.Tko = 0;           *regression*
-% DefaultPerformance.Vels.Crs = 0;            *regression*
-%DefaultPerformance.Vels.Type = 'TAS';        % good
-DefaultPerformance.Alts.Tko = 0;             % good
-% DefaultPerformance.Alts.Crs = 0;            *regression*
-% DefaultPerformance.Range =                 *required*
+
+DefaultPerformance.Alts.Tko = 0;
 DefaultPerformance.RCMax = 10.5;             % m/s
+
 switch TLAR.Class
     case "Turbofan"
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(135,'kts','m/s');
     case "Turboprop"
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(115,'kts','m/s');
 end
-% DefaultAero.L_D.Clb = 15;                    % 0.6*cruise L_D
-%DefaultAero.L_D.Crs = 15;                     % regression
-DefaultAero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
-%DefaultWeight.MTOW = 0;                     % regression
-DefaultWeight.MLW = 0;                      % good
-DefaultWeight.Batt = 0;                      % good
-DefaultWeight.EG = 0;                        % good
-DefaultWeight.EM = 0;                        % good
+
+DefaultWeight.MLW = 0;           
+DefaultWeight.Batt = 0;             
+DefaultWeight.EG = 0;              
+DefaultWeight.EM = 0;              
 DefaultWeight.EAP = 0;
 DefaultWeight.WairfCF = 1;
-% DefaultWeight.Fuel = 0;                    % regression
-% DefaultPropulsion.Arch = 'C';             *required*
-DefaultPropulsion.NumEngines = 2;           % good
+DefaultPropulsion.NumEngines = 2;         
 DefaultPropulsion.MDotCF = 1;
 DefaultPropulsion.InletArea = NaN;
 %DefaultPropulsion.T_W.SLS = 0;                  % regression
@@ -345,7 +311,8 @@ DefaultSettings.Analysis.Type = 1;       % 1 = on design. -1 = off design
 DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots
 DefaultSettings.Table = 0;
 DefaultSettings.VisualizeAircraft = 0;
-
+DefaultSettings.PrintOut = 1;
+DefaultSettings.Degradation = 0;
 % directory
 DefaultSettings.Dir.Size = pwd;
 
@@ -353,7 +320,6 @@ DefaultSettings.Dir.Size = pwd;
 HomeFolder = fileparts(pwd);
 % replace EAP with EAP-CNAP to get the operations directory
 DefaultSettings.Dir.Oper = fullfile(HomeFolder, "EAP-CNAP");
-
 
 
 %% Default gravimetric Fuel energy
@@ -570,8 +536,6 @@ if ~isa(Geometry.Preset,"function_handle")
 end
 
 
-
-
 %% Convert Units
 
 if Settings.Analysis.Type ~= -2
@@ -583,7 +547,6 @@ if Settings.Analysis.Type ~= -2
 end
 
 
-
 %% Passenger and Crew Weights
 
 Weight.Payload = Aircraft.Specs.TLAR.MaxPax*95; % atr paper
@@ -592,7 +555,9 @@ if Settings.Analysis.Type > -2
     Weight.Crew = Weight.Payload/26.1; % from Martins' Metabook
 end
 
-%% Preset computationally expensive regression parameters
+%% Preset computationally expensive regression parameters (TF Only)
+
+if TLAR.Class == "Turbofan"
 
 % for the OEW iteration
 % list parts of the aircraft structure to use in the regression
@@ -613,7 +578,10 @@ Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
 EngWeights = 1;
 [RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
     RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
-
+else
+    % Assign empty output if ~turbofan class
+    RegressionParams = struct();
+end
 %% Prepare Output Structure
 Propulsion.Engine = Engine;
 

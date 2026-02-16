@@ -44,13 +44,16 @@ function [Ts,cp,cv,g] = NewGamma(Tt,M,g)
 delg = 1;
 iter = 0;
 while delg > 1e-3 && iter < 10
+
     Ts = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt,M,g);
     cp = EngineModelPkg.SpecHeatPkg.CpAir(Ts);
     cv = EngineModelPkg.SpecHeatPkg.CvAir(Ts);
     g2 = cp/cv;
     delg = abs(g2-g)/g;
     g = g2;
+
     iter = iter + 1;
+
 end
 g = g2;
 

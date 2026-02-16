@@ -256,6 +256,63 @@ Aircraft.Specs.Power.Windmill.Crs = 0;
 Aircraft.Specs.Power.Windmill.Des = 0;
 Aircraft.Specs.Power.Windmill.Lnd = 0;
 
+%% BATTERY %%
+%%%%%%%%%%%%%
+
+% nominal cell voltage [V]
+Aircraft.Specs.Battery.NomVolCell = 3.6;
+
+% maxinum extracted voltage [V]
+Aircraft.Specs.Battery.MaxExtVolCell = 4.0880;
+
+% maxinum cell capacity [Ah]
+Aircraft.Specs.Battery.CapCell = 3;
+
+% internal resistance [Ohm]
+Aircraft.Specs.Battery.IntResist = 0.0199;
+
+% exponential voltage [V]
+Aircraft.Specs.Battery.ExpVol = 0.0986;
+
+% exponential capacity [(Ah)^-1]
+Aircraft.Specs.Battery.ExpCap = 30;
+
+% acceptable SOC threshold
+Aircraft.Specs.Battery.MinSOC = 20;
+
+% intitial SOC
+Aircraft.Specs.Battery.BegSOC = 100;
+
+% acceptable max c-rate during discharging
+Aircraft.Specs.Battery.MaxAllowCRate = 5;
+
+% charging rate 
+Aircraft.Specs.Battery.Charging = 500*1000;
+
+%%%% battery degradation effect analysis %%%
+Aircraft.Specs.Battery.Degradation = 0; % 1 = analysis with degradation effect; 0 = without degradation effect
+
+if Aircraft.Specs.Battery.Degradation == 1
+    
+    % battery chemistry material (ONLY "NMC" or "LFP" FOR NOW)
+    Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2
+    
+    % Charging time 
+    Aircraft.Specs.Battery.ChrgTime = 60*60; % in sec
+    
+    % charging rate (can be an array or scalar, or a function with output of a scalar or array)
+    Aircraft.Specs.Battery.Cpower = -500*1000; % charging means negative rate in W
+    
+    % battery Full Equivalent Cycles (FECs)
+    Aircraft.Specs.Battery.FEC = 0; % start with 0
+    
+    % battery State of Health (SoH)
+    Aircraft.Specs.Battery.SOH = 100; 
+
+    % battery operation temperature (for analysis only, will remove)
+    Aircraft.Specs.Battery.OpTemp = 35; % [°C]
+end
+
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

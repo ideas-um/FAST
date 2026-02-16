@@ -172,6 +172,9 @@ idx = (nsrc + 1) : ncomp;
 
 % loop through points to get the power available
 for ipnt = 1:npnt
+    
+    % evaluate the function handles for the current splits
+    Lambda = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
 
     % find all upstream transmitters and propellers
     UpTrn = find(sum(Lambda(itrn, itrn), 1) > 0 | (TrnType == 2));
@@ -181,9 +184,6 @@ for ipnt = 1:npnt
     
     % get the initial power available
     Pav(ipnt, :) = [zeros(1, nsrc), PowerAv(ipnt, :), zeros(1, nsnk)];
-    
-    % evaluate the function handles for the current splits
-    Lambda = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
     
     % check if any engines are windmilling
     if (any(Windmill(ipnt, :)))

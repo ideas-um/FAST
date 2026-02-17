@@ -2,7 +2,7 @@ function [Aircraft] = PreSpecProcessing(Aircraft)
 %
 % [Aircraft] = PreSpecProcessing(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 16 feb 2026
+% last updated: 17 feb 2026
 %
 % Instantiate any variables not specified in an aircraft data structure.
 % This function allows users to neglect to assign NaN values to parameters
@@ -441,70 +441,70 @@ else
                 Aircraft.Specs.Power.Windmill.Lnd = NaN;
             end
         end
+    end
         
-        % battery
-        if ~isfield(Aircraft.Specs, "Battery")
+    % battery
+    if ~isfield(Aircraft.Specs, "Battery")
+        Aircraft.Specs.Battery.NomVolCell = NaN;
+        Aircraft.Specs.Battery.MaxExtVolCell = NaN;
+        Aircraft.Specs.Battery.CapCell = NaN;
+        Aircraft.Specs.Battery.IntResist = NaN;
+        Aircraft.Specs.Battery.ExpVol = NaN;
+        Aircraft.Specs.Battery.ExpCap = NaN;
+        Aircraft.Specs.Battery.MinSOC = NaN;
+        Aircraft.Specs.Battery.MaxAllowCRate = NaN;
+        Aircraft.Specs.Battery.Chem = NaN;
+        Aircraft.Specs.Battery.GroundT = NaN;
+        Aircraft.Specs.Battery.Cpower = NaN;
+        Aircraft.Specs.Battery.FEC = NaN;
+        Aircraft.Specs.Battery.SOH = NaN;
+        Aircraft.Specs.Battery.OpTemp = NaN;
+        Aircraft.Specs.Battery.Degradation = NaN;
+    else
+        if ~isfield(Aircraft.Specs.Battery, "NomVolCell")
             Aircraft.Specs.Battery.NomVolCell = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "MaxExtVolCell")
             Aircraft.Specs.Battery.MaxExtVolCell = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "CapCell")
             Aircraft.Specs.Battery.CapCell = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "IntResist")
             Aircraft.Specs.Battery.IntResist = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "ExpVol")
             Aircraft.Specs.Battery.ExpVol = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "ExpCap")
             Aircraft.Specs.Battery.ExpCap = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "MinSOC")
             Aircraft.Specs.Battery.MinSOC = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "MaxAllowCRate")
             Aircraft.Specs.Battery.MaxAllowCRate = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "Chem")
             Aircraft.Specs.Battery.Chem = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "GroundT")
             Aircraft.Specs.Battery.GroundT = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "Cpower")
             Aircraft.Specs.Battery.Cpower = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "FEC")
             Aircraft.Specs.Battery.FEC = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "SOH")
             Aircraft.Specs.Battery.SOH = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "OpTemp")
             Aircraft.Specs.Battery.OpTemp = NaN;
+        end
+        if ~isfield(Aircraft.Specs.Battery, "Degradation")
             Aircraft.Specs.Battery.Degradation = NaN;
-        else
-            if ~isfield(Aircraft.Specs.Battery, "NomVolCell")
-                Aircraft.Specs.Battery.NomVolCell = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "MaxExtVolCell")
-                Aircraft.Specs.Battery.MaxExtVolCell = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "CapCell")
-                Aircraft.Specs.Battery.CapCell = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "IntResist")
-                Aircraft.Specs.Battery.IntResist = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "ExpVol")
-                Aircraft.Specs.Battery.ExpVol = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "ExpCap")
-                Aircraft.Specs.Battery.ExpCap = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "MinSOC")
-                Aircraft.Specs.Battery.MinSOC = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "MaxAllowCRate")
-                Aircraft.Specs.Battery.MaxAllowCRate = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "Chem")
-                Aircraft.Specs.Battery.Chem = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "GroundT")
-                Aircraft.Specs.Battery.GroundT = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "Cpower")
-                Aircraft.Specs.Battery.Cpower = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "FEC")
-                Aircraft.Specs.Battery.FEC = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "SOH")
-                Aircraft.Specs.Battery.SOH = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "OpTemp")
-                Aircraft.Specs.Battery.OpTemp = NaN;
-            end
-            if ~isfield(Aircraft.Specs.Battery, "Degradation")
-                Aircraft.Specs.Battery.Degradation = NaN;
-            end
         end
     end
 end

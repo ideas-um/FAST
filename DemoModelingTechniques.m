@@ -32,6 +32,9 @@ TLARsOnly.Specs.Performance.Range        = 4815e+03  ; % (km)
 TLARsOnly.Specs.TLAR.Class               = "Turbofan";
 TLARsOnly.Specs.Propulsion.PropArch.Type = "C"       ;
 
+% use a constant L/D
+TLARsOnly.Specs.Aero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
+
 % start a timer
 tic;
 

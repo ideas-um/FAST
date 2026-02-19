@@ -92,16 +92,69 @@ toc;
 PrintError(DragPolar);
 
 
-%% PLOT THE L/D CURVES FOR EACH CONFIGURATION ANALYZED %%
+%% PLOT THE AERODYNAMIC QUANTITIES AND MISSION PROFILE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+   
 % create a figure
 figure;
 
-% enable multiple plots
+% create a subplot
+subplot(5, 1, 1);
 hold on
 
-% plot the L/D curves
+% plot altitude
+plot( TLARsOnly.Mission.History.SI.Performance.Time ./ 60,  TLARsOnly.Mission.History.SI.Performance.Alt ./ 1000, "-", "LineWidth", 3, "Color", "black");
+plot(ConstantLD.Mission.History.SI.Performance.Time ./ 60, ConstantLD.Mission.History.SI.Performance.Alt ./ 1000, "-", "LineWidth", 3, "Color", "blue" );
+plot( DragPolar.Mission.History.SI.Performance.Time ./ 60,  DragPolar.Mission.History.SI.Performance.Alt ./ 1000, ":", "LineWidth", 3, "Color", "red"  );
+
+% add a grid and label
+ylabel("Altitude (km)");
+grid on
+
+% create a subplot
+subplot(5, 1, 2);
+hold on
+
+% plot airspeed
+plot( TLARsOnly.Mission.History.SI.Performance.Time ./ 60,  TLARsOnly.Mission.History.SI.Performance.TAS, "-", "LineWidth", 3, "Color", "black");
+plot(ConstantLD.Mission.History.SI.Performance.Time ./ 60, ConstantLD.Mission.History.SI.Performance.TAS, "-", "LineWidth", 3, "Color", "blue" );
+plot( DragPolar.Mission.History.SI.Performance.Time ./ 60,  DragPolar.Mission.History.SI.Performance.TAS, ":", "LineWidth", 3, "Color", "red"  );
+
+% add a grid and label
+ylabel("Airspeed (m/s)");
+grid on
+
+% create a subplot
+subplot(5, 1, 3);
+hold on
+
+% plot CL
+plot( TLARsOnly.Mission.History.SI.Performance.Time ./ 60,  TLARsOnly.Mission.History.SI.Aero.CL, "-", "LineWidth", 3, "Color", "black");
+plot(ConstantLD.Mission.History.SI.Performance.Time ./ 60, ConstantLD.Mission.History.SI.Aero.CL, "-", "LineWidth", 3, "Color", "blue" );
+plot( DragPolar.Mission.History.SI.Performance.Time ./ 60,  DragPolar.Mission.History.SI.Aero.CL, ":", "LineWidth", 3, "Color", "red"  );
+
+% add a grid and label
+ylabel("Lift Coefficient");
+grid on
+
+% create a subplot
+subplot(5, 1, 4);
+hold on
+
+% plot CD
+plot( TLARsOnly.Mission.History.SI.Performance.Time ./ 60,  TLARsOnly.Mission.History.SI.Aero.CD, "-", "LineWidth", 3, "Color", "black");
+plot(ConstantLD.Mission.History.SI.Performance.Time ./ 60, ConstantLD.Mission.History.SI.Aero.CD, "-", "LineWidth", 3, "Color", "blue" );
+plot( DragPolar.Mission.History.SI.Performance.Time ./ 60,  DragPolar.Mission.History.SI.Aero.CD, ":", "LineWidth", 3, "Color", "red"  );
+
+% add a grid and label
+ylabel("Drag Coefficient");
+grid on
+
+% create a subplot
+subplot(5, 1, 5);
+hold on
+
+% plot L/D
 plot( TLARsOnly.Mission.History.SI.Performance.Time ./ 60,  TLARsOnly.Mission.History.SI.Aero.L_D, "-", "LineWidth", 3, "Color", "black");
 plot(ConstantLD.Mission.History.SI.Performance.Time ./ 60, ConstantLD.Mission.History.SI.Aero.L_D, "-", "LineWidth", 3, "Color", "blue" );
 plot( DragPolar.Mission.History.SI.Performance.Time ./ 60,  DragPolar.Mission.History.SI.Aero.L_D, ":", "LineWidth", 3, "Color", "red"  );
@@ -114,10 +167,7 @@ ylabel("Lift-to-Drag Ratio");
 grid on
 
 % add a legend
-legend("TLARs Only", "Constant L/D", "Drag Polar", "Location", "south");
-
-% enlarge font
-set(gca, "FontSize", 20);
+legend("TLARs Only", "Constant L/D", "Drag Polar");
 
 
 end

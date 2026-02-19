@@ -85,11 +85,18 @@ Batt = [NoModel.Specs.Weight.Batt; WtModel.Specs.Weight.Batt];
 % get the energy (convert to kWh)
 Enrg = [NoModel.Mission.History.SI.Energy.E_ES(end, 2); WtModel.Mission.History.SI.Energy.E_ES(end, 2)] ./ 3.6e+6;
 
+% get the battery cells
+SerCells = [NoModel.Specs.Power.Battery.SerCells; WtModel.Specs.Power.Battery.SerCells];
+ParCells = [NoModel.Specs.Power.Battery.ParCells; WtModel.Specs.Power.Battery.ParCells];
+
+% get the maximum C-rate
+MaxCrate = [NaN; max(WtModel.Mission.History.SI.Power.C_rate)];
+
 % create a table
-OutTable = table(Mode, MTOW, OEW, Fuel, Batt, Enrg);
+OutTable = table(Mode, MTOW, OEW, Fuel, Batt, Enrg, SerCells, ParCells, MaxCrate);
 
 % name the rows
-OutTable.Properties.VariableNames = ["Configuration", "MTOW (kg)", "OEW (kg)", "Fuel (kg)", "Battery (kg)", "Battery Energy (kWh)"];
+OutTable.Properties.VariableNames = ["Configuration", "MTOW (kg)", "OEW (kg)", "Fuel (kg)", "Battery (kg)", "Battery Energy (kWh)", "Cells in Series", "Cells in Parallel", "Maximum C-Rate"];
 
 
 end

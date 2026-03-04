@@ -140,6 +140,7 @@ For additional documentation, see package-specific README files. These READMEs w
 
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
+- **+ConstraintDiagramPkg**: This package contains functionality to generate constraint diagrams for turboprop or turbofan aircraft under FAA Part 25 requirements. In the future, additional functionality will be provided for turboprop aircraft under FAA Part 23 requirements.
 - **+CostPkg**: This packages contains functions for estimating aircraft related costs.
 - **+DatabasePkg**: This package contains the IDEAS Lab historical database. It also contains functions which help convert the original database format (MS Excel sheet) into the FAST format (Matlab data structures).
 - **+DataStructPkg**: This package contains functions which process aircraft data structures when calling FAST.
@@ -153,6 +154,7 @@ For additional documentation, see package-specific README files. These READMEs w
 - **+PropulsionPkg**: This package is responsible for creating the user's desired propulsion architecture and evaluating the propulsion system's performance during the mission analysis. It connects to the EngineModelPkg for evaluating an actual engine's performance.
 - **+RegressionPkg**: This package contains code that creates regressions to predict any unknown parameters about the aircraft configuration being designed.
 - **+RetrofitPkg**: This package contains code to run retrofit studies on an aircraft by electrifying its powertrain and replacing part of the payload with batteries.
+- **+SafetyPkg**: This package contains code to run a fault tree analysis from a graph-based representation of a system architecture.
 - **+TutorialsPkg**: This package contains Matlab scripts to accompany all the playlist of YouTube tutorial videos, which can be accessed using [this link](https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-).
 - **+UnitConversionPkg**: This package contains functions which perform unit conversions for use in FAST.
 - **+VisualizationPkg**: This package contains information about visualizing both the aircraft's outer mold line (as a wireframe) and its propulsion architecture (in a schematic).

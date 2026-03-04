@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 feb 2026
+% last updated: 04 mar 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -486,7 +486,7 @@ if (any(Fuel))
         icol = HasEng(ieng) + nsrc;
         
         % check if it has a propeller
-        iprop = WhichProp(ieng);
+        iprop = WhichProp(HasEng(ieng));
 
         % check if the engine is connected to a propeller
         if (iprop ~= 0)

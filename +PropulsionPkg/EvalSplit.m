@@ -2,11 +2,13 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 %
 % [Split] = EvalSplit(SplitFun, SplitVal)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 apr 2024
+% last updated: 05 mar 2026
 %
 % Given a energy/power/thrust split (SplitFun), evaluate it for a given
-% value (SplitVal). This function currently works for up to 4 splits
-% in a single matrix.
+% value (SplitVal). This function currently works for a varying number of
+% power splits in a single function evaluation. Any user may follow the
+% same pattern to edit this script for their use and incorporate a new
+% number of power splits into the code.
 %
 % INPUTS:
 %     SplitFun - function handle to evaluate the energy/power/thrust split.
@@ -52,6 +54,26 @@ elseif (narg < 5)
     % evaluate with 4 arguments
     Split = SplitFun(SplitVal(1), SplitVal(2), SplitVal(3), SplitVal(4));
     
+elseif (narg < 6)
+    
+    % evaluate with 5 arguments
+    Split = SplitFun(SplitVal(1), SplitVal(2), SplitVal(3), SplitVal(4), SplitVal(5));
+    
+elseif (narg < 7)
+    
+    % evaluate with 6 arguments
+    Split = SplitFun(SplitVal(1), SplitVal(2), SplitVal(3), SplitVal(4), SplitVal(5), SplitVal(6));
+    
+elseif (narg < 8)
+    
+    % evaluate with 7 arguments
+    Split = SplitFun(SplitVal(1), SplitVal(2), SplitVal(3), SplitVal(4), SplitVal(5), SplitVal(6), SplitVal(7));
+    
+elseif (narg < 9)
+    
+    % evaluate with 8 arguments
+    Split = SplitFun(SplitVal(1), SplitVal(2), SplitVal(3), SplitVal(4), SplitVal(5), SplitVal(6), SplitVal(7), SplitVal(8));
+    
 elseif (narg < 17)
     
     % evaluate with 16 arguments
@@ -72,7 +94,7 @@ elseif (narg < 18)
 else
     
     % throw error
-    error("ERROR - EvalSplit: only up to 4 distinct split are currently accepted.");
+    error("ERROR - EvalSplit: function evaluation currently unavailable for the desired quantity of power splits.");
     
 end
 

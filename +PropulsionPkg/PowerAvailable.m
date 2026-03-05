@@ -152,6 +152,10 @@ for jtrn = 1:ntrn
         
         % once available, input a cable model here
         
+    elseif (TrnType(jtrn) == 5) % quasi-sinks
+        
+        % once available, input a quasi-sink model here
+        
     else
         
         % throw an error

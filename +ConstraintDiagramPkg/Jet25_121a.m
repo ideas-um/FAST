@@ -70,7 +70,7 @@ if (Type == 0)
 elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
-    G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.4999, -102.7935, 0.5852, 0.0001);
+    G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.4999, -151.22, 0.7855, 0.001);
     
 else
     

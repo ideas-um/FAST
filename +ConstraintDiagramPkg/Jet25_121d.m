@@ -2,7 +2,7 @@ function [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 dec 2025
+% last updated: 05 mar 2026
 %
 % derive the constraints for landing climb with one engine inoperative.
 %
@@ -71,7 +71,7 @@ if (Type == 0)
 elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
-    G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.6337, -21.9853, 0.5782, 2.0940);
+    G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.6025, -41.75, 0.7830, 2.098);
     
 else
     

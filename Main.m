@@ -2,7 +2,7 @@ function [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 %
 % [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 18 sep 2025
+% last updated: 10 mar 2026
 %
 % NOTE: please see README.m in the root directory for all
 %       disclaimers and how to run FAST.
@@ -71,9 +71,6 @@ Aircraft = PropulsionPkg.CreatePropArch(Aircraft);
 
 % identify any parallel connections (for propulsion analysis)
 Aircraft = PropulsionPkg.PropArchConnections(Aircraft);
-
-% process the propulsion architecture for coefficients and connections
-Aircraft = PropulsionPkg.ProcessPropArch(Aircraft);
 
 
 %% USER-SPECIFIED MISSION PROFILE %%

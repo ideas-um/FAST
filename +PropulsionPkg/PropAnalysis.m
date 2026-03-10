@@ -496,8 +496,9 @@ if (any(Fuel))
             
         else
             
-            % there is no connection, skip the analysis
-            continue;
+            % there is no connection, assume idle thrust and that there is
+            % a larger power supplement that dominates the expression
+            TEng = zeros(iend-ibeg+1, 1);
             
         end
         

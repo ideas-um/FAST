@@ -2,7 +2,7 @@ function [Aircraft] = ProcessPropArch(Aircraft)
 %
 % [Aircraft] = ProcessPropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 18 sep 2025
+% last updated: 10 mar 2026
 %
 % given a propulsion architecture, find how each gas turbine engine is
 % connected to a propeller. the power required at the propeller is
@@ -39,14 +39,20 @@ ntrn = length(TrnType);
 % compute the number of sinks
 nsnk = ncomp - nsrc - ntrn;
 
+% get the power requirements from sizing
+SLSPower  = Aircraft.Specs.Propulsion.SLSPower;
+
 % get the downstream sizing splits
 LamSLS = Aircraft.Specs.Power.LamDwn.SLS;
 
 % convert to a cell array
 LamCell = num2cell(LamSLS);
 
-% get the splits
+% get the downstream power splits
 LamDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn(LamCell{:});
+
+% assume perfect efficiencies for computing thrust ratios
+EtaDwn = ones(ncomp, ncomp);
 
 % allocate memory for indexed transmitter arrays
 WhichProp = zeros(1, ntrn);
@@ -58,11 +64,16 @@ itrn = logical([zeros(nsrc, 1);  ones(ntrn, 1); zeros(nsnk, 1)]);
 % combine types to form an ID
 ID = [SrcType'; TrnType'; zeros(nsnk, 1)];
 
-% look at the propeller connections
-PropIdx = find(ID == 2)';
+% get the propeller and gas turbine engine IDs
+PropIdx = find(TrnType == 2) + nsrc;
+ EngIdx = find(TrnType == 1) + nsrc;
 
 % define a power vector
 PowerVector = zeros(ncomp, 1);
+
+% remember the "required" and "SLS" power demands
+Preq = zeros(ncomp, 1);
+PSLS = zeros(ncomp, 1);
 
 % loop through all propellers to find indirect gas turbine engines
 for iprop = PropIdx
@@ -79,26 +90,25 @@ for iprop = PropIdx
         % check if any are gas turbine engines
         AnyGTE = logical(sum(Arch(:, krow) > 0 & ID == 1 & itrn, 2));
         
-        if (any(AnyGTE))
+        if (any(AnyGTE)) % assume only 1 GTE per fan
             
             % get its index
             igte = find(AnyGTE);
 
-            % remember the propeller connection
-            WhichProp(igte - nsrc) = iprop;
-
             % perturb the power vector
-            PowerVector(iprop) = 1;
+            PowerVector(iprop) = SLSPower(iprop - nsrc);
 
             % propagate power downstream
-            Pout = PropulsionPkg.PowerFlow(PowerVector, Arch', LamDwn, ones(ncomp, ncomp), -1, 1.0e-06);
+            Pout = PropulsionPkg.PowerFlow(PowerVector, Arch', LamDwn, EtaDwn, -1, 1.0e-06);
+            
+            % remember the power output by the engine and the total power
+            % required
+            Preq(igte) = Preq(igte) + Pout(igte);
+            PSLS(igte) = PSLS(igte) + SLSPower(iprop - nsrc);
             
             % remove the perturbation
             PowerVector(iprop) = 0;
-            
-            % remember the coefficient
-            HEcoeff(igte - nsrc) = 2 - Pout(igte);
-            
+
             % break out of the loop
             break;
             
@@ -125,9 +135,16 @@ for iprop = PropIdx
 
        % remember the index
        WhichProp(GTEIdx - nsrc) = iprop;
-
+       
     end
+    
 end
+
+% compute the HE coefficient
+HEcoeff(EngIdx - nsrc) = 2 - Preq(EngIdx) ./ PSLS(EngIdx);
+
+% correct for NaN -- set to 0
+HEcoeff(isnan(HEcoeff)) = 0;
 
 % remember the coefficients
 Aircraft.Specs.Propulsion.Engine.HEcoeff = HEcoeff;

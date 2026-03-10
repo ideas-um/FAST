@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 mar 2026
+% last updated: 10 mar 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -511,8 +511,13 @@ if (any(Fuel))
             % temporary thrust required
             TTemp = TEng;
             
-            % any required thrust < 1 must be rounded up to 5% SLS thrust
-            TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
+            
+                % any required thrust < 1 must be rounded up to 5% SLS thrust
+                TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+                
+            end
                         
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
@@ -520,9 +525,13 @@ if (any(Fuel))
             % temporary power required
             PTemp = Pout(ibeg:iend, icol);
             
-            % any required power  < 1 must be rounded up to 5% SLS power
-            PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
             
+                % any required power  < 1 must be rounded up to 5% SLS power
+                PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
+                
+            end            
         end
         
         % get altitudes and mach number

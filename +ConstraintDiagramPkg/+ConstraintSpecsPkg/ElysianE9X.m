@@ -150,15 +150,28 @@ ConstraintDiagramPkg.ConstraintDiagram(Aircraft);
 % add the existing sizing point
 hold on
 scatter(Aircraft.Specs.Aero.W_S.SLS * 9.81 / 1000, 1 / (Aircraft.Specs.Power.P_W.SLS / 9.81 * 1000), 48, "o", "MarkerEdgeColor", [0, 0.251, 0.478], "MarkerFaceColor", [0, 0.251, 0.478]);
+
+% format the axis sizes
 xlim([0, 8]);
 ylim([0, 0.2]);
 axis square
+
+% turn on gridlines
 grid on
+
+% get the axis object
 A = gca;
+
+% set the grid to be semi-transparent and move it to the top
 A.GridAlpha = 0.5;
 A.Layer = "top";
+
+% add minor gridlines
 A.XMinorGrid = "on";
 A.YMinorGrid = "on";
+
+% increase font size
 set(gca, "FontSize", 28);
+
 
 end

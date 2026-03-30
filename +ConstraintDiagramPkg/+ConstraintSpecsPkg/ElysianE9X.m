@@ -2,7 +2,7 @@ function [] = ElysianE9X()
 %
 % [] = ElysianE9X()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 nov 2025
+% last updated: 30 mar 2026
 %
 % create a constraint diagram for a battery electric aircraft
 % representative of the Elysian E9X.
@@ -35,10 +35,10 @@ Aircraft.Specs.TLAR.Class = "Turboprop";
 Aircraft.Specs.TLAR.CFRPart = 25;
 
 % regulations for certification
-Aircraft.Specs.Performance.ConstraintFuns = ["Jet25_119"; "Jet25_121a"; "Jet25_121b"; "Jet25_121c"; "Jet25_121d"; "JetApp"; "JetCrs"; "JetDiv"; "JetLFL"; "JetTOFL"];% "JetAEOClimb"];
+Aircraft.Specs.Performance.ConstraintFuns = ["Jet25_119"; "Jet25_121a"; "Jet25_121b"; "Jet25_121c"; "Jet25_121d"; "JetApp"; "JetCrs"; "JetDiv"; "JetLFL"; "JetTOFL"; "JetAEOClimb"];
 
 % labels for regulations
-Aircraft.Specs.Performance.ConstraintLabs = ["25.119"; "25.121a"; "25.121b"; "25.121c"; "25.121d"; "Approach"; "Cruise"; "Diversion"; "Landing"; "TOFL"];% "AEO Climb"];
+Aircraft.Specs.Performance.ConstraintLabs = ["25.119"; "25.121a"; "25.121b"; "25.121c"; "25.121d"; "Approach"; "Cruise"; "Diversion"; "Landing"; "TOFL"; "AEO Climb"];
 
 % ----------------------------------------------------------
 
@@ -71,7 +71,7 @@ Aircraft.Specs.Performance.TempInc = 1.25;
 Aircraft.Specs.Performance.MaxCont = 1 / 0.94;
 
 % design specific excess power loss ???
-Aircraft.Specs.Performance.PsLoss = 0.4136;
+Aircraft.Specs.Performance.PsLoss = 0.6000;
 
 % landing weight as a fraction of MTOW
 Aircraft.Specs.Performance.Wland_MTOW = 1;
@@ -134,15 +134,15 @@ Aircraft.Specs.Weight.MTOW = 76000;
 % power-weight ratio (kW/kg)
 Aircraft.Specs.Power.P_W.SLS = 1/(0.0666*1000/9.81); % approx. 0.1473;
 
-% number of engines [2024 paper, actually 8, but uses 4-engine climb gradients]
-Aircraft.Specs.Propulsion.NumEngines = 4;
+% number of engines [2024 paper]
+Aircraft.Specs.Propulsion.NumEngines = 8;
 
 
 %% RUN THE CONSTRAINT ANALYSIS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % determine which constraints to use (0 = 14 CFR 25; 1 = novel)
-Aircraft.Settings.ConstraintType = 1;
+Aircraft.Settings.ConstraintType = 0;
 
 % create a constraint diagram
 ConstraintDiagramPkg.ConstraintDiagram(Aircraft);
@@ -150,5 +150,7 @@ ConstraintDiagramPkg.ConstraintDiagram(Aircraft);
 % add the existing sizing point
 hold on
 scatter(Aircraft.Specs.Aero.W_S.SLS * 9.81 / 1000, 1 / (Aircraft.Specs.Power.P_W.SLS / 9.81 * 1000), 48, "o", "MarkerEdgeColor", [0, 0.251, 0.478], "MarkerFaceColor", [0, 0.251, 0.478]);
-
+xlim([0, 8]);
+ylim([0, 0.2]);
+axis square
 end

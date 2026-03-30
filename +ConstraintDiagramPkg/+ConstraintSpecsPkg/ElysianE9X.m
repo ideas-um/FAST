@@ -67,8 +67,8 @@ Aircraft.Specs.Performance.LFL     = 2000;
 Aircraft.Specs.Performance.ObstLen = UnitConversionPkg.ConvLength(1000, "ft", "m");
 
 % multiplicative factors for OEI conditions
-Aircraft.Specs.Performance.TempInc = 1.25;
-Aircraft.Specs.Performance.MaxCont = 1 / 0.94;
+Aircraft.Specs.Performance.TempInc = 1; % can use 1.25 for +50F temperature
+Aircraft.Specs.Performance.MaxCont = 1; % can use 1 / 0.94; for MCT
 
 % design specific excess power loss (0.3697 for "8-engine" aircraft)
 Aircraft.Specs.Performance.PsLoss = 0.3697;

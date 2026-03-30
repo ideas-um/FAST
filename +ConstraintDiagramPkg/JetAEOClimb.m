@@ -2,7 +2,7 @@ function [FAR] = JetAEOClimb(W_S, T_W, Aircraft)
 %
 % [FAR] = JetAEOClimb(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 sep 2025
+% last updated: 30 mar 2026
 %
 % derive the constraints for takeoff climb with all engines operative.
 %
@@ -30,8 +30,8 @@ function [FAR] = JetAEOClimb(W_S, T_W, Aircraft)
 aclass = Aircraft.Specs.TLAR.Class;
 
 % retrieve parameters from the aircraft structure
-CL      = Aircraft.Specs.Aero.CL.Tko;
-CD0     = Aircraft.Specs.Aero.CD0.Tko - 0.025;
+CL      = Aircraft.Specs.Aero.CL.Crs;% was .Tko
+CD0     = Aircraft.Specs.Aero.CD0.Crs;% was .Tko - 0.025;
 AR      = Aircraft.Specs.Aero.AR;
 e       = Aircraft.Specs.Aero.e.Tko;
 TempInc = Aircraft.Specs.Performance.TempInc;
@@ -47,7 +47,7 @@ G       = Aircraft.Specs.Performance.ExtraGrad;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase and one engine inoperative
-CorrFactor = TempInc * OEI;
+CorrFactor = OEI;%TempInc * OEI;
 
 % required speed ratio is 1.2
 ks = 1.2;
@@ -92,7 +92,7 @@ elseif (ReqType == 1)
 elseif (ReqType == 2)
     
     % only consider the temperature increase
-    CorrFactor = CorrFactor / OEI;
+    CorrFactor = 1;%CorrFactor / OEI;
     
     % convert wing loading to english units
     W_S = W_S .* 9.81 .* UnitConversionPkg.ConvForce(1, "N", "lbf") ./ UnitConversionPkg.ConvLength(1, "m", "ft") ^ 2;

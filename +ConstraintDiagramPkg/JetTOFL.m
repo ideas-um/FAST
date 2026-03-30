@@ -38,7 +38,7 @@ Vstall      = Aircraft.Specs.Performance.Vels.Stl;
 BalFieldLen = BalFieldLen * UnitConversionPkg.ConvLength(1, "m", "ft");
 
 % assume a 95% density ratio for a "hot day"
-RhoRwy = 0.95;
+RhoRwy = 1;% 0.95;
 
 
 %% EVALUATE THE CONSTRAINT %%

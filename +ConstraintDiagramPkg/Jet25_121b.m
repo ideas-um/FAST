@@ -2,7 +2,7 @@ function [FAR] = Jet25_121b(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121b(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2026
+% last updated: 30 mar 2026
 %
 % derive the constraints for the second segment climb.
 %
@@ -47,7 +47,7 @@ Vstall  = Aircraft.Specs.Performance.Vels.Stl;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase and one engine inoperative
-CorrFactor = TempInc * OEI;
+CorrFactor = OEI;%TempInc * OEI;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;
@@ -62,7 +62,7 @@ if (Type == 0)
     elseif (NumEng == 3)
         G = 0.027;
         
-    else % (NumEng == 4)
+    else % (NumEng >= 4)
         G = 0.030;
         
     end

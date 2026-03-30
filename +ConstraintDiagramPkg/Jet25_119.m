@@ -45,7 +45,7 @@ Vstall    = Aircraft.Specs.Performance.Vels.Stl;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % correction for standard temperature increase and landing weight
-CorrFactor = TempInc * WlandFact;
+CorrFactor = WlandFact;%TempInc * WlandFact;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;

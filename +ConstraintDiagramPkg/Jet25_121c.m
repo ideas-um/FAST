@@ -2,7 +2,7 @@ function [FAR] = Jet25_121c(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121c(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2026
+% last updated: 30 mar 2026
 %
 % derive the constraints for the enroute climb.
 %
@@ -48,7 +48,7 @@ Vstall  = Aircraft.Specs.Performance.Vels.Stl;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase, maximum continuous thrust, and one engine inoperative
-CorrFactor = TempInc * OEI * MaxCont;
+CorrFactor = OEI;%TempInc * OEI * MaxCont;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;
@@ -63,7 +63,7 @@ if (Type == 0)
     elseif (NumEng == 3)
         G = 0.015;
         
-    else
+    else % (NumEng >= 4)
         G = 0.017;
         
     end

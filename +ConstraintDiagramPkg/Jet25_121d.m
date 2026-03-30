@@ -2,7 +2,7 @@ function [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2026
+% last updated: 30 mar 2026
 %
 % derive the constraints for landing climb with one engine inoperative.
 %
@@ -30,7 +30,7 @@ function [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 aclass = Aircraft.Specs.TLAR.Class;
 
 % retrieve parameters from the aircraft structure
-CL      = 0.85 * Aircraft.Specs.Aero.CL.Lnd;
+CL      = Aircraft.Specs.Aero.CL.Lnd;
 CD0     = (Aircraft.Specs.Aero.CD0.Lnd + Aircraft.Specs.Aero.CD0.Tko) / 2;
 AR      = Aircraft.Specs.Aero.AR;
 e       = Aircraft.Specs.Aero.e.Lnd;
@@ -48,7 +48,7 @@ Wl_W0   = Aircraft.Specs.Performance.Wland_MTOW;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase, one engine inoperative, and landing weight 
-CorrFactor = TempInc * OEI * Wl_W0;
+CorrFactor = OEI * Wl_W0;%TempInc * OEI * Wl_W0;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;
@@ -63,7 +63,7 @@ if (Type == 0)
     elseif (NumEng == 3)
         G = 0.024;
         
-    else
+    else % (NumEng >= 4)
         G = 0.027;
         
     end

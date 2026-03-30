@@ -48,7 +48,7 @@ Vstall  = Aircraft.Specs.Performance.Vels.Stl;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase, maximum continuous thrust, and one engine inoperative
-CorrFactor = OEI;%TempInc * OEI * MaxCont;
+CorrFactor = TempInc * OEI * MaxCont;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;

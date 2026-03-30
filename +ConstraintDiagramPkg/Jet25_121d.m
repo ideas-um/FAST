@@ -48,7 +48,7 @@ Wl_W0   = Aircraft.Specs.Performance.Wland_MTOW;
 OEI = ConstraintDiagramPkg.OEIMultiplier(Aircraft);
 
 % correction for standard temperature increase, one engine inoperative, and landing weight 
-CorrFactor = OEI * Wl_W0;%TempInc * OEI * Wl_W0;
+CorrFactor = TempInc * OEI * Wl_W0;
 
 % get the constraint type
 Type = Aircraft.Settings.ConstraintType;

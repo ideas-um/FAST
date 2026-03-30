@@ -70,8 +70,8 @@ Aircraft.Specs.Performance.ObstLen = UnitConversionPkg.ConvLength(1000, "ft", "m
 Aircraft.Specs.Performance.TempInc = 1.25;
 Aircraft.Specs.Performance.MaxCont = 1 / 0.94;
 
-% design specific excess power loss ???
-Aircraft.Specs.Performance.PsLoss = 0.6000;
+% design specific excess power loss (0.3697 for "8-engine" aircraft)
+Aircraft.Specs.Performance.PsLoss = 0.3697;
 
 % landing weight as a fraction of MTOW
 Aircraft.Specs.Performance.Wland_MTOW = 1;
@@ -153,4 +153,12 @@ scatter(Aircraft.Specs.Aero.W_S.SLS * 9.81 / 1000, 1 / (Aircraft.Specs.Power.P_W
 xlim([0, 8]);
 ylim([0, 0.2]);
 axis square
+grid on
+A = gca;
+A.GridAlpha = 0.5;
+A.Layer = "top";
+A.XMinorGrid = "on";
+A.YMinorGrid = "on";
+set(gca, "FontSize", 28);
+
 end

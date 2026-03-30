@@ -30,7 +30,7 @@ function [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 aclass = Aircraft.Specs.TLAR.Class;
 
 % retrieve parameters from the aircraft structure
-CL      = Aircraft.Specs.Aero.CL.Lnd;
+CL      = 3.1;%Aircraft.Specs.Aero.CL.Lnd;
 CD0     = (Aircraft.Specs.Aero.CD0.Lnd + Aircraft.Specs.Aero.CD0.Tko) / 2;
 AR      = Aircraft.Specs.Aero.AR;
 e       = Aircraft.Specs.Aero.e.Lnd;
@@ -163,7 +163,7 @@ elseif (ReqType == 2)
     end
     
     % compute the required thrust-weight ratio
-    FAR = qinf ./ W_S .* (CD0 + CL ^ 2 / (pi * AR * e)) + G - T_W;
+    FAR = CorrFactor .* (qinf ./ W_S .* (CD0 + CL ^ 2 / (pi * AR * e)) + G) - T_W;
     
 else
     

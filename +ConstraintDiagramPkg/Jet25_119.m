@@ -151,7 +151,7 @@ elseif (ReqType == 2)
     end
     
     % compute the required thrust-weight ratio
-    FAR = qinf ./ W_S .* (CD0 + CL ^ 2 / (pi * AR * e)) + G - T_W;
+    FAR = CorrFactor .* (qinf ./ W_S .* (CD0 + CL ^ 2 / (pi * AR * e)) + G) - T_W;
     
 else
     

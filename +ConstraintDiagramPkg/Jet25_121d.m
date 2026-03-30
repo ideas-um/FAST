@@ -30,7 +30,7 @@ function [FAR] = Jet25_121d(W_S, T_W, Aircraft)
 aclass = Aircraft.Specs.TLAR.Class;
 
 % retrieve parameters from the aircraft structure
-CL      = 3.1;%Aircraft.Specs.Aero.CL.Lnd;
+CL      = Aircraft.Specs.Aero.CL.Lnd;
 CD0     = (Aircraft.Specs.Aero.CD0.Lnd + Aircraft.Specs.Aero.CD0.Tko) / 2;
 AR      = Aircraft.Specs.Aero.AR;
 e       = Aircraft.Specs.Aero.e.Lnd;

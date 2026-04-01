@@ -81,6 +81,10 @@ elseif ((strcmpi(Aircraft.Specs.TLAR.Class, "Turboprop") == 1) || ...
     
     % convert to english units (taken from TurbopropOnDesignCycle)
     SFC = Aircraft.Mission.History.SI.Propulsion.TSFC * 3.6e3 / 0.00134102 * 2.20462;
+    
+elseif (strcmpi(Aircraft.Specs.TLAR.Class, "UAV") == 1)
+    
+    % add code for a UAV here!
    
 else
     

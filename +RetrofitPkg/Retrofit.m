@@ -384,6 +384,10 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
 
     % estimate the engine weights
     Weng = polyval(W_f_of_pow, Power / 1000);
+    
+elseif (strcmpi(aclass, "UAV") == 1)
+    
+    % add code for a UAV here
 
 else
 

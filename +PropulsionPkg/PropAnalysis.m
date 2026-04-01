@@ -72,6 +72,10 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
     % there is no fan, assume perfect efficiency
     EtaFan = 1;
     
+elseif (strcmpi(aclass, "UAV") == 1)
+    
+    % add code for a UAV here
+    
 else
     
     % throw error
@@ -440,6 +444,10 @@ if (any(Fuel))
         
         % get the fuel flow rate
         MDot = @(OffDesignEng) OffDesignEng.Fuel.MDot;
+        
+    elseif (strcmpi(aclass, "UAV") == 1)
+        
+        % add code for a UAV here
 
     end
     
@@ -493,6 +501,10 @@ if (any(Fuel))
             % any required power  < 1 must be rounded up to 5% SLS power
             PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
             
+        elseif (strcmpi(aclass, "UAV") == 1)
+            
+            % add code for a UAV here
+            
         end
         
         % get altitudes and mach number
@@ -523,6 +535,10 @@ if (any(Fuel))
                 
                 % run the engine model
                 OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
+                
+            elseif (strcmpi(aclass, "UAV") == 1)
+                
+                % add code for a UAV here
                 
             end
             

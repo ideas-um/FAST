@@ -99,6 +99,10 @@ if ~isstruct(Aircraft.Specs.Propulsion.Engine)
             [IPRPM,~] = RegressionPkg.NLGPR(Data,{["Power_SLS"],["IPMaxTO"]},Engine.ReqPower);
             [HPRPM,~] = RegressionPkg.NLGPR(Data,{["Power_SLS"],["HPMaxTO"]},Engine.ReqPower);
             Engine.RPMs = [HPRPM,IPRPM];
+            
+        case "UAV"
+            
+            % add code for a UAV here
 
     end
 

@@ -78,6 +78,9 @@ switch TLAR.Class
             warning('Power variables (MTOW, P/W, SLS Power) overconstrained. Prioritizing MTOW and P/W.')
         end
         %Propulsion.Thrust.SLS = NaN;
+        
+    case "UAV"
+        % add code for a UAV here!
 end
 
 %% Set Default year and define future
@@ -93,6 +96,9 @@ switch TLAR.Class
         DefaultPropulsion.T_W.SLS = Propulsion.T_W.SLS;
     case "Turboprop"
         DefaultPower.SLS = Power.SLS;
+        
+    case "UAV"
+        % add code for a UAV here!
 end
 DefaultPower.P_W.SLS = Power.P_W.SLS;
 
@@ -135,6 +141,9 @@ switch TLAR.Class
     case "Turboprop"
         DataAC = TurbopropAC;
         DataEngine = TurbopropEngines; % will be used once engine model specification processing is added
+        
+    case "UAV"
+        % add code for a UAV here!
 end
 
 [knowns,unknowns] = RegressionPkg.VaryUserInputs(Aircraft,TLAR.Class);
@@ -164,6 +173,8 @@ for i = 1:length(unknowns)
                     RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
             case "Turboprop"
                 DefaultAero.L_D.Crs = 16;
+            case "UAV"
+                % add code for a UAV here!
         end
     elseif length(Output) == 3 && isequal(Output,["Specs","Weight","MTOW"])
         [DefaultWeight.MTOW,~] = ...
@@ -228,6 +239,9 @@ switch TLAR.Class
 
         % multiply by 1000 to convert from kW/kg to W/kg
         DefaultPower.SLS = DefaultPower.SLS * 1000;
+        
+    case "UAV"
+        % add code for a UAV here!
 end
 
 
@@ -307,6 +321,10 @@ DefaultSettings.Dir.Oper = fullfile(HomeFolder, "EAP-CNAP");
 switch TLAR.Class
     case "Piston"
         DefaultPower.SpecEnergy.Fuel = 4.465e7/3.6e6; % BP Avgas 80
+        
+    case "UAV"
+        % add code for a UAV here, if necessary!
+        
     otherwise
         DefaultPower.SpecEnergy.Fuel = 4.32e7/3.6e6;  % Jet A
 end
@@ -340,6 +358,10 @@ switch TLAR.Class
         else
             DefaultGeometry.Preset = @(ACStruct)VisualizationPkg.GeometrySpecsPkg.SmallTurboprop(ACStruct);
         end
+        
+    case "UAV"
+        % add more for the UAV here!
+        
 end
 
 [DefaultGeometry.LengthSet,~] = RegressionPkg.NLGPR(DataAC,...
@@ -365,6 +387,9 @@ switch TLAR.Class
         if isfield(Propulsion,"Thrust")
             Propulsion = rmfield(Propulsion,"Thrust");
         end
+        
+    case "UAV"
+        % add code for a UAV here!
 end
 
 

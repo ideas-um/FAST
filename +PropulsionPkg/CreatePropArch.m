@@ -2,7 +2,7 @@ function [Aircraft] = CreatePropArch(Aircraft)
 %
 % [Aircraft] = CreatePropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 jun 2025
+% last updated: 09 mar 2026
 %
 % Given a propulsion architecture, create the necessary architecture,
 % operation and efficiency matrices to perform a propulsion system
@@ -47,6 +47,23 @@ end
 EtaEM = Specs.Power.Eta.EM;
 EtaEG = Specs.Power.Eta.EG;
 
+% check the aircraft class
+if (strcmpi(aclass, "Turbofan") == 1)
+    
+    % get the fan efficiency
+    EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
+    
+elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
+        (strcmpi(aclass, "Piston"   ) == 1) )
+    
+    % get the propeller efficiency
+    EtaTS = Aircraft.Specs.Power.Eta.Propeller;
+    
+elseif (strcmpi(aclass, "UAV") == 1)
+    % add code for a UAV here!
+    
+end
+
 
 %% DEVELOP THE PROPULSION ARCHITECTURE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,20 +93,6 @@ if     (strcmpi(ArchName, "C"  ) == 1)
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % all gas-turbine engines are powered by fuel
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % each propeller/fan is powered by a gas-turbine engine
                zeros(     1, 1), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % split the power at the sink equally amongst all propellers/fans
-           
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
            
     % upstream efficiency matrix
     EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
@@ -130,21 +133,7 @@ elseif (strcmpi(ArchName, "E"  ) == 1)
                 ones(NumEng, 1), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % all electric motors are powered by battery
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % each propeller/fan is powered by an electric motor
                zeros(     1, 1), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % split the power at the sink equally amongst all propellers/fans
-           
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
-           
+
     % upstream efficiency matrix
     EtaUps = [ones(     1, 1), repmat(EtaEM,      1, NumEng), ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the electric motor efficiency
               ones(NumEng, 1), ones(         NumEng, NumEng), ones(NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(NumEng, 1); ... % account for the propeller/fan efficiency
@@ -190,20 +179,6 @@ elseif (strcmpi(ArchName, "PHE") == 1)
                zeros(NumEng, 1),  ones(NumEng, 1), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng)      , zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % the electric motors are powered by the battery
                zeros(NumEng, 1), zeros(NumEng, 1),   eye(NumEng, NumEng) * (1 - lam),   eye(NumEng, NumEng) * lam, zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % the propeller/fan power is split between the gas-turbine engines and electric motors
                zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng)            , zeros(     1, NumEng)      , repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % the sink power is split evenly between the propellers/fans
-           
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
            
     % upstream efficiency matrix
     EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(              1, NumEng), ones(1     , NumEng)                                    , ones(     1, 1); ... % assume gas-turbine engine efficiency of 1 (not used)
@@ -262,20 +237,6 @@ elseif (strcmpi(ArchName, "SHE") == 1)
                zeros(NumEng, 1), zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng)            , zeros(NumEng, NumEng)      ,   eye(NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, 1); ... % propellers/fans require the electric motors
                zeros(     1, 1), zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng)            , zeros(     1, NumEng)      , zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % the sink requires the propellers/fans
            
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
-           
     % upstream efficiency matrix
     EtaUps = [ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume a gas-turbine efficiency of 1 (not used)
               ones(     1, 1), ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng)                                    , ones(     1, 1); ... % account for the cable efficiency
@@ -329,20 +290,6 @@ elseif (strcmpi(ArchName, "TE" ) == 1)
                zeros(NumEng, 1), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % electric motors require the electric generators
                zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(             NumEng, NumEng), zeros(NumEng, 1); ... % propellers/fans require the electric motors
                zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, 1)] ;   % the sink requires the propellers/fans
-    
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
            
     % upstream efficiency matrix
     EtaUps = [ones(     1, 1), ones(     1, NumEng), ones(     1, NumEng)                                    , ones(     1, NumEng)                                   , ones(     1, NumEng)                                    , ones(     1, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
@@ -394,21 +341,7 @@ elseif (strcmpi(ArchName, "PE" ) == 1)
                zeros(NumEng, 1), zeros(NumEng, NumEng), zeros(NumEng, NumEng),   eye(NumEng, NumEng), zeros(                     NumEng, NumEng), zeros(               NumEng, NumEng), zeros(NumEng, 1); ... % "inboard" propellers/fans require electric motors
                zeros(NumEng, 1),   eye(NumEng, NumEng), zeros(NumEng, NumEng), zeros(NumEng, NumEng), zeros(                     NumEng, NumEng), zeros(               NumEng, NumEng), zeros(NumEng, 1); ... % "outboard" propellers/fans require gas-turbine engines
                zeros(     1, 1), zeros(     1, NumEng), zeros(     1, NumEng), zeros(     1, NumEng), repmat((1 - lam) / NumEng,      1, NumEng), repmat(lam / NumEng,      1, NumEng), zeros(     1, 1)] ;   % sinks require all propellers
-           
-    % check the aircraft class
-    if (strcmpi(aclass, "Turbofan") == 1)
-        
-        % get the fan efficiency
-        EtaTS = Aircraft.Specs.Propulsion.Engine.EtaPoly.Fan;
-        
-    elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-            (strcmpi(aclass, "Piston"   ) == 1) )
-        
-        % get the propeller efficiency
-        EtaTS = Aircraft.Specs.Power.Eta.Propeller;
-        
-    end
-           
+    
     % upstream efficiency matrix
     EtaUps = [ones(       1, 1), ones(       1, NumEng), ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, NumEng)                                    , ones(       1, 1); ... % assume perfect efficiency for gas-turbine engines (not used)
               ones(  NumEng, 1), ones(  NumEng, NumEng), ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaEG), ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng)                                    , ones(  NumEng, NumEng) - eye(NumEng, NumEng) * (1 - EtaTS), ones(  NumEng, 1); ... % account for the electric generator efficiency ("inboard") and propeller/fan efficiency ("outboard")

@@ -69,6 +69,10 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
     % there is no fan, assume perfect efficiency
     EtaFan = 1;
     
+elseif (strcmpi(aclass, "UAV") == 1)
+    
+    % add code for a UAV here!
+    
 else
     
     % throw error
@@ -94,6 +98,10 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
     
     % get the total power  (p/w * mtow)
     P0 = Aircraft.Specs.Power.SLS;
+    
+elseif (strcmpi(aclass, "UAV") == 1)
+    
+    % add code for a UAV here!
     
 end
 
@@ -201,6 +209,10 @@ if (any(TrnType > 0 & TrnType ~= 2))
 
         % estimate the engine weights
         Weng = polyval(W_f_of_pow, Pdwn(Eng) / 1000);
+        
+    elseif (strcmpi(aclass, "UAV") == 1)
+        
+        % add code for a UAV here!
 
     else
 

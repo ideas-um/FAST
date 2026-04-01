@@ -248,6 +248,10 @@ switch Class
             
         end
         
+    case "UAV"
+        
+        % add code for a UAV here!
+        
     otherwise
         
         % throw an error

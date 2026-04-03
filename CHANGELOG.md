@@ -12,15 +12,27 @@ Principal Authors:
 - Paul Mokotoff, <prmoko@umich.edu>
 - Max Arnson, <marnson@umich.edu>
 
-Last Updated: 28 Jan 2026
+Last Updated: 03 Apr 2026
 
-## Version 0.5.0 - 28 Jan 2026
+## Version 0.5.0 - 03 Apr 2026
 
 ### Added
 
 1. Created the +ConstraintDiagramPkg, which allows users to generate constraint diagrams for turboprop or turbofan configurations under FAA Part 25 regulations. Users can also generate custom constraints to add to their constraint diagram.
 
 1. Created the +SafetyPkg, which enables users to execute a Fault Tree Analysis to identify the failure probability and failure modes for a given system architecture.
+
+Last Updated: 05 Mar 2026
+
+## Version 0.4.1 - 05 Mar 2026
+
+### Added
+
+1. Added a ``DiversionMission`` to simulate climbing to an altitude of 10,000 ft and then diverting to another airport.
+
+### Changed
+
+1. Updated ``EvalSplit`` to accommodate more power splits.
 
 ## Version 0.4.0 - 20 Jan 2026
 

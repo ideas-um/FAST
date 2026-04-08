@@ -483,7 +483,6 @@ if ~isfield(Aircraft,"Settings")
     Aircraft.Settings.Dir.Oper = NaN;
     Aircraft.Settings.Degradation = NaN;
     Aircraft.Settings.PowerOpt = NaN;
-    Aircraft.Settings.PowerStrat=NaN;
 else
     if ~isfield(Aircraft.Settings,"TkoPoints")
         Aircraft.Settings.TkoPoints = NaN;
@@ -548,9 +547,6 @@ else
      if ~isfield(Aircraft.Settings, "PowerOpt")
         Aircraft.Settings.PowerOpt = NaN;
      end
-     if ~isfield(Aircraft.Settings, "PowerStrat")
-        Aircraft.Settings.PowerStrat = NaN;
-    end
 end
 
 

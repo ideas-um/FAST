@@ -1,4 +1,6 @@
 
+load("Sequence.mat")
+seq = tables{8};
 load("SeqOptAC_fuele.mat")
 Case1 = OptimizedAircraft;
 disp("Case 1")
@@ -20,6 +22,37 @@ case4 = AnalyzeAC(Case4, seq);
 case1.diff = (case1.fburn-case4.fburn)./case4.fburn.*100;
 case2.diff = (case2.fburn-case4.fburn)./case4.fburn.*100;
 case3.diff = (case3.fburn-case4.fburn)./case4.fburn.*100;
+
+%%
+a = [2.85134, 6.32045, 8.54197, 10.5635];
+b = [3.48715, 7.42292, 9.4444, 11.4005];
+
+X = [a; b; nan(size(a))];
+Y = [zeros(size(a)); zeros(size(a)); nan(size(a))];
+
+f = 12;
+figure;
+
+% Plot alt and TAS v time
+t = plot(case1.Time, case1.Alt, "k-", 'LineWidth', 1, 'MarkerSize', 5);
+grid on
+xlabel('Flight Time (hr)', 'FontSize', 12)
+ylabel('Altitude (m)', 'FontSize', f)
+title('Sequence Mission Profile', 'FontSize', f)
+hold on
+flight = xline(a,'--b', 'LineWidth',1);
+b2 = plot(case1.Time(10:32),         case1.Alt(10:32), "*", 'LineWidth', 1, 'MarkerSize', 5, 'Color', 'r');
+n = 74;
+c = plot(case1.Time(10+n:32+n), case1.Alt(10+n:32+n), "*", 'LineWidth', 1, 'MarkerSize', 5, 'Color', 'r');
+n = 2*(74)-1;
+d = plot(case1.Time(10+n:32+n), case1.Alt(10+n:32+n), "*", 'LineWidth', 1, 'MarkerSize', 5, 'Color', 'r');
+n = 3*(74)-2;
+e = plot(case1.Time(10+n:32+n), case1.Alt(10+n:32+n), "*", 'LineWidth', 1, 'MarkerSize', 5, 'Color', 'r');
+n = 4*(74)-3;
+f2 = plot(case1.Time(10+n:32+n), case1.Alt(10+n:32+n), "*", 'LineWidth', 1, 'MarkerSize', 5, 'Color', 'r');
+charge = plot(X(:), Y(:), '-g','LineWidth', 2);
+legend([b2, charge, flight(1), t], {'Climb Evaluation Points', 'Charging', 'Flight Divider', 'Mission Profile'})
+
 %%
 font = 12;
 figure;

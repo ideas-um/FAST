@@ -2,7 +2,7 @@ function [W] = ElectricMachineWeight(P)
 %
 % [W] = ElectricMachineWeight(P)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 29 oct 2025
+% last updated: 09 apr 2026
 %
 % predict the weight of an electric motor using a regression.
 %
@@ -21,6 +21,6 @@ P = P ./ 1000;
 W = zeros(size(P));
 
 % compute the weight
-W(P > 0) = 113.8 .* log10(P(P > 0)) - 235.73;
+W(P > 0) = 0.2118 .* P(P > 0) .^ 1.0332;
 
 end

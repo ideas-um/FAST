@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 19 nov 2025
+% last updated: 17 apr 2025
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -174,7 +174,7 @@ for i = 1:length(unknowns)
             case "Turboprop"
                 DefaultAero.L_D.Crs = 16;
             case "UAV"
-                % add code for a UAV here!
+                DefaultAero.L_D.Crs = 10;
         end
     elseif length(Output) == 3 && isequal(Output,["Specs","Weight","MTOW"])
         [DefaultWeight.MTOW,~] = ...
@@ -264,6 +264,8 @@ switch TLAR.Class
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(135,'kts','m/s');
     case "Turboprop"
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(115,'kts','m/s');
+    case "UAV"
+        % add code for a UAV here!
 end
 
 
@@ -323,7 +325,7 @@ switch TLAR.Class
         DefaultPower.SpecEnergy.Fuel = 4.465e7/3.6e6; % BP Avgas 80
         
     case "UAV"
-        % add code for a UAV here, if necessary!
+        DefaultPower.SpecEnergy.Fuel = 4.32e7/3.6e6;  % Jet A
         
     otherwise
         DefaultPower.SpecEnergy.Fuel = 4.32e7/3.6e6;  % Jet A

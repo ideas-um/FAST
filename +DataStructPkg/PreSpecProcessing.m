@@ -299,7 +299,7 @@ else
             end
         end
 
-        if ~isfield(Aircraft.Specs.Power,"SLS")
+        if ~isfield(Aircraft.Specs.Power,"P_W")
             Aircraft.Specs.Power.P_W.SLS = NaN;
             Aircraft.Specs.Power.P_W.EM = NaN;
             Aircraft.Specs.Power.P_W.EG = NaN;

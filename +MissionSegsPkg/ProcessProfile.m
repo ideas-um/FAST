@@ -2,7 +2,7 @@ function [Aircraft] = ProcessProfile(Aircraft)
 %
 % [Aircraft] = ProcessProfile(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 17 apr 2026
 %
 % Given a mission profile, check for valid inputs.
 %
@@ -63,7 +63,8 @@ for isegs = 1:nsegs
         SegPts(isegs) = Aircraft.Settings.ClbPoints;
         
     elseif ((strcmpi(SegName, "Cruise"         ) == 1) || ...
-            (strcmpi(SegName, "CruiseBRE"      ) == 1) )
+            (strcmpi(SegName, "CruiseBRE"      ) == 1) || ...
+            (strcmpi(SegName, "CruiseUAV"      ) == 1) )
         
         % get number of points in cruise
         SegPts(isegs) = Aircraft.Settings.CrsPoints;

@@ -60,7 +60,9 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
     EtaTS = Aircraft.Specs.Power.Eta.Propeller;
     
 elseif (strcmpi(aclass, "UAV") == 1)
-    % add code for a UAV here!
+    
+    % get the propeller efficiency (not currently used)
+    EtaTS = 1;
     
 end
 

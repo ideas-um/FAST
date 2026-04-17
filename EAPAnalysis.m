@@ -2,7 +2,7 @@ function [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 %
 % [Aircraft] = EAPAnalysis(Aircraft, Type, MaxIter)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 09 jan 2026
+% last updated: 17 apr 2026
 %
 % For a given aircraft, either:
 %
@@ -58,6 +58,9 @@ end
 % structure                  %
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% aircraft class
+aclass = Aircraft.Specs.TLAR.Class;
 
 % check for fuel and batteries
 Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
@@ -215,8 +218,10 @@ while (iter < MaxIter)
         
     else
         
-        % get the initial propulsion system weight
-        Aircraft = PropulsionPkg.PropulsionSizing(Aircraft);
+        % get the initial propulsion system weight (for non-UAVs)
+        if (~strcmpi(aclass, "UAV"))
+            Aircraft = PropulsionPkg.PropulsionSizing(Aircraft);
+        end
         
     end
     

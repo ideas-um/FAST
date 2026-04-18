@@ -250,7 +250,8 @@ switch Class
         
     case "UAV"
         
-        % add code for a UAV here!
+        % throw an error
+        error("ERROR - OEWIteration: UAV weight buildup is in UAVWeight.");
         
     otherwise
         

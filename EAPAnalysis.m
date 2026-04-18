@@ -200,7 +200,11 @@ while (iter < MaxIter)
         
         % iterate on OEW for on-design only
         if (Type > 0)
-            Aircraft = OEWPkg.OEWIteration(Aircraft);
+            if (~strcmpi(aclass, "UAV"))
+                Aircraft = OEWPkg.OEWIteration(Aircraft);
+            else
+                Aircraft = OEWPkg.UAVWeight(Aircraft);
+            end
         end
         
         % clear arrays from the mission analysis

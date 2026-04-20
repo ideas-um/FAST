@@ -3,7 +3,7 @@ function [Aircraft] = UAVWeight(Aircraft)
 % [Aircraft] = UAVWeight(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Maxfield Arnson
-% last updated: 17 apr 2026
+% last updated: 20 apr 2026
 %
 % predict the weight of a UAV.
 %
@@ -79,19 +79,20 @@ Err  = 1;
 % iterate until converged
 while ((Err > Tol) && (Iter < MaxIter))
     
+    % compute the system-level rated power
+    Prated = P_W * MTOW;
+    
     % compute the gas turbine engine weight
     if (strcmpi(Arch, "C"))
         
-        % add engine weight model here, if available
+        % compute the engine weight
+        Weng = OEWPkg.PistonEngineWeight(Prated);
         
     end
     
     % compute the electric motor weight
     if (strcmpi(Arch, "E"))
-        
-        % compute the electric motor rated power
-        Prated = P_W * MTOW;
-        
+                
         % compute the electric motor weight
         Wem = OEWPkg.ElectricMachineWeight(Prated);
         

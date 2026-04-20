@@ -67,11 +67,6 @@ Wbatt = CheckEmpty(Aircraft.Specs.Weight.Batt);
 Weng  = CheckEmpty(Aircraft.Specs.Weight.Engines);
 Wem   = CheckEmpty(Aircraft.Specs.Weight.EM);
 
-% check for a negative OEW and correct via a heuristic, if necessary
-if (OEW < 0)
-    OEW = 0.4 * MTOW;
-end
-
 % initialize the iteration
 Iter = 0;
 Err  = 1;
@@ -85,9 +80,10 @@ while ((Err > Tol) && (Iter < MaxIter))
     % compute the gas turbine engine weight
     if (strcmpi(Arch, "C"))
         
+
         % compute the engine weight
         Weng = OEWPkg.PistonEngineWeight(Prated);
-        
+
     end
     
     % compute the electric motor weight
@@ -98,11 +94,19 @@ while ((Err > Tol) && (Iter < MaxIter))
         
     end
     
+    % check for a negative OEW and correct via a heuristic, if necessary
+    if (OEW < 0)
+        OEW = 0.5 * MTOW;
+    end
+
     % compute the new OEW here, and multiply by the airframe weight
     % calibration factor
+    OEW = 0.4944.*MTOW + 2.2476;
+    OEW = OEW .* OEWCF;
     
     % compute the new MTOW
-    NewMTOW = OEW + Wpay + Wfuel + Wbatt + Weng + Wem;
+    %NewMTOW = OEW + Wpay + Wfuel + Wbatt + Weng + Wem;
+    NewMTOW = OEW + Wpay + Wfuel + Wbatt;
     
     % compute the relative error to check convergence
     Err = abs(NewMTOW - MTOW) / MTOW;

@@ -32,7 +32,7 @@ Aircraft.Specs.TLAR.Class = "UAV";
 % % ** required **
 % % approximate number of passengers (payload / average passenger mass)
 % Aircraft.Specs.TLAR.MaxPax = 15309 / 95;
-Aircraft.Specs.Weight.Payload = 0;
+Aircraft.Specs.Weight.Payload = 10;
 
 
 %% MODEL CALIBRATION FACTORS %%
@@ -143,7 +143,7 @@ Aircraft.Settings.Analysis.MaxIter = 50;
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)
 %     -1 for off-design mode (aircraft performance           )
-Aircraft.Settings.Analysis.Type = -1;
+Aircraft.Settings.Analysis.Type = 1;
 
 % plotting, either:
 %     1 for plotting on

@@ -2,7 +2,7 @@ function [Aircraft] = EvalCruiseUAV(Aircraft)
 %
 % [Aircraft] = EvalCruiseUAV(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 apr 2026
+% last updated: 21 apr 2026
 %
 % evaluate the cruise segment using a breguet range equation for
 % conventionally powered UAVs and a modified one (parameterized by energy)
@@ -89,13 +89,13 @@ else
     Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
     Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
     
-    % assume full fuel/battery energy (convert to joules, remove later)
+    % assume full fuel/battery energy
     if (any(Fuel))
-        BegEleft = Aircraft.Specs.Power.SpecEnergy.Fuel * Aircraft.Specs.Weight.Fuel * 3.6e+6;
+        BegEleft = Aircraft.Specs.Power.SpecEnergy.Fuel * Aircraft.Specs.Weight.Fuel;
     end
     
     if (any(Batt))
-        BegEleft = Aircraft.Specs.Power.SpecEnergy.Batt * Aircraft.Specs.Weight.Batt * 3.6e+6;
+        BegEleft = Aircraft.Specs.Power.SpecEnergy.Batt * Aircraft.Specs.Weight.Batt;
     end
 end
 
@@ -115,11 +115,11 @@ W0 = M0 * g;
 % check for turbofan or turboprop/piston aircraft
 if     (strcmpi(Arch, "C"))
     
-    % get the specific fuel consumption (convert from kg/kW/hr to kg/W/s)
-    c = Aircraft.Specs.Propulsion.SFC / 3.6e+6;
+    % get the specific fuel consumption (already in kg/W/s)
+    c = Aircraft.Specs.Propulsion.SFC;
     
-    % get the fuel specific energy (convert from kWh/kg to Ws/kg)
-    efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;% * 3.6e+6;
+    % get the fuel specific energy (already in Ws/kg)
+    efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;
     
 %     % check the target type
 %     if     (strcmpi(TargetType, "Dist"))
@@ -159,11 +159,8 @@ if     (strcmpi(Arch, "C"))
         
 elseif (strcmpi(Arch, "E"))
     
-    % get the battery specific energy
+    % get the battery specific energy (already in Ws/kg)
     ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
-    
-    % convert units from Wh/kg to Ws/kg
-    ebatt = ebatt * 3600;
     
 %     % check the target type
 %     if     (strcmpi(TargetType, "Dist"))

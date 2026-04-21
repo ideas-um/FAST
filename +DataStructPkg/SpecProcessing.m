@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 17 apr 2025
+% last updated: 21 apr 2026
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -53,12 +53,28 @@ if ~isstring(TLAR.Class) && ~ischar(TLAR.Class)
     error('Aircraft Class (Aircraft.TLAR.Class) not specified')
 end
 
-if isnan(TLAR.MaxPax)
-    error('Number of Passengers (Aircraft.TLAR.MaxPax) not specified')
-end
-
-if isnan(Performance.Range)
-    error('Design Range (Aircraft.Performance.Range) not specified')
+if (~strcmpi(TLAR.Class, "UAV"))
+    if isnan(TLAR.MaxPax)
+        error('Number of Passengers (Aircraft.TLAR.MaxPax) not specified')
+    end
+    
+    if isnan(Performance.Range)
+        error('Design Range (Aircraft.Performance.Range) not specified')
+    end
+    
+else
+    if isnan(Performance.Endurance)
+        error("Design Endurance (Aircraft.Specs.Performance.Endurance) not specified.");
+    end
+    
+    %  no passengers needed
+    TLAR.MaxPax = 0;
+    
+    % no design range required
+    if (isnan(Performance.Range))
+        Performance.Range = 0;
+    end
+    
 end
 
 if ~isstring(Propulsion.PropArch.Type) && ~ischar(Propulsion.PropArch.Type)
@@ -73,14 +89,13 @@ switch TLAR.Class
             warning('Thrust variables (MTOW, T/W, SLS Thrust) overconstrained. Prioritizing MTOW and T/W.')
         end
         %Power.SLS = NaN;
-    case "Turboprop"
+        
+    case {"Turboprop", "UAV"}
         if sum(isnan([Weight.MTOW, Power.SLS, Power.P_W.SLS])) == 0
             warning('Power variables (MTOW, P/W, SLS Power) overconstrained. Prioritizing MTOW and P/W.')
         end
         %Propulsion.Thrust.SLS = NaN;
-        
-    case "UAV"
-        % add code for a UAV here!
+
 end
 
 %% Set Default year and define future
@@ -94,12 +109,10 @@ end
 switch TLAR.Class
     case "Turbofan"
         DefaultPropulsion.T_W.SLS = Propulsion.T_W.SLS;
-    case "Turboprop"
+    case {"Turboprop", "UAV"}
         DefaultPower.SLS = Power.SLS;
-        
-    case "UAV"
-        % add code for a UAV here!
 end
+
 DefaultPower.P_W.SLS = Power.P_W.SLS;
 
 DefaultPerformance.Vels.Tko = Performance.Vels.Tko;
@@ -143,64 +156,74 @@ switch TLAR.Class
         DataEngine = TurbopropEngines; % will be used once engine model specification processing is added
         
     case "UAV"
-        % add code for a UAV here!
+        
+        % no historical data is stored
+        DataAC = [];
+        DataEngine = [];
+        
 end
 
-[knowns,unknowns] = RegressionPkg.VaryUserInputs(Aircraft,TLAR.Class);
-
-
-Input = [{["Specs","TLAR","EIS"]}, {["Specs","Performance","Range"]}, {["Specs","TLAR","MaxPax"]}, knowns.names];
-target = [TLAR.EIS, Performance.Range, TLAR.MaxPax, knowns.values];
-
-w = ones(1,size(target,2)); w(1) = 0.2;
-%#ok<*BDSCA> (Suppresses irrelevant warning)
-for i = 1:length(unknowns)
-
-    Output = unknowns{i};
-    IO = Input;
-    IO{end+1} = Output;
-    if length(Output) == 4 && isequal(Output,["Specs","Performance","Vels","Crs"])
-        [DefaultPerformance.Vels.Crs,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 4 && isequal(Output,["Specs","Performance","Alts","Crs"])
-        [DefaultPerformance.Alts.Crs,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 4 && isequal(Output,["Specs","Aero","L_D","Crs"])
-        switch TLAR.Class
-            case "Turbofan"
-                IO{end} = ["Specs","Aero","L_D","CrsMAC"];
-                [DefaultAero.L_D.Crs,~] = ...
-                    RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-            case "Turboprop"
-                DefaultAero.L_D.Crs = 16;
-            case "UAV"
-                DefaultAero.L_D.Crs = 10;
+% check if historical data is provided
+if (~isempty(DataAC))
+    
+    % get the known/unknown values
+    [knowns,unknowns] = RegressionPkg.VaryUserInputs(Aircraft,TLAR.Class);
+    
+    % list the input and target variables
+    Input = [{["Specs","TLAR","EIS"]}, {["Specs","Performance","Range"]}, {["Specs","TLAR","MaxPax"]}, knowns.names];
+    target = [TLAR.EIS, Performance.Range, TLAR.MaxPax, knowns.values];
+    
+    w = ones(1,size(target,2)); w(1) = 0.2;
+    %#ok<*BDSCA> (Suppresses irrelevant warning)
+    for i = 1:length(unknowns)
+        
+        Output = unknowns{i};
+        IO = Input;
+        IO{end+1} = Output;
+        if length(Output) == 4 && isequal(Output,["Specs","Performance","Vels","Crs"])
+            [DefaultPerformance.Vels.Crs,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 4 && isequal(Output,["Specs","Performance","Alts","Crs"])
+            [DefaultPerformance.Alts.Crs,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 4 && isequal(Output,["Specs","Aero","L_D","Crs"])
+            switch TLAR.Class
+                case "Turbofan"
+                    IO{end} = ["Specs","Aero","L_D","CrsMAC"];
+                    [DefaultAero.L_D.Crs,~] = ...
+                        RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+                case "Turboprop"
+                    DefaultAero.L_D.Crs = 16;
+                case "UAV"
+                    DefaultAero.L_D.Crs = 10;
+            end
+        elseif length(Output) == 3 && isequal(Output,["Specs","Weight","MTOW"])
+            [DefaultWeight.MTOW,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","T_W","SLS"])
+            [DefaultPropulsion.T_W.SLS,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+            
+            
+            
+        elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","Thrust","SLS"])
+            [DefaultPropulsion.Thrust.SLS,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 4 && isequal(Output,["Specs","Power","P_W","SLS"])
+            [DefaultPower.P_W.SLS,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 3 && isequal(Output,["Specs","Power","SLS"])
+            [DefaultPower.SLS,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 3 && isequal(Output,["Specs","Weight","Fuel"])
+            [DefaultWeight.Fuel,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
+        elseif length(Output) == 4 && isequal(Output,["Specs","Aero","W_S","SLS"])
+            [DefaultAero.W_S.SLS,~] = ...
+                RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
         end
-    elseif length(Output) == 3 && isequal(Output,["Specs","Weight","MTOW"])
-        [DefaultWeight.MTOW,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","T_W","SLS"])
-        [DefaultPropulsion.T_W.SLS,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-
-
-
-    elseif length(Output) == 4 && isequal(Output,["Specs","Propulsion","Thrust","SLS"])
-        [DefaultPropulsion.Thrust.SLS,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 4 && isequal(Output,["Specs","Power","P_W","SLS"])
-        [DefaultPower.P_W.SLS,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 3 && isequal(Output,["Specs","Power","SLS"])
-        [DefaultPower.SLS,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 3 && isequal(Output,["Specs","Weight","Fuel"])
-        [DefaultWeight.Fuel,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
-    elseif length(Output) == 4 && isequal(Output,["Specs","Aero","W_S","SLS"])
-        [DefaultAero.W_S.SLS,~] = ...
-            RegressionPkg.NLGPR(DataAC,IO,target,'Weights',w);
     end
+
 end
 
 
@@ -222,7 +245,7 @@ switch TLAR.Class
             end
         end
 
-    case "Turboprop"
+    case {"Turboprop", "UAV"}
         try
             DefaultPower.SLS = DefaultPower.P_W.SLS*DefaultWeight.MTOW;
         catch
@@ -240,8 +263,6 @@ switch TLAR.Class
         % multiply by 1000 to convert from kW/kg to W/kg
         DefaultPower.SLS = DefaultPower.SLS * 1000;
         
-    case "UAV"
-        % add code for a UAV here!
 end
 
 
@@ -265,17 +286,37 @@ switch TLAR.Class
     case "Turboprop"
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(115,'kts','m/s');
     case "UAV"
-        % add code for a UAV here!
+        
+        % assume detailed mission analysis is not used, no speed needed
+        DefaultPerformance.Vels.Tko = 0;
+        
 end
 
+% get the default number of engines
+switch TLAR.Class
+    
+    % turbofan or turboprop
+    case {"Turbofan", "Turboprop"}
+        
+        % assume two engines are installed
+        DefaultPropulsion.NumEngines = 2;
+        
+    % UAV
+    case "UAV"
+        
+        % assume one engine is installed
+        DefaultPropulsion.NumEngines = 1;
+        
+end
 
+% additional default parameters
 DefaultWeight.MLW = 0;           
 DefaultWeight.Batt = 0;             
 DefaultWeight.EG = 0;              
 DefaultWeight.EM = 0;              
 DefaultWeight.EAP = 0;
 DefaultWeight.WairfCF = 1;
-DefaultPropulsion.NumEngines = 2;         
+DefaultWeight.Payload = 0;
 DefaultPropulsion.MDotCF = 1;
 DefaultPower.Eta.Propeller = 0.8;
 DefaultPower.LamDwn.SLS = 0;
@@ -324,9 +365,6 @@ switch TLAR.Class
     case "Piston"
         DefaultPower.SpecEnergy.Fuel = 4.465e7/3.6e6; % BP Avgas 80
         
-    case "UAV"
-        DefaultPower.SpecEnergy.Fuel = 4.32e7/3.6e6;  % Jet A
-        
     otherwise
         DefaultPower.SpecEnergy.Fuel = 4.32e7/3.6e6;  % Jet A
 end
@@ -339,9 +377,21 @@ DefaultPower.Eta.EM = 0.96;
 DefaultPower.Eta.EG = 0.96;
 
 %% EDC Projections
-DefaultPower.P_W.EM = ProjectionPkg.KPPProjection(TLAR.Class, TLAR.EIS, 'Electric Motor Specific Power');
-DefaultPower.SpecEnergy.Batt = ProjectionPkg.KPPProjection(TLAR.Class,TLAR.EIS,'Battery Specific Energy');
-DefaultPower.SpecEnergy.Batt = DefaultPower.SpecEnergy.Batt/1e3; % W to KW per kg
+
+if (~strcmpi(TLAR.Class, "UAV"))
+    DefaultPower.P_W.EM = ProjectionPkg.KPPProjection(TLAR.Class, TLAR.EIS, 'Electric Motor Specific Power');
+    DefaultPower.SpecEnergy.Batt = ProjectionPkg.KPPProjection(TLAR.Class,TLAR.EIS,'Battery Specific Energy');
+    DefaultPower.SpecEnergy.Batt = DefaultPower.SpecEnergy.Batt/1e3; % Wh to kWh per kg
+    
+else
+    
+    % assign default electric motor power-to-weight ratio
+    DefaultPower.P_W.EM = 5; % kW/kg
+    
+    % assign default battery specific energy
+    DefaultPower.SpecEnergy.Batt = 0.25; % kWh/kg
+    
+end
 
 %% Geometry Presets
 % Shape Preset
@@ -362,12 +412,24 @@ switch TLAR.Class
         end
         
     case "UAV"
-        % add more for the UAV here!
+        
+        % no geometry is used
+        DefaultGeometry.Preset = [];
         
 end
 
-[DefaultGeometry.LengthSet,~] = RegressionPkg.NLGPR(DataAC,...
-    {["Specs","TLAR","MaxPax"],["Specs","Aero","Length"]},TLAR.MaxPax);
+% compute the fuselage length if not a UAV
+if (strcmpi(TLAR.Class, "Turbofan") || strcmpi(TLAR.Class, "Turboprop") || strcmpi(TLAR.Class, "Piston"))
+    
+    [DefaultGeometry.LengthSet,~] = RegressionPkg.NLGPR(DataAC,...
+        {["Specs","TLAR","MaxPax"],["Specs","Aero","Length"]},TLAR.MaxPax);
+    
+else
+    
+    % no geometry is used
+    DefaultGeometry.LengthSet = [];
+    
+end
 
 
 %% Set equivalent thrust or power for turbofans and turboprops
@@ -381,7 +443,7 @@ switch TLAR.Class
         if isfield(Power,"SLS")
             Power = rmfield(Power,"SLS");
         end
-    case "Turboprop"
+    case {"Turboprop", "UAV"}
         DefaultPropulsion.Thrust.T_W.SLS = DefaultPower.P_W.SLS/DefaultPerformance.Vels.Tko;
         if isfield(Propulsion,"T_W")
             Propulsion = rmfield(Propulsion,"T_W");
@@ -389,9 +451,6 @@ switch TLAR.Class
         if isfield(Propulsion,"Thrust")
             Propulsion = rmfield(Propulsion,"Thrust");
         end
-        
-    case "UAV"
-        % add code for a UAV here!
 end
 
 
@@ -554,39 +613,55 @@ end
 
 %% Passenger and Crew Weights
 
-Weight.Payload = Aircraft.Specs.TLAR.MaxPax*95; % atr paper
+
 
 if Settings.Analysis.Type > -2
-    Weight.Crew = Weight.Payload/26.1; % from Martins' Metabook
+    if (strcmpi(TLAR.Class, "UAV"))
+        
+        % no crew weight needed for a UAV
+        Weight.Crew = 0;
+                        
+    else
+        
+        % predict the payload weight
+        Weight.Payload = Aircraft.Specs.TLAR.MaxPax*95; % atr paper
+        
+        % predict the crew weight from Martins' metabook
+        Weight.Crew = Weight.Payload/26.1;
+        
+        
+    end
 end
 
 %% Preset computationally expensive regression parameters (TF Only)
 
 if TLAR.Class == "Turbofan"
-
-% for the OEW iteration
-% list parts of the aircraft structure to use in the regression
-IOspace = {["Specs", "Aero"      , "S"            ], ...
-    ["Specs", "Propulsion", "Thrust", "SLS"], ...
-    ["Specs", "TLAR"      , "EIS"          ], ...
-    ["Specs", "Weight"    , "MTOW"         ], ...
-    ["Specs", "Weight"    , "Airframe"     ]}   ;
-
-Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
-OEWWeights = [1 1 0.2 1];
-[RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
-
-% for engine sizing
-IOspace = {["Thrust_Max"],["DryWeight"]};
-Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
-EngWeights = 1;
-[RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
+    
+    % for the OEW iteration
+    % list parts of the aircraft structure to use in the regression
+    IOspace = {["Specs", "Aero"      , "S"            ], ...
+        ["Specs", "Propulsion", "Thrust", "SLS"], ...
+        ["Specs", "TLAR"      , "EIS"          ], ...
+        ["Specs", "Weight"    , "MTOW"         ], ...
+        ["Specs", "Weight"    , "Airframe"     ]}   ;
+    
+    Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
+    OEWWeights = [1 1 0.2 1];
+    [RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
+    
+    % for engine sizing
+    IOspace = {["Thrust_Max"],["DryWeight"]};
+    Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
+    EngWeights = 1;
+    [RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
 else
     % Assign empty output if ~turbofan class
     RegressionParams = struct();
 end
+
+
 %% Prepare Output Structure
 Propulsion.Engine = Engine;
 
@@ -604,7 +679,26 @@ Aircraft.RegressionParams = RegressionParams;
 
 %% Engine Specs
 
-Aircraft = DataStructPkg.EngineSpecProcessing(Aircraft);
+% only run if it is not a UAV
+if (~strcmpi(TLAR.Class, "UAV"))
+    
+    % process the engine sub-structure
+    Aircraft = DataStructPkg.EngineSpecProcessing(Aircraft);
+    
+else
+    
+    % assume no engine weight if not provided
+    if (isfield(Aircraft.Specs.Weight, "Engines"))
+        if (isnan(Aircraft.Specs.Weight.Engines))
+            Aircraft.Specs.Weight.Engines = 0;
+        end
+    else
+        Aircraft.Specs.Weight.Engines = 0;
+    end
+    % convert SFC units from kg/kW/hr to kg/W/s
+    Aircraft.Specs.Propulsion.SFC = Aircraft.Specs.Propulsion.SFC / 3.6e+6;
+    
+end
 
 
 end

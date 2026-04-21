@@ -2,7 +2,7 @@ function [Aircraft] = GenUAV()
 %
 % [Aircraft] = GenUAV()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 apr 2026
+% last updated: 20 apr 2026
 % 
 % model a generic UAV.
 %
@@ -30,8 +30,7 @@ Aircraft.Specs.TLAR.EIS = 2035;
 Aircraft.Specs.TLAR.Class = "UAV";
 
 % % ** required **
-% % approximate number of passengers (payload / average passenger mass)
-% Aircraft.Specs.TLAR.MaxPax = 15309 / 95;
+% payload (kg)
 Aircraft.Specs.Weight.Payload = 10;
 
 
@@ -61,15 +60,14 @@ Aircraft.Specs.Performance.Alts.Crs = 914;
 % endurance (min)
 Aircraft.Specs.Performance.Endurance = 300;
 
-% overall efficiency
-Aircraft.Specs.Performance.EtaOv = 4;
+% overall efficiency:
+% product of L/D and propeller efficiency for conventional UAVs
+% product of L/D, propeller efficiency, and EM efficiency for electric UAVs
+Aircraft.Specs.Performance.EtaOv = 3;
 
 
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
-
-% % aerodynamic analysis method
-% Aircraft.Specs.Aero.L_D.Method = 
 
 % lift-drag ratio during cruise 
 Aircraft.Specs.Aero.L_D.Crs = 12 * Aircraft.Specs.Aero.L_D.CrsCF;
@@ -90,7 +88,10 @@ Aircraft.Specs.Weight.Fuel = 12;
 % battery weight (kg)
 Aircraft.Specs.Weight.Batt = 0;
 
+% OEW (kg)
 Aircraft.Specs.Weight.OEW = 50;
+
+% crew weight (kg)
 Aircraft.Specs.Weight.Crew = 0;
 
 
@@ -157,7 +158,7 @@ Aircraft.Settings.Table = 0;
 Aircraft.Settings.VisualizeAircraft = 0;
 
 % initial set of cruise points
-Aircraft.Settings.CrsPoints = 2;
+Aircraft.Settings.CrsPoints = 10;
 
 % ----------------------------------------------------------
 

@@ -2,7 +2,7 @@ function [Aircraft] = EvalCruiseUAV(Aircraft)
 %
 % [Aircraft] = EvalCruiseUAV(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 15 apr 2026
+% last updated: 20 apr 2026
 %
 % evaluate the cruise segment using a breguet range equation for
 % conventionally powered UAVs and a modified one (parameterized by energy)
@@ -22,15 +22,11 @@ function [Aircraft] = EvalCruiseUAV(Aircraft)
 %% GET MISSION PROFILE INFORMATION %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% get the mission/segment ids
-MissID = Aircraft.Mission.Profile.MissID;
+% get the segment id
 SegsID = Aircraft.Mission.Profile.SegsID;
 
 % get the current cruise target
 Target = Aircraft.Mission.Profile.CrsTarget;
-
-% check for distance- or time-based target
-TargetType = Aircraft.Mission.Profile.Target.Type(MissID);
 
 % get the beginning and ending control point indices
 SegBeg = Aircraft.Mission.Profile.SegBeg(SegsID);
@@ -60,8 +56,8 @@ VType = Aircraft.Mission.Profile.TypeBeg(SegsID);
 
 if (SegBeg > 1)
     
-    % get the weight at the beginning of the segment
-    W0 = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg);
+    % get the mass at the beginning of the segment (kg)
+    M0 = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg);
     
     % get the current fuel burn
     BegFburn = Aircraft.Mission.History.SI.Weight.Fburn(SegBeg);
@@ -76,8 +72,8 @@ if (SegBeg > 1)
     
 else
     
-    % get MTOW
-    W0 = Aircraft.Specs.Weight.MTOW;
+    % get MTOM (kg)
+    M0 = Aircraft.Specs.Weight.MTOW;
     
     % no fuel burn yet
     BegFburn = 0;
@@ -110,17 +106,20 @@ end
 % get acceleration due to gravity
 g = MissionSegsPkg.Gravity(Alt);
 
+% compute the initial weight of the aircraft (N)
+W0 = M0 * g;
+
 % get the true airspeed
 [EAS, TAS, Mach, ~, ~, Rho] = MissionSegsPkg.ComputeFltCon(Alt, 0, VType, Vel);
 
 % check for turbofan or turboprop/piston aircraft
 if     (strcmpi(Arch, "C"))
     
-    % get the specific fuel consumption
-    c = Aircraft.Specs.Propulsion.SFC;
+    % get the specific fuel consumption (convert from kg/kW/hr to kg/W/s)
+    c = Aircraft.Specs.Propulsion.SFC / 3.6e+6;
     
-    % get the fuel specific energy
-    efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;
+    % get the fuel specific energy (convert from kWh/kg to Ws/kg)
+    efuel = Aircraft.Specs.Power.SpecEnergy.Fuel;% * 3.6e+6;
     
 %     % check the target type
 %     if     (strcmpi(TargetType, "Dist"))
@@ -152,11 +151,11 @@ if     (strcmpi(Arch, "C"))
 %         
 %     end
     
-    % compute the fuel burn
-    Wfuel = W0 - W1;
+    % compute the fuel burn (kg)
+    Mfuel = (W0 - W1) / g;
     
     % compute the energy expended
-    EExpended = efuel * Wfuel;
+    EExpended = efuel * Mfuel;
         
 elseif (strcmpi(Arch, "E"))
     
@@ -172,8 +171,8 @@ elseif (strcmpi(Arch, "E"))
         % get the range
         R = Target;
         
-        % compute the battery weight as a function of the range
-        Wbatt = R * W0 / EtaOv / ebatt;
+        % compute the battery mass as a function of the range
+        mbatt = R * W0 / EtaOv / ebatt;
         
         % compute the time to fly
         E = R / TAS;
@@ -200,10 +199,10 @@ elseif (strcmpi(Arch, "E"))
     W1 = W0;
     
     % no fuel burn
-    Wfuel = 0;
+    Mfuel = 0;
     
     % battery energy expended
-    EExpended = ebatt * Wbatt;
+    EExpended = ebatt * mbatt;
     
 else
     
@@ -211,6 +210,9 @@ else
     error("ERROR - EvalCruiseUAV: invalid aircraft class selected.");
     
 end
+
+% compute the final mass
+M1 = W1 / g;
 
 
 %% ASSUME STATE VARIABLES CHANGE LINEARLY %%
@@ -221,8 +223,8 @@ Time = linspace(BegTime, BegTime + E, npnt);
 Dist = linspace(BegDist, BegDist + R, npnt);
 
 % remember the aircraft weight
-Weight = linspace(W0      , W1              , npnt);
-Fburn  = linspace(BegFburn, BegFburn + Wfuel, npnt);
+Weight = linspace(M0      , M1              , npnt);
+Fburn  = linspace(BegFburn, BegFburn + Mfuel, npnt);
 
 % compute the energy expenditure
 E_ES  = linspace(BegEnergy, BegEnergy + EExpended, npnt);

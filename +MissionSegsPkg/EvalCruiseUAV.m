@@ -128,7 +128,7 @@ if     (strcmpi(Arch, "C"))
         R = Target;
         
         % compute the final weight as a function of the range
-        W1 = W0 / exp(R * c / EtaOv);
+        W1 = W0 / exp(R * c * g/ EtaOv);
         
         % compute the time to fly
         E = R / TAS;

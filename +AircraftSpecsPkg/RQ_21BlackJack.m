@@ -1,10 +1,10 @@
-function [Aircraft] = GenUAV()
+function [Aircraft] = RQ_21BlackJack()
 %
-% [Aircraft] = GenUAV()
-% written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 apr 2026
+% [Aircraft] = RQ_7AShadow()
+% written by emma cassidy, emmasmit@umich.edu
+% last updated: 24 apr 2026
 % 
-% model a generic UAV.
+% model Boeing Insitu RQ-21 BlackJack gas powered UAV
 %
 % INPUTS:
 %     none
@@ -31,48 +31,39 @@ Aircraft.Specs.TLAR.Class = "UAV";
 
 % % ** required **
 % payload (kg)
-Aircraft.Specs.Weight.Payload = 10;
+Aircraft.Specs.Weight.Payload = 17;
 
 
 %% MODEL CALIBRATION FACTORS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1;
-Aircraft.Specs.Aero.L_D.CrsCF = 1;
+% overall efficiency:
+% product of L/D and propeller efficiency for conventional UAVs
+% product of L/D, propeller efficiency, and EM efficiency for electric UAVs
+Aircraft.Specs.Performance.EtaOv = 2.8;
 
-% fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1;
-
-% just have airframe and efficiency overall
-
-% airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1;
+% OEW weight calibration factor
+Aircraft.Specs.Weight.WairfCF = 1.14;
  
 
 %% VEHICLE PERFORMANCE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 % cruise speed (mach)
-Aircraft.Specs.Performance.Vels.Crs = 0.10;
+Aircraft.Specs.Performance.Vels.Crs = 30.9/343;
 
 % cruise altitude (m)
-Aircraft.Specs.Performance.Alts.Crs = 914;
+Aircraft.Specs.Performance.Alts.Crs = 5000;
 
 % endurance (min)
-Aircraft.Specs.Performance.Endurance = 300;
-
-% overall efficiency:
-% product of L/D and propeller efficiency for conventional UAVs
-% product of L/D, propeller efficiency, and EM efficiency for electric UAVs
-Aircraft.Specs.Performance.EtaOv = 3;
+Aircraft.Specs.Performance.Endurance = 16.*60;
 
 
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
 
 % lift-drag ratio during cruise 
-Aircraft.Specs.Aero.L_D.Crs = 12 * Aircraft.Specs.Aero.L_D.CrsCF;
+Aircraft.Specs.Aero.L_D.Crs = 12; 
 
 % wing loading (kg/m^2)
 Aircraft.Specs.Aero.W_S.SLS = 7;
@@ -82,16 +73,16 @@ Aircraft.Specs.Aero.W_S.SLS = 7;
 %%%%%%%%%%%%%
 
 % maximum takeoff weight (kg)
-Aircraft.Specs.Weight.MTOW = 50;
+Aircraft.Specs.Weight.MTOW = 61;
 
 % block fuel weight (kg)
-Aircraft.Specs.Weight.Fuel = 12;
+Aircraft.Specs.Weight.Fuel = 7;
 
 % battery weight (kg)
 Aircraft.Specs.Weight.Batt = 0;
 
 % OEW (kg)
-Aircraft.Specs.Weight.OEW = 50;
+Aircraft.Specs.Weight.OEW = 75;
 
 % crew weight (kg)
 Aircraft.Specs.Weight.Crew = 0;
@@ -111,7 +102,9 @@ Aircraft.Specs.Propulsion.PropArch.Type = "C";
 Aircraft.Specs.Propulsion.NumEngines = 1;
 
 % set the BSFC (kg/kW/hr)
-Aircraft.Specs.Propulsion.SFC = 0.35;
+Aircraft.Specs.Propulsion.SFC = 0.076;
+%Aircraft.Specs.Propulsion.SFC = 0.1;
+
 
 
 %% POWER %%

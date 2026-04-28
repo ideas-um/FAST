@@ -20,6 +20,9 @@
 % JetTOFL           - ConstraintDiagramPkg.JetTOFL is a function.
 % OEIMultiplier     - ConstraintDiagramPkg.OEIMultiplier is a function.
 % Sigmoid           - ConstraintDiagramPkg.Sigmoid is a function.
+% UAVCrs            - ConstraintDiagramPkg.UAVCrs is a function.
+% UAVMaxKE          - ConstraintDiagramPkg.UAVMaxKE is a function.
+% UAVMaxSpeed       - ConstraintDiagramPkg.UAVMaxSpeed is a function.
 %
 % Packages
 % -------------------------------------------------------------------------

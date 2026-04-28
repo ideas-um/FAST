@@ -2,8 +2,7 @@ function [] = ConstraintDiagram(Aircraft)
 %
 % ConstraintDiagram.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% adapted from code used in AEROSP 481 as a GSI
-% last updated: 04 dec 2025
+% last updated: 28 apr 2026
 %
 % create a constraint diagram according to 14 CFR 23/25. for turbofans, a
 % T/W-W/S diagram is created using 14 CFR 25. for turboprops/piston, either
@@ -41,13 +40,14 @@ if      (strcmpi(aclass, "Turbofan" ) == 1)
     VertLabel = "Thrust-Weight Ratio (N/N)";
     
 elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
-        (strcmpi(aclass, "Piston"   ) == 1) )
+        (strcmpi(aclass, "Piston"   ) == 1) || ...
+        (strcmpi(aclass, "UAV"      ) == 1) )
         
     % get the power-weight ratio and convert to W/kg from kW/kg
     VertCent = Aircraft.Specs.Power.P_W.SLS .* 1000;
     
     % check which requirements are being used
-    if (CFRPart == 25)
+    if (CFRPart == 25 || CFRPart == 107)
         
         % convert from W/kg to W/N
         VertCent = VertCent / 9.81;
@@ -56,7 +56,7 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
         VertCent = 1 / VertCent;
                 
         % create a vertical range
-        Vrange = linspace(max(0, VertCent - 0.25), min(0.2, VertCent + 0.15), 500);
+        Vrange = linspace(max(0, VertCent - 0.25), min(0.25, VertCent + 0.15), 500);
         
         % define the axis label
         VertLabel = "Power Loading (N/W)";
@@ -90,7 +90,17 @@ HoriCent = Aircraft.Specs.Aero.W_S.SLS;
 HoriLabel = "Wing Loading (kg/m^2)";
 
 % center the grids (+/- 100 for horizontal, +/- 150 for vertical)
-Hrange = linspace(max( 0, HoriCent - 1000), max(1000, HoriCent + 1000), 500);
+if (CFRPart == 107)
+    
+    % use a smaller wing loading range
+    Hrange = linspace(max(0, HoriCent - 50), min(50, HoriCent + 50), 500);
+    
+else
+    
+    % use a larger wind loading range
+    Hrange = linspace(max( 0, HoriCent - 1000), max(1000, HoriCent + 1000), 500);
+    
+end
 
 % create a grid of values
 [Hgrid, Vgrid] = meshgrid(Hrange, Vrange);

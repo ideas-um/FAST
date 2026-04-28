@@ -26,7 +26,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 06 Oct 2025
+% README last updated: 28 April 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -49,6 +49,19 @@ function [] = README()
 % not explicitly defined in 14 CFR 25, but may be necessary for sizing a
 % configuration.
 %
+% Additional constraints have been added for designing UAVs, containing
+% some requirements defined in 14 CFR 107:
+%
+%     107.51  - maximum ground speed (set to 87 kts in the regulation, but
+%               parameteric in the implementation). See UAVMaxSpeed.m
+%     107.120 - maximum kinetic energy upon a collision (set to 11 ft-lbf
+%               but parametric in the implementation). See UAVMaxKE.m
+%     107.130 - maximum kinetic energy upon a collision (set to 25 ft-lbf
+%               but parametric in the implementation). See UAVMaxKE.m
+%
+% An additional UAV constraint was developed for flying at cruise, and
+% assumes a constant lift-to-drag ratio.
+%
 % In future releases, 14 CFR 23 regulations may be added. Alternatively,
 % these can be added by someone else within the aerospace community. 
 % Despite this limitation, the main function, "ConstraintDiagram", has
@@ -60,7 +73,9 @@ function [] = README()
 % turboprop and piston aircraft, a power-to-weight ratio and wing loading
 % diagram (P/W-W/S) is created if the aircraft is certified under 14 CFR
 % 23. If the turboprop/piston aircraft is certified under 14 CFR 25, a
-% power loading and wing loading diagram (W/P-W/S) is created.
+% power loading and wing loading diagram (W/P-W/S) is created. For UAVs
+% certified under 14 CFR 107, a power loading and wing loading diagram
+% (W/P-W/S) is created.
 %
 % -------------------------------------------------------------------------
 %
@@ -68,11 +83,12 @@ function [] = README()
 %
 % First, create a Constraint Specification File. Examples are included in
 % the "+ConstraintSpecsPkg" and include both turbofan and turboprop
-% aircraft certified by 14 CFR 25. A comprehensive list of the possible
-% input parameters is provided in Section III. The actual input parameters
-% needed depend on the requirements used for the analysis. Please consult
-% each constraint function for the necessary parameters that must be input
-% to execute the code accordingly.
+% aircraft certified by 14 CFR 25 or the UAV certified under 14 CFR 107.
+% A comprehensive list of the possible input parameters is provided in
+% Section III. The actual input parameters needed depend on the
+% requirements used for the analysis. Please consult each constraint
+% function for the necessary parameters that must be input to execute the
+% code accordingly.
 %
 % Second, run the "ConstraintDiagram" function. This involves inputting the
 % aircraft model made in the previous step. In the example files, the
@@ -95,16 +111,19 @@ function [] = README()
 %                    a) "Turbofan"
 %                    b) "Turboprop"
 %                    c) "Piston"
+%                    d) "UAV"
 %
 %     CFRPart -  the certification regulations used, either:
-%                    a) 23 - 14 CFR 23
-%                    b) 25 - 14 CFR 25
+%                    a)  23 - 14 CFR  23
+%                    b)  25 - 14 CFR  25
+%                    c) 107 - 14 CFR 107
 %
 %     ReqType -  the requirements used in the packaged constraint
 %                functions, either:
 %                    a) 0 - Roskam
 %                    b) 1 - Mattingly
 %                    c) 2 - deVries et al.
+%                [this is not used for UAVs]
 %
 % Performance
 %     Alts.Crs       - cruise altitude (m)
@@ -149,6 +168,11 @@ function [] = README()
 %     ExtraGrad      - an additional all engine operative climb gradient
 %                      that acts as an additional requirement
 %
+%     VMax           - maximum allowable speed
+%
+%     KEMax          - maximum allowable kinetic energy upon colliding with
+%                      a human or an object
+%
 % Aerodynamics (Aero)
 %     W_S.SLS - wing loading at sea level (kg / m^2)
 %
@@ -171,6 +195,9 @@ function [] = README()
 %     e.Tko   - takeoff Oswald efficiency factor
 %
 %     e.Lnd   - landing Oswald efficiency factor
+%
+%     L_D.Crs - lift-to-drag ratio at cruise [used only for the UAV cruise
+%               analysis]
 %
 % Weights (Weight)
 %     MTOW - maximum takeoff weight
@@ -195,6 +222,7 @@ function [] = README()
 %                      a) 0 - climb gradients from 14 CFR 25
 %                      b) 1 - climb gradients as a function of the specific
 %                             excess power loss
+%                  [not used for UAVs]
 %
 % -------------------------------------------------------------------------
 %

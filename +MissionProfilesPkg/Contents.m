@@ -12,8 +12,11 @@
 % BRECruise00                   - MissionProfilesPkg.BRECruise00 is a function.
 % BRECruise01                   - MissionProfilesPkg.BRECruise01 is a function.
 % BRECruise02                   - MissionProfilesPkg.BRECruise02 is a function.
+% CeRAS                         - MissionProfilesPkg.CeRAS is a function.
+% DiversionMission              - MissionProfilesPkg.DiversionMission is a function.
 % ERJ                           - MissionProfilesPkg.ERJ is a function.
 % ERJ_ClimbThenAccel            - MissionProfilesPkg.ERJ_ClimbThenAccel is a function.
+% GenUAV                        - MissionProfilesPkg.GenUAV is a function.
 % LM100J                        - MissionProfilesPkg.LM100J is a function.
 % LM100J_NoRsrv                 - MissionProfilesPkg.LM100J_NoRsrv is a function.
 % NotionalMission00             - MissionProfilesPkg.NotionalMission00 is a function.

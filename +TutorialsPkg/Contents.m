@@ -13,7 +13,7 @@
 % Tutorial009     - TutorialsPkg.Tutorial009 is a function.
 % Tutorial010     - TutorialsPkg.Tutorial010 is a function.
 % Tutorial011     - TutorialsPkg.Tutorial011 is a function.
-% Tutorial012.m   - TutorialsPkg.Tutorial012.m is a function.
+% Tutorial012     - TutorialsPkg.Tutorial012 is a function.
 %
 % MAT-Files
 % -------------------------------------------------------------------------

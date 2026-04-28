@@ -4,7 +4,7 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% BattAgingOffDeign      - BatteryPkg.BattAgingOffDeign is a function.
+% BattAgingOffDesign     - BatteryPkg.BattAgingOffDesign is a function.
 % Charging               - BatteryPkg.Charging is a function.
 % CyclAging              - BatteryPkg.CyclAging is a function.
 % Discharging            - BatteryPkg.Discharging is a function.

@@ -8,6 +8,7 @@
 % EvalClimb                     - MissionSegsPkg.EvalClimb is a function.
 % EvalCruise                    - MissionSegsPkg.EvalCruise is a function.
 % EvalCruiseBRE                 - MissionSegsPkg.EvalCruiseBRE is a function.
+% EvalCruiseUAV                 - MissionSegsPkg.EvalCruiseUAV is a function.
 % EvalDescent                   - MissionSegsPkg.EvalDescent is a function.
 % EvalDetailedTakeoff           - MissionSegsPkg.EvalDetailedTakeoff is a function.
 % EvalLanding                   - MissionSegsPkg.EvalLanding is a function.

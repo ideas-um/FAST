@@ -12,7 +12,19 @@ Principal Authors:
 - Paul Mokotoff, <prmoko@umich.edu>
 - Max Arnson, <marnson@umich.edu>
 
-Last Updated: 05 Mar 2026
+Last Updated: 29 Apr 2026
+
+## Version 0.5.0 - 29 Apr 2026
+
+### Added
+
+1. Constraint diagram generation capabilities for UAVs have been added. See the UAV*.m files in the +ConstraintDiagramPkg.
+
+1. Sizing and mission analysis capabilities for UAVs. See UAVWeight.m in the +OEWPkg and EvalCruiseBRE.m in the +MissionSegsPkg.
+
+### Changed
+
+1. Updated corresponding files in the +DataStructPkg to accommodate UAV analyses.
 
 ## Version 0.4.1 - 05 Mar 2026
 

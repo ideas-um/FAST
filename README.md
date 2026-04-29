@@ -28,7 +28,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 20 Jan 2026
+README last updated: 28 Apr 2026
 
 ## Learn More About FAST
 
@@ -140,7 +140,8 @@ For additional documentation, see package-specific README files. These READMEs w
 
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
-- **+CostPkg**: This packages contains functions for estimating aircraft related costs.
+- **+ConstraintDiagramPkg**: This package is used to generate constraint diagrams for aircraft certified under 14 CFR 25 or 14 CFR 107 requirements, in addition to other flight performance requirements.
+- **+CostPkg**: This package contains functions for estimating aircraft related costs.
 - **+DatabasePkg**: This package contains the IDEAS Lab historical database. It also contains functions which help convert the original database format (MS Excel sheet) into the FAST format (Matlab data structures).
 - **+DataStructPkg**: This package contains functions which process aircraft data structures when calling FAST.
 - **+EngineModelPkg**: This package contains the gas turbine engine models used while running FAST. It is one of the largest packages and inspecting additional documentation is recommended if a user has more questions regarding the gas turbine engine models.

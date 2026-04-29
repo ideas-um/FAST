@@ -101,7 +101,7 @@ while ((Err > Tol) && (Iter < MaxIter))
 
     % compute the new OEW here, and multiply by the airframe weight
     % calibration factor
-    OEW = 0.4944.*MTOW + 2.2476;
+    OEW = 0.4822*MTOW+2.7192;
     OEW = OEW .* OEWCF;
     
     % compute the new MTOW

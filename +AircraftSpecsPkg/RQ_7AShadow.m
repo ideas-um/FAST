@@ -40,10 +40,10 @@ Aircraft.Specs.Weight.Payload = 27;
 % overall efficiency:
 % product of L/D and propeller efficiency for conventional UAVs
 % product of L/D, propeller efficiency, and EM efficiency for electric UAVs
-Aircraft.Specs.Performance.EtaOv = 2.5;
+Aircraft.Specs.Performance.EtaOv = 2.44;
 
 % OEW weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 0.994;
+Aircraft.Specs.Weight.WairfCF = 1;
  
 
 %% VEHICLE PERFORMANCE %%

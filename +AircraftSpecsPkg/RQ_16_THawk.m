@@ -1,10 +1,10 @@
-function [Aircraft] = RQ_21BlackJack()
+function [Aircraft] = RQ_16_THawk()
 %
 % [Aircraft] = RQ_7AShadow()
 % written by emma cassidy, emmasmit@umich.edu
 % last updated: 24 apr 2026
 % 
-% model Boeing Insitu RQ-21 BlackJack gas powered UAV
+% model Honeywell RQ-16 T-Hawk gas powered UAV
 %
 % INPUTS:
 %     none
@@ -31,7 +31,7 @@ Aircraft.Specs.TLAR.Class = "UAV";
 
 % % ** required **
 % payload (kg)
-Aircraft.Specs.Weight.Payload = 17;
+Aircraft.Specs.Weight.Payload = 0.45;
 
 
 %% MODEL CALIBRATION FACTORS %%
@@ -40,23 +40,23 @@ Aircraft.Specs.Weight.Payload = 17;
 % overall efficiency:
 % product of L/D and propeller efficiency for conventional UAVs
 % product of L/D, propeller efficiency, and EM efficiency for electric UAVs
-Aircraft.Specs.Performance.EtaOv = 2.8;
+Aircraft.Specs.Performance.EtaOv = 0.78;
 
 % OEW weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.145;
+Aircraft.Specs.Weight.WairfCF = 1.03;
  
 
 %% VEHICLE PERFORMANCE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 % cruise speed (mach)
-Aircraft.Specs.Performance.Vels.Crs = 30.9/343;
+Aircraft.Specs.Performance.Vels.Crs = 20/343;
 
 % cruise altitude (m)
-Aircraft.Specs.Performance.Alts.Crs = 5000;
+Aircraft.Specs.Performance.Alts.Crs = 2000;
 
 % endurance (min)
-Aircraft.Specs.Performance.Endurance = 16.*60;
+Aircraft.Specs.Performance.Endurance = 0.83*60;
 
 
 %% AERODYNAMICS %%
@@ -73,16 +73,16 @@ Aircraft.Specs.Aero.W_S.SLS = 7;
 %%%%%%%%%%%%%
 
 % maximum takeoff weight (kg)
-Aircraft.Specs.Weight.MTOW = 61;
+Aircraft.Specs.Weight.MTOW = 8.4;
 
 % block fuel weight (kg)
-Aircraft.Specs.Weight.Fuel = 7;
+Aircraft.Specs.Weight.Fuel = 0.95;
 
 % battery weight (kg)
 Aircraft.Specs.Weight.Batt = 0;
 
 % OEW (kg)
-Aircraft.Specs.Weight.OEW = 75;
+Aircraft.Specs.Weight.OEW = 7;
 
 % crew weight (kg)
 Aircraft.Specs.Weight.Crew = 0;
@@ -102,9 +102,7 @@ Aircraft.Specs.Propulsion.PropArch.Type = "C";
 Aircraft.Specs.Propulsion.NumEngines = 1;
 
 % set the BSFC (kg/kW/hr)
-Aircraft.Specs.Propulsion.SFC = 0.078;
-%Aircraft.Specs.Propulsion.SFC = 0.1;
-
+Aircraft.Specs.Propulsion.SFC = 0.6;
 
 
 %% POWER %%

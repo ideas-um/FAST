@@ -114,13 +114,6 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 % gravimetric specific energy of battery (kWh/kg), not used here
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
-% battery cells in series and parallel 
-Aircraft.Specs.Power.Battery.ParCells = NaN;
-Aircraft.Specs.Power.Battery.SerCells = NaN;
-
-% initial battery SOC
-Aircraft.Specs.Power.Battery.BegSOC = NaN;
-
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -40,7 +40,7 @@ To stay informed about upcoming papers, new releases, and news about FAST, pleas
 
 ## Please cite us when using FAST
 
-If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited if you are only using FAST's integrated visualization capabilities. Paper 6 may be cited for the graph-based methodology used in the propulsion system analysis.
+If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited for the graph-based methodology used in the propulsion system analysis. Paper 6 may be cited if you are only using FAST's integrated visualization capabilities.
 
 1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038452)
 1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft Journal of Aircraft, 63(1), 266-288.](https://doi.org/10.2514/1.C038340)

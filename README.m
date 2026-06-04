@@ -28,7 +28,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 20 Jan 2026
+% README last updated: 28 Jan 2026
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -193,88 +193,100 @@ function [] = README()
 %                    called during the mission analysis for fully or hybrid
 %                    electric aircraft.
 %
-%             (c) +CostPkg
+%             (c) +ConstraintDiagramPkg
+%                    This package contains functionality to generate
+%                    constraint diagrams for turboprop or turbofan aircraft
+%                    under FAA Part 25 requirements. In the future,
+%                    additional functionality will be provided for
+%                    turboprop aircraft under FAA Part 23 requirements.
+%
+%             (d) +CostPkg
 %                    This packages contains functions for estimating
 %                    aircraft related costs.
 % 
-%             (d) +DatabasePkg
+%             (e) +DatabasePkg
 %                    This package contains the IDEAS Lab historical
 %                    database. It also contains functions which help
 %                    convert the original database format (MS Excel sheet)
 %                    into the FAST format (Matlab data structures).
 % 
-%             (e) +DataStructPkg
+%             (f) +DataStructPkg
 %                    This package contains functions which process aircraft
 %                    data structures when calling FAST.
 % 
-%             (f) +EngineModelPkg
+%             (g) +EngineModelPkg
 %                    This package contains the gas turbine engine models
 %                    used while running FAST. It is one of the largest
 %                    packages and inspecting additional documentation is
 %                    recommended if a user has more questions regarding the
 %                    gas turbine engine models.
 % 
-%             (g) +MissionProfilesPkg
+%             (h) +MissionProfilesPkg
 %                    This package is analagous to the AircraftSpecsPkg, as
 %                    it contains specific mission profiles. The
 %                    documentation will guide users in calling pre-made
 %                    mission profiles 
 % 
-%             (h) +MissionSegsPkg
+%             (i) +MissionSegsPkg
 %                    This package is responsible for all aircraft
 %                    performance-related functionality while performing the
 %                    mission analysis (i.e., processing and flying the
 %                    mission).
 %
-%             (i) +OEWPkg
+%             (j) +OEWPkg
 %                    This package determines the aircraft's airframe and 
 %                    propulsion system weights.
 % 
-%             (j) +OptimizationPkg
+%             (k) +OptimizationPkg
 %                    This package contains information about running EAP
 %                    power management optimization, which is focused on
 %                    optimizing in the sizing loop to determine the optimum
 %                    electrified powertrain component sizes and usage
 %                    during flight.
 % 
-%             (k) +PlotPkg
+%             (l) +PlotPkg
 %                    This package contains information about plotting the
 %                    mission history upon the user's request. It creates
 %                    subplots to show the time-based history of multiple
 %                    aircraft performance and system-level parameters.
 % 
-%             (l) +ProjectionPkg
+%             (m) +ProjectionPkg
 %                    This package contains code to project the value of
 %                    certain Key Performance Parameters (KPP) into the
 %                    future using S-curves.
 % 
-%             (m) +PropulsionPkg
+%             (n) +PropulsionPkg
 %                    This package is responsible for creating the user's
 %                    desired propulsion architecture and evaluating the
 %                    propulsion system's performance during the mission
 %                    analysis. It connects to the EngineModelPkg for
 %                    evaluating an actual engine's performance.
 % 
-%             (n) +RegressionPkg
+%             (o) +RegressionPkg
 %                    This package contains code that creates regressions to
 %                    predict any unknown parameters about the aircraft
 %                    configuration being designed.
 % 
-%             (o) +RetrofitPkg
+%             (p) +RetrofitPkg
 %                    This package contains code to run retrofit studies on
 %                    an aircraft by electrifying its powertrain and
 %                    replacing part of the payload with batteries.
 %
-%             (p) +TutorialsPkg
+%             (q) +SafetyPkg
+%                    This package contains code to run a fault tree
+%                    analysis from a graph-based representation of a system
+%                    architecture.
+%
+%             (r) +TutorialsPkg
 %                     This package contains Matlab scripts to accompany all
 %                     the playlist of YouTube tutorial videos, which can be
 %                     accessed using this link: https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-
-% 
-%             (q) +UnitConversionPkg
+%
+%             (s) +UnitConversionPkg
 %                    This package contains functions which perform unit
 %                    conversions for use in FAST.
 % 
-%             (r) +VisualizationPkg
+%             (t) +VisualizationPkg
 %                    This package contains information about visualizing
 %                    both the aicraft's outer mold line(as a wireframe) and
 %                    its propulsion architecture (in a schematic).

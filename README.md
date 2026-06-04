@@ -4,7 +4,7 @@
 
 # README
 
-Copyright 2024 The Regents of the University of Michigan, The Integrated Design of Efficient Aerospace Systems Laboratory
+Copyright 2026 The Regents of the University of Michigan, The Integrated Design of Efficient Aerospace Systems Laboratory
 
 Future Aircraft Sizing Tool (FAST), a MATLAB-based aircraft sizing toolbox for electrified aircraft concepts with any propulsion architecture.
 
@@ -28,7 +28,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 20 Jan 2026
+README last updated: 1 May 2026
 
 ## Learn More About FAST
 
@@ -40,19 +40,18 @@ To stay informed about upcoming papers, new releases, and news about FAST, pleas
 
 ## Please cite us when using FAST
 
-If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited if you are only using FAST's integrated visualization capabilities. Paper 6 may be cited for the graph-based methodology used in the propulsion system analysis.
+If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited for the graph-based methodology used in the propulsion system analysis. Paper 6 may be cited if you are only using FAST's integrated visualization capabilities.
 
 1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038452)
-1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. In AIAA SciTech Forum (p. 2374).](https://doi.org/10.2514/6.2025-2374)
-1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038340)
-1. [Arnson, M., Aljaber, R., & Cinar, G. (2025). Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data. In AIAA SciTech Forum (p. 1287).](https://doi.org/10.2514/6.2025-1287)
-1. [Khailany, N., Mokotoff, P. R., & Cinar, G. (2025). Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST). In AIAA SciTech Forum (p. 1288).](https://doi.org/10.2514/6.2025-1288)
+1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft Journal of Aircraft, 63(1), 266-288.](https://doi.org/10.2514/1.C038340)
+1. [Arnson, M., Aljaber, R., & Cinar, G. (2026). Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038387)
 1. [Mokotoff, P. R., & Cinar, G. (2025). A Graph-Based Framework for Advanced Aircraft Propulsion System Analysis. Aerospace Science and Technology, 168(110798).](https://doi.org/10.1016/j.ast.2025.110798)
+1. [Khailany, N., Mokotoff, P. R., & Cinar, G. (2025). Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST). In AIAA SciTech Forum (p. 1288).](https://doi.org/10.2514/6.2025-1288)
 
 Alternatively, you may use the information below when using BibTeX:
 
 ```
-@article{mokotoff2025afast,
+@article{mokotoff2025fast,
   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
   author={Mokotoff, Paul R and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
   journal={Journal of Aircraft},
@@ -60,17 +59,6 @@ Alternatively, you may use the information below when using BibTeX:
   year={2025},
   publisher={American Institute of Aeronautics and Astronautics},
   doi={https://doi.org/10.2514/1.C038452}
-}
-```
-
-```
-@inproceedings{mokotoff2025bfast,
-  title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
-  author={Mokotoff, Paul and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
-  booktitle={AIAA SciTech 2025 Forum},
-  pages={2374},
-  year={2025},
-  doi={https://doi.org/10.2514/6.2025-2374}
 }
 ```
 
@@ -87,24 +75,14 @@ Alternatively, you may use the information below when using BibTeX:
 ```
 
 ```
-@inproceedings{arnson2025predicting,
-  title={Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data},
-  author={Arnson, Maxfield G and Aljaber, Rawan and Cinar, Gokcin},
-  booktitle={AIAA SciTech 2025 Forum},
-  pages={1287},
-  year={2025},
-  doi={https://doi.org/10.2514/6.2025-1287}
-}
-```
-
-```
-@inproceedings{khailany2025aircraft,
-  title={Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST)},
-  author={Khailany, Nawa and Mokotoff, Paul and Cinar, Gokcin},
-  booktitle={AIAA SciTech 2025 Forum},
-  pages={1288},
-  year={2025},
-  doi={https://doi.org/10.2514/6.2025-1288}
+@article{arnson2026predicting,
+  title={Predicting Conceptual Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data},
+  author={Arnson, Maxfield and Aljaber, Rawan and Cinar, Gokcin},
+  journal={Journal of Aircraft},
+  pages={1--15},
+  year={2026},
+  publisher={American Institute of Aeronautics and Astronautics},
+  doi={https://doi.org/10.2514/1.C038387}
 }
 ```
 
@@ -119,6 +97,18 @@ Alternatively, you may use the information below when using BibTeX:
   doi={https://doi.org/10.1016/j.ast.2025.110798}
 }
 ```
+
+```
+@inproceedings{khailany2025aircraft,
+  title={Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST)},
+  author={Khailany, Nawa and Mokotoff, Paul and Cinar, Gokcin},
+  booktitle={AIAA SciTech 2025 Forum},
+  pages={1288},
+  year={2025},
+  doi={https://doi.org/10.2514/6.2025-1288}
+}
+```
+
 
 # (I) Installation Instructions
 
@@ -140,6 +130,7 @@ For additional documentation, see package-specific README files. These READMEs w
 
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
+- **+ConstraintDiagramPkg**: This package contains functionality to generate constraint diagrams for turboprop or turbofan aircraft under FAA Part 25 requirements. In the future, additional functionality will be provided for turboprop aircraft under FAA Part 23 requirements.
 - **+CostPkg**: This packages contains functions for estimating aircraft related costs.
 - **+DatabasePkg**: This package contains the IDEAS Lab historical database. It also contains functions which help convert the original database format (MS Excel sheet) into the FAST format (Matlab data structures).
 - **+DataStructPkg**: This package contains functions which process aircraft data structures when calling FAST.
@@ -153,6 +144,7 @@ For additional documentation, see package-specific README files. These READMEs w
 - **+PropulsionPkg**: This package is responsible for creating the user's desired propulsion architecture and evaluating the propulsion system's performance during the mission analysis. It connects to the EngineModelPkg for evaluating an actual engine's performance.
 - **+RegressionPkg**: This package contains code that creates regressions to predict any unknown parameters about the aircraft configuration being designed.
 - **+RetrofitPkg**: This package contains code to run retrofit studies on an aircraft by electrifying its powertrain and replacing part of the payload with batteries.
+- **+SafetyPkg**: This package contains code to run a fault tree analysis from a graph-based representation of a system architecture.
 - **+TutorialsPkg**: This package contains Matlab scripts to accompany all the playlist of YouTube tutorial videos, which can be accessed using [this link](https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-).
 - **+UnitConversionPkg**: This package contains functions which perform unit conversions for use in FAST.
 - **+VisualizationPkg**: This package contains information about visualizing both the aircraft's outer mold line (as a wireframe) and its propulsion architecture (in a schematic).

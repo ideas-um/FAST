@@ -2,11 +2,13 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 %
 % [Split] = EvalSplit(SplitFun, SplitVal)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 aug 2025
+% last updated: 05 mar 2026
 %
-% given a power management strategy (SplitFun), evaluate it for a given set
-% of values (SplitVal). this function now works for an unlimited number of
-% power splits (now vectorized instead of individual arguments).
+% Given a energy/power/thrust split (SplitFun), evaluate it for a given
+% value (SplitVal). This function currently works for a varying number of
+% power splits in a single function evaluation. Any user may follow the
+% same pattern to edit this script for their use and incorporate a new
+% number of power splits into the code.
 %
 % INPUTS:
 %     SplitFun - function handle to evaluate the power split.
@@ -23,7 +25,7 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 % ----------------------------------------------------------
 
 % get the number of arguments in the split
-narg = length(SplitVal);%nargin(SplitFun);
+narg = length(SplitVal);
 
 % create a cell array for storing arguments
 Vals = cell(1, narg);

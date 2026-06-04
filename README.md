@@ -28,7 +28,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 1 May 2026
+README last updated: 4 June 2026
 
 ## Learn More About FAST
 
@@ -128,6 +128,7 @@ For additional documentation, see package-specific README files. These READMEs w
 
 ### (2) Package List
 
+- **+AerodynamicsPkg**: This package contains code for an empirical aerodynamic analysis, adapted from NASA's Aviary code.
 - **+AircraftSpecsPkg**: This package contains specific aircraft initialization files. The documentation will guide a user to create their own files for repeated studies.
 - **+BatteryPkg**: This package contains the battery model which is called during the mission analysis for fully or hybrid electric aircraft.
 - **+ConstraintDiagramPkg**: This package contains functionality to generate constraint diagrams for turboprop or turbofan aircraft under FAA Part 25 requirements. In the future, additional functionality will be provided for turboprop aircraft under FAA Part 23 requirements.
@@ -254,5 +255,3 @@ This work is sponsored by the NASA Aeronautics Research Mission Directorate and 
 
 Glenn Engineering and Research Support Contract (GEARS)
 Contract No. 80GRC020D0003
-
-

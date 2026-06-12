@@ -2,7 +2,7 @@ function [Aircraft] = EngineSpecProcessing(Aircraft)
 %
 % [Aircraft] = EngineSpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated 24 apr 2024
+% last updated 12 jun 2026
 %
 % This function only creates and engine in the case that a
 % user did not provide an engine specification file. If so, this
@@ -27,7 +27,7 @@ function [Aircraft] = EngineSpecProcessing(Aircraft)
 Data = Aircraft.HistData.Eng;
 
 % load the engine data
-EngineData = load(fullfile("+EngineModelPkg/+SurrogateOffDesignPkg/ICAO_DATA.mat"));
+EngineData = load(fullfile("+EngineModelPkg", "+SurrogateOffDesignPkg", "ICAO_DATA.mat"));
 
 % define the data to be used for engine NLGPRs
 OffDesignData = EngineData.ICAO_Known_Cffch;

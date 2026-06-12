@@ -28,7 +28,7 @@ Additional Contributors:
 - Michael Tsai
 - Vaibhav Rau
 
-README last updated: 1 May 2026
+README last updated: 12 Jun 2026
 
 ## Learn More About FAST
 
@@ -42,8 +42,8 @@ To stay informed about upcoming papers, new releases, and news about FAST, pleas
 
 If you are using FAST in your work, please cite the following papers. Papers 1 and 2 may be cited for using FAST. Papers 3 and 4 may be cited if you are only using FAST's regressions and/or Aerobase. Paper 5 may be cited for the graph-based methodology used in the propulsion system analysis. Paper 6 may be cited if you are only using FAST's integrated visualization capabilities.
 
-1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038452)
-1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft Journal of Aircraft, 63(1), 266-288.](https://doi.org/10.2514/1.C038340)
+1. [Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design. Journal of Aircraft, 63(3), 1023-1040.](https://doi.org/10.2514/1.C038452)
+1. [Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design. Journal of Aircraft, 63(1), 266-288.](https://doi.org/10.2514/1.C038340)
 1. [Arnson, M., Aljaber, R., & Cinar, G. (2026). Predicting Aircraft Design Parameters Using Gaussian Process Regressions on Historical Data. Journal of Aircraft (article in advance).](https://doi.org/10.2514/1.C038387)
 1. [Mokotoff, P. R., & Cinar, G. (2025). A Graph-Based Framework for Advanced Aircraft Propulsion System Analysis. Aerospace Science and Technology, 168(110798).](https://doi.org/10.1016/j.ast.2025.110798)
 1. [Khailany, N., Mokotoff, P. R., & Cinar, G. (2025). Aircraft Geometry and Propulsion Architecture Visualization for the Future Aircraft Sizing Tool (FAST). In AIAA SciTech Forum (p. 1288).](https://doi.org/10.2514/6.2025-1288)
@@ -55,7 +55,9 @@ Alternatively, you may use the information below when using BibTeX:
   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
   author={Mokotoff, Paul R and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
   journal={Journal of Aircraft},
-  pages={1--18},
+  volume={63},
+  number={3},
+  pages={1023--1040},
   year={2025},
   publisher={American Institute of Aeronautics and Astronautics},
   doi={https://doi.org/10.2514/1.C038452}
@@ -67,7 +69,9 @@ Alternatively, you may use the information below when using BibTeX:
   title={Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design},
   author={Acar, Huseyin and Arnson, Maxfield and Tsai, Michael and Cinar, Gokcin},
   journal={Journal of Aircraft},
-  pages={1--23},
+  volume={63},
+  number={1},
+  pages={266-288},
   year={2025},
   publisher={American Institute of Aeronautics and Astronautics},
   doi={https://doi.org/10.2514/1.C038340}
@@ -91,6 +95,7 @@ Alternatively, you may use the information below when using BibTeX:
   title={A graph-based framework for advanced aircraft propulsion system analysis},
   author={Mokotoff, Paul R and Cinar, Gokcin},
   journal={Aerospace Science and Technology},
+  volume={168},
   pages={110798},
   year={2025},
   publisher={Elsevier},

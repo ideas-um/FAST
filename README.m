@@ -28,7 +28,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 28 Jan 2026
+% README last updated: 12 Jun 2026
 %
 % Learn More About FAST
 % For detailed information about FAST's features, visit our website: 
@@ -53,7 +53,7 @@ function [] = README()
 %
 % 1) Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A
 %    Future Aircraft Sizing Tool for Conventional and Electrified Aircraft
-%    Design. Journal of Aircraft (article in advance).
+%    Design. Journal of Aircraft, 63(3), 1023-1040.
 %    https://doi.org/10.2514/1.C038452
 %
 % 2) Mokotoff, P., Arnson, M., Wang, Y. C., & Cinar, G. (2025). FAST: A
@@ -63,7 +63,7 @@ function [] = README()
 %
 % 3) Acar, H., Arnson, M., Tsai, M., & Cinar, G. (2025). Historical Trends
 %    and Future Projections of Key Performance Parameters in Aircraft
-%    Design. Journal of Aircraft (article in advance).
+%    Design. Journal of Aircraft, 63(1), 266-288.
 %    https://doi.org/10.2514/1.C038340
 %
 % 4) Arnson, M., Aljaber, R., & Cinar, G. (2025). Predicting Aircraft
@@ -86,7 +86,9 @@ function [] = README()
 %   title={FAST: A Future Aircraft Sizing Tool for Conventional and Electrified Aircraft Design},
 %   author={Mokotoff, Paul R and Arnson, Maxfield and Wang, Yi-Chih and Cinar, Gokcin},
 %   journal={Journal of Aircraft},
-%   pages={1--18},
+%   volume={63},
+%   number={3},
+%   pages={1023--1040},
 %   year={2025},
 %   publisher={American Institute of Aeronautics and Astronautics},
 %   doi={https://doi.org/10.2514/1.C038452}
@@ -105,7 +107,9 @@ function [] = README()
 %   title={Historical Trends and Future Projections of Key Performance Parameters in Aircraft Design},
 %   author={Acar, Huseyin and Arnson, Maxfield and Tsai, Michael and Cinar, Gokcin},
 %   journal={Journal of Aircraft},
-%   pages={1--23},
+%   volume={63},
+%   number={1},
+%   pages={266--288},
 %   year={2025},
 %   publisher={American Institute of Aeronautics and Astronautics},
 %   doi={https://doi.org/10.2514/1.C038340}
@@ -133,6 +137,7 @@ function [] = README()
 %   title={A graph-based framework for advanced aircraft propulsion system analysis},
 %   author={Mokotoff, Paul R and Cinar, Gokcin},
 %   journal={Aerospace Science and Technology},
+%   volume={168}
 %   pages={110798},
 %   year={2025},
 %   publisher={Elsevier},

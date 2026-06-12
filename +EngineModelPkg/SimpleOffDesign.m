@@ -3,7 +3,7 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, Engin
 % [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx))
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% last updated: 04 sep 2024
+% last updated: 04 sep 2025
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.

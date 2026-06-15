@@ -176,6 +176,14 @@ function [] = README()
 %
 % -------------------------------------------------------------------------
 %
+% (III) Examples
+%
+%     Refer to the A320Neo.m and ERJ175LR.m files in the "AircraftSpecsPkg"
+%     for examples of how both aerodynamic analysis models can be used and
+%     interchanged across different analyses.
+%
+% -------------------------------------------------------------------------
+%
 % end AerodynamicsPkg.README
 %
 end

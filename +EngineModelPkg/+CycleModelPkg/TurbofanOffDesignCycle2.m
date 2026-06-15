@@ -3,6 +3,7 @@ function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams,Et
 % this is INTERNAL to the off ddesign. do not call this function directly,
 % ever. the TurbofanOffDesign.m function will call this. you do not need to
 %
+% TO DO: MAX
 
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson

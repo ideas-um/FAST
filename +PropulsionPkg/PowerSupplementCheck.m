@@ -2,7 +2,7 @@ function [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan
 %
 % [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan, itrn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 jan 2025
+% last updated: 04 aug 2025
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -112,7 +112,7 @@ if (any(AnyParallel))
         Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
                 
         % add the power supplement, accounting for the fan efficiency
-        Psupp(:, Driving) = Psupp(:, Driving) + Preq(:, Helping) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        Psupp(:, Driving) = Psupp(:, Driving) + sum(Preq(:, Helping), 2) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
         
     end
 end

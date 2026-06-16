@@ -188,110 +188,115 @@ function [] = README()
 %
 %     (2) Package List
 %
-%             (a) +AircraftSpecsPkg
+%             (a) +AerodynamicsPkg
+%                     This package contains code for an empirical
+%                     aerodynamic analysis, adapted from NASA's Aviary
+%                     code.
+%
+%             (b) +AircraftSpecsPkg
 %                    This package contains specific aircraft initialization
 %                    files. The documentation will guide a user to create
 %                    their own files for repeated studies.
 % 
-%             (b) +BatteryPkg
+%             (c) +BatteryPkg
 %                    This package contains the battery model which is
 %                    called during the mission analysis for fully or hybrid
 %                    electric aircraft.
 %
-%             (c) +ConstraintDiagramPkg
+%             (d) +ConstraintDiagramPkg
 %                    This package contains functionality to generate
 %                    constraint diagrams for turboprop or turbofan aircraft
 %                    under FAA Part 25 requirements. In the future,
 %                    additional functionality will be provided for
 %                    turboprop aircraft under FAA Part 23 requirements.
 %
-%             (d) +CostPkg
+%             (e) +CostPkg
 %                    This packages contains functions for estimating
 %                    aircraft related costs.
 % 
-%             (e) +DatabasePkg
+%             (f) +DatabasePkg
 %                    This package contains the IDEAS Lab historical
 %                    database. It also contains functions which help
 %                    convert the original database format (MS Excel sheet)
 %                    into the FAST format (Matlab data structures).
 % 
-%             (f) +DataStructPkg
+%             (g) +DataStructPkg
 %                    This package contains functions which process aircraft
 %                    data structures when calling FAST.
 % 
-%             (g) +EngineModelPkg
+%             (h) +EngineModelPkg
 %                    This package contains the gas turbine engine models
 %                    used while running FAST. It is one of the largest
 %                    packages and inspecting additional documentation is
 %                    recommended if a user has more questions regarding the
 %                    gas turbine engine models.
 % 
-%             (h) +MissionProfilesPkg
+%             (i) +MissionProfilesPkg
 %                    This package is analagous to the AircraftSpecsPkg, as
 %                    it contains specific mission profiles. The
 %                    documentation will guide users in calling pre-made
 %                    mission profiles 
 % 
-%             (i) +MissionSegsPkg
+%             (j) +MissionSegsPkg
 %                    This package is responsible for all aircraft
 %                    performance-related functionality while performing the
 %                    mission analysis (i.e., processing and flying the
 %                    mission).
 %
-%             (j) +OEWPkg
+%             (k) +OEWPkg
 %                    This package determines the aircraft's airframe and 
 %                    propulsion system weights.
 % 
-%             (k) +OptimizationPkg
+%             (l) +OptimizationPkg
 %                    This package contains information about running EAP
 %                    power management optimization, which is focused on
 %                    optimizing in the sizing loop to determine the optimum
 %                    electrified powertrain component sizes and usage
 %                    during flight.
 % 
-%             (l) +PlotPkg
+%             (m) +PlotPkg
 %                    This package contains information about plotting the
 %                    mission history upon the user's request. It creates
 %                    subplots to show the time-based history of multiple
 %                    aircraft performance and system-level parameters.
 % 
-%             (m) +ProjectionPkg
+%             (n) +ProjectionPkg
 %                    This package contains code to project the value of
 %                    certain Key Performance Parameters (KPP) into the
 %                    future using S-curves.
 % 
-%             (n) +PropulsionPkg
+%             (o) +PropulsionPkg
 %                    This package is responsible for creating the user's
 %                    desired propulsion architecture and evaluating the
 %                    propulsion system's performance during the mission
 %                    analysis. It connects to the EngineModelPkg for
 %                    evaluating an actual engine's performance.
 % 
-%             (o) +RegressionPkg
+%             (p) +RegressionPkg
 %                    This package contains code that creates regressions to
 %                    predict any unknown parameters about the aircraft
 %                    configuration being designed.
 % 
-%             (p) +RetrofitPkg
+%             (q) +RetrofitPkg
 %                    This package contains code to run retrofit studies on
 %                    an aircraft by electrifying its powertrain and
 %                    replacing part of the payload with batteries.
 %
-%             (q) +SafetyPkg
+%             (r) +SafetyPkg
 %                    This package contains code to run a fault tree
 %                    analysis from a graph-based representation of a system
 %                    architecture.
 %
-%             (r) +TutorialsPkg
+%             (s) +TutorialsPkg
 %                     This package contains Matlab scripts to accompany all
 %                     the playlist of YouTube tutorial videos, which can be
 %                     accessed using this link: https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-
 %
-%             (s) +UnitConversionPkg
+%             (t) +UnitConversionPkg
 %                    This package contains functions which perform unit
 %                    conversions for use in FAST.
 % 
-%             (t) +VisualizationPkg
+%             (u) +VisualizationPkg
 %                    This package contains information about visualizing
 %                    both the aicraft's outer mold line(as a wireframe) and
 %                    its propulsion architecture (in a schematic).

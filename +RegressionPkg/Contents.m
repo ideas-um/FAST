@@ -4,10 +4,10 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% BuildData                    - RegressionPkg.BuildData is a function.
-% NLGPR                        - RegressionPkg.NLGPR is a function.
-% PriorCalculation             - RegressionPkg.PriorCalculation is a function.
-% SearchDB                     - RegressionPkg.SearchDB is a function.
-% RegProcessing                - RegressionPkg.RegProcessing is a function.
-% SquareExKernel               - RegressionPkg.SquareExKernel is a function.
-% VaryUserInputs               - RegressionPkg.VaryUserInputs is a function.
+% BuildData        - RegressionPkg.BuildData is a function.
+% NLGPR            - RegressionPkg.NLGPR is a function.
+% PriorCalculation - RegressionPkg.PriorCalculation is a function.
+% RegProcessing    - RegressionPkg.RegProcessing is a function.
+% SearchDB         - RegressionPkg.SearchDB is a function.
+% SquareExKernel   - RegressionPkg.SquareExKernel is a function.
+% VaryUserInputs   - RegressionPkg.VaryUserInputs is a function.

@@ -80,21 +80,13 @@ Mission.AltEnd = [0; IntAlt; DivAlt; DivAlt; 0     ; 0];
 % define the climb rate (in m/s)
 Mission.ClbRate = [NaN; NaN; NaN; NaN; NaN; NaN];
 
-% % define the starting/ending speeds
-% Mission.VelBeg = [0   ; Vtko; Vtrn; Vcrs;       Vcrs; 1.1 * Vtko];
-% Mission.VelEnd = [Vtko; Vtrn; Vcrs; Vcrs; 1.1 * Vtko; 0         ];
-% 
-% % define the speed types
-% Mission.TypeBeg = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
-% Mission.TypeEnd = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
-
 % define the starting/ending speeds
-Mission.VelBeg = [0   ; Vtko; Vtrn; 0.40;       0.40; 1.1 * Vtko];
-Mission.VelEnd = [Vtko; Vtrn; 0.40; 0.40; 1.1 * Vtko; 0         ];
+Mission.VelBeg = [0   ; Vtko; Vtrn; Vcrs;       Vcrs; 1.1 * Vtko];
+Mission.VelEnd = [Vtko; Vtrn; Vcrs; Vcrs; 1.1 * Vtko; 0         ];
 
 % define the speed types
-Mission.TypeBeg = ["TAS"; "TAS"; "TAS"; "Mach"; "Mach"; "TAS"];
-Mission.TypeEnd = ["TAS"; "TAS"; "Mach"; "Mach"; "TAS"; "TAS"];
+Mission.TypeBeg = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
+Mission.TypeEnd = ["TAS"; "TAS"; "TAS"; "TAS"; "TAS"; "TAS"];
 
 
 %% REMEMBER THE MISSION PROFILE %%

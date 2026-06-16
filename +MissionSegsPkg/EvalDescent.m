@@ -3,7 +3,7 @@ function [Aircraft] = EvalDescent(Aircraft)
 % [Aircraft] = EvalDescent(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 05 mar 2025
+% last updated: 23 jun 2025
 %
 % Evaluate a descent segment by iterating over the rate of climb and
 % instantaneous acceleration at each control point in the mission.
@@ -32,8 +32,11 @@ function [Aircraft] = EvalDescent(Aircraft)
 % maximum rate of climb
 RCMax = Aircraft.Specs.Performance.RCMax;
 
-% lift-drag ratio
-L_D = Aircraft.Specs.Aero.L_D.Des;
+% wing area
+S = Aircraft.Specs.Aero.S;
+
+% get the L_D computation method
+AeroMethod = Aircraft.Specs.Aero.L_D.Method;
 
 % ----------------------------------------------------------
 
@@ -113,6 +116,9 @@ MaxIter = 10;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% remember the current segment
+Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Descent";
+
 % convert the beginning velocity to TAS
 [~, TASBeg, ~, ~, ~, ~, ~] = MissionSegsPkg.ComputeFltCon( ...
                              AltBeg, dISA, TypeBeg, VelBeg);
@@ -186,8 +192,14 @@ Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
 
 % remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Des, SegEnd - SegBeg + 1, 1);
-Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Des, SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamDwn(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Des  , SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamUps(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Des  , SegEnd - SegBeg + 1, 1);
+
+% get the number of windmilling splits
+nwind = length(Aircraft.Specs.Power.Windmill.Des);
+
+% remember the windmilling engines
+Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd-1, 1:nwind) = repmat(Aircraft.Specs.Power.Windmill.Des, SegEnd - SegBeg, 1);
 
 % ----------------------------------------------------------
 
@@ -263,8 +275,20 @@ while (iter < MaxIter)
     % estimate the lift
     L = Mass .* g .* cosd(FPA);
     
+    % compute the lift coefficient
+    CL = L ./ (0.5 .* Rho .* TAS .^ 2 .* S);
+
+    % store it in the mission history
+    Aircraft.Mission.History.SI.Aero.CL(SegBeg:SegEnd) = CL;
+
+    % compute the lift-drag coefficient
+    Aircraft = AeroMethod(Aircraft);
+    
+    % get the lift-to-drag ratio
+    L_D = Aircraft.Mission.History.SI.Aero.L_D(SegBeg:SegEnd);
+
     % estimate the drag
-    D = L / L_D;
+    D = L ./ L_D;
 
     % calculate energy height
     EnHt = Alt + TAS .^ 2 ./ (2 * g);
@@ -446,12 +470,12 @@ Aircraft.Mission.History.SI.Performance.Acc( SegBeg:SegEnd) = dV_dt;
 Aircraft.Mission.History.SI.Performance.FPA( SegBeg:SegEnd) = FPA  ;
 Aircraft.Mission.History.SI.Performance.Ps(  SegBeg:SegEnd) = Ps   ;
 
+% power metrics
+Aircraft.Mission.History.SI.Power.DV(SegBeg:SegEnd) = DV;
+
 % energy quantities
 Aircraft.Mission.History.SI.Energy.PE(  SegBeg:SegEnd) = PE   ;
 Aircraft.Mission.History.SI.Energy.KE(  SegBeg:SegEnd) = KE   ;
-
-% current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Descent";
 
 % ----------------------------------------------------------
 

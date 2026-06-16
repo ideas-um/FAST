@@ -3,7 +3,7 @@ function [Aircraft] = ERJ175LR()
 % [Aircraft] = ERJ175LR()
 % originally written for E175 by Nawa Khailany
 % modified to E175LR by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 dec 2024
+% last updated: 06 jan 2026
 % 
 % Create a baseline model of the ERJ 175, long-range version (also known as
 % an ERJ 170-200). This version uses a conventional propulsion
@@ -40,14 +40,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.002;
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000;
+Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % 1.002
+Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % 1.000
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.029;
+Aircraft.Specs.Propulsion.MDotCF = 1.050; % 1.029
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.018;
+Aircraft.Specs.Weight.WairfCF = 1.016; % 1.018
  
 
 %% VEHICLE PERFORMANCE %%
@@ -76,6 +76,9 @@ Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(2250, "ft/min", "m/
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
 
+% aerodynamic analysis method
+Aircraft.Specs.Aero.L_D.Method = @(Aircraft) AerodynamicsPkg.DragPolar(Aircraft);
+
 % lift-drag ratio during climb  (assumed same as ERJ175, standard range)
 Aircraft.Specs.Aero.L_D.Clb = 10.9773 * Aircraft.Specs.Aero.L_D.ClbCF;
 
@@ -88,6 +91,66 @@ Aircraft.Specs.Aero.L_D.Des = Aircraft.Specs.Aero.L_D.Clb;
 % wing loading (kg / m^2)
 Aircraft.Specs.Aero.W_S.SLS = UnitConversionPkg.ConvMass(109.25, "lbm", "kg") / ...
                               (UnitConversionPkg.ConvLength(1, "ft", "m")) ^ 2;
+
+% ----------------------------------------------------------
+
+% scale factors for drag contributions
+Aircraft.Specs.Aero.ScaleCD0 = 1;
+Aircraft.Specs.Aero.ScaleCDI = 1;
+Aircraft.Specs.Aero.ScaleSub = 0.8942;
+Aircraft.Specs.Aero.ScaleSup = 1;
+Aircraft.Specs.Aero.ScaleWnd = 1;
+
+% get the component properties --- fuse, htail, vtail, wing, eng1, eng2
+Aircraft.Specs.Aero.Components.Cf = [0.0026, 0.0026, 0.0026, 0.0026, 0.0026, 0.0026];
+Aircraft.Specs.Aero.Components.Re = [2e+6, 2e+6, 2e+6, 2e+6, 2e+6, 2e+6];
+Aircraft.Specs.Aero.Components.Fine = [9.8385, 0.12, 0.12, 0.12, 1.6734, 1.6734];
+Aircraft.Specs.Aero.Components.Swet = [301.4080, 37.3547, 35.3073, 126.2423, 8.4248, 8.4248];
+Aircraft.Specs.Aero.Components.LamFracUpper = [0, 0, 0, 0, 0, 0];
+Aircraft.Specs.Aero.Components.LamFracLower = [0, 0, 0, 0, 0, 0];
+
+% get the wing geometry and properties
+Aircraft.Specs.Aero.Wing.S = 79.8322;
+Aircraft.Specs.Aero.Wing.AirfoilTech = 1;
+
+% get the excrescences drag factor
+Aircraft.Specs.Aero.ExcrescencesDrag = 0.06;
+
+% get the design conditions
+Aircraft.Specs.Aero.DesignCL = 0.5;
+Aircraft.Specs.Aero.DesignMach = 0.78;
+
+% get the wing geometry
+Aircraft.Specs.Aero.Wing.AR = 10.3465; % 28.74 ^ 2 / 79.8322;
+Aircraft.Specs.Aero.Wing.MaxCamber = 0.02;
+Aircraft.Specs.Aero.Wing.t_c = 0.12;
+Aircraft.Specs.Aero.Wing.e = 0.85;
+Aircraft.Specs.Aero.Wing.Sweep = 26.4413; % 26.5 - (1 - 0.2441) / (10.3465 * (1 + 0.2441))
+Aircraft.Specs.Aero.Wing.TR = 0.2441; % 1.35 / 5.53;
+
+% check option for extreme taper ratios
+Aircraft.Specs.Aero.Wing.Redux = 0;
+
+% get the vertical tail geometry
+Aircraft.Specs.Aero.Vtail.AR = 3.23;
+Aircraft.Specs.Aero.Vtail.e = 1;
+Aircraft.Specs.Aero.Vtail.S = 17.3102;
+Aircraft.Specs.Aero.Vtail.Eta = 1;
+Aircraft.Specs.Aero.Vtail.TAF = 0.9;
+Aircraft.Specs.Aero.Vtail.VArm = 14.6485;
+
+% get the rudder geometry
+Aircraft.Specs.Aero.Rudder.S = 4.2353;
+Aircraft.Specs.Aero.Rudder.b = 5.25;
+
+% get the fuselage geometry
+Aircraft.Specs.Aero.Fuse.Area = 9.8980; % pi * (3.55 / 2) ^ 2;
+Aircraft.Specs.Aero.Fuse.Len_Diam = 8.9239; % 31.68 / 3.55;
+Aircraft.Specs.Aero.Fuse.Diam_Span = 0.1235; % 3.55 / 28.74;
+Aircraft.Specs.Aero.Fuse.DistToEng = 3.8688; % m
+
+% get the base area
+Aircraft.Specs.Aero.BaseArea = 0;
 
 
 %% WEIGHTS %%
@@ -137,6 +200,9 @@ Aircraft.Specs.Propulsion.Thrust.SLS = UnitConversionPkg.ConvForce(2 * 14510, "l
 % engine propulsive efficiency
 Aircraft.Specs.Propulsion.Eta.Prop = 0.8;
 
+% engine inlet areas (account for all components)
+Aircraft.Specs.Propulsion.InletArea = [NaN(1, 3), repmat(1.4914, 1, 2), NaN];
+
 
 %% POWER %%
 %%%%%%%%%%%
@@ -148,20 +214,20 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 Aircraft.Specs.Power.SpecEnergy.Batt = NaN;
 
 % downstream power splits
-Aircraft.Specs.Power.LamDwn.SLS = 0;
-Aircraft.Specs.Power.LamDwn.Tko = 0;
-Aircraft.Specs.Power.LamDwn.Clb = 0;
-Aircraft.Specs.Power.LamDwn.Crs = 0;
-Aircraft.Specs.Power.LamDwn.Des = 0;
-Aircraft.Specs.Power.LamDwn.Lnd = 0;
+Aircraft.Specs.Power.LamDwn.SLS = [];
+Aircraft.Specs.Power.LamDwn.Tko = [];
+Aircraft.Specs.Power.LamDwn.Clb = [];
+Aircraft.Specs.Power.LamDwn.Crs = [];
+Aircraft.Specs.Power.LamDwn.Des = [];
+Aircraft.Specs.Power.LamDwn.Lnd = [];
 
 % upstream power splits
-Aircraft.Specs.Power.LamUps.SLS = 0;
-Aircraft.Specs.Power.LamUps.Tko = 0;
-Aircraft.Specs.Power.LamUps.Clb = 0;
-Aircraft.Specs.Power.LamUps.Crs = 0;
-Aircraft.Specs.Power.LamUps.Des = 0;
-Aircraft.Specs.Power.LamUps.Lnd = 0;
+Aircraft.Specs.Power.LamUps.SLS = [];
+Aircraft.Specs.Power.LamUps.Tko = [];
+Aircraft.Specs.Power.LamUps.Clb = [];
+Aircraft.Specs.Power.LamUps.Crs = [];
+Aircraft.Specs.Power.LamUps.Des = [];
+Aircraft.Specs.Power.LamUps.Lnd = [];
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = NaN;
@@ -174,6 +240,79 @@ Aircraft.Specs.Power.P_W.SLS = NaN;
 % leave as NaN if an electric motor or generator isn't in the powertrain
 Aircraft.Specs.Power.P_W.EM = NaN;
 Aircraft.Specs.Power.P_W.EG = NaN;
+
+% battery cells in series and parallel
+% (commented values used for electrified aircraft)
+Aircraft.Specs.Power.Battery.ParCells = NaN;%100;
+Aircraft.Specs.Power.Battery.SerCells = NaN;% 62;
+
+% initial battery SOC (commented value used for electrified aircraft)
+Aircraft.Specs.Power.Battery.BegSOC = NaN;%100;
+
+% windmilling engines
+Aircraft.Specs.Power.Windmill.Tko = 0;
+Aircraft.Specs.Power.Windmill.Clb = 0;
+Aircraft.Specs.Power.Windmill.Crs = 0;
+Aircraft.Specs.Power.Windmill.Des = 0;
+Aircraft.Specs.Power.Windmill.Lnd = 0;
+
+%% BATTERY %%
+%%%%%%%%%%%%%
+
+% nominal cell voltage [V]
+Aircraft.Specs.Battery.NomVolCell = 3.6;
+
+% maxinum extracted voltage [V]
+Aircraft.Specs.Battery.MaxExtVolCell = 4.0880;
+
+% maxinum cell capacity [Ah]
+Aircraft.Specs.Battery.CapCell = 3;
+
+% internal resistance [Ohm]
+Aircraft.Specs.Battery.IntResist = 0.0199;
+
+% exponential voltage [V]
+Aircraft.Specs.Battery.ExpVol = 0.0986;
+
+% exponential capacity [(Ah)^-1]
+Aircraft.Specs.Battery.ExpCap = 30;
+
+% acceptable SOC threshold
+Aircraft.Specs.Battery.MinSOC = 20;
+
+% intitial SOC
+Aircraft.Specs.Battery.BegSOC = 100;
+
+% acceptable max c-rate during discharging
+Aircraft.Specs.Battery.MaxAllowCRate = 5;
+
+% charging rate 
+Aircraft.Specs.Battery.Charging = 500*1000;
+
+%%%% battery degradation effect analysis %%%
+Aircraft.Specs.Battery.Degradation = 0; % 1 = analysis with degradation effect; 0 = without degradation effect
+
+if Aircraft.Specs.Battery.Degradation == 1
+    
+    % battery chemistry material (ONLY "NMC" or "LFP" FOR NOW)
+    Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2
+    
+    % Charging time 
+    Aircraft.Specs.Battery.ChrgTime = 60*60; % in sec
+    
+    % charging rate (can be an array or scalar, or a function with output of a scalar or array)
+    Aircraft.Specs.Battery.Cpower = -500*1000; % charging means negative rate in W
+    
+    % battery Full Equivalent Cycles (FECs)
+    Aircraft.Specs.Battery.FEC = 0; % start with 0
+    
+    % battery State of Health (SoH)
+    Aircraft.Specs.Battery.SOH = 100; 
+
+    % battery operation temperature (for analysis only, will remove)
+    Aircraft.Specs.Battery.OpTemp = 35; % [°C]
+end
+
 
 %% SETTINGS (LEAVE AS NaN FOR DEFAULTS) %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

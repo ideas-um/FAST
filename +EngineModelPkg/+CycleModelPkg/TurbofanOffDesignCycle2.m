@@ -3,6 +3,7 @@ function [OffDesignEngine] = TurbofanOffDesignCycle2(OnDesignEngine,OffParams,Et
 % this is INTERNAL to the off ddesign. do not call this function directly,
 % ever. the TurbofanOffDesign.m function will call this. you do not need to
 %
+% TO DO: MAX
 
 % [OffDesignEngine] = TurbofanOffDesignCycle(OnDesignEngine,FlightCon,OffParams)
 % Written by Maxfield Arnson
@@ -266,6 +267,7 @@ mdot = Rhos*u*A;
 prime = 1;
 
 iter = 0;
+
 while abs(prime) > 1e-7 && iter < 100
 
     Ts = Tt*(1+(g-1)/2*M^2)^(-1);

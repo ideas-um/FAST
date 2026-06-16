@@ -2,7 +2,7 @@ function [Aircraft] = PowerAvailable(Aircraft)
 %
 % [Aircraft] = PowerAvailable(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 jan 2026
+% last updated: 16 feb 2026
 %
 % For a given propulsion architecture, compute the power available.
 %
@@ -71,6 +71,9 @@ OperUps = Aircraft.Specs.Propulsion.PropArch.OperUps;
 % get the upstream power splits
 LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
 
+% check for windmilling
+Windmill = Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, :);
+
 % get the number of components
 ncomp = length(Arch);
 
@@ -97,6 +100,13 @@ SLSPower = Aircraft.Specs.Propulsion.SLSPower;
 
 % get indices for transmitters
 itrn = (1:ntrn) + nsrc;
+
+% find all upstream transmitters (i.e., input at least one transmitter and
+% maybe a source)
+UpTrn = find(sum(Arch(itrn, itrn), 1) > 0);
+ 
+% assume no power available at the propellers yet (need to propagate)
+PowerAv(:, UpTrn) = 0; %#ok<FNDSB>
  
 % loop through all transmitters
 for jtrn = 1:ntrn
@@ -142,6 +152,10 @@ for jtrn = 1:ntrn
         
         % once available, input a cable model here
         
+    elseif (TrnType(jtrn) == 5) % quasi-sinks
+        
+        % once available, input a quasi-sink model here
+        
     else
         
         % throw an error
@@ -174,7 +188,18 @@ for ipnt = 1:npnt
     
     % get the initial power available
     Pav(ipnt, :) = [zeros(1, nsrc), PowerAv(ipnt, :), zeros(1, nsnk)];
+    
+    % check if any engines are windmilling
+    if (any(Windmill(ipnt, :)))
         
+        % get the indices
+        OffTrn = Windmill(ipnt, :) + nsrc;
+        
+        % "turn off" the respective components (set power available to 0)
+        Pav(ipnt, OffTrn) = 0;
+        
+    end
+    
     % propagate the power upstream
     Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
     

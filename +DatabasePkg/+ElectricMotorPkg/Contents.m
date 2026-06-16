@@ -4,7 +4,7 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% InitializeMotorDB          - DatabasePkg.InitializeMotorDB is a function.
+% InitializeMotorDB - DatabasePkg.ElectricMotorPkg.InitializeMotorDB is a function.
 %
 %
 % MAT-Files

@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 20 jun 2025
+% last updated: 10 mar 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -49,6 +49,9 @@ OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
 
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
+
+% get which propellers are connected to the gas turbine engines
+WhichProp = Aircraft.Specs.Propulsion.PropArch.WhichProp;
 
 % get the number of sources and transmitters
 nsrc = length(SrcType);
@@ -115,6 +118,9 @@ Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
 
 % get the necessary splits
 LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
+
+% check for a windmilling engine
+Windmill = Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, :);
 
 % aircraft weight
 Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);
@@ -243,6 +249,14 @@ for ipnt = 1:npnt
     
     % evaluate the function handles for the current splits
     SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+        
+    % check for any windmilling engines
+    if (any(Windmill(ipnt, :)))
+        
+        % split power evenly among the remaining engines
+        SplitDwn = RedistForWindmill(SplitDwn, Windmill(ipnt, :), nsrc, ncomp);
+        
+    end
     
     % propagate the power downstream to the transmitters
     Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', SplitDwn(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
@@ -279,6 +293,14 @@ for ipnt = 1:npnt
     % evaluate the function handles for the current splits
     SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
     
+    % check for any windmilling engines
+    if (any(Windmill(ipnt, :)))
+        
+        % split power evenly among the remaining engines
+        SplitDwn = RedistForWindmill(SplitDwn, Windmill(ipnt, :), nsrc, ncomp);
+        
+    end
+    
     % propagate the power downstream
     Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', SplitDwn(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
     
@@ -304,6 +326,14 @@ for ipnt = 1:npnt
     
     % get the current downstream power split
     SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    
+    % check for any windmilling engines
+    if (any(Windmill(ipnt, :)))
+        
+        % split power evenly among the remaining engines
+        SplitDwn = RedistForWindmill(SplitDwn, Windmill(ipnt, :), nsrc, ncomp);
+        
+    end
     
     % check for the power supplement
     Psupp(ipnt, itrn) = PropulsionPkg.PowerSupplementCheck( ...
@@ -455,19 +485,20 @@ if (any(Fuel))
         % get the column index (offset by number of sources)
         icol = HasEng(ieng) + nsrc;
         
-        % find the propeller that the engine is connected to
-        [~, iprop] = find(Arch(icol, :) & itrn);
-        
+        % check if it has a propeller
+        iprop = WhichProp(HasEng(ieng));
+
         % check if the engine is connected to a propeller
-        if (~isempty(iprop))
+        if (iprop ~= 0)
             
             % get the thrust requirement from the propeller
             TEng = Tout(ibeg:iend, iprop);
             
         else
             
-            % no thrust from a propeller is provided
-            TEng = zeros(iend - ibeg + 1, 1);
+            % there is no connection, assume idle thrust and that there is
+            % a larger power supplement that dominates the expression
+            TEng = zeros(iend-ibeg+1, 1);
             
         end
         
@@ -481,8 +512,13 @@ if (any(Fuel))
             % temporary thrust required
             TTemp = TEng;
             
-            % any required thrust < 1 must be rounded up to 5% SLS thrust
-            TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
+            
+                % any required thrust < 1 must be rounded up to 5% SLS thrust
+                TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+                
+            end
                         
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
@@ -490,9 +526,13 @@ if (any(Fuel))
             % temporary power required
             PTemp = Pout(ibeg:iend, icol);
             
-            % any required power  < 1 must be rounded up to 5% SLS power
-            PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
             
+                % any required power  < 1 must be rounded up to 5% SLS power
+                PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
+                
+            end            
         end
         
         % get altitudes and mach number
@@ -526,18 +566,29 @@ if (any(Fuel))
                 
             end
             
-            % get out the SFC (could be TSFC or BSFC)
-            SFC(ipnt, HasEng(ieng)) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+            % check for any windmilling engines
+            if (any(Windmill(ipnt, :) == HasEng(ieng)))
+                
+                % assume inoperative engine, no fuel flow
+                SFC(     ipnt, HasEng(ieng)) = 0;
+                MDotFuel(ipnt, HasEng(ieng)) = 0;
+                
+            else
+                            
+                % get out the SFC (could be TSFC or BSFC)
+                SFC(ipnt, HasEng(ieng)) = GetSFC(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+                
+                % get the fuel flow
+                MDotFuel(ipnt, HasEng(ieng)) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
             
-            % get the fuel flow
-            MDotFuel(ipnt, HasEng(ieng)) = MDot(OffDesignEngine) * Aircraft.Specs.Propulsion.MDotCF;
+            end
             
             % get the appropriate elements
             ielem = [ifuel, icol];
             
             % evaluate the function handles for the current splits
             SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
-            
+                        
             % temporary mass flow rate
             Tempdmdt = PropulsionPkg.PowerFlow([zeros(1, nfuel), MDotFuel(ipnt, HasEng(ieng))]', ...
                        Arch(ielem, ielem)', SplitDwn(ielem, ielem), EtaDwn(ielem, ielem), -1)';
@@ -606,6 +657,59 @@ Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = LamDwn;
 Aircraft.Mission.History.SI.Energy.E_ES(    SegBeg:SegEnd, :) = E_ES    ;
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
 
+% ----------------------------------------------------------
+
+end
+
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+% ----------------------------------------------------------
+
+function [LamDwn] = RedistForWindmill(LamDwn, iwind, nsrc, ncomp)
+%
+% []
+% written by Paul Mokotoff, prmoko@umich.edu
+% last updated: 16 jun 2025
+%
+% redistribute power from one component when it fails.
+%
+% INPUTS:
+%
+% OUTPUTS:
+%
+%
+
+% get the position of the windmilling components in the matrices
+iwind = iwind + nsrc;
+
+% get the sum of the windmilling components' contributions
+PowFrac = sum(LamDwn(:, iwind), 2);
+
+% zero the columns with windmilling components
+LamDwn(:, iwind) = 0;
+
+% loop through each component
+for icomp = 1:ncomp
+    
+    % check the power fraction
+    if (PowFrac(icomp) > 1.0e-12)
+        
+        % get the remaining components
+        ActiveComp = find(LamDwn(icomp, :) > 1.0e-12);
+        
+        % get the number of remaining components
+        nremain = length(ActiveComp);
+        
+        % check if there are any components remaining
+        if (nremain > 0)
+            
+            % redistribute power equally to the remaining components
+            LamDwn(icomp, ActiveComp) = LamDwn(icomp, ActiveComp) + PowFrac(icomp) / nremain;
+            
+        end        
+    end
+end
+        
 % ----------------------------------------------------------
 
 end

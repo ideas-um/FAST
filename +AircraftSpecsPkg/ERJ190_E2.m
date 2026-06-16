@@ -2,7 +2,7 @@ function [Aircraft] = ERJ190_E2()
 %
 % ERJ190_E2.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 20 jun 2025
+% last updated: 16 feb 2026
 %
 % define the embraer E190-E2 from "advanced 2030 single aisle aircraft
 % modeling" to be used for aircraft sizing/performance analysis.
@@ -164,22 +164,6 @@ Aircraft.Specs.Power.Eta.EM = 0.96;
 
 % electric generator efficiency
 Aircraft.Specs.Power.Eta.EG = 0.96;
-
-% upstream power splits
-Aircraft.Specs.Power.LamUps.SLS = 0;
-Aircraft.Specs.Power.LamUps.Tko = 0;
-Aircraft.Specs.Power.LamUps.Clb = 0;
-Aircraft.Specs.Power.LamUps.Crs = 0;
-Aircraft.Specs.Power.LamUps.Des = 0;
-Aircraft.Specs.Power.LamUps.Lnd = 0;
-
-% downstream power splits
-Aircraft.Specs.Power.LamDwn.SLS = 0;
-Aircraft.Specs.Power.LamDwn.Tko = 0;
-Aircraft.Specs.Power.LamDwn.Clb = 0;
-Aircraft.Specs.Power.LamDwn.Crs = 0;
-Aircraft.Specs.Power.LamDwn.Des = 0;
-Aircraft.Specs.Power.LamDwn.Lnd = 0;
 
 % aircraft power-weight ratio (kW/kg)
 Aircraft.Specs.Power.P_W.SLS = NaN;

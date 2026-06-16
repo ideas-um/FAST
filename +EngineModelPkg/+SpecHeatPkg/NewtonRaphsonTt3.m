@@ -26,11 +26,11 @@ function [Tt3] = NewtonRaphsonTt3(Tt1,heat)
 
 %% Newton Raphson iteration
 Tt3 = Tt1*0.95;
-i = 0;
-while abs(f(Tt3,Tt1) - heat)/heat > 1e-3 && i < 10
+iter = 0;
+while abs(f(Tt3,Tt1) - heat)/heat > 1e-3 && iter < 10
     Tt3new = Tt3 - (f(Tt3,Tt1)-heat)/fprime(Tt3);
     Tt3 = Tt3new;
-    i = i+1;
+    iter = iter + 1;
 end
 
 %% Curve fitted function 

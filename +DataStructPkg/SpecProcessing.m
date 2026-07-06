@@ -253,13 +253,13 @@ switch TLAR.Class
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(115,'kts','m/s');
 end
 
-DefaultWeight.MLW = 0;           
-DefaultWeight.Batt = 0;             
-DefaultWeight.EG = 0;              
-DefaultWeight.EM = 0;              
+DefaultWeight.MLW = 0;
+DefaultWeight.Batt = 0;
+DefaultWeight.EG = 0;
+DefaultWeight.EM = 0;
 DefaultWeight.EAP = 0;
 DefaultWeight.WairfCF = 1;
-DefaultPropulsion.NumEngines = 2;         
+DefaultPropulsion.NumEngines = 2;
 DefaultPropulsion.MDotCF = 1;
 DefaultPropulsion.InletArea = NaN;
 %DefaultPropulsion.T_W.SLS = 0;                  % regression
@@ -559,25 +559,25 @@ end
 
 if TLAR.Class == "Turbofan"
 
-% for the OEW iteration
-% list parts of the aircraft structure to use in the regression
-IOspace = {["Specs", "Aero"      , "S"            ], ...
-    ["Specs", "Propulsion", "Thrust", "SLS"], ...
-    ["Specs", "TLAR"      , "EIS"          ], ...
-    ["Specs", "Weight"    , "MTOW"         ], ...
-    ["Specs", "Weight"    , "Airframe"     ]}   ;
+    % for the OEW iteration
+    % list parts of the aircraft structure to use in the regression
+    IOspace = {["Specs", "Weight"     , "Burden"       ], ...
+        ["Specs", "Propulsion" , "Thrust", "SLS"], ...
+        ["Specs", "Performance", "Range"        ], ...
+        ["Specs", "Weight"     , "MTOW"         ], ...
+        ["Specs", "Weight"     , "Airframe"     ]}   ;
 
-Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
-OEWWeights = [1 1 0.2 1];
-[RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
+    Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
+    OEWWeights = [1 1 1 1];
+    [RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
 
-% for engine sizing
-IOspace = {["Thrust_Max"],["DryWeight"]};
-Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
-EngWeights = 1;
-[RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
+    % for engine sizing
+    IOspace = {["Thrust_Max"],["DryWeight"]};
+    Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
+    EngWeights = 1;
+    [RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
 else
     % Assign empty output if ~turbofan class
     RegressionParams = struct();

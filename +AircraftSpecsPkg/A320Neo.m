@@ -48,10 +48,10 @@ Aircraft.Specs.Aero.L_D.ClbCF = 1;
 Aircraft.Specs.Aero.L_D.CrsCF = 1;
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.092;
+Aircraft.Specs.Propulsion.MDotCF = 1.10;
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 0.993;
+Aircraft.Specs.Weight.WairfCF = 1.0;
  
 
 %% VEHICLE PERFORMANCE %%

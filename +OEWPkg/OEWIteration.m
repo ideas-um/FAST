@@ -3,7 +3,7 @@ function [Aircraft] = OEWIteration(Aircraft)
 % [Aircraft] = OEWIteration(Aircraft)
 % written by Maxfield Arnson
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 25 mar 2025
+% last updated: 6 jul 2026
 %
 % This function takes the aircraft specification structure and performs
 % regressions (using the regression package) based on the data in the
@@ -34,6 +34,7 @@ g = 9.81; % m / s^2
 % get the TLARs
 Class = Aircraft.Specs.TLAR.Class;
 EIS   = Aircraft.Specs.TLAR.EIS;
+Range = Aircraft.Specs.Performance.Range;
 
 % get the wing loading
 W_S = Aircraft.Specs.Aero.W_S.SLS;
@@ -137,18 +138,21 @@ switch Class
                         
             % modify MTOW
             MTOW = MTOW + WengNew - Weng + WemNew - Wem + WegNew - Weg + WcabNew - Wcab;
+
+            % define burden weight (ref: Arnson, Aljaber, Cinar. 2026.)
+            Burden = WengNew + WemNew + WegNew + WcabNew + Wfuel + Wbatt + Wpax + Weap + Wcrew;
                         
             % list the targets for the airframe weight estimation
-            target = [S, T, EIS, MTOW];
+            target = [Burden, T, Range, MTOW];
             
             % list parts of the aircraft structure to use in the regression
-            IO = {["Specs", "Aero"      , "S"            ], ...
-                  ["Specs", "Propulsion", "Thrust", "SLS"], ...
-                  ["Specs", "TLAR"      , "EIS"          ], ...
-                  ["Specs", "Weight"    , "MTOW"         ], ...
-                  ["Specs", "Weight"    , "Airframe"     ]}   ;
+            IO = {["Specs", "Weight"     , "Burden"       ], ...
+                  ["Specs", "Propulsion" , "Thrust", "SLS"], ...
+                  ["Specs", "Performance", "Range"        ], ...
+                  ["Specs", "Weight"     , "MTOW"         ], ...
+                  ["Specs", "Weight"     , "Airframe"     ]}   ;
               
-             % estimate the new airframe weight with a regression
+            % estimate the new airframe weight with a regression
             WframeNew = RegressionPkg.NLGPR(TurbofanAC, IO, target, 'Preprocessing',Aircraft.RegressionParams.OEW);
 
             % update the airframe weight with a calibration factor

@@ -3,7 +3,7 @@ function [Aircraft] = OEWIteration(Aircraft)
 % [Aircraft] = OEWIteration(Aircraft)
 % written by Maxfield Arnson
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 25 mar 2025
+% last updated: 6 jul 2026
 %
 % This function takes the aircraft specification structure and performs
 % regressions (using the regression package) based on the data in the

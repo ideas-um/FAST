@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 12 jun 2026
+% last updated: 6 jul 2026
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft

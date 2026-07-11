@@ -2,7 +2,7 @@ function [] = ElysianE9X()
 %
 % [] = ElysianE9X()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 mar 2026
+% last updated: 11 jul 2026
 %
 % create a constraint diagram for a battery electric aircraft
 % representative of the Elysian E9X.
@@ -141,8 +141,9 @@ Aircraft.Specs.Propulsion.NumEngines = 8;
 %% RUN THE CONSTRAINT ANALYSIS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% determine which constraints to use (0 = 14 CFR 25; 1 = novel)
-Aircraft.Settings.ConstraintType = 0;
+% determine which constraints to use (0 = 14 CFR 25; 1 = novel; 2 = Steiner
+% et al. [extrapolate exiting reg's for >4 engine aircraft])
+Aircraft.Settings.ConstraintType = 2;
 
 % create a constraint diagram
 ConstraintDiagramPkg.ConstraintDiagram(Aircraft);

@@ -2,7 +2,7 @@ function [FAR] = Jet25_111(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_111(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 mar 2026
+% last updated: 11 jul 2026
 %
 % derive the constraints for takeoff climb with one engine inoperative.
 %
@@ -71,6 +71,11 @@ elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
     G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.5026, -42.54, 0.7925, 1.198);
+    
+elseif (Type == 2)
+    
+    % extrapolate for any aircraft with more than 4 engines
+    G = 0.005 + 0.003 * NumEng;
     
 else
     

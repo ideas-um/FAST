@@ -2,7 +2,7 @@ function [FAR] = Jet25_119(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_119(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 dec 2025
+% last updated: 11 jul 2026
 %
 % derive the constraints for a balked landing climb with all engines
 % operative.
@@ -60,6 +60,12 @@ elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
     G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0, 0, 0, 3.2);
+    
+elseif (Type == 2)
+    
+    % extrapolate for any aircraft with more than 4 engines, but it will
+    % always remain the same here
+    G = 0.032;
     
 else
     

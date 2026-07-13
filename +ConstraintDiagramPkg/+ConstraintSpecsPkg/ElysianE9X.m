@@ -2,7 +2,7 @@ function [] = ElysianE9X()
 %
 % [] = ElysianE9X()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 jul 2026
+% last updated: 13 jul 2026
 %
 % create a constraint diagram for a battery electric aircraft
 % representative of the Elysian E9X.
@@ -137,6 +137,10 @@ Aircraft.Specs.Power.P_W.SLS = 1/(0.0666*1000/9.81); % approx. 0.1473;
 % number of engines [2024 paper]
 Aircraft.Specs.Propulsion.NumEngines = 8;
 
+% lapse rate exponent correction factor for cruise/diversion/etc.
+Aircraft.Specs.Propulsion.LapseRate.Crs = 0.10;
+Aircraft.Specs.Propulsion.LapseRate.Div = 0.28;
+
 
 %% RUN THE CONSTRAINT ANALYSIS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,32 +151,6 @@ Aircraft.Settings.ConstraintType = 2;
 
 % create a constraint diagram
 ConstraintDiagramPkg.ConstraintDiagram(Aircraft);
-
-% add the existing sizing point
-hold on
-scatter(Aircraft.Specs.Aero.W_S.SLS * 9.81 / 1000, 1 / (Aircraft.Specs.Power.P_W.SLS / 9.81 * 1000), 48, "o", "MarkerEdgeColor", [0, 0.251, 0.478], "MarkerFaceColor", [0, 0.251, 0.478]);
-
-% format the axis sizes
-xlim([0, 8]);
-ylim([0, 0.2]);
-axis square
-
-% turn on gridlines
-grid on
-
-% get the axis object
-A = gca;
-
-% set the grid to be semi-transparent and move it to the top
-A.GridAlpha = 0.5;
-A.Layer = "top";
-
-% add minor gridlines
-A.XMinorGrid = "on";
-A.YMinorGrid = "on";
-
-% increase font size
-set(gca, "FontSize", 28);
 
 
 end

@@ -2,7 +2,7 @@ function [] = SUSAN()
 %
 % [] = SUSAN()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 13 jul 2026
+% last updated: 22 jul 2026
 %
 % create a constraint diagram for NASA's SUSAN aircraft.
 %
@@ -63,7 +63,10 @@ Aircraft.Specs.Performance.TempInc = 1.25;
 Aircraft.Specs.Performance.MaxCont = 1 / 0.94;
 
 % design specific excess power loss
-Aircraft.Specs.Performance.PsLoss = 0.9171; % mean for twin-engine aircraft
+% 0.9171 - mean SEP loss for twin-engine aircraft
+% 0.0720 - lose a single distributed propulsor (most outboard)
+% 0.3426 - lose the aft turbofan engine
+Aircraft.Specs.Performance.PsLoss = 0.3426;
 
 % landing weight as a fraction of MTOW (computed from FAST simulations)
 Aircraft.Specs.Performance.Wland_MTOW = 0.8411;

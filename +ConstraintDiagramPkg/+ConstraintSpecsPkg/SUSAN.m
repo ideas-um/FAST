@@ -4,7 +4,12 @@ function [] = SUSAN()
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 22 jul 2026
 %
-% create a constraint diagram for NASA's SUSAN aircraft.
+% create a constraint diagram for NASA's SUSAN aircraft. information was
+% extracted from the following paper:
+%
+% Chau, T., & Duensing, J. (2024). Conceptual Design of the Hybrid-Electric
+% Subsonic Single Aft Engine (SUSAN) Electrofan Transport Aircraft. In AIAA
+% SciTech 2024 Forum (p. 1326). https://doi.org/10.2514/6.2024-1326
 %
 % INPUTS:
 %     none

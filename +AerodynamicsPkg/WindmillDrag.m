@@ -2,7 +2,7 @@ function [Aircraft] = WindmillDrag(Aircraft)
 %
 % [Aircraft] = WindmillDrag(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 jan 2026
+% last updated: 22 jul 2026
 %
 % estimate the windmilling drag from any failed engines.
 %
@@ -98,6 +98,9 @@ DelCD = DeltaCD(Tspec, Mach);
 % if there are any NaNs, convert them to zeros
 ThrCD(isnan(ThrCD)) = 0;
 DelCD(isnan(DelCD)) = 0;
+
+% if there are any theoretical drag coefficients less than 0, convert them to zero
+ThrCD(ThrCD <= 0) = 0;
 
 % compute the adjusted drag coefficient
 TotCD = ThrCD - DelCD;

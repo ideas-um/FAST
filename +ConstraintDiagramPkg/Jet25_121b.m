@@ -2,7 +2,7 @@ function [FAR] = Jet25_121b(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121b(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 mar 2026
+% last updated: 11 jul 2026
 %
 % derive the constraints for the second segment climb.
 %
@@ -71,6 +71,11 @@ elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
     G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.6024, -42.00, 0.7829, 2.398);
+    
+elseif (Type == 2)
+    
+    % extrapolate for any aircraft with more than 4 engines
+    G = 0.018 + 0.003 * NumEng;
     
 else
     

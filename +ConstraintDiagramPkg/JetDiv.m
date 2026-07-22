@@ -2,7 +2,7 @@ function [FAR] = JetDiv(W_S, T_W, Aircraft)
 %
 % [FAR] = JetDiv(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 dec 2025
+% last updated: 13 jul 2026
 %
 % derive the constraints for diversion (cruise) performance.
 %
@@ -35,6 +35,9 @@ AR   = Aircraft.Specs.Aero.AR;
 e    = Aircraft.Specs.Aero.e.Crs;
 Mcrs = Aircraft.Specs.Performance.Vels.Div;
 zcrs = Aircraft.Specs.Performance.Alts.Div; % keep in SI units for ComputeFltCon
+
+% get the lapse rate
+LapseRate = Aircraft.Specs.Propulsion.LapseRate.Div;
 
 % get the requirement type
 ReqType = Aircraft.Specs.TLAR.ReqType;
@@ -84,7 +87,7 @@ if (ReqType == 0 || ReqType == 1) % Roskam and Mattingly's equations match
     else
         
         % requirement is thrust-based, account for engine lapsing
-        FAR = (q .* CD0 ./ W_S + W_S ./ (q .* pi .* AR .* e)) ./ RhoRatio ^ 0.6 - T_W;
+        FAR = (q .* CD0 ./ W_S + W_S ./ (q .* pi .* AR .* e)) ./ RhoRatio ^ LapseRate - T_W;
     
     end
     
@@ -94,7 +97,7 @@ elseif (ReqType == 2)
     CL = W_S ./ q;
     
     % use a different equation
-    FAR = q ./ W_S .* (CD0 + CL .^ 2 ./ (pi * AR * e)) ./ RhoRatio ^ 0.2 - T_W;
+    FAR = q ./ W_S .* (CD0 + CL .^ 2 ./ (pi * AR * e)) ./ RhoRatio ^ LapseRate - T_W;
     
 else
     

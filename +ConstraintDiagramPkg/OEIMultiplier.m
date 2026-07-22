@@ -2,7 +2,7 @@ function [k] = OEIMultiplier(Aircraft)
 %
 % [k] = OEIMultiplier(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 04 mar 2026
+% last updated: 11 jul 2026
 %
 % return the appropriate multiplier for engine inoperative conditons,
 % either based on a discrete number of engines installed or a percent
@@ -21,7 +21,7 @@ function [k] = OEIMultiplier(Aircraft)
 Type = Aircraft.Settings.ConstraintType;
 
 % check the multiplier type
-if (Type == 0)
+if ((Type == 0) || (Type == 2))
     
     % get the number of engines
     Neng = Aircraft.Specs.Propulsion.NumEngines;

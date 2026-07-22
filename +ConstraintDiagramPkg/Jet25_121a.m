@@ -2,7 +2,7 @@ function [FAR] = Jet25_121a(W_S, T_W, Aircraft)
 %
 % [FAR] = Jet25_121a(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 mar 2026
+% last updated: 11 jul 2026
 %
 % derive the constraints for the transition segment climb.
 %
@@ -71,6 +71,13 @@ elseif (Type == 1)
     
     % compute the climb gradient from a sigmoid curve
     G = ConstraintDiagramPkg.Sigmoid(Aircraft, 0.4999, -151.22, 0.7855, 0.001);
+    
+elseif (Type == 2)
+    
+    % extrapolate for any aircraft with more than 4 engines (only applies
+    % for >4 engines, but taking the maximum in case an aircraft with <=4
+    % engines is being designed
+    G = max(0, -0.007 + 0.003 * NumEng);
     
 else
     

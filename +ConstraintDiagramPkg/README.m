@@ -26,7 +26,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 06 Oct 2025
+% README last updated: 22 July 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -176,11 +176,19 @@ function [] = README()
 %     MTOW - maximum takeoff weight
 %
 % Propulsion
-%     T_W.SLS    - thrust-to-weight ratio at sea-level, used for turbofan
-%                  aircraft
+%     T_W.SLS        - thrust-to-weight ratio at sea-level, used for
+%                      turbofan aircraft
 %
-%     NumEngines - number of engines installed (used for 14 CFR 25 climb
-%                  gradients)
+%     NumEngines     - number of engines installed (used for 14 CFR 25
+%                      climb gradients)
+%
+%     LapseRate.Crs  - engine lapse rate during cruise (or at cruise
+%                      altitude)
+%
+%     LapseRate.Div  - engine lapse rate during a diversion (or at the
+%                      corresponding altitude)
+%
+%     LapseRate.Ceil - engine lapse rate at the service ceiling
 %
 % Power
 %     P_W.SLS - power-to-weight ratio at sea-level, used for turboprop or
@@ -195,6 +203,8 @@ function [] = README()
 %                      a) 0 - climb gradients from 14 CFR 25
 %                      b) 1 - climb gradients as a function of the specific
 %                             excess power loss
+%                      c) 2 - climb gradients as a function of the number
+%                             of propulsors installed on the aircraft
 %
 % -------------------------------------------------------------------------
 %

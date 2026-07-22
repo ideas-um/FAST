@@ -2,7 +2,7 @@ function [FAR] = JetCeil(W_S, T_W, Aircraft)
 %
 % [FAR] = JetCeil(W_S, T_W, Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 sep 2025
+% last updated: 13 jul 2026
 %
 % derive the constraints for service ceiling.
 %
@@ -37,6 +37,9 @@ zserv   = Aircraft.Specs.Performance.Alts.Srv; % keep in SI units for ComputeFlt
 ReqType = Aircraft.Specs.TLAR.ReqType;
 CrsMach = Aircraft.Specs.Performance.Vels.Crs;
 
+% get the lapse rate
+LapseRate = Aircraft.Specs.Propulsion.LapseRate.Ceil;
+
 
 %% EVALUATE THE CONSTRAINT %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,7 +58,7 @@ G = 0.001;
 if (ReqType == 0)
     
     % use the metabook's equation
-    FAR = (2 * sqrt(CD0 / pi / e / AR) + G) / RhoRatio ^ 0.6 - T_W;
+    FAR = (2 * sqrt(CD0 / pi / e / AR) + G) / RhoRatio ^ LapseRate - T_W;
     
 elseif (ReqType == 1)
 
@@ -83,7 +86,7 @@ elseif (ReqType == 1)
     end
     
     % use Mattingly's equation for service ceiling
-    FAR = 1 ./ RhoRatio ^ 0.6 .* (q .* CD0 ./ W_S + W_S ./ q ./ (pi * AR * e) + G) - T_W;
+    FAR = 1 ./ RhoRatio ^ LapseRate .* (q .* CD0 ./ W_S + W_S ./ q ./ (pi * AR * e) + G) - T_W;
     
 else
     

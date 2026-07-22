@@ -2,7 +2,7 @@ function [dCD0] = TrimDrag(Aircraft)
 %
 % [dCD0] = TrimDrag(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 08 jan 2026
+% last updated: 22 jul 2026
 %
 % estimate the trim drag from any failed engines.
 %
@@ -38,18 +38,24 @@ if (~any(Dwm))
     
     % return an array of zeros
     dCD0 = zeros(npnt, 1);
-
+    
     % exit the program
     return
     
 end
+
+% get the component
+icomp = Aircraft.Mission.History.SI.Power.Windmill(SegBeg);
+
+% get the number of sources
+nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
 
 
 %% PRE-PROCESSING %%
 %%%%%%%%%%%%%%%%%%%%
 
 % get the SLS thrust
-Tsls = Aircraft.Specs.Propulsion.Engine.DesignThrust;
+Tsls = Aircraft.Specs.Propulsion.SLSThrust(icomp - nsrc);
 
 % get the moment arm between the fuselage and most outboard engine
 Arm = Aircraft.Specs.Aero.Fuse.DistToEng;

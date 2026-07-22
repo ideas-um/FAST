@@ -2,10 +2,21 @@ function [] = ElysianE9X()
 %
 % [] = ElysianE9X()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 30 mar 2026
+% last updated: 22 jul 2026
 %
 % create a constraint diagram for a battery electric aircraft
 % representative of the Elysian E9X.
+%
+% data was extracted from the following papers, published in 2024 and 2025:
+%     1) de Vries, R., Wolleswinkel, R. E., Hoogreef, M., & Vos, R. (2024).
+%        A new perspective on battery-electric aviation, part II:
+%        Conceptual design of a 90-seater. In AIAA Scitech 2024 Forum 
+%        (p. 1490). https://doi.org/10.2514/6.2024-1490
+%
+%     2) de Vries, R., Wolleswinkel, R. E., Exalto, J., van den Berg, P.,
+%        Vos, R., & Hoogreef, M. (2025). Conceptual Redesign of a 90-Seater
+%        Battery-Electric Aircraft. In AIAA AVIATION FORUM AND ASCEND 2025
+%        (p. 3153). https://doi.org/10.2514/6.2025-3153
 %
 % INPUTS:
 %     none
@@ -137,41 +148,20 @@ Aircraft.Specs.Power.P_W.SLS = 1/(0.0666*1000/9.81); % approx. 0.1473;
 % number of engines [2024 paper]
 Aircraft.Specs.Propulsion.NumEngines = 8;
 
+% lapse rate exponent correction factor for cruise/diversion/etc.
+Aircraft.Specs.Propulsion.LapseRate.Crs = 0.10;
+Aircraft.Specs.Propulsion.LapseRate.Div = 0.28;
+
 
 %% RUN THE CONSTRAINT ANALYSIS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% determine which constraints to use (0 = 14 CFR 25; 1 = novel)
-Aircraft.Settings.ConstraintType = 0;
+% determine which constraints to use (0 = 14 CFR 25; 1 = novel; 2 = Steiner
+% et al. [extrapolate exiting reg's for >4 engine aircraft])
+Aircraft.Settings.ConstraintType = 2;
 
 % create a constraint diagram
 ConstraintDiagramPkg.ConstraintDiagram(Aircraft);
-
-% add the existing sizing point
-hold on
-scatter(Aircraft.Specs.Aero.W_S.SLS * 9.81 / 1000, 1 / (Aircraft.Specs.Power.P_W.SLS / 9.81 * 1000), 48, "o", "MarkerEdgeColor", [0, 0.251, 0.478], "MarkerFaceColor", [0, 0.251, 0.478]);
-
-% format the axis sizes
-xlim([0, 8]);
-ylim([0, 0.2]);
-axis square
-
-% turn on gridlines
-grid on
-
-% get the axis object
-A = gca;
-
-% set the grid to be semi-transparent and move it to the top
-A.GridAlpha = 0.5;
-A.Layer = "top";
-
-% add minor gridlines
-A.XMinorGrid = "on";
-A.YMinorGrid = "on";
-
-% increase font size
-set(gca, "FontSize", 28);
 
 
 end

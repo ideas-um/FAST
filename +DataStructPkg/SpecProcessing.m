@@ -125,6 +125,7 @@ DefaultAero.MAC = NaN;
 DefaultAero.S = NaN;
 DefaultAero.AR = NaN;
 DefaultAero.L_D.CrsMAC = NaN;
+DefaultAero.L_D.Method = NaN;
 
 DefaultWeight.Cargo = NaN;
 DefaultWeight.OEW = NaN;

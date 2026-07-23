@@ -2,7 +2,7 @@ function [Aircraft] = EvalCruise(Aircraft)
 %
 % [Aircraft] = EvalCruise(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 07 apr 2025
+% last updated: 21 july 2025
 %
 % Evaluate a cruise segment by iterating over the aircraft's mass. Climb/
 % descent and accelerations are allowed in the segment.
@@ -31,8 +31,11 @@ function [Aircraft] = EvalCruise(Aircraft)
 % maximum rate of climb/descent
 dh_dt_max = Aircraft.Specs.Performance.RCMax;
 
-% lift-drag ratio
-L_D = Aircraft.Specs.Aero.L_D.Crs;
+% wing area
+S = Aircraft.Specs.Aero.S;
+
+% get the L_D computation method
+AeroMethod = Aircraft.Specs.Aero.L_D.Method;
 
 % ----------------------------------------------------------
 
@@ -109,6 +112,9 @@ MaxIter = 10;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% remember the current segment
+Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Cruise";
+
 % convert the beginning velocity to TAS
 [~, TASBeg, ~, ~, ~, ~, ~] = MissionSegsPkg.ComputeFltCon( ...
                              AltBeg, dISA, TypeBeg, VelBeg);
@@ -169,8 +175,14 @@ else
 end
 
 % remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Crs, SegEnd - SegBeg + 1, 1);
-Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Crs, SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamDwn(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Crs  , SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamUps(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Crs  , SegEnd - SegBeg + 1, 1);
+
+% get the number of windmilling splits
+nwind = length(Aircraft.Specs.Power.Windmill.Crs);
+
+% remember the windmilling engines
+Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd-1, 1:nwind) = repmat(Aircraft.Specs.Power.Windmill.Crs, SegEnd - SegBeg, 1);
 
 % remember initial quantities in the mission history
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
@@ -280,8 +292,20 @@ while (iter < MaxIter)
     % estimate the lift (ncases)
     L = Mass .* g .* cosd(FPA);
     
+    % compute the lift coefficient
+    CL = L ./ (0.5 .* Rho .* TAS .^ 2 .* S);
+
+    % store it in the mission history
+    Aircraft.Mission.History.SI.Aero.CL(SegBeg:SegEnd) = CL;
+
+    % compute the lift-drag coefficient
+    Aircraft = AeroMethod(Aircraft);
+    
+    % get the lift-to-drag ratio
+    L_D = Aircraft.Mission.History.SI.Aero.L_D(SegBeg:SegEnd);
+    
     % estimate the drag (ncases)
-    D = L / L_D;
+    D = L ./ L_D;
     
     % compute power to overcome drag --- new (ncases)
     DV = D .* TAS;
@@ -390,12 +414,12 @@ Aircraft.Mission.History.SI.Performance.Acc( SegBeg:SegEnd) = dV_dt;
 Aircraft.Mission.History.SI.Performance.FPA( SegBeg:SegEnd) = FPA  ;
 Aircraft.Mission.History.SI.Performance.Ps(  SegBeg:SegEnd) = Ps   ;
 
+% power metrics
+Aircraft.Mission.History.SI.Power.DV(SegBeg:SegEnd) = DV;
+
 % energy quantities
 Aircraft.Mission.History.SI.Energy.PE(  SegBeg:SegEnd) = PE   ;
 Aircraft.Mission.History.SI.Energy.KE(  SegBeg:SegEnd) = KE   ;
-
-% current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Cruise";
 
 % ----------------------------------------------------------
 

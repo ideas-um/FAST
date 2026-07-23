@@ -2,7 +2,7 @@ function [] = PlotPerfParam(x, y, inst, lx, ly, name)
 %
 % [] = PlotPerfParam(x, y, inst, lx, ly, name)
 % written by Paul Mokotoff, prmoko@umich.edu
-% updated 29 aug 2024
+% updated 19 aug 2025
 %
 % Plot a given parameter from the mission analysis.
 %
@@ -49,7 +49,7 @@ if (inst == 1)
     %
     
     % get the matrix size
-    [nrow, ncol] = size(x);
+    [nrow, ncol] = size(y);
     
     % allocate memory
     xnew = zeros(2*(nrow-1)+1, ncol);
@@ -59,7 +59,7 @@ if (inst == 1)
     for icol = 1:ncol
         
         % transform data into a "step-like" function
-        xnew(:, icol) = [reshape([x(1:end-1, icol)'; x(2:end  , icol)'], [], 1); x(end, icol)];
+        xnew(:, icol) = [reshape([x(1:end-1      )'; x(2:end        )'], [], 1); x(end      )];
         ynew(:, icol) = [reshape([y(1:end-1, icol)'; y(1:end-1, icol)'], [], 1); y(end, icol)];
         
     end

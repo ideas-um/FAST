@@ -2,7 +2,7 @@ function [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 %
 % [Aircraft, MissionHistory] = Main(InputAircraft, ProfileFxn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% last updated: 10 mar 2026
 %
 % NOTE: please see README.m in the root directory for all
 %       disclaimers and how to run FAST.

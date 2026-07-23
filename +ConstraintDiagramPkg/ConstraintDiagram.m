@@ -2,7 +2,8 @@ function [] = ConstraintDiagram(Aircraft)
 %
 % ConstraintDiagram.m
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 28 apr 2026
+% adapted from code used in AEROSP 481 as a GSI
+% last updated: 23 jul 2026
 %
 % create a constraint diagram according to 14 CFR 23/25. for turbofans, a
 % T/W-W/S diagram is created using 14 CFR 25. for turboprops/piston, either
@@ -56,7 +57,7 @@ elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
         VertCent = 1 / VertCent;
                 
         % create a vertical range
-        Vrange = linspace(max(0, VertCent - 0.25), min(0.25, VertCent + 0.15), 500);
+        Vrange = linspace(max(0, VertCent - 0.25), min(0.2, VertCent + 0.15), 500);
         
         % define the axis label
         VertLabel = "Power Loading (N/W)";

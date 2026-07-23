@@ -12,9 +12,9 @@ Principal Authors:
 - Paul Mokotoff, <prmoko@umich.edu>
 - Max Arnson, <marnson@umich.edu>
 
-Last Updated: 29 Apr 2026
+Last Updated: 23 Jul 2026
 
-## Version 0.5.0 - 29 Apr 2026
+## Version 0.7.0 - 23 Jul 2026
 
 ### Added
 
@@ -25,6 +25,30 @@ Last Updated: 29 Apr 2026
 ### Changed
 
 1. Updated corresponding files in the +DataStructPkg to accommodate UAV analyses.
+
+## Verison 0.6.0 - 04 Jun 2026
+
+### Added
+
+1. Adapted the empirical aerodynamic analysis from NASA's Aviary code into FAST.
+
+1. Added empirical model for predicting electric motor weights as a function of their rated power.
+
+1. Created a function to select the appropriate "HEcoeff" for an engine connected to electrical components (either as a power boost or power siphon).
+
+### Changed
+
+1. Improved the "EvalSplit" function in the +PropulsionPkg to accommodate an unlimited number of power splits.
+
+1. Updated calibration factors on aircraft that leverage the empirical aerodynamic analysis.
+
+## Version 0.5.0 - 03 Apr 2026
+
+### Added
+
+1. Created the +ConstraintDiagramPkg, which allows users to generate constraint diagrams for turboprop or turbofan configurations under FAA Part 25 regulations. Users can also generate custom constraints to add to their constraint diagram.
+
+1. Created the +SafetyPkg, which enables users to execute a Fault Tree Analysis to identify the failure probability and failure modes for a given system architecture.
 
 ## Version 0.4.1 - 05 Mar 2026
 

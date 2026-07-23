@@ -2,14 +2,14 @@ function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 %
 % [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2025
+% last updated: 03 sep 2025
 %
 % Re-compute the operational power splits for a "full throttle" setting
 % during the mission.
 %
-% WARNING: this function only works for two elements connected in parallel
-% right now (or conventional/electric architectures that don't have any
-% power splits).
+% this function previously worked for two elements connected in parallel.
+% it has now been generalized to work for any number of elements connected
+% in parallel.
 %
 % INPUTS:
 %     Aircraft - structure with information about the aircraft and mission
@@ -50,6 +50,9 @@ end
 %% RE-COMPUTE THE POWER SPLITS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% get the propulsion architecture
+Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
+
 % get the number of parallel connections
 npar = length(ParIndx);
 
@@ -67,7 +70,7 @@ LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
 idx = any(LamUps > 0, 2);
 
 % get the number of downstream splits
-nsplit = Aircraft.Settings.nargOperDwn;
+nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
 
 % get a temporary power split
 TmpSplit = LamDwn(1, :);
@@ -87,32 +90,38 @@ for ipar = 1:npar
     % account for the source indices
     imain = imain + nsrc;
     
-    % assume neither split contributes
-    UseSplit = false(1, nsplit);
+    % get all indices
+    jdx = [imain, isupp];
     
-    % find the downstream split contributing
-    for isplit = 1:nsplit
-        
-        % perturb a split
-        TmpSplit(isplit) = TmpSplit(isplit) + 0.01;
-        
-        % get the new matrix
-        OperNew = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, TmpSplit);
-        
-        % check if the matrices are different
-        UseSplit(isplit) = OperDwn(isupp+nsrc, imain) ~= OperNew(isupp+nsrc, imain);
-        
-        % remove the perturbation
-        TmpSplit(isplit) = TmpSplit(isplit) - 0.01;
-        
-    end
+    % find the upstream split
+    iups = find(sum(Arch(jdx, :), 1) == length(isupp) + 1);
     
     % get the total power output at any given time from those sources
-    Pout = sum(Pav(idx, [imain, isupp]), 2);
-    
-    % compute the downstream power split
-    LamDwn(idx, UseSplit) = Pav(idx, isupp) ./ Pout;
+    Pout = sum(Pav(idx, jdx), 2);
+        
+    % find the downstream split contributing
+    for kdx = jdx
+        for isplit = 1:nsplit
             
+            % perturb a split
+            TmpSplit(isplit) = TmpSplit(isplit) + 0.01;
+            
+            % get the new matrix
+            OperNew = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, TmpSplit);
+            
+            % check if the matrices are different
+            if (abs(OperDwn(iups, kdx) - OperNew(iups, kdx)) > 1.0e-06)
+                
+                % recompute the power split
+                LamDwn(idx, isplit) = Pav(idx, kdx) ./ Pout;
+                
+            end
+            
+            % remove the perturbation
+            TmpSplit(isplit) = TmpSplit(isplit) - 0.01;
+            
+        end
+    end            
 end
 
 % if any are NaN, return 0 (assume it's from 0 power available)

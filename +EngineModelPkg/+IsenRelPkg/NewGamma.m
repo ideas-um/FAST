@@ -42,15 +42,18 @@ function [Ts,cp,cv,g] = NewGamma(Tt,M,g)
 
 % Iterate until gamma no longer changes
 delg = 1;
-i = 0;
-while delg > 1e-3 && i < 10
+iter = 0;
+while delg > 1e-3 && iter < 10
+
     Ts = EngineModelPkg.IsenRelPkg.Ts_Tt(Tt,M,g);
     cp = EngineModelPkg.SpecHeatPkg.CpAir(Ts);
     cv = EngineModelPkg.SpecHeatPkg.CvAir(Ts);
     g2 = cp/cv;
     delg = abs(g2-g)/g;
     g = g2;
-    i = i+1;
+
+    iter = iter + 1;
+
 end
 g = g2;
 

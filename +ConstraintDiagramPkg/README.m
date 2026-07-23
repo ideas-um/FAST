@@ -26,7 +26,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 28 April 2026
+% README last updated: 23 July 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -168,10 +168,10 @@ function [] = README()
 %     ExtraGrad      - an additional all engine operative climb gradient
 %                      that acts as an additional requirement
 %
-%     VMax           - maximum allowable speed
+%     VMax           - maximum allowable speed [used for UAVs]
 %
 %     KEMax          - maximum allowable kinetic energy upon colliding with
-%                      a human or an object
+%                      a human or an object [used for UAVs]
 %
 % Aerodynamics (Aero)
 %     W_S.SLS - wing loading at sea level (kg / m^2)

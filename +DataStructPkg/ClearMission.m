@@ -2,7 +2,7 @@ function [Aircraft] = ClearMission(Aircraft, ielem)
 %
 % [Aircraft] = ClearMission(Aircraft, ielem)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 12 dec 2024
+% last updated: 05 jan 2026
 %
 % Reset all of the information from the Aircraft.Mission.History.SI.*
 % sub-structure to 0s. This is needed each time a mission is re-flown.
@@ -57,6 +57,12 @@ if (ielem == 0)
     Aircraft.Mission.History.SI.Performance.Rho( :, :) = 0;
     Aircraft.Mission.History.SI.Performance.Ps(  :, :) = 0;
     
+    % aerodynamic data
+    Aircraft.Mission.History.SI.Aero.CL( :, :) = 0;
+    Aircraft.Mission.History.SI.Aero.CD( :, :) = 0;
+    Aircraft.Mission.History.SI.Aero.L_D(:, :) = 0;
+    Aircraft.Mission.History.SI.Aero.Dwm(:, :) = 0;
+    
     % propulsion data
     Aircraft.Mission.History.SI.Propulsion.TSFC(    :, :) = 0;
     Aircraft.Mission.History.SI.Propulsion.MDotFuel(:, :) = 0;
@@ -70,6 +76,7 @@ if (ielem == 0)
     
     % aircraft power as a function of time
     Aircraft.Mission.History.SI.Power.TV(      :, :) = 0;
+    Aircraft.Mission.History.SI.Power.DV(      :, :) = 0;
     Aircraft.Mission.History.SI.Power.Req(     :, :) = 0;
     Aircraft.Mission.History.SI.Power.LamUps(  :, :) = 0;
     Aircraft.Mission.History.SI.Power.LamDwn(  :, :) = 0;
@@ -83,6 +90,7 @@ if (ielem == 0)
     Aircraft.Mission.History.SI.Power.Voltage( :, :) = 0;
     Aircraft.Mission.History.SI.Power.Current( :, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(:, :) = 0;
+    Aircraft.Mission.History.SI.Power.Windmill(:, :) = 0;
     
     % aircraft energy as a function of time
     Aircraft.Mission.History.SI.Energy.KE(      :, :) = 0;
@@ -114,6 +122,12 @@ else
     Aircraft.Mission.History.SI.Performance.Rho( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Performance.Ps(  ielem:end, :) = 0;
     
+    % aerodynamic data
+    Aircraft.Mission.History.SI.Aero.CL( ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Aero.CD( ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Aero.L_D(ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Aero.Dwm(ielem:end, :) = 0;
+    
     % propulsion data
     Aircraft.Mission.History.SI.Propulsion.TSFC(    ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Propulsion.MDotFuel(ielem:end, :) = 0;
@@ -127,6 +141,7 @@ else
     
     % aircraft power as a function of time
     Aircraft.Mission.History.SI.Power.TV(      ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.DV(      ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Req(     ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.LamUps(  ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.LamDwn(  ielem:end, :) = 0;
@@ -140,6 +155,7 @@ else
     Aircraft.Mission.History.SI.Power.Voltage( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Current( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Power.Windmill(ielem:end, :) = 0;
     
     % aircraft energy as a function of time
     Aircraft.Mission.History.SI.Energy.KE(      ielem:end, :) = 0;

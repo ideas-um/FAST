@@ -3,7 +3,7 @@ function [Aircraft] = EvalTakeoff(Aircraft)
 % [Aircraft] = EvalTakeoff(Aircraft)
 % originally written by Huseyin Acar
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last modified: 05 mar 2025
+% last modified: 17 jun 2025
 %
 % Evaluate the takeoff segment. Assume a 1-minute takeoff at constant
 % acceleration and maximum thrust/power from all power sources.
@@ -130,8 +130,14 @@ if (any(Batt))
 end
 
 % remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Tko, SegEnd - SegBeg + 1, 1);
-Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Tko, SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamDwn(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Tko  , SegEnd - SegBeg + 1, 1);
+Aircraft.Mission.History.SI.Power.LamUps(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Tko  , SegEnd - SegBeg + 1, 1);
+
+% get the number of windmilling splits
+nwind = length(Aircraft.Specs.Power.Windmill.Tko);
+
+% remember the windmilling engines
+Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, 1:nwind) = repmat(Aircraft.Specs.Power.Windmill.Tko, SegEnd - SegBeg + 1, 1);
 
 
 %% FLY TAKEOFF %%
@@ -197,6 +203,7 @@ PE = Mass .* g .* Alt;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % remember information in the mission history
+Aircraft.Mission.History.SI.Power.DV(        SegBeg:SegEnd) =    0;
 Aircraft.Mission.History.SI.Power.Req(       SegBeg:SegEnd) = Preq;
 Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 

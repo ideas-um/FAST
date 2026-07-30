@@ -77,7 +77,8 @@ Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(2250, "ft/min", "m/
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
 
-% aerodynamic analysis method
+% Use the calibrated fixed L/D values below; this electric spec does not
+% provide the drag-polar geometry fields required by AerodynamicsPkg.DragPolar.
 Aircraft.Specs.Aero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
 
 % lift-drag ratio during climb  (assumed same as ERJ175, standard range)

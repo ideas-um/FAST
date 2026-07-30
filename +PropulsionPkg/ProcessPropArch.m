@@ -43,6 +43,9 @@ nsnk = ncomp - nsrc - ntrn;
 SLSPower  = Aircraft.Specs.Propulsion.SLSPower;
 
 % get the downstream sizing splits
+% PowerOpt expands scalar segment inputs into per-transmitter mission rows.
+% Use that row during SLS processing when available so PHE split functions
+% receive the same lambda shape used by mission analysis.
 if isfield(Aircraft.Specs.Power.LamDwn, "Miss")
     LamSLS = Aircraft.Specs.Power.LamDwn.Miss(10, :);
 else

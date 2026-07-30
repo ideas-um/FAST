@@ -105,6 +105,8 @@ DefaultAero.WingtipDevice = NaN;
 DefaultAero.MAC = NaN;
 DefaultAero.S = NaN;
 DefaultAero.AR = NaN;
+% Fixed L/D is the safe default for aircraft specs that provide Clb/Crs/Des
+% values but do not define the detailed drag-polar geometry.
 DefaultAero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
 DefaultAero.L_D.CrsMAC = NaN;
 

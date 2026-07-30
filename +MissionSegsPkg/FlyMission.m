@@ -158,8 +158,8 @@ for imiss = 1:nmiss
             % get the last point in the segment
             SegEnd = Mission.SegEnd(isegs);
 
-            % power split versus altitude for mission
-            % fill in power splits
+            % Cruise-target iteration clears mission history from ielem:end;
+            % refill PowerOpt splits before each segment evaluation.
             Aircraft = PropulsionPkg.LamFill(Aircraft);
             
             % define the function call

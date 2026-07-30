@@ -33,7 +33,8 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 %TrnType(TrnType==2) = [];
 ntrans = length(TrnType);
 
-% get lambda splits over mission profile
+% Start from the segment-level split inputs; this routine expands them into
+% per-time-step, per-transmitter arrays used by PropAnalysis and sizing.
 LamUps = Aircraft.Specs.Power.LamUps;
 LamDwn = Aircraft.Specs.Power.LamDwn;
 
@@ -44,7 +45,8 @@ if isfield(LamUps, 'Miss')
 
 % if no lambda mission filled, fill in based on Lam input
 else
-%ONLY WORKS CURRENTLY FOR PHE
+% This mapping is currently written for the PHE architecture layout:
+% gas turbines, electric motors, and fans.
 
     % designate space for lambda mission array
     LamUps.Miss = zeros(nlen,ntrans);
@@ -79,7 +81,9 @@ else
         % segement length
         npt = Profile.SegEnd(i)-Profile.SegBeg(i)+1;
         
-        % fill in current segment power
+        % Build one split row for this segment; LamUps is assigned directly
+        % to electric motors, and LamDwn is balanced between electric motors,
+        % gas turbines, and fans for the PHE architecture.
         ups = ones(1,ntrans);
         dwn = ones(1,ntrans);
 
@@ -97,7 +101,7 @@ else
             dwn(iFan)=[1,0];
         end
         %}
-        % propagate through sgement points
+        % Propagate the segment split row through all mission points in the segment.
         LamUps.Miss(Profile.SegBeg(i):Profile.SegEnd(i), :) = repmat(ups,npt,1);
         LamDwn.Miss(Profile.SegBeg(i):Profile.SegEnd(i), :) = repmat(dwn,npt,1);
     

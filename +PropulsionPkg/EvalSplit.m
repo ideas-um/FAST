@@ -23,7 +23,8 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 
 % ----------------------------------------------------------
 
-% get the number of arguments in the split
+% PowerOpt PHE architectures may pass one vector-valued lambda row, while
+% other architectures still use separate scalar lambda arguments.
 narg = nargin(SplitFun);
 
 % call the function with an appropriate number of inputs

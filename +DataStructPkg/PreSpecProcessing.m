@@ -518,6 +518,7 @@ if ~isfield(Aircraft,"Settings")
     Aircraft.Settings.DesPoints = NaN;
     Aircraft.Settings.OEW.MaxIter = NaN;
     Aircraft.Settings.Degradation = NaN;
+    % Optional PowerOpt flag; SpecProcessing assigns the default when absent.
     Aircraft.Settings.PowerOpt = NaN;
     Aircraft.Settings.OEW.Tol = NaN;
     Aircraft.Settings.Analysis.MaxIter = NaN;
@@ -587,6 +588,7 @@ else
         Aircraft.Settings.Degradation = NaN;
     end
     if ~isfield(Aircraft.Settings, "PowerOpt")
+        % Preserve compatibility with aircraft specs written before PowerOpt.
         Aircraft.Settings.PowerOpt = NaN;
     end
     if ~isfield(Aircraft.Settings, "PrintOut")

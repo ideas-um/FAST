@@ -155,6 +155,8 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
+% LamUps/LamDwn are prefilled by PropulsionPkg.LamFill; do not overwrite the
+% PowerOpt mission schedule inside the segment physics.
 % get the number of windmilling splits
 nwind = length(Aircraft.Specs.Power.Windmill.Clb);
 

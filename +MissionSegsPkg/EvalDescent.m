@@ -191,6 +191,8 @@ Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 % remember the fuel and battery energy remaining
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
 
+% LamUps/LamDwn are prefilled by PropulsionPkg.LamFill; do not overwrite the
+% PowerOpt mission schedule inside the segment physics.
 % get the number of windmilling splits
 nwind = length(Aircraft.Specs.Power.Windmill.Des);
 

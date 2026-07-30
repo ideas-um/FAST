@@ -126,6 +126,8 @@ else
     
 end
 
+% LamUps/LamDwn are prefilled by PropulsionPkg.LamFill; do not overwrite the
+% PowerOpt mission schedule inside the segment physics.
 % get the number of windmilling splits
 nwind = length(Aircraft.Specs.Power.Windmill.Lnd);
 

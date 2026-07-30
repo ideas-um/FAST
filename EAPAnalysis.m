@@ -182,7 +182,8 @@ end
 % initialize the mission history
 Aircraft = DataStructPkg.InitMissionHistory(Aircraft);
 
-% fill in mission-level power splits after the history arrays exist
+% PowerOpt stores split schedules in mission-history arrays, so fill them
+% after InitMissionHistory creates those arrays.
 Aircraft = PropulsionPkg.LamFill(Aircraft);
 
 % print initial size
@@ -226,7 +227,8 @@ while (iter < MaxIter)
     % get the updated MTOW
     MTOW = Aircraft.Specs.Weight.MTOW;
 
-    % fill in mission-level power splits after any mission-history reset
+    % ClearMission zeros LamUps/LamDwn between sizing iterations; refill the
+    % PowerOpt schedule before flying so battery sizing sees the requested splits.
     Aircraft = PropulsionPkg.LamFill(Aircraft);
 
     % fly the mission

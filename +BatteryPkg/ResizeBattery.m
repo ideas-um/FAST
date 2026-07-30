@@ -1,9 +1,12 @@
 function [Aircraft] = ResizeBattery(Aircraft)
 %
 % [Aircraft] = ResizeBattery(Aircraft)
+%
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 11 dec 2024
+% modified by Yipeng Liu, yipenglx@umich.edu
+%
+% last updated: 21 oct 2025
 %
 % After an aircraft flies a mission, update its battery size. If a "simple"
 % battery model is used (not considering cells in series and parallel),
@@ -32,8 +35,6 @@ Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
 % if there is no battery, return a zero battery weight
 if (all(~Batt, "all"))
-% get 0 battery weight every time for a test
-%if Aircraft.Settings.PowerOpt ==0
     
     % return zero battery weight
     Aircraft.Specs.Weight.Batt = 0;
@@ -47,12 +48,11 @@ end
 ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
 
 % energy consumed during flight
-Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt);
-EnergyDemand = max(Ebatt, [], 1);
-EnergyDemand(EnergyDemand < 0) = 0;
+Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt); 
+Energy = sum(Ebatt);
 
-if all(EnergyDemand == 0)
-    % return zero battery weight
+if Energy == 0
+        % return zero battery weight
     Aircraft.Specs.Weight.Batt = 0;
     
     % exit the function
@@ -64,8 +64,8 @@ end
 %% RESIZE THE BATTERY %%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% first, size the battery based on peak energy demand
-Aircraft.Specs.Weight.Batt = EnergyDemand ./ ebatt;
+% first, size the battery based on energy demand
+Aircraft.Specs.Weight.Batt = Ebatt(end, :) ./ ebatt;
 
 % check if number of battery cells must be updated
 if (Aircraft.Settings.DetailedBatt == 1)
@@ -109,9 +109,6 @@ if (Aircraft.Settings.DetailedBatt == 1)
     
     % power consumed during flight
     Pbatt = Aircraft.Mission.History.SI.Power.Pout(:, [Batt, false(1, ncomp-nsrc)]);
-    
-
-    %Pbatt = Aircraft.Mission.History.SI.Power.P_ES(:, Batt);
 
     % Current curing flight
     Cbatt = Aircraft.Mission.History.SI.Power.Current(:, Batt);
@@ -129,29 +126,38 @@ if (Aircraft.Settings.DetailedBatt == 1)
         
     % find the maximum SOC difference for resizing the battery
     DeltaSOC = max(MinSOC - SOC);
-    Sizeto = DeltaSOC/100;
-    % if a value is negative, min. SOC not surpassed - no SOC change needed
-    %DeltaSOC(DeltaSOC < 0) = 0;
-    
-    % indices for the number of batteries
-    %ibatt = 1:sum(Batt);
-    
-    % identify if the battery is too large or too small
-    %TooLarge = ibatt(DeltaSOC == 0);
 
-    
-    % compute the SOC to reduce the battery size and convert to a fraction
-    %DownsizeTo = -(min(SOC) - MinSOC) / 100;
-    
-    % modify the change in SOC needed
-    %DeltaSOC(TooLarge) = DownsizeTo(TooLarge);
-        
-    % compute the total capacity of the existing battery pack
+    % compute how toadjust SOC
+    Sizeto = DeltaSOC/100;
+
+   % compute the total capacity of the existing battery pack
     ExistBattCap = QMax * Npar;
     
     % update number of cells in parallel (assume 1 cell per module, ./ Qmax is for aged cell capacity in EPASS, ./ 1 is for number of cells in parallel per module)
     NparSOC = ceil(ceil((ExistBattCap + Sizeto .* QMax .* Npar) ./ QMax) ./ 1);
     
+    %{
+    % if a value is negative, min. SOC not surpassed - no SOC change needed
+    DeltaSOC(DeltaSOC < 0) = 0;
+    
+    % indices for the number of batteries
+    ibatt = 1:sum(Batt);
+    
+    % identify if the battery is too large
+    TooLarge = ibatt(DeltaSOC == 0);
+    
+    % compute the SOC to reduce the battery size and convert to a fraction
+    DownsizeTo = -(min(SOC) - MinSOC) / 100;
+    
+    % modify the change in SOC needed
+    DeltaSOC(TooLarge) = DownsizeTo(TooLarge);
+        
+    % compute the total capacity of the existing battery pack
+    ExistBattCap = QMax * Npar;
+    
+    % update number of cells in parallel (assume 1 cell per module, ./ Qmax is for aged cell capacity in EPASS, ./ 1 is for number of cells in parallel per module)
+    NparSOC = ceil(ceil((ExistBattCap + DeltaSOC .* QMax .* Npar) ./ QMax) ./ 1);
+    %}
     % ------------------------------------------------------
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,10 +168,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     % too rapidly)               %
     %                            %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % get the energy consumed by the battery during each segment
-    dEbatt = diff(Ebatt);
-    
+
     % compute the C-rate (current in segment / total capacity of battery pack)
     C_rate = Cbatt ./ (ExistBattCap); 
 
@@ -180,7 +183,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
 
     % resize the battery if the C-rate is exceeded
     if (any(ExceedCRate))
-        disp('crate exceed')
+        
         % get the maximum C-rate
         MaxCrate = max(abs(C_rate));
         
@@ -216,12 +219,6 @@ if (Aircraft.Settings.DetailedBatt == 1)
 
     % remember the new number of cells in parallel
     Npar = max(NparSOC, NparCrate);
-    
-%     % compute the number of battery cells (from E-PASS, not used)
-%     Ncells = Npar * Nser;
-% 
-%     % compute the required capacity (from E-PASS, not used)
-%     Qreq = Npar * QMax;
     
     % compute the mass of the battery (multiply by 3600 to convert from Wh to Joules)
     Wbatt = QMax * Npar * VNom * Nser * 3600 ./ ebatt;

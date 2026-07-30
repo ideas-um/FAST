@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 19 nov 2025
+% last updated: 6 jul 2026
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -112,6 +112,7 @@ DefaultWeight.OEW = NaN;
 DefaultWeight.OEW_MTOW = NaN;
 DefaultWeight.Fuel = NaN;
 DefaultWeight.FuelFrac = NaN;
+DefaultWeight.Airframe = NaN;
 
 DefaultPropulsion.Fuel.Type = NaN;
 DefaultPropulsion.Fuel.Density = NaN;
@@ -252,29 +253,48 @@ switch TLAR.Class
         DefaultPerformance.Vels.Tko = UnitConversionPkg.ConvVel(115,'kts','m/s');
 end
 
-
-DefaultWeight.MLW = 0;           
-DefaultWeight.Batt = 0;             
-DefaultWeight.EG = 0;              
-DefaultWeight.EM = 0;              
+DefaultWeight.MLW = 0;
+DefaultWeight.Batt = 0;
+DefaultWeight.EG = 0;
+DefaultWeight.EM = 0;
 DefaultWeight.EAP = 0;
 DefaultWeight.WairfCF = 1;
-DefaultPropulsion.NumEngines = 2;         
+DefaultPropulsion.NumEngines = 2;
 DefaultPropulsion.MDotCF = 1;
+DefaultPropulsion.InletArea = NaN;
+%DefaultPropulsion.T_W.SLS = 0;                  % regression
+%DefaultPropulsion.Thrust.SLS = 0;           % regression
+%DefaultPropulsion.Thrust.Tko = DefaultPropulsion.Thrust.SLS;
+%DefaultPropulsion.Thrust.Crs = 0;           % regression
+% DefaultPropulsion.TSFC = 0.5;              % regression
+%DefaultPropulsion.Eta.Therm = 0.3;          % switch case
+%DefaultPropulsion.Eta.Prop = 0.85;          % switch case
+% DefaultPower.P_W.AC = 5;                    regression
+% DefaultPower.P_W.Batt =                     *calculated*
 DefaultPower.Eta.Propeller = 0.8;
-DefaultPower.LamDwn.SLS = 0;
-DefaultPower.LamDwn.Tko = 0;
-DefaultPower.LamDwn.Clb = 0;
-DefaultPower.LamDwn.Crs = 0;
-DefaultPower.LamDwn.Des = 0;
-DefaultPower.LamDwn.Lnd = 0;
-DefaultPower.LamUps.SLS = 0;
-DefaultPower.LamUps.Tko = 0;
-DefaultPower.LamUps.Clb = 0;
-DefaultPower.LamUps.Crs = 0;
-DefaultPower.LamUps.Des = 0;
-DefaultPower.LamUps.Lnd = 0;
-DefaultPower.P_W.EG = 5;                    
+DefaultPower.LamDwn.SLS = [];
+DefaultPower.LamDwn.Tko = [];
+DefaultPower.LamDwn.Clb = [];
+DefaultPower.LamDwn.Crs = [];
+DefaultPower.LamDwn.Des = [];
+DefaultPower.LamDwn.Lnd = [];
+DefaultPower.LamUps.SLS = [];
+DefaultPower.LamUps.Tko = [];
+DefaultPower.LamUps.Clb = [];
+DefaultPower.LamUps.Crs = [];
+DefaultPower.LamUps.Des = [];
+DefaultPower.LamUps.Lnd = [];
+DefaultPower.Windmill.Tko = 0;
+DefaultPower.Windmill.Clb = 0;
+DefaultPower.Windmill.Crs = 0;
+DefaultPower.Windmill.Des = 0;
+DefaultPower.Windmill.Lnd = 0;
+DefaultPower.P_W.EG = 5;                      % good
+%DefaultPower.P_W.EM = 5;                     % EDC Projection
+% DefaultPower.SpecEnergy.Fuel = 4.32e7;               % if statement
+%DefaultPower.SpecEnergy.Batt = 0;                     % EDC Projection
+%DefaultPower.Eta.EM = 0.96;                 % switch case
+%DefaultPower.Eta.EG = 0.96;                 % switch case
 DefaultPower.Battery.ParCells = NaN;
 DefaultPower.Battery.SerCells = NaN;
 DefaultPower.Battery.BegSOC   = NaN;
@@ -292,6 +312,7 @@ DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots
 DefaultSettings.Table = 0;
 DefaultSettings.VisualizeAircraft = 0;
 DefaultSettings.PrintOut = 1;
+DefaultSettings.Degradation = 0;
 DefaultSettings.PowerOpt = 0;
 % directory
 DefaultSettings.Dir.Size = pwd;
@@ -416,8 +437,10 @@ for i = 1:length(Aerofields)
     if isstruct(Aero.(Aerofields{i}))
         subfields = fieldnames(Aero.(Aerofields{i}));
         for j = 1:length(subfields)
-            if isnan(Aero.(Aerofields{i}).(subfields{j}))
-                Aero.(Aerofields{i}).(subfields{j}) = DefaultAero.(Aerofields{i}).(subfields{j});
+            if (isnumeric(Aero.(Aerofields{i}).(subfields{j})))
+                if isnan(Aero.(Aerofields{i}).(subfields{j}))
+                    Aero.(Aerofields{i}).(subfields{j}) = DefaultAero.(Aerofields{i}).(subfields{j});
+                end
             end
         end
     elseif isnan(Aero.(Aerofields{i}))
@@ -537,25 +560,25 @@ end
 
 if TLAR.Class == "Turbofan"
 
-% for the OEW iteration
-% list parts of the aircraft structure to use in the regression
-IOspace = {["Specs", "Aero"      , "S"            ], ...
-    ["Specs", "Propulsion", "Thrust", "SLS"], ...
-    ["Specs", "TLAR"      , "EIS"          ], ...
-    ["Specs", "Weight"    , "MTOW"         ], ...
-    ["Specs", "Weight"    , "Airframe"     ]}   ;
+    % for the OEW iteration
+    % list parts of the aircraft structure to use in the regression
+    IOspace = {["Specs", "Weight"     , "Burden"       ], ...
+        ["Specs", "Propulsion" , "Thrust", "SLS"], ...
+        ["Specs", "Performance", "Range"        ], ...
+        ["Specs", "Weight"     , "MTOW"         ], ...
+        ["Specs", "Weight"     , "Airframe"     ]}   ;
 
-Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
-OEWWeights = [1 1 0.2 1];
-[RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
+    Prior = RegressionPkg.PriorCalculation(DataAC,IOspace);
+    OEWWeights = [1 1 1 1];
+    [RegressionParams.OEW.DataMatrix,    RegressionParams.OEW.HyperParams,     RegressionParams.OEW.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataAC,IOspace,Prior, OEWWeights);
 
-% for engine sizing
-IOspace = {["Thrust_Max"],["DryWeight"]};
-Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
-EngWeights = 1;
-[RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
-    RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
+    % for engine sizing
+    IOspace = {["Thrust_Max"],["DryWeight"]};
+    Prior = RegressionPkg.PriorCalculation(DataEngine,IOspace);
+    EngWeights = 1;
+    [RegressionParams.WEngine.DataMatrix,    RegressionParams.WEngine.HyperParams,     RegressionParams.WEngine.InverseTerm] =...
+        RegressionPkg.RegProcessing(DataEngine,IOspace,Prior, EngWeights);
 else
     % Assign empty output if ~turbofan class
     RegressionParams = struct();

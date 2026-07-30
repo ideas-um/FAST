@@ -1,11 +1,13 @@
 function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Charging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 %
-% [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+% [Voltage, Current, Pout, Capacity, SOC, C_rate] = Charging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 jul 2024
+% modified by Yipeng Liu, yipenglx@umich.edu
 %
-% Model (dis)charging for a Lithium-ion battery.
+% last updated: 21 oct 2025
+%
+% Model charging dynamics for a Lithium-ion battery.
 %
 % INPUTS:
 %     Preq     - power required by the battery.
@@ -21,13 +23,16 @@ function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Charging(Aircraft, Pr
 %                set this variable to 1.
 %                size/type/units: 1-by-1 / integer / []
 %
-%    Series    - number of cells connceted in series. for a single cell,
+%     Series   - number of cells connceted in series. for a single cell,
 %                set this variable to 1.
 %                size/type/units: 1-by-1 / integer / []
 %
 % OUTPUTS:
 %     Voltage  - battery voltage as a function of time.
 %                size/type/units: n-by-1 / double / [V]
+%
+%     Current  - battery current as a function of time.
+%                size/type/units: n-by-1 / double / [A]
 %
 %     Pout     - battery output power.
 %                size/type/units: n-by-1 / double / [W]
@@ -68,7 +73,7 @@ elseif ((npreq >  1) && (ntime == 1))
 elseif (npreq ~= ntime)
     
     % throw an error
-    error("ERROR - Model: required power and time are different sizes.");
+    error("ERROR - Charging: required power and time are different sizes.");
         
 end
 
@@ -76,7 +81,7 @@ end
 if     (nsocs >  1)
     
     % throw an error
-    error("ERROR - Model: initial SOC must be a scalar or an empty array.");
+    error("ERROR - Charging: initial SOC must be a scalar or an empty array.");
     
 elseif (nsocs == 0)
     
@@ -102,28 +107,13 @@ ResistanceTemp = Aircraft.Specs.Battery.IntResist;
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-if isfield(Aircraft.Specs.Battery, "expVol") && ~isnan(Aircraft.Specs.Battery.expVol)
-    A = Aircraft.Specs.Battery.expVol;
-else
-    A = Aircraft.Specs.Battery.ExpVol;
-end
+A = Aircraft.Specs.Battery.ExpVol;
 
 % exponential capacity [(Ah)^-1]
-if isfield(Aircraft.Specs.Battery, "expCap") && ~isnan(Aircraft.Specs.Battery.expCap)
-    B = Aircraft.Specs.Battery.expCap;
-else
-    B = Aircraft.Specs.Battery.ExpCap;
-end
-
-Degradation = 0;
-if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "Degradation")
-    Degradation = Aircraft.Settings.Degradation;
-elseif isfield(Aircraft.Specs.Battery, "Degradation")
-    Degradation = Aircraft.Specs.Battery.Degradation;
-end
+B = Aircraft.Specs.Battery.ExpCap;
 
 % Determine maximum capacity [Ah] based on analysis type and degradation effect
-if Aircraft.Settings.Analysis.Type < 0 && Degradation == 1
+if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Specs.Battery.Degradation == 1
 
     % Off-design analysis with battery degradation effect
     Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;
@@ -264,8 +254,6 @@ end
 
 % remove the first SOC value
 SOC(1) = [];
-
-
 
 % ----------------------------------------------------------
 

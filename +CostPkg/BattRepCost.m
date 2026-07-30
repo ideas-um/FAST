@@ -1,4 +1,4 @@
-function [C_rep] = BattRepCost(Aircraft, Year, BMS, Lifespan)
+function [Cost] = BattRepCost(Aircraft, Year, BMS, Lifespan)
 %
 % written by Yipeng Liu, yipenglx@umich.edu
 % last updated: 05 Jun 2025
@@ -40,7 +40,7 @@ BattType = Aircraft.Specs.Battery.Chem; % NMC = 1, LFP = 2
 years_data = [2023, 2026, 2030, 2035]'; % [1]
 
 % Choose the corresponding BMS portion for desired battery chem (if BMS is
-% considered or not)
+% considered or not) to regress
 if BMS == 1
 
     if BattType == 1
@@ -69,7 +69,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Choose the corresponding BMS portion for desired battery chem (if BMS is
-% considered or not)
+% considered or not) to regress
 
 if BattType == 1
 
@@ -101,12 +101,14 @@ E_rat = SpecEnergy * BattWeight; % Battery Rated Capacity in [kWh]
 %% Discount Rate %%
 %%%%%%%%%%%%%%%%%%%
 
+% Discount Rate of Battery System
 DiscRate = 0.07; % [3] 
 
 %% Final Battery Replacement Model %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-C_rep = (1 + BMS_lambda/100) * C_E_rep * E_rat / (1+DiscRate)^Lifespan;
+% Total cost of battery replacement in its lifecycle
+Cost = (1 + BMS_lambda/100) * C_E_rep * E_rat / (1+DiscRate)^Lifespan;
 
 end
 

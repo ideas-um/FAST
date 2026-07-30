@@ -1,11 +1,13 @@
 function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Discharging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 %
-% [Voltage, Pout, Capacity, SOC] = Model(Preq, Time, SOCBeg, Parallel, Series)
+% [Voltage, Current, Pout, Capacity, SOC, C_rate] = Discharging(Aircraft, Preq, Time, SOCBeg, Parallel, Series)
 % originally written by Sasha Kryuchkov
 % overhauled by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 jul 2024
+% modified by Yipeng Liu, yipenglx@umich.edu
 %
-% Model (dis)charging for a Lithium-ion battery.
+% last updated: 21 oct 2025
+%
+% Model discharging dynamics for a Lithium-ion battery.
 %
 % INPUTS:
 %     Preq     - power required by the battery.
@@ -29,6 +31,9 @@ function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Discharging(Aircraft,
 %     Voltage  - battery voltage as a function of time.
 %                size/type/units: n-by-1 / double / [V]
 %
+%     Current  - battery current as a function of time.
+%                size/type/units: n-by-1 / double / [A]
+%
 %     Pout     - battery output power.
 %                size/type/units: n-by-1 / double / [W]
 %
@@ -41,8 +46,6 @@ function [Voltage, Current, Pout, Capacity, SOC, C_rate] = Discharging(Aircraft,
 %
 %     C_rate   - Rate of (dis)charge. 
 %                size/type/units: n-by-1 / double / [C]
-
-
 %% PROCESS INPUTS %%
 %%%%%%%%%%%%%%%%%%%%
 
@@ -68,7 +71,7 @@ elseif ((npreq >  1) && (ntime == 1))
 elseif (npreq ~= ntime)
     
     % throw an error
-    error("ERROR - Model: required power and time are different sizes.");
+    error("ERROR - Discharging: required power and time are different sizes.");
         
 end
 
@@ -76,7 +79,7 @@ end
 if     (nsocs >  1)
     
     % throw an error
-    error("ERROR - Model: initial SOC must be a scalar or an empty array.");
+    error("ERROR - Discharging: initial SOC must be a scalar or an empty array.");
     
 elseif (nsocs == 0)
     
@@ -102,28 +105,13 @@ ResistanceTemp = Aircraft.Specs.Battery.IntResist;
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-if isfield(Aircraft.Specs.Battery, "expVol") && ~isnan(Aircraft.Specs.Battery.expVol)
-    A = Aircraft.Specs.Battery.expVol;
-else
-    A = Aircraft.Specs.Battery.ExpVol;
-end
+A = Aircraft.Specs.Battery.ExpVol;
 
 % exponential capacity [(Ah)^-1]
-if isfield(Aircraft.Specs.Battery, "expCap") && ~isnan(Aircraft.Specs.Battery.expCap)
-    B = Aircraft.Specs.Battery.expCap;
-else
-    B = Aircraft.Specs.Battery.ExpCap;
-end
-
-Degradation = 0;
-if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "Degradation")
-    Degradation = Aircraft.Settings.Degradation;
-elseif isfield(Aircraft.Specs.Battery, "Degradation")
-    Degradation = Aircraft.Specs.Battery.Degradation;
-end
+B = Aircraft.Specs.Battery.ExpCap;
 
 % Determine maximum capacity [Ah] based on analysis type and degradation effect
-if Aircraft.Settings.Analysis.Type < 0 && Degradation == 1
+if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Specs.Battery.Degradation == 1
 
     % Off-design analysis with battery degradation effect
     Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;
@@ -159,7 +147,7 @@ for itime = 1:ntime
     
     % compute the initial discharged capacity
     DischargedCapacityStart = (1 - (SOC(itime) / 100)) .* Q;
-        
+
     isDischarge = (Preq(itime)>=0);
 
     if (isDischarge)
@@ -208,7 +196,7 @@ for itime = 1:ntime
     % check for any imaginary currents
     if (any(~isreal(CurrBatt)))
         
-        if (Preq >= 0)
+        if (isDischarge)
             
             % get the 2-norm (magnitude) of the complex current (initial guess)
             CurrBatt = norm(CurrBatt);

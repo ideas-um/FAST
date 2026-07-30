@@ -3,7 +3,7 @@ function [Aircraft] = EvalClimb(Aircraft)
 % [Aircraft] = EvalClimb(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
 % patterned after code written by Gokcin Cinar in E-PASS
-% last updated: 20 jun 2025
+% last updated: 16 feb 2026
 %
 % Evaluate a climb segment by iterating over the power required. While
 % iterating over the power required, the drag and specific excess power
@@ -36,8 +36,11 @@ function [Aircraft] = EvalClimb(Aircraft)
 % maximum rate of climb
 dh_dtMax = Aircraft.Specs.Performance.RCMax;
 
-% lift-drag ratio
-L_D = Aircraft.Specs.Aero.L_D.Clb;
+% wing area
+S = Aircraft.Specs.Aero.S;
+
+% get the L_D computation method
+AeroMethod = Aircraft.Specs.Aero.L_D.Method;
 
 % ----------------------------------------------------------
 
@@ -111,6 +114,9 @@ MaxIter = 10;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% remember the current segment
+Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Climb";
+
 % vector of equally spaced altitudes
 Alt = linspace(AltBeg, AltEnd, npoint)'; % m
                          
@@ -149,12 +155,11 @@ Eleft_ES = zeros(npoint, 1);
 Fuel = Aircraft.Specs.Propulsion.PropArch.SrcType == 1;
 Batt = Aircraft.Specs.Propulsion.PropArch.SrcType == 0;
 
-% remember the power splits
-%Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Clb, SegEnd - SegBeg + 1, 1);
-%Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Clb, SegEnd - SegBeg + 1, 1);
+% get the number of windmilling splits
+nwind = length(Aircraft.Specs.Power.Windmill.Clb);
 
-%LamSLS = Aircraft.Specs.Power.LamTSPS.SLS;
-Aircraft.Mission.History.SI.Power.LamTSPS(SegBeg:SegEnd) = zeros(npoint, 1);
+% remember the windmilling engines
+Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd-1, 1:nwind) = repmat(Aircraft.Specs.Power.Windmill.Clb, SegEnd - SegBeg, 1);
 
 % if not first segment, get accumulated quantities
 if (SegBeg > 1)
@@ -265,7 +270,7 @@ while (iter < MaxIter)
     Aircraft.Mission.History.SI.Performance.TAS( SegBeg:SegEnd) = TAS ;
     Aircraft.Mission.History.SI.Performance.Rho( SegBeg:SegEnd) = Rho ;
     Aircraft.Mission.History.SI.Performance.Mach(SegBeg:SegEnd) = Mach;
-    Aircraft.Mission.History.SI.Performance.Alt(SegBeg:SegEnd)  = Alt;
+    Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
     
     % ------------------------------------------------------
     
@@ -278,6 +283,9 @@ while (iter < MaxIter)
     
     % compute the power available
     Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
+
+    % for full throttle, recompute the operational power splits
+    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
     
     % get the power available
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
@@ -296,6 +304,18 @@ while (iter < MaxIter)
     % estimate the lift
     L = Mass .* g .* cosd(FPA);
     
+    % compute the lift coefficient
+    CL = L ./ (0.5 .* Rho .* TAS .^ 2 .* S);
+    
+    % store it in the mission history
+    Aircraft.Mission.History.SI.Aero.CL(SegBeg:SegEnd) = CL;
+    
+    % compute the lift-drag coefficient
+    Aircraft = AeroMethod(Aircraft);
+    
+    % get the lift-to-drag ratio
+    L_D = Aircraft.Mission.History.SI.Aero.L_D(SegBeg:SegEnd);
+    
     % estimate the drag
     D = L ./ L_D;
 
@@ -305,38 +325,25 @@ while (iter < MaxIter)
     % compute the specific excess power
     Ps = (Pav - DV) ./ (Mass .* g);
 
-    
     % check for invalid specific excess power values
     if (any(Ps(1:end-1) < 0))
-        if Aircraft.Settings.PrintOut ==1
-            warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
-        end
-        if Aircraft.Settings.Analysis.Type < 0
-        
-            error('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
-         
-        end
+        warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
     end
-    
             
     % compute time to fly, depending if rate of climb is given
     if (isnan(dh_dtReq))
       
         % compute time to fly based on energy height
         dTime = dEnHt ./ Ps(1:end-1);
-        if any(dTime<0)
-            %error
-        end
         
         % update the rate of climb (0 gets overwritten by next segment)
         dh_dt = [diff(Alt) ./ dTime; 0];
-        
         
         % find points that exceed the maximum rate of climb
         irow = find(dh_dt - dh_dtMax > EPS06);
         
         % adjust points that exceed the maximum rate of climb
-        if (any(irow) && Aircraft.Settings.PowerOpt == 0)
+        if (any(irow))
             
             % limit the rate of climb
             dh_dt(irow) = dh_dtMax;
@@ -346,7 +353,6 @@ while (iter < MaxIter)
             
         end
         
-        
         % compute the acceleration
         dV_dt = [diff(TAS) ./ dTime; 0];
                 
@@ -354,9 +360,6 @@ while (iter < MaxIter)
         
         % compute time to fly based on rate of climb
         dTime = diff(Alt) ./ dh_dt(1:end-1);
-        if any(dTime<0)
-            warning
-        end
 
         % compute the acceleration
         dV_dt = [diff(TAS) ./ dTime; 0];
@@ -405,7 +408,6 @@ while (iter < MaxIter)
     
     % power required (ncases)
     Preq = dPE_dt + dKE_dt + DV;
-    %Preq = Inf(npoint, 1);
     
     % thrust required
     Treq = Preq ./ TAS;
@@ -486,12 +488,12 @@ Aircraft.Mission.History.SI.Performance.Acc( SegBeg:SegEnd) = dV_dt;
 Aircraft.Mission.History.SI.Performance.FPA( SegBeg:SegEnd) = FPA  ;
 Aircraft.Mission.History.SI.Performance.Ps(  SegBeg:SegEnd) = Ps   ;
 
+% power metrics
+Aircraft.Mission.History.SI.Power.DV(SegBeg:SegEnd) = DV;
+
 % energy quantities
 Aircraft.Mission.History.SI.Energy.PE(SegBeg:SegEnd) = PE;
 Aircraft.Mission.History.SI.Energy.KE(SegBeg:SegEnd) = KE;
-
-% current segment
-Aircraft.Mission.History.Segment(SegBeg:SegEnd) = "Climb";
 
 % ----------------------------------------------------------
 

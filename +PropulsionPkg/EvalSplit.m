@@ -72,7 +72,7 @@ elseif (narg < 18)
 else
     
     % throw error
-    error("ERROR - EvalSplit: only up to 4 distinct split are currently accepted.");
+    error("ERROR - EvalSplit: only up to 17 distinct split values are currently accepted.");
     
 end
 

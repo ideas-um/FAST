@@ -272,10 +272,10 @@ Aircraft.Specs.Battery.CapCell = 3;
 Aircraft.Specs.Battery.IntResist = 0.0199;
 
 % exponential voltage [V]
-Aircraft.Specs.Battery.expVol = 0.0986;
+Aircraft.Specs.Battery.ExpVol = 0.0986;
 
 % exponential capacity [(Ah)^-1]
-Aircraft.Specs.Battery.expCap = 30;
+Aircraft.Specs.Battery.ExpCap = 30;
 
 % acceptable SOC threshold
 Aircraft.Specs.Battery.MinSOC = 20;
@@ -290,9 +290,9 @@ Aircraft.Specs.Battery.MaxAllowCRate = 5;
 Aircraft.Specs.Battery.Charging = 500*1000;
 
 %%%% battery degradation effect analysis %%%
-Aircraft.Settings.Degradation = 0; % 1 = analysis with degradation effect; 0 = without degradation effect
+Aircraft.Specs.Battery.Degradation = 0; % 1 = analysis with degradation effect; 0 = without degradation effect
 
-if Aircraft.Settings.Degradation == 1
+if Aircraft.Specs.Battery.Degradation == 1
     
     % battery chemistry material (ONLY "NMC" or "LFP" FOR NOW)
     Aircraft.Specs.Battery.Chem = 1; % NMC: 1    LFP:2

@@ -93,9 +93,6 @@ DV     = zeros(npoint, 1);
 % time change
 dt = zeros(npoint,1);
 
-% friction
-F = zeros(npoint,1); 
-
 % acceleration
 dV_dt = zeros(npoint, 1);
 
@@ -217,9 +214,9 @@ Pav = 0;
 i = 0; 
 
 % converge on take off roll length
-while dTkoRoll > EPS06 && i < 10
+while dTkoRoll > EPS06 && i < MaxIter
 
-    Dist = linspace(0, TkoRoll, npoint);
+    Dist = linspace(0, TkoRoll, npoint)';
 
     for ipt = 1:npoint
     
@@ -257,16 +254,22 @@ while dTkoRoll > EPS06 && i < 10
         end
         
         if ipt ~= npoint
-            % solve for dtime using 0 = 1/2 dv_dt^2 dt + v dt - ds;
-            a = .5 .* dV_dt(ipt).^2;
+            % Solve for dt using ds = v*dt + 0.5*a*dt^2 over the current
+            % distance interval. The takeoff roll iteration changes the
+            % distance grid until the last point reaches the target speed.
+            a = 0.5 .* dV_dt(ipt);
             b = TAS(ipt);
             c = -(Dist(ipt+1)-Dist(ipt));
+
+            if abs(a) < EPS06
+                dt(ipt) = -c ./ b;
+            else
+                dt(ipt) = (-b + sqrt(b.^2 - 4.*a.*c))./(2.*a);
+            end
         
-            dt(ipt) = (-b + sqrt(b.^2 - 4.*a.*c))./(2.*a);
-        
-        if dt < 0
-            error
-        end
+            if dt(ipt) < 0
+                error("ERROR - EvalDetailedTakeoff: negative time step while iterating takeoff distance.");
+            end
         
             % update next velcoity
             TAS(ipt+1) = dV_dt(ipt) * dt(ipt) + TAS(ipt);
@@ -325,7 +328,7 @@ Preq(1) = Pav(1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Time = Time + timeStart;
-%Dist = Dist + distStart;
+Dist = Dist + distStart;
         
 % store variables in the mission history
 Aircraft.Mission.History.SI.Power.Req(       SegBeg:SegEnd) = Preq;

@@ -4,5 +4,5 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% PlotMission             - PlotPkg.PlotMission is a function.
-% PlotPerfParam           - PlotPkg.PlotPerfParam is a function.
+% PlotMission   - PlotPkg.PlotMission is a function.
+% PlotPerfParam - PlotPkg.PlotPerfParam is a function.

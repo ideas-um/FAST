@@ -1,5 +1,5 @@
 function [] = HEA_DesignStudies(RunCases)
-% function to perform hybridization studies on A30neo
+% function to perform hybridization studies on the electrified ERJ175LR
 
 %% check inputs and setup
 
@@ -10,55 +10,12 @@ end
 
 % skip all initial sizing if just loading aircraft
 if RunCases == 1
-%% Size conventional aircraft
+    %% Set up electrified ERJ175
 
-Aircraft = AircraftSpecsPkg.A320neo;
-Aircraft.Specs.Propulsion.PropArch.Type = "PHE";
-Aircraft.Specs.Propulsion.PropArch.TrnType = [];
-Aircraft.Settings.PowerStrat = -1;
-
-% gravimetric specific energy of battery (kWh/kg), not used here
-Aircraft.Specs.Power.SpecEnergy.Batt = .25;
-Aircraft.Settings.PowerOpt = 0;
-
-% battery cells in series and parallel 
-Aircraft.Specs.Power.Battery.ParCells = 100;
-Aircraft.Specs.Power.Battery.SerCells = 62;
-
-% initial battery SOC
-Aircraft.Specs.Power.Battery.BegSOC = 100;
-
-AircraftOG = Main(Aircraft, @MissionProfilesPkg.A320);
-
-%% off-design run of conventional on shorter mission
-
-Aircraft2 = AircraftOG;
-Aircraft2.Specs.Weight.Payload = Aircraft2.Specs.Weight.Payload + 500; %500 kg of reserve fuel so dont have to fly reserve mission
-Aircraft2.Specs.Performance.Range = UnitConversionPkg.ConvLength(800, "naut mi", "m");
-Aircraft2.Settings.Analysis.Type = -1;
-
-Aircraft2.Specs.Power.LamUps = rmfield(Aircraft2.Specs.Power.LamUps, 'Miss');
-Aircraft2.Specs.Power.LamDwn = rmfield(Aircraft2.Specs.Power.LamDwn, 'Miss');
-Aircraft2 = Main(Aircraft2, @MissionProfilesPkg.NarrowBodyMission);
-
-%% Set up hybridization and add EMs
-
-Aircraft = Aircraft2;
-Aircraft.Settings.Analysis.Type = -1;
-
-% add in EMs and weight
-Aircraft.Specs.Weight.EM = 400;
-Aircraft.Specs.Weight.OEW = Aircraft.Specs.Weight.OEW + Aircraft.Specs.Weight.EM;
-Aircraft.Specs.Power.P_W.EM = 10*1000;
-
-Aircraft.Specs.Propulsion.SLSPower(:,[3,4]) = [200,200]*10*1000;
-Aircraft.Specs.Propulsion.SLSPower(:,[5,6]) = Aircraft.Specs.Propulsion.SLSPower(:,[5,6]) + Aircraft.Specs.Propulsion.SLSPower(:,[3,4]).*.99;% add EM to SLS power
-Aircraft.Specs.Propulsion.SLSThrust(:,[3,4]) = Aircraft.Specs.Propulsion.SLSPower(:,[3,4])/Aircraft.Specs.Performance.Vels.Tko;
-Aircraft.Specs.Propulsion.SLSThrust(:,[5,6]) = Aircraft.Specs.Propulsion.SLSThrust(:,[5,6]) + Aircraft.Specs.Propulsion.SLSThrust(:,[3,4]);
-Aircraft.Specs.Power.LamUps = [];
-Aircraft.Specs.Power.LamDwn = [];
-
-AircraftStruct = Aircraft;
+    AircraftStruct = AircraftSpecsPkg.ERJ175LR_Elec;
+    AircraftStruct.Settings.PowerStrat = -1;
+    AircraftStruct.Settings.PowerOpt = 0;
+    AircraftStruct.Settings.PrintOut = 0;
 end
 
 %% Sizing Iteration
@@ -80,7 +37,7 @@ pass = zeros(n*n1,1);
 i=0;
 
 % create results folder if not one already
-folderName = 'A320neo_hybrid2';
+folderName = 'HEA_2150nmi_250Whkg';
 
 if ~exist(folderName, 'dir')
     mkdir(folderName);
@@ -126,7 +83,7 @@ for itko = 1:n1
             Aircraft.Settings.PrintOut = 0;
             % -1 = prioritize downstream, go from fan back to energy sources
             
-            Aircraft = Main(Aircraft, @MissionProfilesPkg.NarrowBodyMission);
+            Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ);
                 
             % save the aircraft
             save(fullfile(folderName, MyMat), "Aircraft");
@@ -149,7 +106,7 @@ for itko = 1:n1
         fburn(iclb,itko) = Aircraft.Specs.Weight.Fuel;
         batt(iclb,itko) = Aircraft.Specs.Weight.Batt;
         SOC(iclb, itko) = Aircraft.Mission.History.SI.Power.SOC(end,2);
-        Energy(iclb, itko) = Aircraft.Mission.History.SI.Energy.E_ES(end,2);
+        Energy(iclb, itko) = max(Aircraft.Mission.History.SI.Energy.E_ES(:,2));
         %crate(iclb, itko) = max(Aircraft.Mission.History.SI.Power.C_rate(:,2));
     end
 end

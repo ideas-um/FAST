@@ -3,7 +3,7 @@ function [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, Engin
 % [OffOutputs] = SimpleOffDesign(Aircraft, OffParams, ElectricLoad, EngineIdx, MissionIdx))
 % written by Paul Mokotoff, prmoko@umich.edu and Yi-Chih Wang,
 % ycwangd@umich.edu
-% last updated: 11 dec 2024
+% last updated: 04 sep 2025
 %
 % Simple off-design engine model using a fuel flow equation from the BADA
 % Database.
@@ -115,7 +115,7 @@ Cffch =  Aircraft.Specs.Propulsion.Engine.Cffch;
 %     c = 2 - SLSThrust_HE / SLSThrust_conv;
 %
 % now, we just use a coefficient from the engine specification file
-c = Aircraft.Specs.Propulsion.Engine.HEcoeff;
+c = Aircraft.Specs.Propulsion.Engine.HEcoeff(EngineIdx - nsrc);
     
 % compute the fraction of thrust required to SLS thrust
 ThrustFrac = ThrustReq / (c * SLSThrust_conv);

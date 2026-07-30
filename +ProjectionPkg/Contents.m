@@ -4,4 +4,4 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% KPPProjection           - ProjectionPkg.KPPProjection is a function.
+% KPPProjection - ProjectionPkg.KPPProjection is a function.

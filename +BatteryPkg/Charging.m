@@ -102,13 +102,28 @@ ResistanceTemp = Aircraft.Specs.Battery.IntResist;
 ncell = Series * Parallel;
 
 % exponential voltage [V]
-A = Aircraft.Specs.Battery.expVol;
+if isfield(Aircraft.Specs.Battery, "expVol") && ~isnan(Aircraft.Specs.Battery.expVol)
+    A = Aircraft.Specs.Battery.expVol;
+else
+    A = Aircraft.Specs.Battery.ExpVol;
+end
 
 % exponential capacity [(Ah)^-1]
-B = Aircraft.Specs.Battery.expCap;
+if isfield(Aircraft.Specs.Battery, "expCap") && ~isnan(Aircraft.Specs.Battery.expCap)
+    B = Aircraft.Specs.Battery.expCap;
+else
+    B = Aircraft.Specs.Battery.ExpCap;
+end
+
+Degradation = 0;
+if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "Degradation")
+    Degradation = Aircraft.Settings.Degradation;
+elseif isfield(Aircraft.Specs.Battery, "Degradation")
+    Degradation = Aircraft.Specs.Battery.Degradation;
+end
 
 % Determine maximum capacity [Ah] based on analysis type and degradation effect
-if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Settings.Degradation == 1
+if Aircraft.Settings.Analysis.Type < 0 && Degradation == 1
 
     % Off-design analysis with battery degradation effect
     Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;

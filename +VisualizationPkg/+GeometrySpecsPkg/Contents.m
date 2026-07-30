@@ -5,15 +5,15 @@
 %
 % Functions
 % -------------------------------------------------------------------------
-% DeltaCanard                         - VisualizationPkg.GeometrySpecsPkg.DeltaCanard is a function.
-% LargeTurbofan                       - VisualizationPkg.GeometrySpecsPkg.LargeTurbofan is a function.
-% LargeTurboprop                      - VisualizationPkg.GeometrySpecsPkg.LargeTurboprop is a function.
-% LM100JNominalGeometry               - VisualizationPkg.GeometrySpecsPkg.LM100JNominalGeometry is a function.
-% PittsSpecial                        - VisualizationPkg.GeometrySpecsPkg.PittsSpecial is a function.
-% SimpleGeometry                      - VisualizationPkg.GeometrySpecsPkg.SimpleGeometry is a function.
-% SmallDoubleAisleTurbofan            - VisualizationPkg.GeometrySpecsPkg.SmallDoubleAisleTurbofan is a function.
-% SmallTurboprop                      - VisualizationPkg.GeometrySpecsPkg.SmallTurboprop is a function.
-% Transport                           - VisualizationPkg.GeometrySpecsPkg.Transport is a function.
+% DeltaCanard              - VisualizationPkg.GeometrySpecsPkg.DeltaCanard is a function.
+% LargeTurbofan            - VisualizationPkg.GeometrySpecsPkg.LargeTurbofan is a function.
+% LargeTurboprop           - VisualizationPkg.GeometrySpecsPkg.LargeTurboprop is a function.
+% LM100JNominalGeometry    - VisualizationPkg.GeometrySpecsPkg.LM100JNominalGeometry is a function.
+% PittsSpecial             - VisualizationPkg.GeometrySpecsPkg.PittsSpecial is a function.
+% SimpleGeometry           - VisualizationPkg.GeometrySpecsPkg.SimpleGeometry is a function.
+% SmallDoubleAisleTurbofan - VisualizationPkg.GeometrySpecsPkg.SmallDoubleAisleTurbofan is a function.
+% SmallTurboprop           - VisualizationPkg.GeometrySpecsPkg.SmallTurboprop is a function.
+% Transport                - VisualizationPkg.GeometrySpecsPkg.Transport is a function.
 %
 % MAT-Files
 % -------------------------------------------------------------------------
@@ -26,7 +26,7 @@
 % DAT Files
 % -------------------------------------------------------------------------
 % ATR72_Engines.dat                   - VisualizationPkg.GeometrySpecsPkg.ATR72_Engines is a DAT file.
-% ATR72_Fuselage.dat                  - VisualizationPkg.GeometrySpecsPkg.ATR72_Fuselage is a DAT file.
+% ATR72Fuselage.dat                   - VisualizationPkg.GeometrySpecsPkg.ATR72Fuselage is a DAT file.
 % Beech99_Engines.dat                 - VisualizationPkg.GeometrySpecsPkg.Beech99_Engines is a DAT file.
 % Beech99Fuselage.dat                 - VisualizationPkg.GeometrySpecsPkg.Beech99Fuselage is a DAT file.
 % DeltaCanard_Engines.dat             - VisualizationPkg.GeometrySpecsPkg.DeltaCanard_Engines is a DAT file.

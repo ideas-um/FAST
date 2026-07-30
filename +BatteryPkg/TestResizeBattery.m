@@ -3,7 +3,8 @@ function [Success] = TestResizeBattery()
 % [Success] = TestResizeBattery()
 % written by Vaibhav Rau, vaibhav.rau@warriorlife.net
 % modified by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 sep 2024
+% modified by Yipeng Liu, yipenglx@umich.edu
+% last updated: 23 sep 2025
 %
 % Generate simple test cases to confirm that the resize battery script
 % is working properly.
@@ -46,10 +47,12 @@ itest = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % define the values to be resized
-TestIn.Specs.Propulsion.PropArch.ESType = 0;
-TestIn.Specs.Power.SpecEnergy.Batt = 0.4 * 3.6e+6;
-TestIn.Mission.History.SI.Energy.E_ES = 100;
-TestIn.Settings.DetailedBatt = 0;
+TestIn.Specs.Propulsion.PropArch.SrcType = 0;
+TestIn.Specs.Propulsion.PropArch.Arch    = 1;
+TestIn.Specs.Power.SpecEnergy.Batt       = 0.4 * 3.6e+6;
+TestIn.Mission.History.SI.Energy.E_ES    = [0; 100]; 
+TestIn.Mission.History.SI.Energy.Eleft_ES= [0; 0];
+TestIn.Settings.DetailedBatt             = 0;
 
 % ----------------------------------------------------------
 
@@ -84,15 +87,24 @@ itest = itest + 1;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% define the values to be resized
-TestIn.Specs.Propulsion.PropArch.ESType = 0;
-TestIn.Specs.Power.SpecEnergy.Batt = 0.3 * 3.6e+6 ;
-TestIn.Mission.History.SI.Energy.E_ES = [110, 123];
-TestIn.Settings.DetailedBatt = 1;
-TestIn.Specs.Power.Battery.SerCells = 3;
-TestIn.Specs.Power.Battery.ParCells = 2;
-TestIn.Mission.History.SI.Power.SOC = 30;
-TestIn.Mission.History.SI.Power.P_ES = 200;
+TestIn.Specs.Propulsion.PropArch.SrcType = 0;
+TestIn.Specs.Propulsion.PropArch.Arch    = 1;
+TestIn.Specs.Power.SpecEnergy.Batt       = 0.3 * 3.6e+6;   % [J/kg]
+TestIn.Mission.History.SI.Energy.E_ES    = [0; 123];       % [J]
+TestIn.Mission.History.SI.Energy.Eleft_ES= [0; 0];
+TestIn.Settings.DetailedBatt             = 1;
+
+TestIn.Specs.Power.Battery.SerCells      = 3;
+TestIn.Specs.Power.Battery.ParCells      = 2;
+
+TestIn.Specs.Battery.NomVolCell          = 3.9;            % [V]
+TestIn.Specs.Battery.CapCell             = 2.4;            % [Ah]
+TestIn.Specs.Battery.MinSOC              = 60;             % [%]
+TestIn.Specs.Battery.MaxAllowCRate       = 2.0;            % [C]
+
+TestIn.Mission.History.SI.Power.SOC      = [60; 60];       % [%]
+TestIn.Mission.History.SI.Power.Pout     = [0; 0];         % [W]
+TestIn.Mission.History.SI.Power.Current  = [0; 0];         % [A]
 
 % ----------------------------------------------------------
 

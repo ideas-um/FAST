@@ -2,7 +2,7 @@ function [Aircraft] = EngineSpecProcessing(Aircraft)
 %
 % [Aircraft] = EngineSpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated 24 apr 2024
+% last updated 12 jun 2026
 %
 % This function only creates and engine in the case that a
 % user did not provide an engine specification file. If so, this
@@ -25,6 +25,12 @@ function [Aircraft] = EngineSpecProcessing(Aircraft)
 % Read in data for use in the regressions. This data will have been
 % assigned in SpecProcessing()
 Data = Aircraft.HistData.Eng;
+
+% load the engine data
+EngineData = load(fullfile("+EngineModelPkg", "+SurrogateOffDesignPkg", "ICAO_DATA.mat"));
+
+% define the data to be used for engine NLGPRs
+OffDesignData = EngineData.ICAO_Known_Cffch;
 
 if ~isstruct(Aircraft.Specs.Propulsion.Engine)
     switch Aircraft.Specs.TLAR.Class
@@ -69,6 +75,25 @@ if ~isstruct(Aircraft.Specs.Propulsion.Engine)
             [Engine.OPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["OPR_SLS"]},Engine.DesignThrust);
             [Engine.BPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["BPR"]},Engine.DesignThrust);
             [Engine.FPR,~] = RegressionPkg.NLGPR(Data,{["Thrust_SLS"],["FPR"]},Engine.DesignThrust);
+            
+            % target data for regressions
+            Target = [Engine.DesignThrust, Engine.OPR, Engine.BPR];
+            
+            % perform regressions for BADA coefficients
+            IOSpace = {"Thrust", "OPR", "BPR", "Cff3"};
+            Engine.Cff3 = RegressionPkg.NLGPR(OffDesignData, IOSpace, Target);
+            
+            IOSpace = {"Thrust", "OPR", "BPR", "Cff2"};
+            Engine.Cff2 = RegressionPkg.NLGPR(OffDesignData, IOSpace, Target);
+            
+            IOSpace = {"Thrust", "OPR", "BPR", "Cff1"};
+            Engine.Cff1 = RegressionPkg.NLGPR(OffDesignData, IOSpace, Target);
+            
+            IOSpace = {"Thrust", "OPR", "BPR", "Cffch"};
+            Engine.Cffch = RegressionPkg.NLGPR(OffDesignData, IOSpace, Target);
+            
+            Engine.HEcoeff = 1;
+            
         case "Turboprop"
 
             %% Default Values

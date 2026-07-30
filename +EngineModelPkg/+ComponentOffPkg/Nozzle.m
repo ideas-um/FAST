@@ -19,7 +19,7 @@ while abs(prime) > 1e-5 && iter < 10
 
     M2 = M2 - fx/prime;
 
-    iter = iter+1;
+    iter = iter + 1;
 
 end
 

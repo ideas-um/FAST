@@ -12,7 +12,59 @@ Principal Authors:
 - Paul Mokotoff, <prmoko@umich.edu>
 - Max Arnson, <marnson@umich.edu>
 
-Last Updated: 26 Nov 2025
+Last Updated: 04 Jun 2026
+
+## Verison 0.6.0 - 04 Jun 2026
+
+### Added
+
+1. Adapted the empirical aerodynamic analysis from NASA's Aviary code into FAST.
+
+1. Added empirical model for predicting electric motor weights as a function of their rated power.
+
+1. Created a function to select the appropriate "HEcoeff" for an engine connected to electrical components (either as a power boost or power siphon).
+
+### Changed
+
+1. Improved the "EvalSplit" function in the +PropulsionPkg to accommodate an unlimited number of power splits.
+
+1. Updated calibration factors on aircraft that leverage the empirical aerodynamic analysis.
+
+## Version 0.5.0 - 03 Apr 2026
+
+### Added
+
+1. Created the +ConstraintDiagramPkg, which allows users to generate constraint diagrams for turboprop or turbofan configurations under FAA Part 25 regulations. Users can also generate custom constraints to add to their constraint diagram.
+
+1. Created the +SafetyPkg, which enables users to execute a Fault Tree Analysis to identify the failure probability and failure modes for a given system architecture.
+
+Last Updated: 05 Mar 2026
+
+## Version 0.4.1 - 05 Mar 2026
+
+### Added
+
+1. Added a ``DiversionMission`` to simulate climbing to an altitude of 10,000 ft and then diverting to another airport.
+
+### Changed
+
+1. Updated ``EvalSplit`` to accommodate more power splits.
+
+## Version 0.4.0 - 20 Jan 2026
+
+### Added
+
+1. CostPkg with a battery replacement cost estimation model.
+
+2. Battery state of health model to capture long term effects of using a battery during flight operations.
+
+### Changed
+
+1. Reorganized battery (dis)charging model and broke into seperate files for readibility.
+
+### Fixed
+
+1. Fixed C-rate assumption error and battery resizing error. 
 
 ## Version 0.3.0 - 26 Nov 2025
 

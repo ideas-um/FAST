@@ -18,21 +18,18 @@ function [] = README()
 %
 % Additional Contributors:
 %     Huseyin Acar
-%     Yi-Chih (Arenas) Wang
-%     Miranda Stockhausen
-%     Emma Cassidy
 %     Nawa Khailany
 %     Janki Patel
 %     Michael Tsai
-%     Vaibhav Rau
+%     Yipeng Liu
 % 
-% README last updated: 08 Sep 2025
+% README last updated: 21 Oct 2025
 % 
 % -------------------------------------------------------------------------
 %
 % (I) Overview
 %
-%       The Battery Package is used to model battery (dis)charging in
+%       The Battery Package is used to model battery (Dis)Charging(.m) in
 %       FAST's mission analysis and is also responsible for re-sizing the
 %       battery in an aircraft. This package is only run when a number of
 %       cells in series and in parallel are provided via 
@@ -40,6 +37,10 @@ function [] = README()
 %       "Aircraft.Specs.Power.Battery.ParCells". An initial battery
 %       state-of-charge (SOC) is also required by including a double
 %       between 0 and 100 in "Aircraft.Specs.Power.Battery.BegSOC".
+%       The battery lifespan (SOH) prediction is valid by using the
+%       "CyclAging.m" which is an empirical model for calendar aging
+%       only. The "GroundCharge.m" function is used to analysis varied
+%       aircraft charging strategy by input time and desire charge power.
 % 
 % -------------------------------------------------------------------------
 % (II) Warning

@@ -47,14 +47,12 @@ end
 ebatt = Aircraft.Specs.Power.SpecEnergy.Batt;
 
 % energy consumed during flight
-Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt); 
+Ebatt = Aircraft.Mission.History.SI.Energy.E_ES(:, Batt);
+EnergyDemand = max(Ebatt, [], 1);
+EnergyDemand(EnergyDemand < 0) = 0;
 
-% energy remaining during flight
-Ebatt_re = Aircraft.Mission.History.SI.Energy.Eleft_ES(:, Batt); 
-
-energy = sum(Ebatt);
-if energy==0
-        % return zero battery weight
+if all(EnergyDemand == 0)
+    % return zero battery weight
     Aircraft.Specs.Weight.Batt = 0;
     
     % exit the function
@@ -66,8 +64,8 @@ end
 %% RESIZE THE BATTERY %%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% first, size the battery based on energy demand
-Aircraft.Specs.Weight.Batt = Ebatt(end, :) ./ ebatt;
+% first, size the battery based on peak energy demand
+Aircraft.Specs.Weight.Batt = EnergyDemand ./ ebatt;
 
 % check if number of battery cells must be updated
 if (Aircraft.Settings.DetailedBatt == 1)
@@ -178,7 +176,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     C_rate(isinf(C_rate)) = 0;
     
     % check if the C-rate is exceeded
-    ExceedCRate = find(C_rate - MaxAllowCRate > .1);
+    ExceedCRate = abs(C_rate) > MaxAllowCRate;
 
     % resize the battery if the C-rate is exceeded
     if (any(ExceedCRate))
@@ -245,7 +243,7 @@ if (Aircraft.Settings.DetailedBatt == 1)
     Aircraft.Specs.Power.Battery.ParCells = Npar;
 
     % remember the battery c-rates updated
-    % Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar);
+    Aircraft.Mission.History.SI.Power.C_rate = Cbatt ./ (QMax * Npar);
 
 
 end

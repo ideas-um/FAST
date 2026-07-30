@@ -43,13 +43,14 @@ nsnk = ncomp - nsrc - ntrn;
 SLSPower  = Aircraft.Specs.Propulsion.SLSPower;
 
 % get the downstream sizing splits
-LamSLS = Aircraft.Specs.Power.LamDwn.SLS;
-
-% convert to a cell array
-LamCell = num2cell(LamSLS);
+if isfield(Aircraft.Specs.Power.LamDwn, "Miss")
+    LamSLS = Aircraft.Specs.Power.LamDwn.Miss(10, :);
+else
+    LamSLS = Aircraft.Specs.Power.LamDwn.SLS;
+end
 
 % get the downstream power splits
-LamDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn(LamCell{:});
+LamDwn = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, LamSLS);
 
 % assume perfect efficiencies for computing thrust ratios
 EtaDwn = ones(ncomp, ncomp);

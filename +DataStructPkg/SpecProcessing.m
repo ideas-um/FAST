@@ -105,6 +105,7 @@ DefaultAero.WingtipDevice = NaN;
 DefaultAero.MAC = NaN;
 DefaultAero.S = NaN;
 DefaultAero.AR = NaN;
+DefaultAero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
 DefaultAero.L_D.CrsMAC = NaN;
 
 DefaultWeight.Cargo = NaN;

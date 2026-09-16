@@ -1,107 +1,102 @@
-classdef TestEngineMotorRegressions < matlab.unittest.TestCase
-    % Exercise engine and motor accounting on small, controlled architectures.
+function [Success] = TestEngineMotorRegressions()
+%
+% [Success] = TestEngineMotorRegressions()
+% written by Triet Ho
+%
+% Check engine and motor accounting on small propulsion architectures.
+%
+% INPUTS:
+%     none
+%
+% OUTPUTS:
+%     Success - 1 when all 14 checks pass, otherwise 0.
+%               size/type/units: 1-by-1 / int / []
+%
 
-    methods (Test)
-        function oneEngineOnePropeller(testCase)
-            aircraft = makeAircraft([1]);
-            aircraft = PropulsionPkg.ProcessPropArch(aircraft);
-            testCase.verifyEqual(propellerConnections(aircraft, 1), 3);
-        end
+% Record each case separately so failures identify the affected behavior.
+Pass = false(14, 1);
 
-        function oneEngineTwoPropellers(testCase)
-            aircraft = makeAircraft([1, 1]);
-            aircraft = PropulsionPkg.ProcessPropArch(aircraft);
-            testCase.verifyEqual(propellerConnections(aircraft, 1), [3, 4]);
-        end
+%% ENGINE TO PROPELLER CONNECTIONS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        function oneEngineThreePropellers(testCase)
-            aircraft = makeAircraft([1, 1, 1]);
-            aircraft = PropulsionPkg.ProcessPropArch(aircraft);
-            testCase.verifyEqual(propellerConnections(aircraft, 1), [3, 4, 5]);
-        end
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1]));
+Pass(1) = isequal(propellerConnections(aircraft, 1), 3);
 
-        function twoEnginesSeparatePropellers(testCase)
-            aircraft = makeAircraft([1, 2]);
-            aircraft = PropulsionPkg.ProcessPropArch(aircraft);
-            testCase.verifyEqual(propellerConnections(aircraft, 1), 4);
-            testCase.verifyEqual(propellerConnections(aircraft, 2), 5);
-        end
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1, 1]));
+Pass(2) = isequal(propellerConnections(aircraft, 1), [3, 4]);
 
-        function eachEngineReceivesItsOwnMotorSupplement(testCase)
-            aircraft = makeTwoEngineSizingAircraft(0.2, 0.4);
-            aircraft = PropulsionPkg.PropulsionSizing(aircraft);
-            expected = aircraft.Specs.Propulsion.PowerSupp(1:2);
-            actual = arrayfun(@(engine) engine.FanSysObject.ElecWork, aircraft.Specs.Propulsion.SizedEngine);
-            actual = actual(:)';
-            testCase.verifyGreaterThan(abs(diff(expected)), 1e5);
-            testCase.verifyEqual(actual, expected, "RelTol", 1e-8);
-        end
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1, 1, 1]));
+Pass(3) = isequal(propellerConnections(aircraft, 1), [3, 4, 5]);
 
-        function engineOrderDoesNotChangeMotorSupplement(testCase)
-            aircraft = makeTwoEngineSizingAircraft(0.4, 0.2);
-            aircraft = PropulsionPkg.PropulsionSizing(aircraft);
-            expected = aircraft.Specs.Propulsion.PowerSupp(1:2);
-            actual = arrayfun(@(engine) engine.FanSysObject.ElecWork, aircraft.Specs.Propulsion.SizedEngine);
-            actual = actual(:)';
-            testCase.verifyGreaterThan(abs(diff(expected)), 1e5);
-            testCase.verifyEqual(actual, expected, "RelTol", 1e-8);
-        end
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1, 2]));
+Pass(4) = isequal(propellerConnections(aircraft, 1), 4) && ...
+          isequal(propellerConnections(aircraft, 2), 5);
 
-        function fanTargetUsesFanEfficiency(testCase)
-            actual = parallelSupplement([1, 0, 2], [0, 10, 0], 0.8);
-            testCase.verifyEqual(actual, 8, "AbsTol", 1e-10);
-        end
+%% PER ENGINE MOTOR SUPPLEMENTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        function generatorTargetDoesNotUseFanEfficiency(testCase)
-            actual = parallelSupplement([1, 0, 3], [0, 10, 0], 0.8);
-            testCase.verifyEqual(actual, 10, "AbsTol", 1e-10);
-        end
+Pass(5) = CheckEngineSupplements(0.2, 0.4);
+Pass(6) = CheckEngineSupplements(0.4, 0.2);
 
-        function cableTargetDoesNotUseFanEfficiency(testCase)
-            actual = parallelSupplement([1, 0, 4], [0, 10, 0], 0.65);
-            testCase.verifyEqual(actual, 10, "AbsTol", 1e-10);
-        end
+%% TARGET EFFICIENCY AND MOTOR CREDIT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        function multipleMotorsOnNonFanTarget(testCase)
-            actual = parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8);
-            testCase.verifyEqual(actual, 18, "AbsTol", 1e-10);
-        end
+Pass(7) = CheckValue(parallelSupplement([1, 0, 2], [0, 10, 0], 0.8), 8);
+Pass(8) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 0.8), 10);
+Pass(9) = CheckValue(parallelSupplement([1, 0, 4], [0, 10, 0], 0.65), 10);
+Pass(10) = CheckValue(parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8), 18);
+Pass(11) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 1), 10);
 
-        function fanEfficiencyOneIsNeutral(testCase)
-            actual = parallelSupplement([1, 0, 3], [0, 10, 0], 1);
-            testCase.verifyEqual(actual, 10, "AbsTol", 1e-10);
-        end
+architecture = zeros(4);
+architecture(1, 3) = 1;
+architecture(2, 3:4) = 1;
+splits = ones(4);
+splits(3, 2) = 0.25;
+splits(4, 2) = 0.75;
+actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0, 0], architecture, splits, ones(4), [1, 0, 2, 2], 0.8);
+Pass(12) = CheckValue(actual(1), 4);
 
-        function motorSplitLimitsEngineSupplement(testCase)
-            architecture = zeros(4);
-            architecture(1, 3) = 1;
-            architecture(2, 3:4) = 1;
-            splits = ones(4);
-            splits(3, 2) = 0.25;
-            splits(4, 2) = 0.75;
-            actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0, 0], architecture, splits, ones(4), [1, 0, 2, 2], 0.8);
-            testCase.verifyEqual(actual(1), 4, "AbsTol", 1e-10);
-        end
+architecture = zeros(3);
+architecture(1:2, 3) = 1;
+efficiencies = ones(3);
+efficiencies(3, 2) = 0.5;
+actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0], architecture, ones(3), efficiencies, [1, 0, 2], 0.8);
+Pass(13) = CheckValue(actual(1), 8);
 
-        function motorPathLossLimitsEngineSupplement(testCase)
-            architecture = zeros(3);
-            architecture(1:2, 3) = 1;
-            efficiencies = ones(3);
-            efficiencies(3, 2) = 0.5;
-            actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0], architecture, ones(3), efficiencies, [1, 0, 2], 0.8);
-            testCase.verifyEqual(actual(1), 8, "AbsTol", 1e-10);
-        end
+architecture = zeros(4);
+architecture(1:2, 3:4) = 1;
+splits = ones(4);
+splits(3, 2) = 0.25;
+splits(4, 2) = 0.75;
+actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0, 0], architecture, splits, ones(4), [1, 0, 2, 2], 0.8);
+Pass(14) = CheckValue(actual(1), 16);
 
-        function sharedTargetsDoNotCreditMotorTwice(testCase)
-            architecture = zeros(4);
-            architecture(1:2, 3:4) = 1;
-            splits = ones(4);
-            splits(3, 2) = 0.25;
-            splits(4, 2) = 0.75;
-            actual = PropulsionPkg.PowerSupplementCheck([0, 20, 0, 0], architecture, splits, ones(4), [1, 0, 2, 2], 0.8);
-            testCase.verifyEqual(actual(1), 16, "AbsTol", 1e-10);
-        end
-    end
+Success = all(Pass);
+if (Success)
+    fprintf(1, "EngineMotorRegressions tests passed!\n");
+else
+    fprintf(1, "EngineMotorRegressions tests failed:\n");
+    fprintf(1, "    Test %d\n", find(~Pass));
+end
+
+end
+
+function [Pass] = CheckEngineSupplements(firstMotorShare, secondMotorShare)
+% Preserve the distinct load check while comparing each sized engine.
+aircraft = makeTwoEngineSizingAircraft(firstMotorShare, secondMotorShare);
+aircraft = PropulsionPkg.PropulsionSizing(aircraft);
+expected = aircraft.Specs.Propulsion.PowerSupp(1:2);
+actual = arrayfun(@(engine) engine.FanSysObject.ElecWork, aircraft.Specs.Propulsion.SizedEngine);
+actual = actual(:)';
+Pass = abs(diff(expected)) > 1e5 && ...
+       isequal(size(actual), size(expected)) && ...
+       all(isfinite(actual)) && all(isfinite(expected)) && ...
+       all(abs(actual - expected) <= 1e-8 * max(1, abs(expected)));
+end
+
+function [Pass] = CheckValue(actual, expected)
+% Use the same absolute tolerance as the original scalar assertions.
+Pass = isscalar(actual) && isfinite(actual) && abs(actual - expected) <= 1e-10;
 end
 
 function aircraft = makeTwoEngineSizingAircraft(firstMotorShare, secondMotorShare)

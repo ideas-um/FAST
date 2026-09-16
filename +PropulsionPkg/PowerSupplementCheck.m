@@ -111,8 +111,15 @@ if (any(AnyParallel))
         % find the electric motors that are supplementing
         Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
                 
-        % add the power supplement, accounting for the fan efficiency
-        Psupp(:, Driving) = Psupp(:, Driving) + sum(Preq(:, Helping), 2) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        % Credit only the motor power routed through this connection.
+        % The fan efficiency applies at fan targets, after path losses.
+        TargetEfficiency = 1;
+        if (TrnType(icomp) == 2)
+            TargetEfficiency = EtaFan;
+        end
+        MotorPower = Preq(:, Helping) * ...
+                     (Lambda(icomp, Helping) .* Eta(icomp, Helping))';
+        Psupp(:, Driving) = Psupp(:, Driving) + MotorPower .* TargetEfficiency;
         
     end
 end

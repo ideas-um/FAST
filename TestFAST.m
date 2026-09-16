@@ -31,6 +31,7 @@ BatteryPkg.TestResizeBattery();
 PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
 PropulsionPkg.TestEngineMotorRegressions();
+PropulsionPkg.TestEdgePowerConsistency();
 
 
 %% TEST UNIT CONVERSION PACKAGE %%

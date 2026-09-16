@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 mar 2026
+% last updated: 16 sep 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -47,8 +47,14 @@ Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 % get the downstream operational matrix
 OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
 
+% get the upstream operational matrix for edge-flow consistency
+OperUps = Aircraft.Specs.Propulsion.PropArch.OperUps;
+
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
+
+% get the upstream efficiency matrix
+EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
 % get which propellers are connected to the gas turbine engines
 WhichProp = Aircraft.Specs.Propulsion.PropArch.WhichProp;
@@ -118,9 +124,22 @@ Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
 
 % get the necessary splits
 LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
+LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
 
 % check for a windmilling engine
 Windmill = Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, :);
+
+% The two operational matrices describe the same mission point. Reject
+% edge flows that disagree even when both matrix row sums are valid.
+for ipnt = 1:length(PreqSnk)
+    SplitUps = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
+    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    if (any(Windmill(ipnt, :)))
+        SplitDwn = RedistForWindmill(SplitDwn, Windmill(ipnt, :), nsrc, ncomp);
+    end
+    PropulsionPkg.CheckEdgePowerConsistency( ...
+        Arch, SplitUps, SplitDwn, EtaUps, EtaDwn, PreqSnk(ipnt));
+end
 
 % aircraft weight
 Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);

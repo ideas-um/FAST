@@ -486,13 +486,13 @@ if (any(Fuel))
         icol = HasEng(ieng) + nsrc;
         
         % check if it has a propeller
-        iprop = WhichProp(HasEng(ieng));
+        iprop = WhichProp{HasEng(ieng)};
 
         % check if the engine is connected to a propeller
-        if (iprop ~= 0)
+        if (~isempty(iprop))
             
             % get the thrust requirement from the propeller
-            TEng = Tout(ibeg:iend, iprop);
+            TEng = sum(Tout(ibeg:iend, iprop), 2);
             
         else
             

@@ -55,7 +55,7 @@ LamDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn(LamCell{:});
 EtaDwn = ones(ncomp, ncomp);
 
 % allocate memory for indexed transmitter arrays
-WhichProp = zeros(1, ntrn);
+WhichProp = repmat({[]}, 1, ntrn);
 HEcoeff   = zeros(1, ntrn);
 
 % create logical array transmitters
@@ -134,7 +134,9 @@ for iprop = PropIdx
     if (~isempty(GTEIdx))
 
        % remember the index
-       WhichProp(GTEIdx - nsrc) = iprop;
+       for igte = GTEIdx(:)'
+           WhichProp{igte - nsrc}(end + 1) = iprop;
+       end
        
     end
     

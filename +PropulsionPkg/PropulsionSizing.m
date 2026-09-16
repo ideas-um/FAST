@@ -207,7 +207,7 @@ if (any(TrnType > 0 & TrnType ~= 2))
                 InletArea = pi * Engine.FanDiam ^ 2 / 4;
                 
                 % find the fan connected to the engine
-                ifan = find((Arch(jeng+nsrc, idx) == 1) & Prop);
+                ifan = find((Arch(ieng(jeng)+nsrc, idx) == 1) & Prop);
                 
                 % remember the inlet area
                 Aircraft.Specs.Propulsion.InletArea(ifan) = InletArea;

@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 21 checks pass, otherwise 0.
+%     Success - 1 when all 25 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(21, 1);
+Pass = false(25, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,6 +148,33 @@ Pass(20) = CheckSeparateParallelTargets();
 % A direct engine and an engine connected through a cable can both feed
 % one propeller. Finding the direct engine must not hide the indirect one.
 Pass(21) = CheckMixedDepthEngineConnections();
+
+%% THREE-ENGINE ARCHITECTURES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Three engines driving separate propellers retain separate connections.
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1, 2, 3]));
+Pass(22) = isequal(propellerConnections(aircraft, 1), 5) && ...
+           isequal(propellerConnections(aircraft, 2), 6) && ...
+           isequal(propellerConnections(aircraft, 3), 7);
+
+% Three engines sharing a fan receive proportional motor credit.
+architecture = zeros(5);
+architecture(1:4, 5) = 1;
+splits = zeros(5);
+splits(5, 1:4) = [0.1, 0.2, 0.3, 0.4];
+efficiencies = ones(5);
+efficiencies(5, 1:4) = 0.8;
+actual = PropulsionPkg.PowerSupplementCheck( ...
+    [12.5, 25, 37.5, 50, 100], architecture, splits, efficiencies, ...
+    [1, 1, 1, 0, 2], 0.99);
+Pass(23) = all(abs(actual(1:3) - [6.6, 13.2, 19.8]) < 1e-10);
+
+% Sizing must use each engine's graph index when motors and engines are interleaved.
+Pass(24) = CheckThreeInterleavedEngineInletAreas();
+
+% Direct and two indirect engine paths must all contribute to one fan.
+Pass(25) = CheckThreeMixedDepthEngineConnections();
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -554,5 +581,97 @@ actual = aircraft.Specs.Propulsion.Engine.HEcoeff(1:2);
 pass = all(abs(actual - [1.5, 1.5]) < 1e-10);
 if (~pass)
     fprintf(1, "Mixed-depth engine coefficients: %s\n", mat2str(actual));
+end
+end
+
+function pass = CheckThreeInterleavedEngineInletAreas()
+%
+% pass = CheckThreeInterleavedEngineInletAreas()
+% written by Triet Ho
+% last updated: 16 sep 2026
+%
+% Size three independently supplemented engines interleaved with motors.
+% Each engine must assign its inlet area to its own fan.
+%
+% INPUTS:
+%     none
+%
+% OUTPUTS:
+%     pass - true when all three fan areas and supplements are assigned.
+%            size/type/units: 1-by-1 / logical / []
+%
+
+aircraft = makeTwoEngineSizingAircraft(0.2, 0.4);
+architecture = zeros(12);
+architecture(1, [4, 6, 8]) = 1;
+architecture(2, [3, 5, 7]) = 1;
+architecture(3:4, 9) = 1;
+architecture(5:6, 10) = 1;
+architecture(7:8, 11) = 1;
+architecture(9:11, 12) = 1;
+splits = ones(12);
+splits(9, [3, 4]) = [0.2, 0.8];
+splits(10, [5, 6]) = [0.4, 0.6];
+splits(11, [7, 8]) = [0.3, 0.7];
+splits(12, 9:11) = 1 / 3;
+aircraft.Specs.Propulsion.PropArch.Arch = architecture;
+aircraft.Specs.Propulsion.PropArch.TrnType = [0, 1, 0, 1, 0, 1, 2, 2, 2];
+aircraft.Specs.Propulsion.PropArch.OperDwn = @() splits;
+aircraft.Specs.Propulsion.PropArch.EtaDwn = ones(12);
+aircraft.Specs.Propulsion.InletArea = NaN(1, 9);
+aircraft = PropulsionPkg.PropulsionSizing(aircraft);
+areas = aircraft.Specs.Propulsion.InletArea;
+supplements = aircraft.Specs.Propulsion.PowerSupp([2, 4, 6]);
+actual = arrayfun(@(engine) engine.FanSysObject.ElecWork, ...
+                  aircraft.Specs.Propulsion.SizedEngine);
+pass = numel(areas) == 9 && all(isnan(areas(1:6))) && ...
+       all(isfinite(areas(7:9))) && ...
+       numel(actual) == 3 && all(isfinite(actual)) && ...
+       all(abs(actual(:)' - supplements) <= 1e-8 * max(1, abs(supplements)));
+if (~pass)
+    fprintf(1, "Three interleaved engine areas: %s\n", mat2str(areas));
+end
+end
+
+function pass = CheckThreeMixedDepthEngineConnections()
+%
+% pass = CheckThreeMixedDepthEngineConnections()
+% written by Triet Ho
+% last updated: 16 sep 2026
+%
+% Check one direct and two indirect engine paths to a common propeller.
+% Each engine delivers one third of the propeller's SLS power.
+%
+% INPUTS:
+%     none
+%
+% OUTPUTS:
+%     pass - true when all three hybrid coefficients are correct.
+%            size/type/units: 1-by-1 / logical / []
+%
+
+aircraft.Specs.Propulsion.PropArch.Arch = zeros(8);
+aircraft.Specs.Propulsion.PropArch.Arch(1, 2:4) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch(2, 7) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch(3, 5) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch(4, 6) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch(5:6, 7) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch(7, 8) = 1;
+aircraft.Specs.Propulsion.PropArch.SrcType = 1;
+aircraft.Specs.Propulsion.PropArch.TrnType = [1, 1, 1, 4, 4, 2];
+splits = zeros(8);
+splits(2:4, 1) = 1;
+splits(5, 3) = 1;
+splits(6, 4) = 1;
+splits(7, [2, 5, 6]) = 1 / 3;
+splits(8, 7) = 1;
+aircraft.Specs.Propulsion.PropArch.OperDwn = @() splits;
+aircraft.Specs.Propulsion.SLSPower = [100, 100, 100, 100, 100, 90];
+aircraft.Specs.Power.LamDwn.SLS = [];
+aircraft = PropulsionPkg.ProcessPropArch(aircraft);
+actual = aircraft.Specs.Propulsion.Engine.HEcoeff(1:3);
+pass = all(abs(actual - 5 / 3) < 1e-10);
+if (~pass)
+    fprintf(1, "Three mixed-depth engine coefficients: %s\n", mat2str(actual));
 end
 end

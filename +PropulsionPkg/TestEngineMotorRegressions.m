@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 25 checks pass, otherwise 0.
+%     Success - 1 when all 33 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(25, 1);
+Pass = false(33, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,32 +149,21 @@ Pass(20) = CheckSeparateParallelTargets();
 % one propeller. Finding the direct engine must not hide the indirect one.
 Pass(21) = CheckMixedDepthEngineConnections();
 
-%% THREE-ENGINE ARCHITECTURES %%
+%% MULTI-ENGINE ARCHITECTURES %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Three engines driving separate propellers retain separate connections.
-aircraft = PropulsionPkg.ProcessPropArch(makeAircraft([1, 2, 3]));
-Pass(22) = isequal(propellerConnections(aircraft, 1), 5) && ...
-           isequal(propellerConnections(aircraft, 2), 6) && ...
-           isequal(propellerConnections(aircraft, 3), 7);
-
-% Three engines sharing a fan receive proportional motor credit.
-architecture = zeros(5);
-architecture(1:4, 5) = 1;
-splits = zeros(5);
-splits(5, 1:4) = [0.1, 0.2, 0.3, 0.4];
-efficiencies = ones(5);
-efficiencies(5, 1:4) = 0.8;
-actual = PropulsionPkg.PowerSupplementCheck( ...
-    [12.5, 25, 37.5, 50, 100], architecture, splits, efficiencies, ...
-    [1, 1, 1, 0, 2], 0.99);
-Pass(23) = all(abs(actual(1:3) - [6.6, 13.2, 19.8]) < 1e-10);
-
-% Sizing must use each engine's graph index when motors and engines are interleaved.
-Pass(24) = CheckThreeInterleavedEngineInletAreas();
-
-% Direct and two indirect engine paths must all contribute to one fan.
-Pass(25) = CheckThreeMixedDepthEngineConnections();
+% Exercise more than two engines at increasing graph sizes. Each count
+% checks distinct propellers, one shared fan, interleaved sizing, and
+% direct plus indirect paths to a common propeller.
+EngineCounts = [3, 5, 8];
+for icount = 1:length(EngineCounts)
+    engineCount = EngineCounts(icount);
+    caseIndex = 22 + 4 * (icount - 1);
+    Pass(caseIndex) = CheckManyEngineConnections(engineCount);
+    Pass(caseIndex + 1) = CheckManyEngineMotorCredit(engineCount);
+    Pass(caseIndex + 2) = CheckManyInterleavedEngineInletAreas(engineCount);
+    Pass(caseIndex + 3) = CheckManyMixedDepthEngineConnections(engineCount);
+end
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -584,94 +573,172 @@ if (~pass)
 end
 end
 
-function pass = CheckThreeInterleavedEngineInletAreas()
+function pass = CheckManyEngineConnections(engineCount)
 %
-% pass = CheckThreeInterleavedEngineInletAreas()
+% pass = CheckManyEngineConnections(engineCount)
 % written by Triet Ho
 % last updated: 16 sep 2026
 %
-% Size three independently supplemented engines interleaved with motors.
-% Each engine must assign its inlet area to its own fan.
+% Check that each engine retains its own direct propeller connection.
 %
 % INPUTS:
-%     none
+%     engineCount - number of TSEs and propellers in the graph.
+%                   size/type/units: 1-by-1 / integer / []
 %
 % OUTPUTS:
-%     pass - true when all three fan areas and supplements are assigned.
-%            size/type/units: 1-by-1 / logical / []
+%     pass        - true if every engine has its expected propeller.
+%                   size/type/units: 1-by-1 / logical / []
+%
+
+aircraft = PropulsionPkg.ProcessPropArch(makeAircraft(1:engineCount));
+pass = true;
+for engine = 1:engineCount
+    pass = pass && isequal(propellerConnections(aircraft, engine), ...
+                           1 + engineCount + engine);
+end
+end
+
+function pass = CheckManyEngineMotorCredit(engineCount)
+%
+% pass = CheckManyEngineMotorCredit(engineCount)
+% written by Triet Ho
+% last updated: 16 sep 2026
+%
+% Check proportional motor credit when many TSEs share one fan. The
+% downstream shares and parent powers describe the same edge flows.
+%
+% INPUTS:
+%     engineCount - number of TSEs feeding the fan.
+%                   size/type/units: 1-by-1 / integer / []
+%
+% OUTPUTS:
+%     pass        - true if each TSE receives its expected motor credit.
+%                   size/type/units: 1-by-1 / logical / []
+%
+
+fan = engineCount + 2;
+architecture = zeros(fan);
+architecture(1:fan-1, fan) = 1;
+engineShares = 0.6 * (1:engineCount) / sum(1:engineCount);
+splits = zeros(fan);
+splits(fan, :) = [engineShares, 0.4, 0];
+efficiencies = ones(fan);
+efficiencies(fan, 1:fan-1) = 0.8;
+parentPower = 100 * splits(fan, 1:fan-1) / 0.8;
+actual = PropulsionPkg.PowerSupplementCheck( ...
+    [parentPower, 100], architecture, splits, efficiencies, ...
+    [ones(1, engineCount), 0, 2], 0.99);
+expected = 40 * 0.99 * engineShares / sum(engineShares);
+pass = numel(actual) == fan && ...
+       all(abs(actual(1:engineCount) - expected) < 1e-10);
+end
+
+function pass = CheckManyInterleavedEngineInletAreas(engineCount)
+%
+% pass = CheckManyInterleavedEngineInletAreas(engineCount)
+% written by Triet Ho
+% last updated: 16 sep 2026
+%
+% Size independently supplemented engines interleaved with motors. Each
+% engine must assign its inlet area and motor load to its own fan.
+%
+% INPUTS:
+%     engineCount - number of TSE, motor, and fan triples.
+%                   size/type/units: 1-by-1 / integer / []
+%
+% OUTPUTS:
+%     pass        - true when all fan areas and supplements are assigned.
+%                   size/type/units: 1-by-1 / logical / []
 %
 
 aircraft = makeTwoEngineSizingAircraft(0.2, 0.4);
-architecture = zeros(12);
-architecture(1, [4, 6, 8]) = 1;
-architecture(2, [3, 5, 7]) = 1;
-architecture(3:4, 9) = 1;
-architecture(5:6, 10) = 1;
-architecture(7:8, 11) = 1;
-architecture(9:11, 12) = 1;
-splits = ones(12);
-splits(9, [3, 4]) = [0.2, 0.8];
-splits(10, [5, 6]) = [0.4, 0.6];
-splits(11, [7, 8]) = [0.3, 0.7];
-splits(12, 9:11) = 1 / 3;
+ncomp = 3 * engineCount + 3;
+sink = ncomp;
+fans = 2 * engineCount + 3 : 3 * engineCount + 2;
+motors = 3:2:2 * engineCount + 1;
+engines = 4:2:2 * engineCount + 2;
+architecture = zeros(ncomp);
+architecture(1, engines) = 1;
+architecture(2, motors) = 1;
+splits = ones(ncomp);
+for engine = 1:engineCount
+    fan = fans(engine);
+    architecture([motors(engine), engines(engine)], fan) = 1;
+    motorShare = 0.1 + 0.7 * engine / (engineCount + 1);
+    splits(fan, [motors(engine), engines(engine)]) = ...
+        [motorShare, 1 - motorShare];
+end
+architecture(fans, sink) = 1;
+splits(sink, fans) = 1 / engineCount;
 aircraft.Specs.Propulsion.PropArch.Arch = architecture;
-aircraft.Specs.Propulsion.PropArch.TrnType = [0, 1, 0, 1, 0, 1, 2, 2, 2];
+aircraft.Specs.Propulsion.PropArch.TrnType = ...
+    [repmat([0, 1], 1, engineCount), 2 * ones(1, engineCount)];
 aircraft.Specs.Propulsion.PropArch.OperDwn = @() splits;
-aircraft.Specs.Propulsion.PropArch.EtaDwn = ones(12);
-aircraft.Specs.Propulsion.InletArea = NaN(1, 9);
+aircraft.Specs.Propulsion.PropArch.EtaDwn = ones(ncomp);
+aircraft.Specs.Propulsion.InletArea = NaN(1, 3 * engineCount);
 aircraft = PropulsionPkg.PropulsionSizing(aircraft);
 areas = aircraft.Specs.Propulsion.InletArea;
-supplements = aircraft.Specs.Propulsion.PowerSupp([2, 4, 6]);
+supplements = aircraft.Specs.Propulsion.PowerSupp(2:2:2 * engineCount);
 actual = arrayfun(@(engine) engine.FanSysObject.ElecWork, ...
                   aircraft.Specs.Propulsion.SizedEngine);
-pass = numel(areas) == 9 && all(isnan(areas(1:6))) && ...
-       all(isfinite(areas(7:9))) && ...
-       numel(actual) == 3 && all(isfinite(actual)) && ...
+pass = numel(areas) == 3 * engineCount && ...
+       all(isnan(areas(1:2 * engineCount))) && ...
+       all(isfinite(areas(2 * engineCount + 1:end))) && ...
+       numel(actual) == engineCount && all(isfinite(actual)) && ...
        all(abs(actual(:)' - supplements) <= 1e-8 * max(1, abs(supplements)));
 if (~pass)
-    fprintf(1, "Three interleaved engine areas: %s\n", mat2str(areas));
+    fprintf(1, "%d interleaved engine areas: %s\n", engineCount, mat2str(areas));
 end
 end
 
-function pass = CheckThreeMixedDepthEngineConnections()
+function pass = CheckManyMixedDepthEngineConnections(engineCount)
 %
-% pass = CheckThreeMixedDepthEngineConnections()
+% pass = CheckManyMixedDepthEngineConnections(engineCount)
 % written by Triet Ho
 % last updated: 16 sep 2026
 %
-% Check one direct and two indirect engine paths to a common propeller.
-% Each engine delivers one third of the propeller's SLS power.
+% One TSE connects directly to a propeller; the others connect through
+% separate cables. Each should deliver an equal share of the power.
 %
 % INPUTS:
-%     none
+%     engineCount - number of TSEs feeding the propeller.
+%                   size/type/units: 1-by-1 / integer / []
 %
 % OUTPUTS:
-%     pass - true when all three hybrid coefficients are correct.
-%            size/type/units: 1-by-1 / logical / []
+%     pass        - true when every hybrid coefficient is correct.
+%                   size/type/units: 1-by-1 / logical / []
 %
 
-aircraft.Specs.Propulsion.PropArch.Arch = zeros(8);
-aircraft.Specs.Propulsion.PropArch.Arch(1, 2:4) = 1;
-aircraft.Specs.Propulsion.PropArch.Arch(2, 7) = 1;
-aircraft.Specs.Propulsion.PropArch.Arch(3, 5) = 1;
-aircraft.Specs.Propulsion.PropArch.Arch(4, 6) = 1;
-aircraft.Specs.Propulsion.PropArch.Arch(5:6, 7) = 1;
-aircraft.Specs.Propulsion.PropArch.Arch(7, 8) = 1;
+propeller = 2 * engineCount + 1;
+sink = propeller + 1;
+engines = 2:engineCount + 1;
+cables = engineCount + 2:2 * engineCount;
+architecture = zeros(sink);
+architecture(1, engines) = 1;
+architecture(engines(1), propeller) = 1;
+splits = zeros(sink);
+splits(engines, 1) = 1;
+for engine = 2:engineCount
+    cable = cables(engine - 1);
+    architecture(engines(engine), cable) = 1;
+    architecture(cable, propeller) = 1;
+    splits(cable, engines(engine)) = 1;
+end
+architecture(propeller, sink) = 1;
+splits(propeller, [engines(1), cables]) = 1 / engineCount;
+splits(sink, propeller) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch = architecture;
 aircraft.Specs.Propulsion.PropArch.SrcType = 1;
-aircraft.Specs.Propulsion.PropArch.TrnType = [1, 1, 1, 4, 4, 2];
-splits = zeros(8);
-splits(2:4, 1) = 1;
-splits(5, 3) = 1;
-splits(6, 4) = 1;
-splits(7, [2, 5, 6]) = 1 / 3;
-splits(8, 7) = 1;
+aircraft.Specs.Propulsion.PropArch.TrnType = ...
+    [ones(1, engineCount), 4 * ones(1, engineCount - 1), 2];
 aircraft.Specs.Propulsion.PropArch.OperDwn = @() splits;
-aircraft.Specs.Propulsion.SLSPower = [100, 100, 100, 100, 100, 90];
+aircraft.Specs.Propulsion.SLSPower = [100 * ones(1, 2 * engineCount - 1), 90];
 aircraft.Specs.Power.LamDwn.SLS = [];
 aircraft = PropulsionPkg.ProcessPropArch(aircraft);
-actual = aircraft.Specs.Propulsion.Engine.HEcoeff(1:3);
-pass = all(abs(actual - 5 / 3) < 1e-10);
+actual = aircraft.Specs.Propulsion.Engine.HEcoeff(1:engineCount);
+pass = all(abs(actual - (2 - 1 / engineCount)) < 1e-10);
 if (~pass)
-    fprintf(1, "Three mixed-depth engine coefficients: %s\n", mat2str(actual));
+    fprintf(1, "%d mixed-depth engine coefficients: %s\n", ...
+            engineCount, mat2str(actual));
 end
 end

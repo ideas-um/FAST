@@ -2,7 +2,7 @@ function [Aircraft] = PropArchConnections(Aircraft)
 %
 % [Aircraft] = PropArchConnections(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 17 jan 2025
+% last updated: 16 sep 2026
 %
 % Given a propulsion architecture, identify any parallel electric motor /
 % engine connections. These connections are used to reduce the power
@@ -77,7 +77,9 @@ for iconn = 1:length(AnyParallel)
     if (~isempty(Driving) && ~isempty(Helping))
     
         % list the electric motors
-        ParConns{Driving} = [ParConns{Driving}; Helping];
+        for idrive = Driving(:)'
+            ParConns{idrive} = [ParConns{idrive}; Helping];
+        end
     
     end
 end

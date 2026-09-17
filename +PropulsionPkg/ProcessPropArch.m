@@ -2,7 +2,7 @@ function [Aircraft] = ProcessPropArch(Aircraft)
 %
 % [Aircraft] = ProcessPropArch(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 mar 2026
+% last updated: 16 sep 2026
 %
 % given a propulsion architecture, find how each gas turbine engine is
 % connected to a propeller. the power required at the propeller is
@@ -55,7 +55,7 @@ LamDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn(LamCell{:});
 EtaDwn = ones(ncomp, ncomp);
 
 % allocate memory for indexed transmitter arrays
-WhichProp = zeros(1, ntrn);
+WhichProp = repmat({[]}, 1, ntrn);
 HEcoeff   = zeros(1, ntrn);
 
 % create logical array transmitters
@@ -75,53 +75,15 @@ PowerVector = zeros(ncomp, 1);
 Preq = zeros(ncomp, 1);
 PSLS = zeros(ncomp, 1);
 
-% loop through all propellers to find indirect gas turbine engines
+% Propagate each propeller's demand through every upstream path. A direct
+% engine connection must not hide a second engine reached through a cable.
 for iprop = PropIdx
-        
-    % remember a copy of the index
-    jprop = iprop;
-        
-    % remember the index
-    krow = jprop;
-    
-    % loop until gas turbine engine is found
-    while (~isempty(krow))
-        
-        % check if any are gas turbine engines
-        AnyGTE = logical(sum(Arch(:, krow) > 0 & ID == 1 & itrn, 2));
-        
-        if (any(AnyGTE)) % assume only 1 GTE per fan
-            
-            % get its index
-            igte = find(AnyGTE);
-
-            % perturb the power vector
-            PowerVector(iprop) = SLSPower(iprop - nsrc);
-
-            % propagate power downstream
-            Pout = PropulsionPkg.PowerFlow(PowerVector, Arch', LamDwn, EtaDwn, -1, 1.0e-06);
-            
-            % remember the power output by the engine and the total power
-            % required
-            Preq(igte) = Preq(igte) + Pout(igte);
-            PSLS(igte) = PSLS(igte) + SLSPower(iprop - nsrc);
-            
-            % remove the perturbation
-            PowerVector(iprop) = 0;
-
-            % break out of the loop
-            break;
-            
-        else
-            
-            % remember the indices
-            jrow = krow;
-            
-            % search a level deeper
-            [krow, ~] = find(Arch(:, jrow));
-            
-        end
-    end    
+    PowerVector(iprop) = SLSPower(iprop - nsrc);
+    Pout = PropulsionPkg.PowerFlow(PowerVector, Arch', LamDwn, EtaDwn, -1, 1.0e-06);
+    ActiveEngines = EngIdx(Pout(EngIdx) > 0);
+    Preq(ActiveEngines) = Preq(ActiveEngines) + Pout(ActiveEngines);
+    PSLS(ActiveEngines) = PSLS(ActiveEngines) + SLSPower(iprop - nsrc);
+    PowerVector(iprop) = 0;
 end
 
 % loop through all propellers to find directly connected gas turbine engines
@@ -134,7 +96,9 @@ for iprop = PropIdx
     if (~isempty(GTEIdx))
 
        % remember the index
-       WhichProp(GTEIdx - nsrc) = iprop;
+       for igte = GTEIdx(:)'
+           WhichProp{igte - nsrc}(end + 1) = iprop;
+       end
        
     end
     

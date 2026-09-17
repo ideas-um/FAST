@@ -16,4 +16,5 @@
 % PropulsionSizing     - PropulsionPkg.PropulsionSizing is a function.
 % RecomputeSplits      - PropulsionPkg.RecomputeSplits is a function.
 % TestCreatePropArch   - PropulsionPkg.TestCreatePropArch is a function.
+% TestEngineMotorRegressions - PropulsionPkg.TestEngineMotorRegressions is a function.
 % TestPowerAvailable   - PropulsionPkg.TestPowerAvailable is a function.

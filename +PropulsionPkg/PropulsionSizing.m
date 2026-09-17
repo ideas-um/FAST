@@ -195,7 +195,7 @@ if (any(TrnType > 0 & TrnType ~= 2))
             if (Aircraft.Specs.Propulsion.Engine.DesignThrust > 1.0e-06)
             
                 % size the engine
-                Engine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Psupp(ieng(1)));
+                Engine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Psupp(ieng(jeng)));
                 
                 % turn off engine sizing
                 Engine.Specs.Sizing = 0;                
@@ -207,7 +207,7 @@ if (any(TrnType > 0 & TrnType ~= 2))
                 InletArea = pi * Engine.FanDiam ^ 2 / 4;
                 
                 % find the fan connected to the engine
-                ifan = find((Arch(jeng+nsrc, idx) == 1) & Prop);
+                ifan = find((Arch(ieng(jeng)+nsrc, idx) == 1) & Prop);
                 
                 % remember the inlet area
                 Aircraft.Specs.Propulsion.InletArea(ifan) = InletArea;

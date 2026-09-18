@@ -57,15 +57,15 @@ Pass(6) = CheckEngineSupplements(0.4, 0.2);
 % fan target applies fan efficiency to the motor contribution
 Pass(7) = CheckValue(parallelSupplement([1, 0, 2], [0, 10, 0], 0.8), 8);
 
-% generator and cable targets do not incur a fan-efficiency loss
-Pass(8) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 0.8), 10);
-Pass(9) = CheckValue(parallelSupplement([1, 0, 4], [0, 10, 0], 0.65), 10);
+% generator and cable targets are loads, not supplemental fan thrust
+Pass(8) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 0.8), 0);
+Pass(9) = CheckValue(parallelSupplement([1, 0, 4], [0, 10, 0], 0.65), 0);
 
-% contributions from two motors must both be counted at a shared target
-Pass(10) = CheckValue(parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8), 18);
+% neither motor creates fan thrust when both feed one generator
+Pass(10) = CheckValue(parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8), 0);
 
-% unity fan efficiency leaves the motor contribution unchanged
-Pass(11) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 1), 10);
+% unity fan efficiency cannot turn a generator load into fan thrust
+Pass(11) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 1), 0);
 
 % only one quarter of the first fan's demand comes from the motor
 architecture = zeros(4);

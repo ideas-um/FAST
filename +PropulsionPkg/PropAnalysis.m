@@ -572,7 +572,9 @@ if (any(Fuel))
                 OffParams.Thrust = TTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft, OffParams, Psupp(ipnt, icol), icol, ipnt);
+                OffDesignEngine = EngFun(Aircraft, OffParams, ...
+                    PropulsionPkg.EngineModelSupplement(aclass, Psupp(ipnt, icol)), ...
+                    icol, ipnt);
                 
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
@@ -581,7 +583,8 @@ if (any(Fuel))
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
+                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, ...
+                    PropulsionPkg.EngineModelSupplement(aclass, Psupp(ipnt, icol)));
                 
             end
             

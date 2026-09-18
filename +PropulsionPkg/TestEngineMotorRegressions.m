@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 33 checks pass, otherwise 0.
+%     Success - 1 when all 34 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(33, 1);
+Pass = false(34, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,6 +164,21 @@ for icount = 1:length(EngineCounts)
     Pass(caseIndex + 2) = CheckManyInterleavedEngineInletAreas(engineCount);
     Pass(caseIndex + 3) = CheckManyMixedDepthEngineConnections(engineCount);
 end
+
+%% NON-PROPULSIVE PARALLEL TARGETS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% A motor that powers an electric generator does not supplement the
+% engine's fan. The engine siphons 1 W to that generator; only the motor's
+% 50 W contribution at the separate fan earns a 40 W fan-adjusted credit.
+architecture = zeros(4);
+architecture(1:2, 3:4) = 1;
+splits = zeros(4);
+splits(3, 1:2) = [0.01, 0.99];
+splits(4, 1:2) = [0.5, 0.5];
+actual = PropulsionPkg.PowerSupplementCheck( ...
+    [51, 149, 100, 100], architecture, splits, ones(4), [1, 0, 3, 2], 0.8);
+Pass(34) = CheckValue(actual(1), 39);
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 33 checks pass, otherwise 0.
+%     Success - 1 when all 34 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(33, 1);
+Pass = false(34, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,15 +57,15 @@ Pass(6) = CheckEngineSupplements(0.4, 0.2);
 % fan target applies fan efficiency to the motor contribution
 Pass(7) = CheckValue(parallelSupplement([1, 0, 2], [0, 10, 0], 0.8), 8);
 
-% generator and cable targets do not incur a fan-efficiency loss
-Pass(8) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 0.8), 10);
-Pass(9) = CheckValue(parallelSupplement([1, 0, 4], [0, 10, 0], 0.65), 10);
+% generator and cable targets are loads, not supplemental fan thrust
+Pass(8) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 0.8), 0);
+Pass(9) = CheckValue(parallelSupplement([1, 0, 4], [0, 10, 0], 0.65), 0);
 
-% contributions from two motors must both be counted at a shared target
-Pass(10) = CheckValue(parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8), 18);
+% neither motor creates fan thrust when both feed one generator
+Pass(10) = CheckValue(parallelSupplement([1, 0, 0, 3], [0, 7, 11, 0], 0.8), 0);
 
-% unity fan efficiency leaves the motor contribution unchanged
-Pass(11) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 1), 10);
+% unity fan efficiency cannot turn a generator load into fan thrust
+Pass(11) = CheckValue(parallelSupplement([1, 0, 3], [0, 10, 0], 1), 0);
 
 % only one quarter of the first fan's demand comes from the motor
 architecture = zeros(4);
@@ -164,6 +164,21 @@ for icount = 1:length(EngineCounts)
     Pass(caseIndex + 2) = CheckManyInterleavedEngineInletAreas(engineCount);
     Pass(caseIndex + 3) = CheckManyMixedDepthEngineConnections(engineCount);
 end
+
+%% NON-PROPULSIVE PARALLEL TARGETS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% A motor that powers an electric generator does not supplement the
+% engine's fan. The engine siphons 1 W to that generator; only the motor's
+% 50 W contribution at the separate fan earns a 40 W fan-adjusted credit.
+architecture = zeros(4);
+architecture(1:2, 3:4) = 1;
+splits = zeros(4);
+splits(3, 1:2) = [0.01, 0.99];
+splits(4, 1:2) = [0.5, 0.5];
+actual = PropulsionPkg.PowerSupplementCheck( ...
+    [51, 149, 100, 100], architecture, splits, ones(4), [1, 0, 3, 2], 0.8);
+Pass(34) = CheckValue(actual(1), 39);
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

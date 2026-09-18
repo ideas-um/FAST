@@ -100,7 +100,15 @@ if (any(AnyParallel))
         % find the gas-turbine engine being supplemented
         Driving = find((Arch(:, icomp) > 0)' & (TrnType == 1));
         
-        % a shared target needs both an engine and a motor contribution
+        % Only a shared fan/propeller produces supplemental thrust. A
+        % generator or cable is an electrical load whose engine share is
+        % already represented by the downstream power split; crediting the
+        % motor there would subtract unrelated power from engine fuel flow.
+        if (TrnType(icomp) ~= 2)
+            continue;
+        end
+
+        % a shared fan needs both an engine and a motor contribution
         Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
         if (isempty(Driving) || isempty(Helping))
             continue;
@@ -111,12 +119,6 @@ if (any(AnyParallel))
         % motor input power here would apply the same split a second time.
         MotorPower = Preq(:, icomp) .* sum(Lambda(icomp, Helping));
 
-        % Only a fan target needs the engine fan-efficiency conversion.
-        TargetEfficiency = 1;
-        if (TrnType(icomp) == 2)
-            TargetEfficiency = EtaFan;
-        end
-
         % When engines share the target, allocate the motor credit in
         % proportion to their own contributions to that target.
         EngineShares = Lambda(icomp, Driving);
@@ -124,7 +126,7 @@ if (any(AnyParallel))
             EngineShares = ones(size(EngineShares));
         end
         Psupp(:, Driving) = Psupp(:, Driving) + ...
-                            MotorPower .* TargetEfficiency .* ...
+                            MotorPower .* EtaFan .* ...
                             (EngineShares ./ sum(EngineShares));
         
     end

@@ -800,7 +800,7 @@ CorrectEtaDwn = ...
 % check the matrices
 FooPass(1) = CheckTest(TestOut.Specs.Propulsion.PropArch.Arch           , CorrectArch   , EPS06);
 FooPass(2) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperDwn(Lambda), CorrectOperDwn, EPS06);
-FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(     1), CorrectOperUps, EPS06);
+FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(Lambda), CorrectOperUps, EPS06);
 FooPass(4) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaUps         , CorrectEtaUps , EPS06);
 FooPass(5) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaDwn         , CorrectEtaDwn , EPS06);
 
@@ -929,7 +929,7 @@ CorrectEtaDwn = ...
 % check the matrices
 FooPass(1) = CheckTest(TestOut.Specs.Propulsion.PropArch.Arch           , CorrectArch   , EPS06);
 FooPass(2) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperDwn(Lambda), CorrectOperDwn, EPS06);
-FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(     1), CorrectOperUps, EPS06);
+FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(Lambda), CorrectOperUps, EPS06);
 FooPass(4) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaUps         , CorrectEtaUps , EPS06);
 FooPass(5) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaDwn         , CorrectEtaDwn , EPS06);
 
@@ -1061,7 +1061,7 @@ CorrectEtaDwn = ...
 % check the matrices
 FooPass(1) = CheckTest(TestOut.Specs.Propulsion.PropArch.Arch           , CorrectArch   , EPS06);
 FooPass(2) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperDwn(Lambda), CorrectOperDwn, EPS06);
-FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(     1), CorrectOperUps, EPS06);
+FooPass(3) = CheckTest(TestOut.Specs.Propulsion.PropArch.OperUps(Lambda), CorrectOperUps, EPS06);
 FooPass(4) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaUps         , CorrectEtaUps , EPS06);
 FooPass(5) = CheckTest(TestOut.Specs.Propulsion.PropArch.EtaDwn         , CorrectEtaDwn , EPS06);
 

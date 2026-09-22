@@ -178,7 +178,7 @@ elseif (strcmpi(ArchName, "PHE") == 1)
               [zeros(     1, 1), zeros(     1, 1), repmat(1 / NumEng,      1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng)      , zeros(     1, 1); ... % fuel powers the gas-turbine engines
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng), repmat(1 / NumEng,      1, NumEng), zeros(     1, NumEng)      , zeros(     1, 1); ... % battery powers the electric motors
                zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng)      , zeros(NumEng, 1); ... % each gas-turbine engine spins a propeller/fan
-               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng) * lam, zeros(NumEng, 1); ... % each electric motor spins a propeller/fan
+               zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng),   eye(NumEng, NumEng)      , zeros(NumEng, 1); ... % each electric motor sends all of its output to one propeller/fan
                zeros(NumEng, 1), zeros(NumEng, 1),  zeros(            NumEng, NumEng),  zeros(            NumEng, NumEng), zeros(NumEng, NumEng)      ,  ones(NumEng, 1); ... % all propellers/fans connect to the sink
                zeros(     1, 1), zeros(     1, 1),  zeros(                 1, NumEng),  zeros(                 1, NumEng), zeros(     1, NumEng)      , zeros(     1, 1)] ;   % the sink does not connect to anything
            

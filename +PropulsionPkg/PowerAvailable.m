@@ -65,8 +65,8 @@ Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 % get the efficiency matrices
 EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
-% get the operational matrices
-OperUps = Aircraft.Specs.Propulsion.PropArch.OperUps;
+% get the operational matrices for the current mission segment
+[OperUps, ~] = PropulsionPkg.SelectOperMatrices(Aircraft);
 
 % get the upstream power splits
 LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);

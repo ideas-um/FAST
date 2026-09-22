@@ -2,7 +2,7 @@ function [Aircraft] = ProcessProfile(Aircraft)
 %
 % [Aircraft] = ProcessProfile(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 26 mar 2024
+% last updated: 22 sep 2026
 %
 % Given a mission profile, check for valid inputs.
 %
@@ -33,6 +33,23 @@ EPS06 = 1.0e-06;
 
 % get the number of segments
 [nsegs, ncols] = size(Mission.Segs);
+
+% Segment-indexed operational matrices map one-to-one to mission segments.
+% Validate the count here because the mission profile is created after the
+% propulsion architecture in FAST's main workflow.
+PropArch = Aircraft.Specs.Propulsion.PropArch;
+HaveOperBySegment = isfield(PropArch, ...
+                            ["OperUpsBySegment"; "OperDwnBySegment"]);
+if (sum(HaveOperBySegment) == 1)
+    error("FAST:IncompleteSegmentOperMatrices", ...
+          "OperUpsBySegment and OperDwnBySegment must be supplied together.");
+end
+if (sum(HaveOperBySegment) == 2 && ...
+    (numel(PropArch.OperUpsBySegment) ~= nsegs || ...
+     numel(PropArch.OperDwnBySegment) ~= nsegs))
+    error("FAST:SegmentOperMatrixCount", ...
+          "Expected %d upstream and downstream segment operational matrices.", nsegs);
+end
 
 % check that segments are in a column vector
 if (ncols > 1)

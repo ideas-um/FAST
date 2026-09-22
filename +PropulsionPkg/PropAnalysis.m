@@ -44,11 +44,8 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 % get the propulsion architecture
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
-% get the downstream operational matrix
-OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
-
-% get the upstream operational matrix for edge-flow consistency
-OperUps = Aircraft.Specs.Propulsion.PropArch.OperUps;
+% get the operational matrices for the current mission segment
+[OperUps, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
 
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;

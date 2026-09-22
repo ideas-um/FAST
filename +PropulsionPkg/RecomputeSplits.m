@@ -69,8 +69,7 @@ idx = any(LamUps > 0, 2);
 % get the number of downstream splits
 nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
 
-OperUps = Aircraft.Specs.Propulsion.PropArch.OperUps;
-OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
+[OperUps, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
 EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
 % Collect each parallel target's incoming edges. An engine can contribute

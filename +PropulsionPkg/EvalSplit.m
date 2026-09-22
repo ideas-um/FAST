@@ -2,7 +2,7 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 %
 % [Split] = EvalSplit(SplitFun, SplitVal)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 05 mar 2026
+% last updated: 22 sep 2026
 %
 % Given a energy/power/thrust split (SplitFun), evaluate it for a given
 % value (SplitVal). This function currently works for a varying number of
@@ -11,8 +11,9 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 % number of power splits into the code.
 %
 % INPUTS:
-%     SplitFun - function handle to evaluate the power split.
-%                size/type/units: 1-by-1 / function handle / []
+%     SplitFun - function handle to evaluate, or a fixed numeric power
+%                split matrix. Numeric matrices are returned unchanged.
+%                size/type/units: 1-by-1 or p-by-q / function handle or double / []
 %
 %     SplitVal - power split values.
 %                size/type/units: m-by-n / double / []
@@ -23,6 +24,14 @@ function [Split] = EvalSplit(SplitFun, SplitVal)
 %
 
 % ----------------------------------------------------------
+
+% A numeric operational matrix is already fully resolved. This permits a
+% custom architecture to prescribe one direct matrix per mission segment
+% without inventing unused lambda inputs.
+if (isnumeric(SplitFun))
+    Split = SplitFun;
+    return
+end
 
 % get the number of arguments in the split
 narg = length(SplitVal);

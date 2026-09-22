@@ -469,7 +469,7 @@ for i = 1:length(Propulsionfields)
     if isstruct(Propulsion.(Propulsionfields{i}))
         subfields = fieldnames(Propulsion.(Propulsionfields{i}));
         for j = 1:length(subfields)
-            if isstring(Propulsion.(Propulsionfields{i}).(subfields{j})) || ischar(Propulsion.(Propulsionfields{i}).(subfields{j})) || isa(Propulsion.(Propulsionfields{i}).(subfields{j}), 'function_handle')
+            if isstring(Propulsion.(Propulsionfields{i}).(subfields{j})) || ischar(Propulsion.(Propulsionfields{i}).(subfields{j})) || isa(Propulsion.(Propulsionfields{i}).(subfields{j}), 'function_handle') || iscell(Propulsion.(Propulsionfields{i}).(subfields{j}))
             elseif isnan(Propulsion.(Propulsionfields{i}).(subfields{j}))
                 Propulsion.(Propulsionfields{i}).(subfields{j}) = DefaultPropulsion.(Propulsionfields{i}).(subfields{j});
             end

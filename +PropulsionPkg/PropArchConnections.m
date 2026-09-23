@@ -78,7 +78,9 @@ for iconn = 1:length(AnyParallel)
     
         % list the electric motors
         for idrive = Driving(:)'
-            ParConns{idrive} = [ParConns{idrive}; Helping];
+            % A shared engine can help several targets with different motor
+            % counts; keep one row of distinct companion motor indices.
+            ParConns{idrive} = unique([ParConns{idrive}, Helping(:)'], 'stable');
         end
     
     end

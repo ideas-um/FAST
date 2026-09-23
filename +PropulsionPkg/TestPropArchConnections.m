@@ -8,7 +8,8 @@ function [Success] = TestPropArchConnections()
 % complete list of companion motors, including when Driving is nonscalar.
 %
 % OUTPUTS:
-%     Success - true when the one-, two-, three-, and nine-engine cases pass.
+%     Success - true when the one-, two-, three-, nine-engine and shared-
+%               engine cases pass.
 %               size/type/units: 1-by-1 / logical / []
 %
 
@@ -31,9 +32,21 @@ for icase = 1:length(EngineCounts)
     Pass(icase) = all(cellfun(@(item) isequal(item, motors), connections(1:neng))) && ...
                   all(cellfun(@isempty, connections(neng + 1:end)));
 end
+% The same engine can drive targets with differently sized helper sets.
+nsrc = 1;
+ntrn = 7;
+arch = zeros(nsrc + ntrn + 1);
+arch([2, 3, 4], 7) = 1;
+arch([2, 3, 5, 6], 8) = 1;
+aircraft.Specs.Propulsion.PropArch.Arch = arch;
+aircraft.Specs.Propulsion.PropArch.SrcType = 1;
+aircraft.Specs.Propulsion.PropArch.TrnType = [1, 0, 0, 0, 0, 2, 2];
+aircraft = PropulsionPkg.PropArchConnections(aircraft);
+connections = aircraft.Specs.Propulsion.PropArch.ParConns;
+Pass(end + 1) = isequal(connections{1}, [3, 4, 5, 6]);
 Success = all(Pass);
 if (~Success)
-    fprintf(1, "PropArchConnections failed for engine count(s): %s\n", ...
-            mat2str(EngineCounts(~Pass)));
+    fprintf(1, "PropArchConnections failed for test(s): %s\n", ...
+            mat2str(find(~Pass)));
 end
 end

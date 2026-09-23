@@ -227,6 +227,15 @@ for ipnt = 1:npnt
     end
 end
 
+% OperUps already applies LamUps while propagating total power to the sink.
+% Keep that sink result, but make the stored electric-motor component
+% availability consistent with the same upstream split. RecomputeSplits
+% reads these component columns to derive LamDwn.
+iEM = find(TrnType == 0);
+if ~isempty(iEM)
+    Pav(:, nsrc + iEM) = Pav(:, nsrc + iEM) .* LamUps(:, iEM);
+end
+
 % convert the power available to thrust available
 Tav = Pav ./ TAS;
 

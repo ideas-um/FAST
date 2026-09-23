@@ -306,6 +306,29 @@ for ipnt = 1:npnt
     
 end
 
+% Source propagation can restore a requested transmitter load above the
+% component availability enforced earlier. Reapply the hard component
+% limit here before reconciling source power and integrating energy.
+EMTrn = find(TrnType == 0);
+if ~isempty(EMTrn)
+    EMCols = nsrc + EMTrn;
+    Pout(:, EMCols) = min(Pout(:, EMCols), Pav(:, EMCols));
+end
+
+% Reconcile each battery source with the electric-motor output that
+% actually survived the component availability limit. PowerFlow above can
+% otherwise reconstruct battery demand from the requested LamDwn split and
+% exceed the LamUps-limited EM capability.
+BattSrc = find(SrcType == 0);
+for ibatt = BattSrc
+    ConnectedEM = find((TrnType == 0) & ...
+        (Arch(ibatt, nsrc + (1:ntrn)) > 0));
+    if ~isempty(ConnectedEM)
+        EMEta = EtaDwn(ibatt, nsrc + ConnectedEM);
+        Pout(:, ibatt) = sum(Pout(:, nsrc + ConnectedEM) ./ EMEta, 2);
+    end
+end
+
 % compute the thrust required/output
 Tout = Pout ./ TAS;
 Treq = Preq ./ TAS;

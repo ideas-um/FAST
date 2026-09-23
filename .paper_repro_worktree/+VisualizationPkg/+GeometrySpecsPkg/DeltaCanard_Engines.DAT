@@ -1,0 +1,18 @@
+NumberOfEngines=4
+
+engine_1
+140 3 -5
+1 1
+TURBOFAN
+engine_2
+140 9.5 -5
+1 1
+TURBOFAN
+engine_3
+140 -3 -5
+1 1
+TURBOFAN
+engine_4
+140 -9.5 -5
+1 1
+TURBOFAN

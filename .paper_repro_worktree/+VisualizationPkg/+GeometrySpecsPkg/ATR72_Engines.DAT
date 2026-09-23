@@ -1,0 +1,11 @@
+NumberOfEngines=2
+
+engine_1
+44 13 5
+1 1
+TURBOPROP
+engine_2
+44 -13 5
+1 1
+TURBOPROP
+

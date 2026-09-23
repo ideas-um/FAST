@@ -14,19 +14,12 @@ function [Aircraft] = EnergyCost_perAirport(Aircraft, Origin, priceTable)
 if nargin < 2
     Origin = "Avg";
     % load fuel/energy pricing table
-    priceTable = readtable('\+CostPkg\Energy_CostbyAirport.xlsx');
+    PackageDir = fileparts(mfilename("fullpath"));
+    priceTable = readtable(fullfile(PackageDir, "Energy_CostbyAirport.xlsx"));
 elseif nargin < 3
-    priceTable = readtable('\+CostPkg\Energy_CostbyAirport.xlsx');
+    PackageDir = fileparts(mfilename("fullpath"));
+    priceTable = readtable(fullfile(PackageDir, "Energy_CostbyAirport.xlsx"));
 end
-
-% get the number of points in each segment
-TkoPts = Aircraft.Settings.TkoPoints;
-ClbPts = Aircraft.Settings.ClbPoints;
-CrsPts = Aircraft.Settings.CrsPoints;
-DesPts = Aircraft.Settings.DesPoints;
-
-% number of points in the main mission
-npt = Aircraft.Mission.Profile.MainMissEnd;
 
 % check number of energy sources
 Fuel = 1;

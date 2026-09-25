@@ -31,7 +31,6 @@ Aircraft.Specs.Power.LamUps.Crs = 0;
 Aircraft.Specs.Power.LamUps.Des = 0;
 Aircraft.Specs.Power.LamUps.Lnd = 0;
 
-Aircraft.Settings.PowerStrat = -1;
 Aircraft.Settings.PowerOpt = 0;
 Aircraft.Settings.PrintOut = 0;
 

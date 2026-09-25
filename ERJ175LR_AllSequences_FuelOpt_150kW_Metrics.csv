@@ -1,0 +1,2 @@
+Sequence,Flights,Distance_nmi,HybridMainFuel_kg,ConventionalMainFuel_kg,MainFuelSaved_kg,MainFuelSaved_pct,HybridFullFuel_kg,ConventionalFullFuel_kg,FullFuelSaved_kg,FullFuelSaved_pct,BatteryEnergy_kWh,MeanInitialSOCExcludingFirst_pct,MeanFinalSOCExcludingLast_pct,OptimizerTime_min
+8,5,3929.509472,14636.6746886367,17208.6867676883,2572.01207905161,14.946010196902,20314.4534160915,23553.8262884832,3239.37287239164,13.7530642907711,782.186360204969,66.66043414547,21.3076828957158,3.41666666666667e-06

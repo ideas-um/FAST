@@ -1,0 +1,2403 @@
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256177e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256177e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256177e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256177e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.972663e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914914e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.943539e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.885790e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.939689e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881940e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.939423e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.881674e+04 lbm   
+    Wem   = 5.256176e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+ Iter  Func-count            Fval   Feasibility   Step Length       Norm of   First-order  
+                                                                       step    optimality
+    0          47    8.535130e+03     0.000e+00     1.000e+00     0.000e+00     3.668e+03  
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 9.062370e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.004622e+04 lbm   
+    Wem   = 6.834393e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 9.054407e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.996658e+04 lbm   
+    Wem   = 6.834393e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 9.053817e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.996068e+04 lbm   
+    Wem   = 6.834393e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 9.035637e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.977889e+04 lbm   
+    Wem   = 6.359556e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 9.014234e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.956485e+04 lbm   
+    Wem   = 6.359556e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 9.012080e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.954331e+04 lbm   
+    Wem   = 6.359556e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 9.011577e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.953829e+04 lbm   
+    Wem   = 6.359556e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 9.047431e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.989682e+04 lbm   
+    Wem   = 6.027842e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 9.026119e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.968371e+04 lbm   
+    Wem   = 6.027842e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 9.022853e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.965104e+04 lbm   
+    Wem   = 6.027842e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 9.022566e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.964817e+04 lbm   
+    Wem   = 6.027842e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.987839e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.930090e+04 lbm   
+    Wem   = 5.795989e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.994041e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.936293e+04 lbm   
+    Wem   = 5.795989e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.999319e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.941570e+04 lbm   
+    Wem   = 5.795989e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 9.000653e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.942905e+04 lbm   
+    Wem   = 5.795989e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 9.002523e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.944775e+04 lbm   
+    Wem   = 5.633868e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.975121e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.917372e+04 lbm   
+    Wem   = 5.633868e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.972166e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914417e+04 lbm   
+    Wem   = 5.633868e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.972252e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.914503e+04 lbm   
+    Wem   = 5.633868e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.992566e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.934817e+04 lbm   
+    Wem   = 5.520473e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.967501e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.909753e+04 lbm   
+    Wem   = 5.520473e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.964451e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.906703e+04 lbm   
+    Wem   = 5.520473e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.963816e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.906067e+04 lbm   
+    Wem   = 5.520473e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.980308e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.922560e+04 lbm   
+    Wem   = 5.441140e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.961049e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.903301e+04 lbm   
+    Wem   = 5.441140e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.958638e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.900890e+04 lbm   
+    Wem   = 5.441140e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.958640e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.900891e+04 lbm   
+    Wem   = 5.441140e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.980036e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.922287e+04 lbm   
+    Wem   = 5.385629e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.951120e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.893371e+04 lbm   
+    Wem   = 5.385629e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.948033e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.890285e+04 lbm   
+    Wem   = 5.385629e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.947404e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.889655e+04 lbm   
+    Wem   = 5.385629e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.970759e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.913010e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.941195e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.883446e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.938442e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.880693e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.938372e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.880624e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.970759e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.913010e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.941195e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.883446e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.938442e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.880693e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.938372e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.880624e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+
+Initial Size:          
+    MTOW  = 9.126388e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 2.068639e+04 lbm   
+    S     = 8.353673e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.970759e+04 lbm   
+    OEW   = 5.137148e+04 lbm   
+    Wbatt = 2.243847e+03 lbm   
+    Wfuel = 1.913010e+04 lbm   
+    Wem   = 5.346783e+02 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.353673e+02 ft^2
+

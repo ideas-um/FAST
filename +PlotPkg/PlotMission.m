@@ -92,6 +92,9 @@ end
 % fuel flow
 MDotFuel = Aircraft.Mission.History.SI.Propulsion.MDotFuel;
 
+% lambda power split outputs
+LamUpsVector = Aircraft.Mission.History.SI.Power.LamUps;
+LamDwnVector = Aircraft.Mission.History.SI.Power.LamDwn;
 % ----------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,8 +123,79 @@ Weight = UnitConversionPkg.ConvMass(Mass , 'kg', 'lbm');
 Fburn  = UnitConversionPkg.ConvMass(Fburn, 'kg', 'lbm');
 
 % ----------------------------------------------------------
+figure;
+%plot altitude against time
+subplot(2, 1, 1);
+PlotPkg.PlotPerfParam(Time, LamDwnVector, 0, "Flight Time (min)", "Altitude (ft)", "LamDwn");
+subplot(2, 1, 2);
+PlotPkg.PlotPerfParam(Time, LamUpsVector, 0, "Flight Time (min)", "Altitude (ft)", "LamUps");
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          Figure 1          %
+%                            %
+% profile flight performance %
+% parameters: 2-by-2 subplot %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% create figure and maximize it
+figure;
+set(gcf, 'Position', get(0, 'Screensize'));
+
+n =5;
+m = 2;
+
+% plot altitude against time
+subplot(n, m, 1);
+PlotPkg.PlotPerfParam(Time, Alt, 0, "Flight Time (min)", "Altitude (ft)", "Altitude");
+
+% plot distance against time
+subplot(n, m, 2);
+PlotPkg.PlotPerfParam(Dist, Alt, 0, "Distance Flown (nmi)","Altitude (ft)", "Profile");
+
+% plot distance against time
+subplot(n, m, 3);
+PlotPkg.PlotPerfParam(Time, Dist, 0, "Flight Time (min)", "Distance Flown (nmi)", "Dist");
+
+% plot velocity against time
+subplot(n, m, 4);
+PlotPkg.PlotPerfParam(Time, TAS, 0, "Flight Time (min)", "Airspeed (kts)", "Airspeed (TAS)");
+
+% plot rate of climb against time
+subplot(n, m, 5);
+PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), 1, "Flight Time (min)", "Rate of Climb (ft/min)", "Rate of Climb");
+
+% plot the fuel flow
+subplot(n, m, 6);
+PlotPkg.PlotPerfParam(Time, MDotFuel, 1, "Flight Time (min)", "Fuel Flow (kg/s)", "Fuel Flow");
+
+% plot the sfc
+subplot(n, m, 7);
+PlotPkg.PlotPerfParam(Time, SFC, 0, "Flight Time (min)", "SFC (lbm/hp/hr)", "SFC");
+
+% plot the power output
+subplot(n, m, 8);
+PlotPkg.PlotPerfParam(Time, PoutVector, 1, "Flight Time (min)", "Power Output (MW)", "Power Output");
+
+% plot power available/required against time
+subplot(n, m, 9);
+hold on
+PlotPkg.PlotPerfParam(Time,  PavVector, 1, "Flight Time (min)", "Power (MW)", "Power");
+PlotPkg.PlotPerfParam(Time, PreqVector, 1, "Flight Time (min)", "Power (MW)", "Power");
+
+subplot(n, m, 10);
+hold on
+PlotPkg.PlotPerfParam(Time,  PavVector, 1, "Flight Time (min)", "% (MW)", "Power");
+PlotPkg.PlotPerfParam(Time, PreqVector, 1, "Flight Time (min)", "% (MW)", "Power");
+% ----------------------------------------------------------
+
+
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          Figure 1          %
 %                            %
 % profile flight performance %
 % parameters: 2-by-2 subplot %
@@ -151,6 +225,7 @@ PlotPkg.PlotPerfParam(Time(1:end-1), RC(1:end-1), 1, "Flight Time (min)", "Rate 
 % ----------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          Figure 2          %
 %                            %
 % profile aircraft weights:  %
 % 2-by-2 subplot with time   %

@@ -1,0 +1,139 @@
+{Error using DataStructPkg.SpecProcessing (line 65)
+Propulsion Architecture (Aircraft.Propulsion.Arch) not specified
+
+Error in Main (line 71)
+    Aircraft = DataStructPkg.SpecProcessing(Aircraft);
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error in RunAllSequencePowerOptParallel (line 35)
+    ConventionalAircraft = Main(ConventionalAircraft, ...
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+[Warning: Thrust variables (MTOW, T/W, SLS Thrust) overconstrained. Prioritizing MTOW and T/W.] 
+[> In DataStructPkg.SpecProcessing (line 73)
+In Main (line 71)
+In RunAllSequencePowerOptParallel (line 35)] 
+Initial Size:          
+    MTOW  = 8.551700e+04 lbm   
+    Wbatt = 0.000000e+00 lbm   
+    Wfuel = 2.078500e+04 lbm   
+    S     = 7.827643e+02 ft^2
+
+Iteration  0:
+    MTOW  = 8.555183e+04 lbm   
+    OEW   = 4.776984e+04 lbm   
+    Wbatt = 0.000000e+00 lbm   
+    Wfuel = 2.081983e+04 lbm   
+    Wem   = 0.000000e+00 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 7.827643e+02 ft^2
+
+Iteration  1:
+    MTOW  = 8.748206e+04 lbm   
+    OEW   = 4.951122e+04 lbm   
+    Wbatt = 0.000000e+00 lbm   
+    Wfuel = 2.100867e+04 lbm   
+    Wem   = 0.000000e+00 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 7.989597e+02 ft^2
+
+Iteration  2:
+    MTOW  = 8.767614e+04 lbm   
+    OEW   = 4.966802e+04 lbm   
+    Wbatt = 0.000000e+00 lbm   
+    Wfuel = 2.104596e+04 lbm   
+    Wem   = 0.000000e+00 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.020852e+02 ft^2
+
+Iteration  3:
+    MTOW  = 8.774645e+04 lbm   
+    OEW   = 4.972831e+04 lbm   
+    Wbatt = 0.000000e+00 lbm   
+    Wfuel = 2.105598e+04 lbm   
+    Wem   = 0.000000e+00 lbm   
+    Weg   = 0.000000e+00 lbm   
+    S     = 8.030406e+02 ft^2
+
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 2 workers.
+Optimizing 1 of 864 sequences with 2 workers and 0 iterations.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+    TotalSequences    CompletedSequences    RemainingSequences    CompletedFlights    AverageMainFuelSaved_kgPerSequence    AverageMainFuelSaved_pctPerSequence    FleetWeightedMainFuelSaved_pct    AverageFullFuelSaved_kgPerSequence    AverageFullFuelSaved_pctPerSequence    FleetWeightedFullFuelSaved_pct    AverageInitialSOCExcludingFirst_pct    AverageFinalSOCExcludingLast_pct    TotalOptimizerWorkerTime_min
+    ______________    __________________    __________________    ________________    __________________________________    ___________________________________    ______________________________    __________________________________    ___________________________________    ______________________________    ___________________________________    ________________________________    ____________________________
+
+         864                  1                    863                   5                           2572                                 14.946                               14.946                              3239.4                                13.753                               13.753                               66.66                                21.308                          3.4167e-06         
+
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 8 workers.
+Optimizing 864 of 864 sequences with 8 workers and 5 iterations.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0      75    1.423943e+03    0.000e+00    6.139e+01                 141.602789 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0      75    4.561216e+03    0.000e+00    5.942e+01               11054.431878 sec
+    1     160    1.423927e+03    0.000e+00    3.837e+00    7.866e-03  59461.594782 sec
+    1     152    4.560992e+03    0.000e+00    2.578e+00    2.494e-01  59481.555770 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     112    6.665023e+03    0.000e+00    5.584e+01               59491.066585 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     112    6.634409e+03    0.000e+00    5.197e+01               59494.023180 sec
+    2     236    1.424013e+03    0.000e+00    3.805e+00    1.121e-02  59512.429607 sec
+    2     238    4.560989e+03    0.000e+00    2.350e+00    2.105e-03  59567.767273 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     112    6.406818e+03    0.000e+00    5.627e+01               59574.638020 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     112    6.477412e+03    0.000e+00    5.242e+01               59575.365994 sec
+    3     315    1.424046e+03    0.000e+00    1.349e+00    1.529e-02  59582.007744 sec
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     149    5.693260e+03    0.000e+00    6.129e+01               59585.833317 sec
+    4     393    1.424042e+03    0.000e+00    1.339e+00    6.654e-03  59623.695645 sec
+    1     226    6.664703e+03    0.000e+00    3.362e+00    2.902e-01  59630.610615 sec
+    3     332    4.560989e+03    0.000e+00    2.349e+00    4.014e-06  59633.302326 sec
+    1     226    6.634095e+03    0.000e+00    3.026e+00    3.135e-01  59637.612671 sec

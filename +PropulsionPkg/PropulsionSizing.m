@@ -312,8 +312,14 @@ end
 % remember the weight of the engines
 Aircraft.Specs.Weight.Engines = sum(Weng);
 
-% compute the electric motor and generator weight
-Aircraft.Specs.Weight.EM = sum(OEWPkg.ElectricMachineWeight(Pdwn(EM)));%sum(Pdwn(EM)) / P_Wem;
+% Compute electric-motor weight from the user-specified power-to-weight
+% ratio. P_Wem is converted to W/kg during specification processing, so
+% this directly honors inputs such as the paper's 10 kW/kg assumption.
+if ~isempty(EM) && isfinite(P_Wem) && (P_Wem > 0)
+    Aircraft.Specs.Weight.EM = sum(Pdwn(EM)) / P_Wem;
+else
+    Aircraft.Specs.Weight.EM = sum(OEWPkg.ElectricMachineWeight(Pdwn(EM)));
+end
 Aircraft.Specs.Weight.EG = sum(OEWPkg.ElectricMachineWeight(Pdwn(EG)));%sum(Pdwn(EG)) / P_Weg;
 
 % process the propulsion architecture for coefficients and connections

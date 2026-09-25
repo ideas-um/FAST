@@ -207,6 +207,13 @@ Eng = TrnType == 1;
 Fuel = SrcType == 1;
 Batt = SrcType == 0;
 
+% Start a new mission from its prescribed/carryover battery SOC. The
+% default 100% initialization otherwise erases sequence charging state at
+% the first segment of every flight.
+if (DetailedBatt == 1) && (SegBeg == 1) && any(Batt)
+    SOC(:, Batt) = Aircraft.Specs.Power.Battery.BegSOC;
+end
+
 % allocate memory for the power required and supplemental power
 Preq  = zeros(npnt, ncomp);
 Pout  = zeros(npnt, ncomp);

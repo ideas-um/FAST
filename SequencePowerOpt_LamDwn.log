@@ -1,0 +1,46 @@
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+{Error using fmincon (line 531)
+Optimization Toolbox must be installed to call fmincon.
+
+Error in OptimizationPkg.SequencePowerOpt (line 142)
+    PCbest = fmincon(@(PC) ObjFunc(PC, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), options);
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error in RunPaperSequencePowerOpt (line 15)
+    OptimizationPkg.SequencePowerOpt(Aircraft, Sequence);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     186    1.334693e+04    0.000e+00    4.785e+01                 252.242635 sec
+    1     372    1.331266e+04    0.000e+00    1.357e+00    1.266e+00    486.907135 sec
+    2     561    1.327039e+04    0.000e+00    1.709e+00    1.785e-01    723.611886 sec
+    3     766    1.326789e+04    0.000e+00    1.231e+00    1.713e-05    985.565941 sec
+    4     953    1.326789e+04    0.000e+00    1.231e+00    6.633e-05   1196.988719 sec
+    5    1148    1.326789e+04    0.000e+00    1.231e+00    7.496e-06   4176.738397 sec
+
+Solver stopped prematurely.
+
+fmincon stopped because it exceeded the iteration limit,
+options.MaxIterations = 5.000000e+00.
+
+    Flight    Distance_nmi    GroundTime_min    Fuel_kg    BatteryEnergy_kWh    InitialSOC_pct    FinalSOC_pct
+    ______    ____________    ______________    _______    _________________    ______________    ____________
+
+      1          1151.4              0          2380.5          238.98               100             20.307   
+      2          1151.4             37          2380.7          237.98               100             20.786   
+      3          406.68             65          1269.4          230.25               100             20.981   
+      4          406.68             53          1269.5          230.14               100             21.037   
+      5          813.36             50          2315.6          239.25               100             20.179   
+
+             Metric             Paper     CurrentBranch    DifferencePercent
+    ________________________    ______    _____________    _________________
+
+    "TotalFuel_kg"               14674       9615.7             -34.47      
+    "TotalBatteryEnergy_kWh"    635.55       1176.6             85.129      
+
+Electric motor weight: 90.997 kg

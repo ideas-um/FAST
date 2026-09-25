@@ -1,0 +1,36 @@
+[Warning: Column headers from the file were modified to make them valid MATLAB identifiers before creating variable names for the table. The original column headers are saved in
+the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as table variable names.] 
+Initial point X0 is not between bounds LB and UB; 
+FMINCON shifted X0 to strictly satisfy the bounds.
+
+                                            First-order      Norm of                  
+ Iter F-count            f(x)  Feasibility   optimality         step   Wall-Clock Time
+    0     186    1.255672e+04    0.000e+00    5.324e+01                 208.145351 sec
+    1     374    1.254685e+04    0.000e+00    4.423e+01    3.176e-01    404.987618 sec
+    2     574    1.254308e+04    0.000e+00    4.267e+01    5.623e-04    679.081022 sec
+    3     763    1.254308e+04    0.000e+00    4.267e+01    3.889e-04    919.144658 sec
+    4     962    1.254308e+04    0.000e+00    4.226e+01    3.837e-06   1152.677330 sec
+    5    1149    1.254308e+04    0.000e+00    4.226e+01    1.321e-05   1371.441397 sec
+
+Solver stopped prematurely.
+
+fmincon stopped because it exceeded the iteration limit,
+options.MaxIterations = 5.000000e+00.
+
+    Flight    Distance_nmi    GroundTime_min    Fuel_kg    BatteryEnergy_kWh    InitialSOC_pct    FinalSOC_pct
+    ______    ____________    ______________    _______    _________________    ______________    ____________
+
+      1          1151.4              0          2367.2          238.98                 100           20.135   
+      2          1151.4             37          2167.7          107.03               52.93           20.478   
+      3          406.68             65          1078.8          206.83              79.641           21.693   
+      4          406.68             53          993.98           176.8              68.487           21.399   
+      5          813.36             50          2158.9          219.17              65.538           20.403   
+
+             Metric             Paper     CurrentBranch    DifferencePercent
+    ________________________    ______    _____________    _________________
+
+    "TotalFuel_kg"               14674       8766.6             -40.257     
+    "TotalBatteryEnergy_kWh"    635.55        948.8              49.287     
+
+Electric motor weight: 90.997 kg

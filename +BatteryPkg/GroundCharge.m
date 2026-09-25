@@ -33,6 +33,15 @@ if nargin<3
 end
 
 TimeStep = 1;                           % simulate in 1-second increments
+if ~isscalar(ChrgTime) || ~isfinite(ChrgTime)
+    error("BatteryPkg:GroundCharge:InvalidChargeTime", ...
+        "ChrgTime must be a finite scalar number of seconds.");
+end
+
+if ChrgTime < 0
+    error("BatteryPkg:GroundCharge:NegativeChargeTime", ...
+        "ChrgTime cannot be negative.");
+end
 maxSteps = ceil(ChrgTime / TimeStep);
 
 % Initial empty arrays
@@ -46,7 +55,16 @@ C_rateSeries   = zeros(maxSteps,   1);
 
 %% Initial SOC and cell parameters %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-SOCBeg = Aircraft.Mission.History.SI.Power.SOC(end);
+Batt = find(Aircraft.Specs.Propulsion.PropArch.SrcType == 0, 1);
+if isempty(Batt)
+    error("BatteryPkg:GroundCharge:NoBatterySource", ...
+        "The propulsion architecture does not contain a battery source.");
+end
+SOCBeg = Aircraft.Mission.History.SI.Power.SOC(end, Batt);
+if ~isscalar(SOCBeg) || ~isfinite(SOCBeg)
+    error("BatteryPkg:GroundCharge:InvalidInitialSOC", ...
+        "The final mission battery SOC must be a finite scalar.");
+end
 SOCSeries(1) = SOCBeg;
 
 SerCells = Aircraft.Specs.Power.Battery.SerCells;
@@ -60,6 +78,10 @@ else
     DynamicArray = true;
     PowerArray      = PowerStrategy(:);  % ensure column vector
     Narray          = length(PowerArray);
+    if Narray == 0
+        error("BatteryPkg:GroundCharge:EmptyPowerStrategy", ...
+            "PowerStrategy cannot be empty.");
+    end
 end
 
 % Compute cell capacity (also if degradation is considered)
@@ -92,6 +114,12 @@ SOC_cutoffActual = 80;       % SOC at which CV taper begins
 for step = 1:maxSteps
     SOC_now = SOCSeries(step);
 
+    % Do not enter the CC/CV equations at a fully charged state.
+    if SOC_now >= 100
+        SOCSeries(step) = 100;
+        break
+    end
+
     if ~InCV
 
         %%%%%%%%%% Part 1 or 2 (CC) %%%%%%%%%%%%%%%%%%
@@ -104,6 +132,18 @@ for step = 1:maxSteps
                 else
                     Pdesired = PowerArray(Narray);
                 end
+            else
+                Pdesired = BasePower;
+            end
+            CurrentPower = -abs(Pdesired);
+
+        elseif step == 1
+            % There is no previous current/voltage sample when charging
+            % starts at or above 80% SOC. Use the requested charger power
+            % for the first second; subsequent steps can use the resulting
+            % sample to enter the normal CC/CV logic.
+            if DynamicArray
+                Pdesired = PowerArray(1);
             else
                 Pdesired = BasePower;
             end
@@ -175,18 +215,16 @@ for step = 1:maxSteps
         break;
     end
 
-    % If reached 100% SOC, stop
-    if SOC_now >= 100
-        SOCSeries(step)        = 100;
-        CapacitySeries(step+1) = CapacitySeries(step);
-        break;
-    end
 end
 
 
 %% TRIM ARRAYS TO ACTUAL SIMULATION LENGTH %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-validLen       = step;
+if maxSteps == 0
+    validLen = 0;
+else
+    validLen = step;
+end
 VoltageSeries  = VoltageSeries(1:validLen);
 CurrentSeries  = CurrentSeries(1:validLen);
 PoutSeries     = PoutSeries(1:validLen);

@@ -1,4 +1,4 @@
-function [OptimizedAircraft, PCbest, t, OptSeqTable] = SequencePowerOpt(Aircraft, Sequence)
+function [OptimizedAircraft, PCbest, t, OptSeqTable, exitflag, OptimizerOutput] = SequencePowerOpt(Aircraft, Sequence)
 %
 % OptimizedAircraft = SequencePowerOpt(Aircraft, Sequence)
 % written by Emma Cassidy, emmasmit@umich.edu
@@ -26,6 +26,19 @@ priceTable = readtable(fullfile(PackageDir, "..", "+CostPkg", "Energy_CostbyAirp
 
 % number of missions to fly
 nflight = height(Sequence);
+
+if nflight > 1
+    IntermediateGateTimes = Sequence.GROUND_TIME(2:end);
+    if any(~isfinite(IntermediateGateTimes) | IntermediateGateTimes <= 7)
+        BadFlight = find(~isfinite(IntermediateGateTimes) | ...
+            IntermediateGateTimes <= 7, 1) + 1;
+        error("OptimizationPkg:SequencePowerOpt:InvalidGroundTimeData", ...
+            ["Sequence input data are invalid: flight %d has %.3f minutes " ...
+            "of preceding gate time; intermediate gate times must exceed " ...
+            "the 7-minute fueling/service allowance."], ...
+            BadFlight, Sequence.GROUND_TIME(BadFlight));
+    end
+end
 
 % setup a table large enough for all flights
 % note that 24 = number of data metrics returned (setup in varTypes/Names)
@@ -68,6 +81,11 @@ if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptMaxIter"
     MaxOptIter = Aircraft.Settings.PowerOptMaxIter;
 end
 
+MaxStarts = 3;
+if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptMaxStarts")
+    MaxStarts = Aircraft.Settings.PowerOptMaxStarts;
+end
+
 % Evaluations mutate the cached sequence result, so keep them serial.
 options = optimoptions("fmincon", ...
                        "MaxIterations", MaxOptIter, ...
@@ -91,7 +109,7 @@ options.MaxFunctionEvaluations = 10^9;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % run off design mission
-Aircraft.Settings.Analysis.Type = -2;
+Aircraft.Settings.Analysis.Type = -1;
 
 % turn off FAST print outs
 Aircraft.Settings.PrintOut = 0;
@@ -103,7 +121,10 @@ Aircraft.Settings.ConSOC = 0;
 Aircraft.Settings.Table = 0;
 
 Aircraft.Settings.PowerOpt = 1;
-Aircraft.Settings.PowerStrat = -1;
+
+% Every sequence begins with a fully charged battery. Subsequent initial
+% SOC values are propagated only from the preceding flight and turnaround.
+Aircraft.Specs.Power.Battery.BegSOC = 100;
 
 % Build the mission-indexed lambda schedules used by Main, then identify
 % the transmitter columns for the PHE architecture.
@@ -126,26 +147,86 @@ PC(isnan(PC)) = 0;
 PC = min(max(PC, 0), 0.9);
 PC0 = repmat(PC, 1, nflight);
 lb = zeros(size(PC0));
-ub = 0.9 .* ones(size(PC0));
+ub = ones(size(PC0));
 
 % save storage values
 PClast = [];
 Objective = [];
 SOC    = [];
 dh_dt = [];
+PowerExcess = [];
+MTOWExcess = [];
+LastEvaluationFailure = "";
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 if (MaxOptIter < 1)
-    PCbest = PC0;
-else
-    PCbest = fmincon(@(PC) ObjFunc(PC, Aircraft, Sequence), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), options);
+    error("ERROR - SequencePowerOpt: MaxIterations must be positive for a converged result.");
+end
+
+StartPoints = BuildStartPoints(PC0, MaxStarts);
+Attempts = repmat(struct("Start", 0, "ExitFlag", NaN, "Iterations", NaN, ...
+    "Objective_kg", NaN, "MaxConstraint", Inf, "ValidReplay", false), ...
+    numel(StartPoints), 1);
+Converged = false;
+
+for iStart = 1:numel(StartPoints)
+    PClast = [];
+    [CandidatePC, ~, CandidateExitFlag, CandidateOutput] = ...
+        fmincon(@(PC) ObjFunc(PC, Aircraft, Sequence), StartPoints{iStart}, ...
+        [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), options);
+
+    PClast = [];
+[ReplayObjective, ReplaySOC, ReplayRC, ReplayPowerExcess, ...
+        ReplayMTOWExcess, ValidReplay] = ...
+        FlySequence(CandidatePC, Aircraft, Sequence);
+    ReplayConstraints = [ ...
+        reshape(Aircraft.Specs.Battery.MinSOC - ReplaySOC, [], 1); ...
+        reshape(ReplaySOC - 100, [], 1); ...
+        reshape(ReplayRC - Aircraft.Specs.Performance.RCMax, [], 1); ...
+        ReplayPowerExcess(:); ReplayMTOWExcess(:)];
+    MaxConstraint = max(ReplayConstraints, [], "all");
+
+    Attempts(iStart).Start = iStart;
+    Attempts(iStart).ExitFlag = CandidateExitFlag;
+    Attempts(iStart).Iterations = CandidateOutput.iterations;
+    Attempts(iStart).Objective_kg = ReplayObjective;
+    Attempts(iStart).MaxConstraint = MaxConstraint;
+    Attempts(iStart).ValidReplay = ValidReplay;
+
+    if CandidateExitFlag > 0 && ValidReplay && ...
+            isfinite(ReplayObjective) && ReplayObjective < 1e14 && ...
+            MaxConstraint <= options.ConstraintTolerance
+        PCbest = CandidatePC;
+        exitflag = CandidateExitFlag;
+        OptimizerOutput = CandidateOutput;
+        OptimizerOutput.StartAttempt = iStart;
+        OptimizerOutput.Attempts = Attempts(1:iStart);
+        OptimizerOutput.ReplayObjective_kg = ReplayObjective;
+        OptimizerOutput.MaxConstraint = MaxConstraint;
+        Converged = true;
+        break
+    end
+end
+
+if ~Converged
+    FailureSuffix = "";
+    if strlength(LastEvaluationFailure) > 0
+        FailureSuffix = " Last evaluation failure: " + LastEvaluationFailure;
+    end
+    error("OptimizationPkg:SequencePowerOpt:NoConvergedSolution", ...
+        "No converged, feasible sequence solution was found after %d starts and %d iterations per start.%s", ...
+        numel(StartPoints), MaxOptIter, FailureSuffix);
 end
 t = toc / 60;
 
 % Ensure the returned aircraft sequence corresponds exactly to PCbest,
 % rather than whichever finite-difference point fmincon evaluated last.
-FlySequence(PCbest, Aircraft, Sequence);
+[~, ~, ~, ~, ~, FinalReplayValid] = FlySequence(PCbest, Aircraft, Sequence);
+if ~FinalReplayValid
+    error("OptimizationPkg:SequencePowerOpt:FinalReplayFailed", ...
+        "The converged control schedule failed during its final sequence replay.");
+end
 
 %% Post-Processing %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,17 +241,26 @@ for kflight = 1:nflight
 end
 
 
-save("SeqOptAC_futDOC.mat", "OptimizedAircraft");
-save("opttable_futDOC.mat", "OptSeqTable");
+% Result persistence is owned by the calling workflow. Avoid fixed-name
+% saves here because they collide when sequences are optimized in parallel.
     
 %% Nested Functions %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
-    function [DOC,SOC, dh_dt]  = FlySequence(PC, Aircraft, Sequence)
-    % Direct operating cost is the sequence objective.
-    DOC = 0;
+    function [TotalFuel,SOC, dh_dt, PowerExcess, MTOWExcess, Valid] = ...
+            FlySequence(PC, Aircraft, Sequence)
+    % Total main-mission fuel burn is the sequence objective.
+    TotalFuel = 0;
     SOC = zeros(length(pts), nflight);
     dh_dt = zeros(length(pts), nflight);
+    % Check power availability at the same fixed takeoff/climb control
+    % points used by the SOC and rate-of-climb constraints.  Restricting
+    % the mission histories to pts preserves every optimized control point
+    % while keeping the nonlinear-constraint vector length invariant.
+    PowerExcess = zeros(length(pts), nflight);
+    MTOWExcess = zeros(nflight, 1);
+    Valid = false;
+    CandidateAircraft = struct;
 
     % iterate through missions
     for jflight = 1:nflight
@@ -192,9 +282,9 @@ save("opttable_futDOC.mat", "OptSeqTable");
         
         % ground time (mimutes)
         if jflight < nflight
-            ChargeTimeMin = Sequence.GROUND_TIME(jflight+1) - 5;
+            ChargeTimeMin = Sequence.GROUND_TIME(jflight+1) - 7;
         else
-            ChargeTimeMin = 1e3;
+            ChargeTimeMin = 0;
         end
         
         % payload
@@ -245,8 +335,9 @@ save("opttable_futDOC.mat", "OptSeqTable");
         % payload
         Aircraft.Specs.Weight.Payload = Wpayload;
 
-        %--------------------------------------------------------------
-        % input design variables
+        % Rebuild this flight's range-dependent mission profile without
+        % entering aircraft or propulsion sizing, then apply its controls.
+        Aircraft = PrepareFlightMission(Aircraft);
         Aircraft = ApplyPowerSplit(Aircraft, PC(:, jflight));
 
         % ----------------------------------------------------------
@@ -259,24 +350,46 @@ save("opttable_futDOC.mat", "OptSeqTable");
 
         % fly mission
         try
-            Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+            Aircraft = FlyFixedAircraft(Aircraft);
             %Aircraft = OptimizationPkg.MissionPowerOpt(Aircraft);
             
-            % determine cost of flight
+            % Determine cost for post-processing, then add this flight's
+            % main-mission fuel burn to the sequence objective.
             Aircraft = CostPkg.EnergyCost_perAirport(Aircraft, Sequence.ORIGIN(jflight), priceTable);
-
-            %objective function: DOC
-            DOC = DOC + Aircraft.Specs.Cost.FOC;
+            MainSegs = find(Aircraft.Mission.Profile.ID == 1);
+            MainEnd = Aircraft.Mission.Profile.SegEnd(MainSegs(end));
+            TotalFuel = TotalFuel + Aircraft.Mission.History.SI.Weight.Fburn(MainEnd);
 
             % rate of climb
             dh_dt(:, jflight) = Aircraft.Mission.History.SI.Performance.RC(pts);
         
             %SOC
             SOC(:, jflight) = Aircraft.Mission.History.SI.Power.SOC(pts,2);
-        catch
-            DOC = 10^15;
-            dh_dt(:, jflight) = Aircraft.Specs.Performance.RCMax + ones(length(pts), 1);
-            SOC(:, jflight) = -ones(length(pts), 1);
+
+            % fmincon constraint: power demand may not exceed component
+            % power availability anywhere in the complete mission.
+            ThisPowerExcess = Aircraft.Mission.History.SI.Power.Preq - ...
+                Aircraft.Mission.History.SI.Power.Pav;
+            % Unused terminal/component entries are stored as NaN and do
+            % not represent a physical demand point.
+            ThisPowerExcess(~isfinite(ThisPowerExcess)) = 0;
+            PowerExcess(:, jflight) = ThisPowerExcess(pts);
+
+            % fmincon constraint: the flight takeoff weight may not exceed
+            % the MTOW of the original sized HEA design.
+            MTOWExcess(jflight) = ...
+                Aircraft.Mission.History.SI.Weight.CurWeight(1) - ...
+                Aircraft.Specs.Weight.MTOW;
+        catch ME
+            LastEvaluationFailure = "Flight " + jflight + ": " + ...
+                string(ME.message) + " (" + string(ME.identifier) + ")";
+            TotalFuel = 10^15;
+            dh_dt(:, :) = Aircraft.Specs.Performance.RCMax + 1;
+            SOC(:, :) = -1;
+            PowerExcess(:, :) = 1e15;
+            MTOWExcess(:) = 1e15;
+            OptimizedAircraft = struct;
+            return
         end
 
        
@@ -284,19 +397,36 @@ save("opttable_futDOC.mat", "OptSeqTable");
      
         
         try
-            % charge battery
-            Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
-    
-            % assign charges SOC to begSOC for next flight
-            Aircraft.Specs.Battery.BegSOC = Aircraft.Mission.History.SI.Power.ChargedAC.SOCEnd;
-        catch
-            Aircraft.Specs.Battery.BegSOC = 20;
+            % Charge the battery and propagate its actual post-charge SOC
+            % to the next flight. A charging failure invalidates the entire
+            % sequence evaluation; it must never be replaced by a fake SOC.
+            if jflight < nflight
+                Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime);
+                Aircraft.Specs.Power.Battery.BegSOC = ...
+                    Aircraft.Mission.History.SI.Power.ChargedAC.SOCEnd;
+            end
+        catch ME
+            % Keep optimizer evaluations quiet, but retain the true reason
+            % so a wholly failed sequence reports a useful diagnostic.
+            LastEvaluationFailure = "Ground charge after flight " + ...
+                jflight + ": " + string(ME.message) + " (" + ...
+                string(ME.identifier) + ")";
+            TotalFuel = 10^15;
+            dh_dt(:, :) = Aircraft.Specs.Performance.RCMax + 1;
+            SOC(:, :) = -1;
+            PowerExcess(:, :) = 1e15;
+            MTOWExcess(:) = 1e15;
+            OptimizedAircraft = struct;
+            return
         end
         
         % save optimized aircraft struct
         nameAC = sprintf("Aircraft%d", jflight);
-        OptimizedAircraft.(nameAC) = Aircraft;
+        CandidateAircraft.(nameAC) = Aircraft;
     end
+
+    OptimizedAircraft = CandidateAircraft;
+    Valid = true;
 
 end
 
@@ -327,17 +457,26 @@ end
 function [c, ceq] = Cons(PC, Aircraft, Sequence)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [Objective, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence);
+        [Objective, SOC, dh_dt, PowerExcess, MTOWExcess] = ...
+            FlySequence(PC, Aircraft, Sequence);
         PClast = PC;
     end
-    % compute SOC constraint
-    cSOC = Aircraft.Specs.Battery.MinSOC - SOC;
+    % Battery SOC must remain within its physical range at every optimized
+    % takeoff/climb control point for every flight in the sequence.
+    cSOCMin = Aircraft.Specs.Battery.MinSOC - SOC;
+    cSOCMax = SOC - 100;
 
     % compute RC constraint
     cRC = dh_dt - Aircraft.Specs.Performance.RCMax;
 
     % out put constraints
-    c = [cSOC(:); cRC(:)];
+    % Component-wise power constraint across every flight and mission point.
+    cPower = PowerExcess;
+
+    % Per-flight structural weight constraint against the fixed HEA design.
+    cMTOW = MTOWExcess;
+
+    c = [cSOCMin(:); cSOCMax(:); cRC(:); cPower(:); cMTOW(:)];
     ceq = [];
 
 end
@@ -355,8 +494,30 @@ function OutAircraft = ApplyPowerSplit(InAircraft, PC)
     OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = ...
         repmat(1 / length(iFan), length(pts), length(iFan));
 
-    % LamUps controls availability, not the optimized demand split.
+    % The climb derate is used only while sizing the installed motors.
+    % During sequence optimization the full installed motor rating is
+    % available throughout takeoff and climb.
     OutAircraft.Specs.Power.LamUps.Miss(pts, iEM) = 1;
+end
+
+function OutAircraft = PrepareFlightMission(InAircraft)
+    OutAircraft = MissionProfilesPkg.ERJ_ClimbThenAccel(InAircraft);
+    OutAircraft = MissionSegsPkg.ProcessProfile(OutAircraft);
+    OutAircraft = DataStructPkg.InitMissionHistory(OutAircraft);
+
+    if isfield(OutAircraft.Specs.Power.LamUps, "Miss")
+        OutAircraft.Specs.Power.LamUps = rmfield(OutAircraft.Specs.Power.LamUps, "Miss");
+    end
+    if isfield(OutAircraft.Specs.Power.LamDwn, "Miss")
+        OutAircraft.Specs.Power.LamDwn = rmfield(OutAircraft.Specs.Power.LamDwn, "Miss");
+    end
+    OutAircraft = PropulsionPkg.LamFill(OutAircraft);
+end
+
+function OutAircraft = FlyFixedAircraft(InAircraft)
+    OutAircraft = DataStructPkg.ClearMission(InAircraft);
+    OutAircraft = PropulsionPkg.LamFill(OutAircraft);
+    OutAircraft = MissionSegsPkg.FlyMission(OutAircraft);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,6 +611,24 @@ if (isempty(TakeoffSegs) || isempty(ClimbSegs))
 end
 
 pts = (Mission.SegBeg(TakeoffSegs(1)):Mission.SegEnd(ClimbSegs(end)))';
+end
+
+
+function Starts = BuildStartPoints(PC0, MaxStarts)
+MaxStarts = max(1, floor(MaxStarts));
+Starts = cell(min(MaxStarts, 3), 1);
+Starts{1} = PC0;
+
+if numel(Starts) >= 2
+    % A conservative schedule preserves more battery for later flights.
+    FlightScale = linspace(0.35, 1, size(PC0, 2));
+    Starts{2} = PC0 .* FlightScale;
+end
+
+if numel(Starts) >= 3
+    % A uniform low-assist schedule provides a distinct feasible basin.
+    Starts{3} = min(PC0, 0.10 .* ones(size(PC0)));
+end
 end
 
 end

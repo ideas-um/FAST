@@ -65,16 +65,13 @@ options.StepTolerance = 1.0e-8;
 
 % run off-design mission so the optimizer changes mission power splits
 % without resizing the aircraft inside each objective evaluation.
-Aircraft.Settings.Analysis.Type = -2;
+Aircraft.Settings.Analysis.Type = -1;
 
 % turn off FAST print outs
 Aircraft.Settings.PrintOut = 0;
 
 % turn off FAST internal SOC constraint
 Aircraft.Settings.PowerOpt = 1;
-
-% prioritize downstream power requirements.
-Aircraft.Settings.PowerStrat = -1;
 
 % no mission history table
 Aircraft.Settings.Table = 0;
@@ -135,7 +132,7 @@ t = toc / 60;
 %%%%%%%%%%%%%%%%%%%%
 
 OptAircraft = ApplyPowerSplit(Aircraft0, PCbest);
-OptAircraft = Main(OptAircraft, ProfileFxn);
+OptAircraft = FlyFixedAircraft(OptAircraft);
 
 fburnOG  = ObjFunc(PC0);
 fburnOpt = ObjFunc(PCbest);
@@ -157,8 +154,10 @@ function [fburnOut, SOCOut, RCOut] = FlyAircraft(PC)
     TestAircraft = ApplyPowerSplit(Aircraft0, PC);
 
     try
-        % fly off-design mission
-        TestAircraft = Main(TestAircraft, ProfileFxn);
+        % Fly the already-sized aircraft directly. Calling Main here enters
+        % EAPAnalysis, whose first pass calls PropulsionSizing even for the
+        % retrofit (-2) mode and therefore changes motor and aircraft size.
+        TestAircraft = FlyFixedAircraft(TestAircraft);
 
         % fuel required for mission
         fburnOut = TestAircraft.Mission.History.SI.Weight.Fburn(end);
@@ -185,6 +184,19 @@ function [fburnOut, SOCOut, RCOut] = FlyAircraft(PC)
         SOCOut = -1;
         RCOut = Aircraft0.Specs.Performance.RCMax + ones(size(pts));
     end
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            %
+% Fixed-Aircraft Mission     %
+%                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function OutAircraft = FlyFixedAircraft(InAircraft)
+    OutAircraft = DataStructPkg.ClearMission(InAircraft);
+    OutAircraft = PropulsionPkg.LamFill(OutAircraft);
+    OutAircraft = MissionSegsPkg.FlyMission(OutAircraft);
 end
 
 
@@ -246,8 +258,9 @@ function [OutAircraft] = ApplyPowerSplit(InAircraft, PC)
     % Keep fan demand evenly distributed for the PHE twin-fan architecture.
     OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = repmat(1 / length(iFan), length(pts), length(iFan));
 
-    % Electric motors must remain enabled in the upstream schedule anywhere
-    % the optimizer may request downstream electric assist.
+    % The climb derate is used only while sizing the installed motors.
+    % During mission optimization the full installed motor rating is
+    % available throughout the optimized takeoff-to-cruise window.
     OutAircraft.Specs.Power.LamUps.Miss(pts, iEM) = 1;
 end
 

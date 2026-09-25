@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 34 checks pass, otherwise 0.
+%     Success - 1 when all 39 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(34, 1);
+Pass = false(39, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -179,6 +179,31 @@ splits(4, 1:2) = [0.5, 0.5];
 actual = PropulsionPkg.PowerSupplementCheck( ...
     [51, 149, 100, 100], architecture, splits, ones(4), [1, 0, 3, 2], 0.8);
 Pass(34) = CheckValue(actual(1), 39);
+
+%% ENGINE IDLE AND ELECTRIC-ONLY OPERATION %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% A conventional engine with no demanded thrust remains at idle.
+Pass(35) = CheckValue( ...
+    PropulsionPkg.ResolveEngineDemand(0, 50, false), 50);
+
+% Electric-only operation at one point cannot disable idle elsewhere in
+% the same segment.
+Actual = PropulsionPkg.ResolveEngineDemand([0; 0], 50, [false; true]);
+Pass(36) = isequal(Actual, [50; 0]);
+
+% Positive demand is passed through unchanged.
+Pass(37) = CheckValue( ...
+    PropulsionPkg.ResolveEngineDemand(100, 50, false), 100);
+
+% Full electric assistance may deliberately shut the engine down.
+Pass(38) = CheckValue( ...
+    PropulsionPkg.ResolveEngineDemand(0, 50, true), 0);
+
+% Takeoff or another prohibited shutdown condition keeps the same fully
+% assisted engine at idle rather than silently turning it off.
+Pass(39) = CheckValue( ...
+    PropulsionPkg.ResolveEngineDemand(0, 50, false), 50);
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

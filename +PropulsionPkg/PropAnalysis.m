@@ -525,30 +525,35 @@ if (any(Fuel))
         % compute thrust/power available (depends on aircraft class)
         if      (strcmpi(aclass, "Turbofan" ) == 1)
             
-            % temporary thrust required
-            TTemp = TEng;
-            
-            % check if there is a power siphon
-            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
-            
-                % any required thrust < 1 must be rounded up to 5% SLS thrust
-                TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
-                
-            end
+            % Determine the net engine demand point by point. Electric-only
+            % operation may shut an engine down after takeoff, but a partial
+            % or microscopic supplement must not remove the idle floor for
+            % an entire mission segment.
+            ModelSupplement = Psupp(ibeg:iend, icol) ./ TAS(ibeg:iend);
+            NetDemand = TEng - ModelSupplement;
+            IdleDemand = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+            AllowShutdown = (SegBeg > 1) & ...
+                            (ModelSupplement >= IdleDemand) & ...
+                            (NetDemand <= 0);
+            TTemp = PropulsionPkg.ResolveEngineDemand( ...
+                TEng, IdleDemand, AllowShutdown);
                         
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
             % temporary power required
             PTemp = Pout(ibeg:iend, icol);
-            
-            % check if there is a power siphon
-            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
-            
-                % any required power  < 1 must be rounded up to 5% SLS power
-                PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
-                
-            end            
+
+            % Turboprop power flow already contains the motor contribution,
+            % so there is no model supplement to subtract a second time.
+            % Permit shutdown only when motor assistance is large enough to
+            % replace idle power and leaves zero engine power at this point.
+            IdleDemand = 0.05 * Aircraft.Specs.Power.SLS;
+            AllowShutdown = (SegBeg > 1) & ...
+                            (Psupp(ibeg:iend, icol) >= IdleDemand) & ...
+                            (PTemp <= 0);
+            PTemp = PropulsionPkg.ResolveEngineDemand( ...
+                PTemp, IdleDemand, AllowShutdown);
         end
         
         % get altitudes and mach number

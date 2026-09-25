@@ -440,7 +440,13 @@ end
 function [val] = ObjFunc(PC, Aircraft, Sequence)
     % check if PC values changes
     if ~isequal(PC, PClast)
-        [Objective, SOC, dh_dt] = FlySequence(PC, Aircraft, Sequence);
+        % Cache every quantity consumed by Cons. fmincon commonly calls the
+        % objective before the nonlinear constraints at the same PC; if
+        % only the first three outputs are assigned here, Cons sees a cache
+        % hit while PowerExcess and MTOWExcess are still empty, changing the
+        % constraint-vector length on its next evaluation.
+        [Objective, SOC, dh_dt, PowerExcess, MTOWExcess] = ...
+            FlySequence(PC, Aircraft, Sequence);
         PClast = PC;
         %disp(PC)
     end

@@ -74,6 +74,9 @@ Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(1475/60, "ft/s", "m
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% aerodynamic analysis method
+Aircraft.Specs.Aero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
+
 % lift-drag ratio at climb
 Aircraft.Specs.Aero.L_D.Clb = 10;
 

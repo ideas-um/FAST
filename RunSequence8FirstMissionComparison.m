@@ -9,10 +9,16 @@ if isfile(fullfile("output", "ERJ17LR_PHE_sized.mat"))
     Input = load(fullfile("output", "ERJ17LR_PHE_sized.mat"), "SizedPHE");
     BaseAircraft = Input.SizedPHE;
     InputFile = fullfile("output", "ERJ17LR_PHE_sized.mat");
-else
+elseif isfile(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"))
     Input = load(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"), "A");
     BaseAircraft = Input.A;
     InputFile = fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat");
+elseif isfile("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat")
+    Input = load("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat", "SizedAircraft");
+    BaseAircraft = Input.SizedAircraft;
+    InputFile = "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat";
+else
+    error("No saved fixed-size ERJ175LR PHE aircraft was found.");
 end
 
 SequenceData = load("Sequence.mat", "tables");

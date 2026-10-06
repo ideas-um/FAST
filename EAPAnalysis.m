@@ -159,6 +159,25 @@ Aircraft.Settings.Converged = 1;
 % define convergence tolerance
 EPS = 1.0e-3;
 
+% Number of recent battery-sizing iterations retained for detecting a
+% repeated discrete-cell limit cycle. Increase this value to detect longer
+% cycles; a cycle must repeat at least twice within this window.
+BattCycleHistoryLength = 10;
+
+% Battery limit-cycle detection is only applicable to on-design sizing with
+% the detailed (integer series/parallel cell) battery model.
+DetectBattCycle = (Type > 0) && (Aircraft.Settings.DetailedBatt == 1) && any(Batt);
+BattSizeFixed   = false;
+BattHistoryCount = 0;
+BattSizeHistory = nan(BattCycleHistoryLength, numel(Wbatt));
+BattCellHistory = nan(BattCycleHistoryLength, numel(ParCells));
+
+% Expose the cycle-detection settings and result for post-processing.
+Aircraft.Settings.BattCycleHistoryLength = BattCycleHistoryLength;
+Aircraft.Settings.BattCycleDetected      = 0;
+Aircraft.Settings.BattCyclePeriod        = 0;
+Aircraft.Settings.BattSizeFixed          = 0;
+
 % iteration counter
 iter = 0;
 
@@ -240,8 +259,8 @@ while (iter < MaxIter)
     % compute the fuel burn weight changes
     dWfuel = Fburn - Wfuel;
         
-    % check if a retrofit is being performed (fixed battery weight)
-    if (Type == -2)
+    % check if a retrofit or limit-cycle resolution is using a fixed battery
+    if ((Type == -2) || BattSizeFixed)
         
         % fixed battery weight
         dWbatt = 0;
@@ -250,6 +269,46 @@ while (iter < MaxIter)
         
         % resize the battery for power and energy
         Aircraft = BatteryPkg.ResizeBattery(Aircraft);
+
+        % Detect repeated cycles in the detailed battery's integer parallel-
+        % cell configuration. Once detected, select and lock the smallest
+        % battery state in the repeated cycle so the rest of the aircraft can
+        % continue sizing around a fixed battery.
+        if (DetectBattCycle)
+
+            if (BattHistoryCount < BattCycleHistoryLength)
+                BattHistoryCount = BattHistoryCount + 1;
+            else
+                BattSizeHistory(1:(end - 1), :) = BattSizeHistory(2:end, :);
+                BattCellHistory(1:(end - 1), :) = BattCellHistory(2:end, :);
+            end
+
+            BattSizeHistory(BattHistoryCount, :) = Aircraft.Specs.Weight.Batt(:).';
+            BattCellHistory(BattHistoryCount, :) = Aircraft.Specs.Power.Battery.ParCells(:).';
+
+            ActiveBattSizeHistory = BattSizeHistory(1:BattHistoryCount, :);
+            ActiveBattCellHistory = BattCellHistory(1:BattHistoryCount, :);
+            CyclePeriod = FindRepeatedCycle(ActiveBattCellHistory);
+
+            if (CyclePeriod > 0)
+                CycleRows = (BattHistoryCount - CyclePeriod + 1):BattHistoryCount;
+                [~, SmallestCycleRow] = min(sum(ActiveBattSizeHistory(CycleRows, :), 2));
+                FixedRow = CycleRows(SmallestCycleRow);
+
+                Aircraft.Specs.Weight.Batt = ActiveBattSizeHistory(FixedRow, :);
+                Aircraft.Specs.Power.Battery.ParCells = ActiveBattCellHistory(FixedRow, :);
+                BattSizeFixed = true;
+
+                Aircraft.Settings.BattCycleDetected = 1;
+                Aircraft.Settings.BattCyclePeriod   = CyclePeriod;
+                Aircraft.Settings.BattSizeFixed     = 1;
+
+                fprintf(1, "Battery sizing limit cycle detected (period %d). " + ...
+                           "Fixing the smallest cycle battery at %.6e lbm.\n\n", ...
+                        CyclePeriod, ...
+                        UnitConversionPkg.ConvMass(sum(Aircraft.Specs.Weight.Batt), "kg", "lbm"));
+            end
+        end
         
         % find the difference between the new and old battery weight
         dWbatt = Aircraft.Specs.Weight.Batt - Wbatt;
@@ -324,6 +383,9 @@ while (iter < MaxIter)
     end 
 end
 
+% Record the number of completed sizing/analysis iterations.
+Aircraft.Settings.Analysis.Iterations = iter;
+
 % print warning if maximum iterations reached
 if ((iter == MaxIter) && (Type > 0))
     
@@ -334,7 +396,6 @@ if ((iter == MaxIter) && (Type > 0))
     Aircraft.Settings.Converged = 0;
     
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                          %
@@ -390,5 +451,30 @@ if Type ~= 1 % Battery degradation only makes sense in off-design
 end
 
 % ----------------------------------------------------------
+
+end
+
+% ----------------------------------------------------------
+
+function [Period] = FindRepeatedCycle(History)
+% Find a multi-state cycle repeated twice at the end of a history matrix.
+% A period-one repetition is ordinary convergence and is intentionally
+% excluded. Exact comparison is appropriate because detailed battery sizing
+% produces integer parallel-cell counts.
+
+Period = 0;
+NumStates = size(History, 1);
+
+for CandidatePeriod = 2:floor(NumStates / 2)
+    PreviousCycle = History((end - 2 * CandidatePeriod + 1):(end - CandidatePeriod), :);
+    CurrentCycle  = History((end -     CandidatePeriod + 1):end, :);
+
+    HasMultipleStates = size(unique(CurrentCycle, "rows"), 1) > 1;
+
+    if (HasMultipleStates && isequaln(PreviousCycle, CurrentCycle))
+        Period = CandidatePeriod;
+        return
+    end
+end
 
 end

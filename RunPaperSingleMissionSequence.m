@@ -5,11 +5,21 @@
 clearvars;
 clc;
 
-Input = load("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat", "SizedAircraft");
+if isfile(fullfile("output", "ERJ17LR_PHE_sized.mat"))
+    Input = load(fullfile("output", "ERJ17LR_PHE_sized.mat"), "SizedPHE");
+    Aircraft = Input.SizedPHE;
+    InputFile = fullfile("output", "ERJ17LR_PHE_sized.mat");
+elseif isfile(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"))
+    Input = load(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"), "A");
+    Aircraft = Input.A;
+    InputFile = fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat");
+else
+    error("No saved fixed-size ERJ17LR PHE aircraft was found in output.");
+end
 SequenceData = load("Sequence.mat", "tables");
 Sequence = SequenceData.tables{8};
-Aircraft = Input.SizedAircraft;
-Aircraft.Settings.PowerOptMaxIter = 5;
+Aircraft.Settings.PowerOptMaxIter = 500;
+Aircraft.Specs.Battery.Charging = 150e3;
 
 nflight = height(Sequence);
 FlightAircraft = struct();
@@ -49,7 +59,7 @@ for iflight = 1:nflight
     FlightAircraft.(sprintf("Aircraft%d", iflight)) = Aircraft;
 
     if iflight < nflight
-        ChargeTime_min(iflight) = max(Sequence.GROUND_TIME(iflight + 1) - 5, 0);
+        ChargeTime_min(iflight) = max(Sequence.GROUND_TIME(iflight + 1) - 7, 0);
         Aircraft = BatteryPkg.GroundCharge(Aircraft, ChargeTime_min(iflight) * 60);
         if isfield(Aircraft.Mission.History.SI.Power, "ChargedAC")
             Charged = Aircraft.Mission.History.SI.Power.ChargedAC;
@@ -58,7 +68,7 @@ for iflight = 1:nflight
             else
                 PostChargeSOC_pct(iflight) = Charged.SOCEnd;
             end
-            Aircraft.Specs.Battery.BegSOC = PostChargeSOC_pct(iflight);
+            Aircraft.Specs.Power.Battery.BegSOC = PostChargeSOC_pct(iflight);
         end
     else
         PostChargeSOC_pct(iflight) = FinalSOC_pct(iflight);
@@ -88,11 +98,14 @@ PaperComparison = table( ...
 
 ElectricMotorWeight_kg = sum(Aircraft.Specs.Weight.EM, "all");
 RunMetadata = struct("SequenceIndex", 8, ...
-    "MaxSQPIterationsPerFlight", 5, ...
-    "ChargingRule", "GROUND_TIME(next flight) - 5 minutes", ...
+    "InputFile", InputFile, ...
+    "MaxOptimizerIterationsPerFlight", 500, ...
+    "ChargerPower_kW", 150, ...
+    "ChargingRule", "GROUND_TIME(next flight) - 7 minutes", ...
     "AnalysisType", -1, ...
+    "ObjectiveBoundary", "End of main mission (Mission.Profile.ID == 1)", ...
     "OptimizedSchedule", "LamDwn");
-save("ERJ175LR_SingleMissionSequence_LamDwn.mat", "FlightAircraft", ...
+save(fullfile("output", "ERJ17LR_PHE_Sequence8_MissionOpt_150kW_500iter_FullPowerConstraint.mat"), "FlightAircraft", ...
     "PCbest", "Sequence", "FlightResults", "PaperComparison", ...
     "TotalFuel_kg", "TotalBatteryEnergy_kWh", "ElectricMotorWeight_kg", ...
     "RunMetadata", "-v7.3");

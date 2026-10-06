@@ -86,12 +86,13 @@ if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptMaxStart
     MaxStarts = Aircraft.Settings.PowerOptMaxStarts;
 end
 
-% Evaluations mutate the cached sequence result, so keep them serial.
+% Objective and constraint evaluations recompute from their explicit
+% inputs, so finite-difference points can run safely on parallel workers.
 options = optimoptions("fmincon", ...
                        "MaxIterations", MaxOptIter, ...
                        "Display", "iter", ...
                        "Algorithm", "interior-point", ...
-                       "UseParallel", false);
+                       "UseParallel", true);
 
 % objective function convergence tolerance
 options.OptimalityTolerance = 10^-6;
@@ -130,6 +131,8 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;
 % the transmitter columns for the PHE architecture.
 Aircraft = PrepareSequenceAircraft(Aircraft);
 pts = FirstMissionTakeoffThroughClimb(Aircraft);
+nMissionPts = Aircraft.Mission.Profile.SegEnd(end);
+nComponents = length(Aircraft.Specs.Propulsion.PropArch.Arch);
 
 TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 iEM  = find(TrnType == 0);
@@ -140,8 +143,8 @@ if (isempty(iEM) || isempty(iGT) || isempty(iFan))
     error("ERROR - SequencePowerOpt: expected a PHE architecture with engines, electric motors, and fans.");
 end
 
-% Use one electric-assist control per mission point and flight. Both
-% electric motors receive the same split; gas turbines receive 1 - split.
+% Use one electric-assist control per mission point and flight. Parallel
+% transmitters each receive the full architecture split value.
 PC = mean(Aircraft.Specs.Power.LamDwn.Miss(pts, iEM), 2);
 PC(isnan(PC)) = 0;
 PC = min(max(PC, 0), 0.9);
@@ -149,13 +152,6 @@ PC0 = repmat(PC, 1, nflight);
 lb = zeros(size(PC0));
 ub = ones(size(PC0));
 
-% save storage values
-PClast = [];
-Objective = [];
-SOC    = [];
-dh_dt = [];
-PowerExcess = [];
-MTOWExcess = [];
 LastEvaluationFailure = "";
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -171,12 +167,10 @@ Attempts = repmat(struct("Start", 0, "ExitFlag", NaN, "Iterations", NaN, ...
 Converged = false;
 
 for iStart = 1:numel(StartPoints)
-    PClast = [];
     [CandidatePC, ~, CandidateExitFlag, CandidateOutput] = ...
         fmincon(@(PC) ObjFunc(PC, Aircraft, Sequence), StartPoints{iStart}, ...
         [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), options);
 
-    PClast = [];
 [ReplayObjective, ReplaySOC, ReplayRC, ReplayPowerExcess, ...
         ReplayMTOWExcess, ValidReplay] = ...
         FlySequence(CandidatePC, Aircraft, Sequence);
@@ -184,7 +178,7 @@ for iStart = 1:numel(StartPoints)
         reshape(Aircraft.Specs.Battery.MinSOC - ReplaySOC, [], 1); ...
         reshape(ReplaySOC - 100, [], 1); ...
         reshape(ReplayRC - Aircraft.Specs.Performance.RCMax, [], 1); ...
-        ReplayPowerExcess(:); ReplayMTOWExcess(:)];
+        ReplayPowerExcess(:) / 1e6; ReplayMTOWExcess(:)];
     MaxConstraint = max(ReplayConstraints, [], "all");
 
     Attempts(iStart).Start = iStart;
@@ -253,11 +247,8 @@ end
     TotalFuel = 0;
     SOC = zeros(length(pts), nflight);
     dh_dt = zeros(length(pts), nflight);
-    % Check power availability at the same fixed takeoff/climb control
-    % points used by the SOC and rate-of-climb constraints.  Restricting
-    % the mission histories to pts preserves every optimized control point
-    % while keeping the nonlinear-constraint vector length invariant.
-    PowerExcess = zeros(length(pts), nflight);
+    % Check every component at every mission point for every flight.
+    PowerExcess = zeros(nMissionPts, nComponents, nflight);
     MTOWExcess = zeros(nflight, 1);
     Valid = false;
     CandidateAircraft = struct;
@@ -373,7 +364,23 @@ end
             % Unused terminal/component entries are stored as NaN and do
             % not represent a physical demand point.
             ThisPowerExcess(~isfinite(ThisPowerExcess)) = 0;
-            PowerExcess(:, jflight) = ThisPowerExcess(pts);
+            if ~isequal(size(ThisPowerExcess), [nMissionPts, nComponents])
+                error("OptimizationPkg:SequencePowerOpt:PowerHistorySize", ...
+                    "Unexpected power-history size for flight %d.", jflight);
+            end
+            PowerExcess(:, :, jflight) = ThisPowerExcess;
+            if max(ThisPowerExcess, [], "all") > 1
+                % Reaching the prescribed mission time is not sufficient:
+                % reject any PC schedule that requests unavailable power.
+                TotalFuel = 1e15;
+                dh_dt(:, jflight:end) = ...
+                    Aircraft.Specs.Performance.RCMax + 1;
+                SOC(:, jflight:end) = -1;
+                PowerExcess(:, :, jflight+1:end) = 1e15;
+                MTOWExcess(jflight:end) = 1e15;
+                OptimizedAircraft = struct;
+                return
+            end
 
             % fmincon constraint: the flight takeoff weight may not exceed
             % the MTOW of the original sized HEA design.
@@ -438,20 +445,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [val] = ObjFunc(PC, Aircraft, Sequence)
-    % check if PC values changes
-    if ~isequal(PC, PClast)
-        % Cache every quantity consumed by Cons. fmincon commonly calls the
-        % objective before the nonlinear constraints at the same PC; if
-        % only the first three outputs are assigned here, Cons sees a cache
-        % hit while PowerExcess and MTOWExcess are still empty, changing the
-        % constraint-vector length on its next evaluation.
-        [Objective, SOC, dh_dt, PowerExcess, MTOWExcess] = ...
-            FlySequence(PC, Aircraft, Sequence);
-        PClast = PC;
-        %disp(PC)
-    end
-    % return objective function value
-    val = Objective;
+    [val, ~, ~, ~, ~] = FlySequence(PC, Aircraft, Sequence);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -461,12 +455,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 function [c, ceq] = Cons(PC, Aircraft, Sequence)
-    % check if PC values changes
-    if ~isequal(PC, PClast)
-        [Objective, SOC, dh_dt, PowerExcess, MTOWExcess] = ...
-            FlySequence(PC, Aircraft, Sequence);
-        PClast = PC;
-    end
+    [~, SOC, dh_dt, PowerExcess, MTOWExcess] = ...
+        FlySequence(PC, Aircraft, Sequence);
     % Battery SOC must remain within its physical range at every optimized
     % takeoff/climb control point for every flight in the sequence.
     cSOCMin = Aircraft.Specs.Battery.MinSOC - SOC;
@@ -477,7 +467,9 @@ function [c, ceq] = Cons(PC, Aircraft, Sequence)
 
     % out put constraints
     % Component-wise power constraint across every flight and mission point.
-    cPower = PowerExcess;
+    % Scale watts to megawatts for a numerically balanced constraint while
+    % preserving the physical condition Preq <= Pav.
+    cPower = PowerExcess / 1e6;
 
     % Per-flight structural weight constraint against the fixed HEA design.
     cMTOW = MTOWExcess;
@@ -495,10 +487,13 @@ end
 function OutAircraft = ApplyPowerSplit(InAircraft, PC)
     OutAircraft = InAircraft;
 
-    OutAircraft.Specs.Power.LamDwn.Miss(pts, iEM) = repmat(PC, 1, length(iEM));
-    OutAircraft.Specs.Power.LamDwn.Miss(pts, iGT) = repmat(1 - PC, 1, length(iGT));
+    % FAST assigns the complete split to every parallel motor/turbine.
+    OutAircraft.Specs.Power.LamDwn.Miss(pts, iEM) = ...
+        repmat(PC, 1, length(iEM));
+    OutAircraft.Specs.Power.LamDwn.Miss(pts, iGT) = ...
+        repmat(1 - PC, 1, length(iGT));
     OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = ...
-        repmat(1 / length(iFan), length(pts), length(iFan));
+        repmat(0.5, length(pts), length(iFan));
 
     % The climb derate is used only while sizing the installed motors.
     % During sequence optimization the full installed motor rating is
@@ -623,17 +618,18 @@ end
 function Starts = BuildStartPoints(PC0, MaxStarts)
 MaxStarts = max(1, floor(MaxStarts));
 Starts = cell(min(MaxStarts, 3), 1);
-Starts{1} = PC0;
+% Zero assist is the conventional, normally power-feasible baseline for a
+% fixed-size PHE and gives fmincon a valid starting basin.
+Starts{1} = zeros(size(PC0));
 
 if numel(Starts) >= 2
-    % A conservative schedule preserves more battery for later flights.
-    FlightScale = linspace(0.35, 1, size(PC0, 2));
-    Starts{2} = PC0 .* FlightScale;
+    Starts{2} = PC0;
 end
 
 if numel(Starts) >= 3
-    % A uniform low-assist schedule provides a distinct feasible basin.
-    Starts{3} = min(PC0, 0.10 .* ones(size(PC0)));
+    % A conservative schedule preserves more battery for later flights.
+    FlightScale = linspace(0.35, 1, size(PC0, 2));
+    Starts{3} = PC0 .* FlightScale;
 end
 end
 

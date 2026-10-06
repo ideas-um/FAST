@@ -1,11 +1,11 @@
-function [OptAircraft, PCbest, t] = MissionPowerOpt(Aircraft, ProfileFxn)
+function [OptAircraft, PCbest, t, exitflag, OptimizerOutput] = MissionPowerOpt(Aircraft, ProfileFxn)
 %
 % OptAircraft = MissionPowerOpt(Aircraft, ProfileFxn)
 % written by Emma Cassidy, emmasmit@umich.edu
 % updated for mission-indexed PowerOpt scheduling
 %
 % Optimize the PHE electric downstream power split over the first mission
-% from takeoff through the end of cruise. The optimizer works on the
+% from takeoff through the end of climb. The optimizer works on the
 % mission-filled LamDwn.Miss array so it follows whatever mission profile
 % is provided instead of relying on hard-coded control-point indices.
 %
@@ -42,19 +42,22 @@ if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptMaxIter"
     MaxOptIter = Aircraft.Settings.PowerOptMaxIter;
 end
 
-% Keep optimizer evaluations serial because the nested objective caches the
-% last mission evaluation and mutates a local Aircraft copy.
+% Each evaluation is stateless, so finite-difference points can run safely
+% on parallel workers.
 options = optimoptions("fmincon", ...
                        "MaxIterations", MaxOptIter, ...
                        "Display", "iter", ...
-                       "Algorithm", "sqp", ...
-                       "UseParallel", false);
+                       "Algorithm", "interior-point", ...
+                       "UseParallel", true);
 
 % objective function convergence tolerance
-options.OptimalityTolerance = 1.0e-8;
+options.OptimalityTolerance = 1.0e-6;
 
 % step size convergence
-options.StepTolerance = 1.0e-8;
+options.StepTolerance = 1.0e-9;
+
+% Match SequencePowerOpt's evaluation allowance.
+options.MaxFunctionEvaluations = 1.0e9;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,6 +74,9 @@ Aircraft.Settings.Analysis.Type = -1;
 Aircraft.Settings.PrintOut = 0;
 
 % turn off FAST internal SOC constraint
+Aircraft.Settings.ConSOC = 0;
+
+% The optimizer supplies and constrains the mission-indexed power split.
 Aircraft.Settings.PowerOpt = 1;
 
 % no mission history table
@@ -81,9 +87,19 @@ Aircraft.Settings.Table = 0;
 % actual mission profile instead of stale hard-coded indices.
 Aircraft0 = PrepareMissionAircraft(Aircraft, ProfileFxn);
 
-% optimize the first mission from takeoff through the end of its final
-% cruise segment.
-pts = FirstMissionTakeoffToCruise(Aircraft0);
+% Use the same takeoff-through-climb control horizon as SequencePowerOpt.
+pts = FirstMissionTakeoffThroughClimb(Aircraft0);
+
+% Keep the optimization and feasibility horizon on the revenue mission.
+% Reserve/diversion segments remain in the flown profile for reporting, but
+% they must not be included in the single-mission sequence objective.
+MainSegs = find(Aircraft0.Mission.Profile.ID == 1);
+if isempty(MainSegs)
+    error("ERROR - MissionPowerOpt: mission profile does not contain main mission ID 1.");
+end
+MainEnd = Aircraft0.Mission.Profile.SegEnd(MainSegs(end));
+nMissionPts = Aircraft0.Mission.Profile.SegEnd(end);
+nComponents = length(Aircraft0.Specs.Propulsion.PropArch.Arch);
 
 % get architecture indices used to apply a symmetric PHE split.
 TrnType = Aircraft0.Specs.Propulsion.PropArch.TrnType;
@@ -95,22 +111,18 @@ if (isempty(iEM) || isempty(iGT) || isempty(iFan))
     error("ERROR - MissionPowerOpt: PowerOpt currently expects a PHE architecture with engines, electric motors, and fans.");
 end
 
-% get starting electric downstream split from the mission-filled schedule.
+% Parallel transmitters each receive the full architecture split value;
+% recover the common electric split without summing duplicate columns.
 PC0 = mean(Aircraft0.Specs.Power.LamDwn.Miss(pts, iEM), 2);
 PC0(isnan(PC0)) = 0;
 PC0 = min(max(PC0, 0), 0.9);
+% Start from the conventional (zero-assist) schedule, which avoids asking
+% the fixed-size motors for more than their installed power on iteration 0.
+PC0 = zeros(size(PC0));
 
-% keep electric assist bounded below full electric contribution so the gas
-% turbine path remains available for the main mission.
+% Match SequencePowerOpt: PC is the total electric fraction and may reach 1.
 lb = zeros(size(PC0));
-ub = 0.9 .* ones(size(PC0));
-
-% save storage values for objective/constraint caching.
-PClast = [];
-fburn = [];
-SOC = [];
-dh_dt = [];
-
+ub = ones(size(PC0));
 
 %% RUN THE OPTIMIZER %%
 %%%%%%%%%%%%%%%%%%%%%%
@@ -121,9 +133,21 @@ if (MaxOptIter < 1)
     % fmincon's finite-difference loop.
     PCbest = PC0;
     ObjFunc(PCbest);
-    Cons(PCbest);
+    [FinalConstraints, ~] = Cons(PCbest);
+    exitflag = double(max(FinalConstraints, [], "all") <= options.ConstraintTolerance);
+    OptimizerOutput = struct("iterations", 0, "constrviolation", ...
+        max(FinalConstraints, [], "all"));
 else
-    PCbest = fmincon(@(PC) ObjFunc(PC), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC), options);
+    [PCbest, ~, exitflag, OptimizerOutput] = fmincon( ...
+        @(PC) ObjFunc(PC), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC), options);
+    [FinalConstraints, ~] = Cons(PCbest);
+    MaxConstraint = max(FinalConstraints, [], "all");
+    if exitflag <= 0 || MaxConstraint > options.ConstraintTolerance
+        error("OptimizationPkg:MissionPowerOpt:NoFeasibleSolution", ...
+            ["Mission optimizer did not produce a feasible result " ...
+             "(exit flag %d, maximum scaled constraint %.6g)."], ...
+            exitflag, MaxConstraint);
+    end
 end
 t = toc / 60;
 
@@ -149,7 +173,7 @@ fprintf("Fuel Burn Reduction: %f\n", fdiff);
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fburnOut, SOCOut, RCOut] = FlyAircraft(PC)
+function [fburnOut, SOCOut, RCOut, PowerExcessOut] = FlyAircraft(PC)
     % input updated mission split schedule
     TestAircraft = ApplyPowerSplit(Aircraft0, PC);
 
@@ -160,16 +184,16 @@ function [fburnOut, SOCOut, RCOut] = FlyAircraft(PC)
         TestAircraft = FlyFixedAircraft(TestAircraft);
 
         % fuel required for mission
-        fburnOut = TestAircraft.Mission.History.SI.Weight.Fburn(end);
+        fburnOut = TestAircraft.Mission.History.SI.Weight.Fburn(MainEnd);
         if (fburnOut < 0)
             fburnOut = 1.0e10;
         end
 
-        % constrain SOC over the whole flown mission, not only the optimized
-        % window, so cruise optimization cannot deplete the reserve mission.
+        % Match SequencePowerOpt by constraining SOC at every optimized
+        % takeoff/climb control point.
         Batt = TestAircraft.Specs.Propulsion.PropArch.SrcType == 0;
         if (any(Batt))
-            SOCOut = TestAircraft.Mission.History.SI.Power.SOC(:, Batt);
+            SOCOut = TestAircraft.Mission.History.SI.Power.SOC(pts, Batt);
         else
             SOCOut = 100;
         end
@@ -177,12 +201,25 @@ function [fburnOut, SOCOut, RCOut] = FlyAircraft(PC)
         % climb-rate constraint is applied only over the optimized window.
         RCOut = TestAircraft.Mission.History.SI.Performance.RC(pts);
 
+        % A prescribed trajectory is feasible only when every propulsion
+        % component can supply its required power at every mission point.
+        PowerExcessOut = TestAircraft.Mission.History.SI.Power.Preq - ...
+            TestAircraft.Mission.History.SI.Power.Pav;
+        PowerExcessOut(~isfinite(PowerExcessOut)) = 0;
+        if max(PowerExcessOut, [], "all") > 1
+            % The prescribed trajectory may still reach its final time,
+            % but this PC schedule is physically invalid for the fixed
+            % installed propulsion system. Reject the optimizer evaluation.
+            fburnOut = 1.0e10;
+        end
+
     catch
         % Penalize failed mission evaluations and return constraint values
         % that fmincon will reject.
         fburnOut = 1.0e10;
         SOCOut = -1;
         RCOut = Aircraft0.Specs.Performance.RCMax + ones(size(pts));
+        PowerExcessOut = 1e15 * ones(nMissionPts, nComponents);
     end
 end
 
@@ -207,14 +244,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [val] = ObjFunc(PC)
-    % check if PC values changed
-    if ~isequal(PC, PClast)
-        [fburn, SOC, dh_dt] = FlyAircraft(PC);
-        PClast = PC;
-    end
-
-    % return objective function value
-    val = fburn;
+    [val, ~, ~, ~] = FlyAircraft(PC);
 end
 
 
@@ -225,18 +255,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [c, ceq] = Cons(PC)
-    % check if PC values changed
-    if ~isequal(PC, PClast)
-        [fburn, SOC, dh_dt] = FlyAircraft(PC);
-        PClast = PC;
-    end
+    [~, SOC, dh_dt, PowerExcess] = FlyAircraft(PC);
 
     % enforce minimum battery SOC and maximum rate of climb.
     cSOC = Aircraft0.Specs.Battery.MinSOC - SOC(:);
     cRC = dh_dt(:) - Aircraft0.Specs.Performance.RCMax;
 
     % output constraints
-    c = [cSOC; cRC];
+    % Scale watts to megawatts for a numerically balanced constraint while
+    % preserving the physical condition Preq <= Pav.
+    c = [cSOC; cRC; PowerExcess(:) / 1e6];
     ceq = [];
 end
 
@@ -250,13 +278,14 @@ end
 function [OutAircraft] = ApplyPowerSplit(InAircraft, PC)
     OutAircraft = InAircraft;
 
-    % Enforce symmetric electric assist on all electric motors and balance
-    % the complementary downstream split on all gas turbines.
-    OutAircraft.Specs.Power.LamDwn.Miss(pts, iEM) = repmat(PC, 1, length(iEM));
-    OutAircraft.Specs.Power.LamDwn.Miss(pts, iGT) = repmat(1 - PC, 1, length(iGT));
+    % FAST assigns the complete split to every parallel motor/turbine.
+    OutAircraft.Specs.Power.LamDwn.Miss(pts, iEM) = ...
+        repmat(PC, 1, length(iEM));
+    OutAircraft.Specs.Power.LamDwn.Miss(pts, iGT) = ...
+        repmat(1 - PC, 1, length(iGT));
 
     % Keep fan demand evenly distributed for the PHE twin-fan architecture.
-    OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = repmat(1 / length(iFan), length(pts), length(iFan));
+    OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = repmat(0.5, length(pts), length(iFan));
 
     % The climb derate is used only while sizing the installed motors.
     % During mission optimization the full installed motor rating is
@@ -293,22 +322,21 @@ Aircraft = PropulsionPkg.LamFill(Aircraft);
 end
 
 
-function [pts] = FirstMissionTakeoffToCruise(Aircraft)
-% Return mission-history indices from first takeoff point through the end of
-% the final cruise segment in mission ID 1.
+function [pts] = FirstMissionTakeoffThroughClimb(Aircraft)
+% Return mission-history indices from first takeoff through final climb.
 
 Mission = Aircraft.Mission.Profile;
 MissionID = 1;
 
 InMission = Mission.ID == MissionID;
 TakeoffSegs = find(InMission & (strcmpi(Mission.Segs, "Takeoff") | strcmpi(Mission.Segs, "DetailedTakeoff")));
-CruiseSegs = find(InMission & strcmpi(Mission.Segs, "Cruise"));
+ClimbSegs = find(InMission & strcmpi(Mission.Segs, "Climb"));
 
-if (isempty(TakeoffSegs) || isempty(CruiseSegs))
-    error("ERROR - MissionPowerOpt: first mission must include takeoff and cruise segments.");
+if (isempty(TakeoffSegs) || isempty(ClimbSegs))
+    error("ERROR - MissionPowerOpt: first mission must include takeoff and climb segments.");
 end
 
 SegBeg = Mission.SegBeg(TakeoffSegs(1));
-SegEnd = Mission.SegEnd(CruiseSegs(end));
+SegEnd = Mission.SegEnd(ClimbSegs(end));
 pts = (SegBeg:SegEnd)';
 end

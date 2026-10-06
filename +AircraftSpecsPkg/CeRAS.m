@@ -76,6 +76,9 @@ Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(2250, "ft/min", "m/
 %% AERODYNAMICS %%
 %%%%%%%%%%%%%%%%%%
 
+% aerodynamic analysis method
+Aircraft.Specs.Aero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
+
 % lift-drag ratio during climb  (assumed same as ERJ175, standard range)
 Aircraft.Specs.Aero.L_D.Clb = 13;
 
@@ -148,20 +151,20 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
 % downstream power splits
-Aircraft.Specs.Power.LamDwn.SLS = 0;
-Aircraft.Specs.Power.LamDwn.Tko = 0;
-Aircraft.Specs.Power.LamDwn.Clb = 0;
-Aircraft.Specs.Power.LamDwn.Crs = 0;
-Aircraft.Specs.Power.LamDwn.Des = 0;
-Aircraft.Specs.Power.LamDwn.Lnd = 0;
+Aircraft.Specs.Power.LamDwn.SLS = [];
+Aircraft.Specs.Power.LamDwn.Tko = [];
+Aircraft.Specs.Power.LamDwn.Clb = [];
+Aircraft.Specs.Power.LamDwn.Crs = [];
+Aircraft.Specs.Power.LamDwn.Des = [];
+Aircraft.Specs.Power.LamDwn.Lnd = [];
 
 % upstream power splits
-Aircraft.Specs.Power.LamUps.SLS = 0;
-Aircraft.Specs.Power.LamUps.Tko = 0;
-Aircraft.Specs.Power.LamUps.Clb = 0;
-Aircraft.Specs.Power.LamUps.Crs = 0;
-Aircraft.Specs.Power.LamUps.Des = 0;
-Aircraft.Specs.Power.LamUps.Lnd = 0;
+Aircraft.Specs.Power.LamUps.SLS = [];
+Aircraft.Specs.Power.LamUps.Tko = [];
+Aircraft.Specs.Power.LamUps.Clb = [];
+Aircraft.Specs.Power.LamUps.Crs = [];
+Aircraft.Specs.Power.LamUps.Des = [];
+Aircraft.Specs.Power.LamUps.Lnd = [];
 
 % electric motor and generator efficiencies, not used here just in HEA one
 Aircraft.Specs.Power.Eta.EM = 0.96;

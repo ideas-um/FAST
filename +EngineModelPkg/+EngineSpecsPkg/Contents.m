@@ -13,6 +13,7 @@
 % CF6_80C2_B7F     - EngineModelPkg.EngineSpecsPkg.CF6_80C2_B7F is a function.
 % ExampleTF        - EngineModelPkg.EngineSpecsPkg.ExampleTF is a function.
 % ExampleTP        - EngineModelPkg.EngineSpecsPkg.ExampleTP is a function.
+% GE90_115B        - EngineModelPkg.EngineSpecsPkg.GE90_115B is a function.
 % LEAP_1A26        - EngineModelPkg.EngineSpecsPkg.LEAP_1A26 is a function.
 % PT6A_114A        - EngineModelPkg.EngineSpecsPkg.PT6A_114A is a function.
 % PW_123           - EngineModelPkg.EngineSpecsPkg.PW_123 is a function.

@@ -9,6 +9,7 @@
 % ATR42_600               - MissionProfilesPkg.ATR42_600 is a function.
 % ATRMissionBRE           - MissionProfilesPkg.ATRMissionBRE is a function.
 % ATRMissionEPASS         - MissionProfilesPkg.ATRMissionEPASS is a function.
+% B777300ER               - MissionProfilesPkg.B777300ER is a function.
 % BRECruise00             - MissionProfilesPkg.BRECruise00 is a function.
 % BRECruise01             - MissionProfilesPkg.BRECruise01 is a function.
 % BRECruise02             - MissionProfilesPkg.BRECruise02 is a function.

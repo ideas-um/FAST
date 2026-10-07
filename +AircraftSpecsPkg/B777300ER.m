@@ -165,8 +165,7 @@ Aircraft.Specs.Propulsion.NumEngines = 2;
 Aircraft.Specs.Propulsion.Thrust.SLS = 2 * UnitConversionPkg.ConvForce(115300, "lbf", "N");
 
 % thrust-weight ratio
-Aircraft.Specs.Propulsion.T_W.SLS = Aircraft.Specs.Propulsion.Thrust.SLS / ...
-                                    (Aircraft.Specs.Weight.MTOW * 9.80665);
+Aircraft.Specs.Propulsion.T_W.SLS = NaN;
 
 % engine propulsive efficiency
 Aircraft.Specs.Propulsion.Eta.Prop = 0.8;

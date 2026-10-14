@@ -286,8 +286,16 @@ while (iter < MaxIter)
     % compute the power available
     Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-    % for full throttle, recompute the operational power splits
-    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    % Sizing (+1) retains FAST's legacy split recomputation. Regular
+    % off-design analysis (-1) recomputes every transmitter split from the
+    % LamUps-limited installed power available. Optimization analysis (-2)
+    % preserves the optimizer-commanded LamDwn.Miss schedule.
+    if Aircraft.Settings.Analysis.Type > 0
+        Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    elseif Aircraft.Settings.Analysis.Type == -1
+        Aircraft = PropulsionPkg.RecomputeSplits( ...
+            Aircraft, SegBeg, SegEnd, true);
+    end
     
     % get the power available
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);
@@ -330,6 +338,17 @@ while (iter < MaxIter)
     % check for invalid specific excess power values
     if (any(Ps(1:end-1) < 0))
         warning('Target climb altitude cannot be reached (Ps < 0). Results may be faulty.')
+        FailOnNegativeClimbExcessPower = ...
+            isfield(Aircraft.Settings, "FailOnNegativeClimbExcessPower") && ...
+            logical(Aircraft.Settings.FailOnNegativeClimbExcessPower);
+        if Aircraft.Settings.Analysis.Type == -2 && ...
+                FailOnNegativeClimbExcessPower
+            iBadPs = find(Ps(1:end-1) < 0, 1);
+            error("MissionSegsPkg:EvalClimb:NegativeExcessPower", ...
+                "Fixed-command climb is infeasible at mission point %d: Pav=%.9g W, drag power=%.9g W, Ps=%.9g m/s.", ...
+                SegBeg + iBadPs - 1, Pav(iBadPs), DV(iBadPs), ...
+                Ps(iBadPs));
+        end
     end
             
     % compute time to fly, depending if rate of climb is given
@@ -340,7 +359,7 @@ while (iter < MaxIter)
         
         % update the rate of climb (0 gets overwritten by next segment)
         dh_dt = [diff(Alt) ./ dTime; 0];
-        
+
         % find points that exceed the maximum rate of climb
         irow = find(dh_dt - dh_dtMax > EPS06);
         
@@ -429,7 +448,7 @@ while (iter < MaxIter)
     
     % perform the propulsion analysis
     Aircraft = PropulsionPkg.PropAnalysis(Aircraft);
-    
+
     % extract updated mass from aircraft structure
     Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);
     

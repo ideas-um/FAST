@@ -125,11 +125,18 @@ end
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calculate initial wing area
-S = MTOW / W_S;
-
-% input it back into aircraft structure
-Aircraft.Specs.Aero.S = S;
+% Size wing area only during on-design analysis.  An off-design mission
+% changes carried fuel and takeoff weight, not the installed wing geometry.
+% Recomputing S = MTOW/W_S for Type < 0 silently shrank the aircraft wing
+% on shorter routes and made independently optimized missions inconsistent
+% with fixed-aircraft sequence optimization.
+if Type > 0 || ~isfield(Aircraft.Specs.Aero, "S") || ...
+        ~isscalar(Aircraft.Specs.Aero.S) || ~isfinite(Aircraft.Specs.Aero.S)
+    S = MTOW / W_S;
+    Aircraft.Specs.Aero.S = S;
+else
+    S = Aircraft.Specs.Aero.S;
+end
 
 % check if the aircraft should be visualized
 if (Aircraft.Settings.VisualizeAircraft == 1) && (Aircraft.Settings.Analysis.Type ~= -2)
@@ -237,9 +244,13 @@ while (iter < MaxIter)
         end
         
     else
-        
-        % get the initial propulsion system weight
-        Aircraft = PropulsionPkg.PropulsionSizing(Aircraft);
+
+        % Size installed propulsion hardware only for an on-design analysis.
+        % Off-design analysis must retain the original sized engines, motors,
+        % fans, and their weights while iterating mission fuel and MTOW.
+        if (Type > 0)
+            Aircraft = PropulsionPkg.PropulsionSizing(Aircraft);
+        end
         
     end
     
@@ -250,17 +261,73 @@ while (iter < MaxIter)
     % PowerOpt schedule before flying so battery sizing sees the requested splits.
     Aircraft = PropulsionPkg.LamFill(Aircraft);
 
+    % Regular off-design operation uses the battery only on the main
+    % mission. Reserve and diversion missions must remain turbine-only;
+    % otherwise the generic segment-level Clb schedule applies the 30%
+    % motor availability cap to reserve climbs as well. Besides understating
+    % reserve fuel, that previously left nonzero battery Pout after the pack
+    % had reached its minimum SOC. Apply this before FlyMission so the -1
+    % split recomputation sees zero motor availability on every reserve row.
+    if Type == -1
+        ReserveSegs = find(Aircraft.Mission.Profile.ID ~= 1);
+        if ~isempty(ReserveSegs)
+            ReservePts = [];
+            for iReserveSeg = ReserveSegs(:).'
+                ReservePts = [ReservePts, ...
+                    Aircraft.Mission.Profile.SegBeg(iReserveSeg): ...
+                    Aircraft.Mission.Profile.SegEnd(iReserveSeg)]; %#ok<AGROW>
+            end
+            ReservePts = unique(ReservePts);
+            TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
+            iEM = find(TrnType == 0);
+            iGT = find(TrnType == 1);
+            iFan = find(TrnType == 2);
+            Aircraft.Specs.Power.LamUps.Miss(ReservePts, iEM) = 0;
+            Aircraft.Specs.Power.LamDwn.Miss(ReservePts, iEM) = 0;
+            Aircraft.Specs.Power.LamDwn.Miss(ReservePts, iGT) = 1;
+            Aircraft.Specs.Power.LamDwn.Miss(ReservePts, iFan) = 0.5;
+            Aircraft.Mission.History.SI.Power.LamUps = ...
+                Aircraft.Specs.Power.LamUps.Miss;
+            Aircraft.Mission.History.SI.Power.LamDwn = ...
+                Aircraft.Specs.Power.LamDwn.Miss;
+        end
+    end
+
+    % In optimization mode (-2), LamDwn.Miss is the commanded output share
+    % and must not be recomputed. LamUps is installed availability, so keep
+    % every transmitter at its full rating even when LamDwn is zero. Regular
+    % off-design mode (-1) retains its prescribed LamUps schedule and
+    % recomputes feasible operational splits.
+    PreserveOptimizationLamUps = isfield(Aircraft.Settings, ...
+        "PreserveOptimizationLamUps") && ...
+        logical(Aircraft.Settings.PreserveOptimizationLamUps);
+    if Type == -2 && ~PreserveOptimizationLamUps
+        Aircraft.Specs.Power.LamUps.Miss(:) = 1;
+        Aircraft.Mission.History.SI.Power.LamUps = ...
+            Aircraft.Specs.Power.LamUps.Miss;
+    end
+
     % fly the mission
     Aircraft = MissionSegsPkg.FlyMission(Aircraft);
             
     % get fuel burn
     Fburn = Aircraft.Mission.History.SI.Weight.Fburn(end);
     
-    % compute the fuel burn weight changes
-    dWfuel = Fburn - Wfuel;
+    % Compute the fuel-burn weight change. Power-optimization evaluations
+    % may cross the battery-depletion boundary and create a fuel fixed-point
+    % cycle, so allow an explicitly requested under-relaxed update. The fixed
+    % point is unchanged; only the path used to reach it is damped.
+    FuelRelaxation = 1;
+    if isfield(Aircraft.Settings.Analysis, "FuelRelaxation") && ...
+            ~isnan(Aircraft.Settings.Analysis.FuelRelaxation)
+        FuelRelaxation = Aircraft.Settings.Analysis.FuelRelaxation;
+    end
+    dWfuel = FuelRelaxation .* (Fburn - Wfuel);
         
-    % check if a retrofit or limit-cycle resolution is using a fixed battery
-    if ((Type == -2) || BattSizeFixed)
+    % Off-design analysis flies the already-sized aircraft. Iterate the
+    % carried fuel and takeoff weight, but keep the installed battery fixed.
+    % Battery resizing is an on-design operation only.
+    if ((Type < 0) || BattSizeFixed)
         
         % fixed battery weight
         dWbatt = 0;
@@ -387,10 +454,10 @@ end
 Aircraft.Settings.Analysis.Iterations = iter;
 
 % print warning if maximum iterations reached
-if ((iter == MaxIter) && (Type > 0))
+if (iter == MaxIter)
     
     % print a warning
-    warning('WARNING - EAPAnalysis: maximum number of sizing iterations reached.');
+    warning('WARNING - EAPAnalysis: maximum number of sizing/analysis iterations reached.');
     
     % show that it didn't converge
     Aircraft.Settings.Converged = 0;

@@ -1,6 +1,6 @@
-function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
+function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd, RecomputeAllSplits)
 %
-% [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
+% [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd, RecomputeAllSplits)
 % written by Paul Mokotoff, prmoko@umich.edu
 % last updated: 03 sep 2025
 %
@@ -22,6 +22,11 @@ function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 %     SegEnd   - ending segment index.
 %                size/type/units: 1-by-1 / int / []
 %
+%     RecomputeAllSplits
+%              - if true, recompute every mission-indexed downstream split.
+%                if false or omitted, retain FAST's legacy sizing behavior.
+%                size/type/units: 1-by-1 / logical / []
+%
 % OUTPUTS:
 %     Aircraft - structure with the updated power splits. Only LamTSPS is
 %                updated for now.
@@ -31,6 +36,12 @@ function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 
 %% PRE-PROCESSING %%
 %%%%%%%%%%%%%%%%%%%%
+
+% preserve legacy sizing behavior unless full mission split recomputation
+% is explicitly requested by off-design feasibility dispatch
+if nargin < 4
+    RecomputeAllSplits = false;
+end
 
 % get the parallel connections
 ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
@@ -70,10 +81,21 @@ LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
 idx = any(LamUps > 0, 2);
 
 % get the number of downstream splits
-nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
+if RecomputeAllSplits
+    nsplit = size(LamDwn, 2);
+else
+    nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
+end
 
-% get a temporary power split
-TmpSplit = LamDwn(1, :);
+% Use an interior probe to identify which split controls each parallel
+% branch.  A segment can begin at a shared point where the preceding
+% depleted-battery segment left every LamDwn value at zero.  Probing the
+% topology at that disconnected zero state makes EvalSplit appear
+% insensitive to every split, so no branch is recomputed and the fan can
+% subsequently receive power with no contributing source.  The topology is
+% independent of the operating split value; 0.5 keeps every branch connected
+% while its sensitivity is detected.
+TmpSplit = 0.5 .* ones(1, size(LamDwn, 2));
 
 % get the original downstream matrix
 OperDwn = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, TmpSplit);

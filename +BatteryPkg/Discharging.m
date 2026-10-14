@@ -110,8 +110,15 @@ A = Aircraft.Specs.Battery.ExpVol;
 % exponential capacity [(Ah)^-1]
 B = Aircraft.Specs.Battery.ExpCap;
 
-% Determine maximum capacity [Ah] based on analysis type and degradation effect
-if Aircraft.Settings.Analysis.Type < 0 && Aircraft.Specs.Battery.Degradation == 1
+% Determine maximum capacity [Ah] based on analysis type and degradation.
+% BatterySOH_pct supports an explicit aged off-design operating point without
+% enabling the lifecycle model (which would update SOH after every replay).
+if Aircraft.Settings.Analysis.Type < 0 && ...
+        isfield(Aircraft.Settings, "BatterySOH_pct")
+    Q = Aircraft.Specs.Battery.CapCell * ...
+        Aircraft.Settings.BatterySOH_pct / 100;
+elseif Aircraft.Settings.Analysis.Type < 0 && ...
+        Aircraft.Specs.Battery.Degradation == 1
 
     % Off-design analysis with battery degradation effect
     Q = Aircraft.Specs.Battery.CapCell * Aircraft.Specs.Battery.SOH(end) / 100;
@@ -168,6 +175,13 @@ for itime = 1:ntime
     
     % solve the polynomial to find the minimum current
     CurrBattPoly = [VoltageCellHot, VoltageCellCold, -TVreq_es_cell];
+
+    if any(~isfinite(CurrBattPoly))
+        error("BatteryPkg:Discharging:NonfiniteCurrentPolynomial", ...
+            "Non-finite battery current state at local point %d: SOC=%.9g%%, pack power request=%.9g W, cell power request=%.9g W.", ...
+            itime, SOC(itime), Preq(itime), ...
+            TVreq_es_cell);
+    end
     
     % find the root
     CurrBatt = roots(CurrBattPoly);
@@ -236,6 +250,12 @@ for itime = 1:ntime
     
     % update the SOC
     SOC(itime+1) = SOC(itime) - 100 * DischargedCapacity / Q;
+    if SOC(itime+1) > 100 + 1.0e-6
+        error("BatteryPkg:Discharging:UnexpectedInFlightCharging", ...
+            "Battery SOC exceeded 100%% at local point %d: SOC %.9g -> %.9g%%, requested pack power %.9g W, current %.9g A, step %.9g s.", ...
+            itime, SOC(itime), SOC(itime+1), Preq(itime), ...
+            Current(itime), Time(itime) * 3600);
+    end
     
     % update the capacity
     Capacity(itime) = Q * SOC(itime) / 100 * Parallel;

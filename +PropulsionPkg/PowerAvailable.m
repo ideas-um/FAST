@@ -164,6 +164,12 @@ for jtrn = 1:ntrn
     end
 end
 
+% Apply installed transmitter limits before propagating power downstream.
+% Previously, lapse-based engine power could be propagated to the fans and
+% sink first and capped only afterward. That left TV based on stale,
+% over-limit turbine power even though the stored turbine Pav was capped.
+PowerAv = min(PowerAv, repmat(SLSPower, npnt, 1));
+
 
 %% COMPUTE THE TOTAL POWER AVAILABLE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -203,7 +209,9 @@ for ipnt = 1:npnt
     % propagate the power upstream
     Pav(ipnt, idx) = PropulsionPkg.PowerFlow(Pav(ipnt, idx)', Arch(idx, idx), Lambda(idx, idx), EtaUps(idx, idx), +1)';
     
-    % check that the component is not overloaded
+    % Safety check for downstream/derived transmitters whose power is
+    % established during propagation. Independent transmitter limits were
+    % already applied above, before TV was calculated.
     Overload = Pav(ipnt, itrn) > SLSPower;
     
     % suppress component overloads
@@ -234,6 +242,37 @@ end
 iEM = find(TrnType == 0);
 if ~isempty(iEM)
     Pav(:, nsrc + iEM) = Pav(:, nsrc + iEM) .* LamUps(:, iEM);
+end
+
+% In fixed-schedule optimization mode, LamUps describes installed
+% availability while LamDwn prescribes the actual component ratio. The
+% usable sink power must therefore be limited by the first component that
+% reaches its available power at that commanded ratio. Summing every active
+% component's full Pav would change the climb trajectory before the
+% optimizer changes LamDwn and would not reproduce a feasible -1 seed.
+if Aircraft.Settings.Analysis.Type == -2 && nsnk == 1
+    OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
+    EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
+    LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
+    TrnSnkIdx = (nsrc + 1):ncomp;
+
+    for ipnt = 1:npnt
+        SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+        UnitReq = zeros(length(TrnSnkIdx), 1);
+        UnitReq(end) = 1;
+        UnitReq = PropulsionPkg.PowerFlow(UnitReq, ...
+            Arch(TrnSnkIdx, TrnSnkIdx)', ...
+            SplitDwn(TrnSnkIdx, TrnSnkIdx), ...
+            EtaDwn(TrnSnkIdx, TrnSnkIdx), -1);
+
+        TrnReqPerSink = UnitReq(1:ntrn);
+        Active = TrnReqPerSink > 1.0e-12;
+        if any(Active)
+            FixedSplitTV = min(Pav(ipnt, nsrc + find(Active)) ./ ...
+                TrnReqPerSink(Active)');
+            Pav(ipnt, isnk) = min(Pav(ipnt, isnk), FixedSplitTV);
+        end
+    end
 end
 
 % convert the power available to thrust available

@@ -1,0 +1,616 @@
+function Aggregate = RunAllSequencesFullComparisonParallel( ...
+        NumWorkers, MaxIterations, SequenceIndices)
+%RUNALLSEQUENCESFULLCOMPARISONPARALLEL Production comparison for Sequence.mat.
+%
+% Runs, for every selected daily sequence:
+%   1) regular unoptimized PHE operation (-1),
+%   2) sequential individual-flight MissionPowerOpt,
+%   3) joint SequencePowerOpt, and
+%   4) conventional off-design operation.
+%
+% Work is parallelized across sequences. Each sequence is independently
+% checkpointed and contains complete mission histories, final lightweight
+% flight specifications, optimizer controls, charge histories, flight-level
+% results, and daily metrics. Full aircraft databases are saved once rather
+% than duplicated thousands of times.
+
+if nargin < 1 || isempty(NumWorkers)
+    NumWorkers = 6;
+end
+if nargin < 2 || isempty(MaxIterations)
+    MaxIterations = 500;
+end
+
+RunVersion = "all-sequences-thermal-reserve-fuel-only-v1";
+RootDir = fileparts(mfilename("fullpath"));
+OutputDir = fullfile(RootDir, "output", "all_sequences_full_comparison");
+CheckpointDir = fullfile(OutputDir, "checkpoints");
+FailureDir = fullfile(OutputDir, "failures");
+if ~isfolder(CheckpointDir), mkdir(CheckpointDir); end
+if ~isfolder(FailureDir), mkdir(FailureDir); end
+
+SequenceData = load(fullfile(RootDir, "Sequence.mat"), "tables");
+Sequences = SequenceData.tables;
+nSequence = numel(Sequences);
+if nargin < 3 || isempty(SequenceIndices)
+    SequenceIndices = 1:nSequence;
+end
+SequenceIndices = unique(SequenceIndices(:)');
+if any(SequenceIndices < 1 | SequenceIndices > nSequence)
+    error("Sequence indices must be between 1 and %d.", nSequence);
+end
+
+PHEData = load(fullfile(RootDir, "output", ...
+    "ERJ175LR_PHE_Sized.mat"), "SizedAircraft");
+BasePHE = PHEData.SizedAircraft;
+BasePHE.Specs.Battery.Charging = 150e3;
+BasePHE.Settings.GroundChargeModel = "ThermalEquivalentCircuit";
+BasePHE.Settings.BatterySOH_pct = 80;
+BasePHE.Settings.BatteryInitialTemperature_C = 35;
+BasePHE.Settings.PrintOut = 0;
+BasePHE.Settings.Plotting = 0;
+BasePHE.Settings.Table = 0;
+
+ConventionalData = load(fullfile(RootDir, "output", ...
+    "ERJ175LR_Conventional_RegularTakeoff_Calibrated.mat"), "C");
+BaseConventional = ConventionalData.C;
+BaseConventional.Settings.PrintOut = 0;
+BaseConventional.Settings.Plotting = 0;
+BaseConventional.Settings.Table = 0;
+
+InputMetadata = struct( ...
+    "RunVersion", RunVersion, ...
+    "SequenceFile", "Sequence.mat", ...
+    "SequenceCount", nSequence, ...
+    "MaxIterations", MaxIterations, ...
+    "ParallelWorkers", NumWorkers, ...
+    "GroundChargeModel", "ThermalEquivalentCircuit", ...
+    "ChargerPower_kW", 150, ...
+    "BatterySOH_pct", 80, ...
+    "InitialBatteryTemperature_C", 35, ...
+    "ReserveDispatch", "Turbine only", ...
+    "ChargingRule", "GROUND_TIME(next flight) - 7 minutes", ...
+    "Generated", string(datetime("now")));
+save(fullfile(OutputDir, "BaseAircraftAndRunInputs.mat"), ...
+    "BasePHE", "BaseConventional", "InputMetadata", "-v7.3");
+
+Pool = gcp("nocreate");
+if isempty(Pool) || Pool.NumWorkers ~= NumWorkers
+    if ~isempty(Pool), delete(Pool); end
+    parpool("Processes", NumWorkers);
+end
+
+fprintf(['Starting %d selected sequences of %d with %d process workers ' ...
+    'and %d optimizer iterations.\n'], numel(SequenceIndices), ...
+    nSequence, NumWorkers, MaxIterations);
+
+parfor iWork = 1:numel(SequenceIndices)
+    iSequence = SequenceIndices(iWork);
+    CheckpointFile = fullfile(CheckpointDir, ...
+        sprintf("Sequence_%04d.mat", iSequence));
+    if IsCompleteCheckpoint(CheckpointFile, RunVersion, MaxIterations)
+        continue;
+    end
+    try
+        RunOneSequence(iSequence, Sequences{iSequence}, BasePHE, ...
+            BaseConventional, MaxIterations, RunVersion, CheckpointFile);
+    catch ME
+        SaveFailure(FailureDir, iSequence, RunVersion, MaxIterations, ME);
+    end
+end
+
+Aggregate = AggregateCheckpoints(CheckpointDir, nSequence, ...
+    RunVersion, MaxIterations);
+save(fullfile(OutputDir, "AllSequences_Aggregate.mat"), ...
+    "Aggregate", "InputMetadata", "-v7.3");
+writetable(Aggregate.SequenceSummary, fullfile(OutputDir, ...
+    "AllSequences_SequenceSummary.csv"));
+writetable(Aggregate.FlightResults, fullfile(OutputDir, ...
+    "AllSequences_FlightResults.csv"));
+writetable(Aggregate.ChargeResults, fullfile(OutputDir, ...
+    "AllSequences_ChargeResults.csv"));
+writetable(Aggregate.FleetMetrics, fullfile(OutputDir, ...
+    "AllSequences_FleetMetrics.csv"));
+
+disp(Aggregate.FleetMetrics);
+end
+
+
+function RunOneSequence(iSequence, Sequence, BasePHE, BaseConventional, ...
+        MaxIterations, RunVersion, CheckpointFile)
+SequenceTimer = tic;
+nFlight = height(Sequence);
+
+% Regular -1 PHE baseline. Reserve/diversion battery use is disabled in
+% EAPAnalysis for this mode.
+[UnoptimizedAircraft, UnoptimizedCharge] = FlyUnoptimizedSequence( ...
+    BasePHE, Sequence);
+
+% Independent optimizer, with landing SOC -> thermal ground charge -> next
+% flight beginning SOC and temperature.
+[IndividualAircraft, IndividualPC, IndividualExitFlag, ...
+    IndividualOptimizerOutput, IndividualOptimizerTime_min, ...
+    IndividualCharge] = FlyIndividualSequence( ...
+    BasePHE, Sequence, MaxIterations);
+
+% Seed joint optimization with the complete feasible individual schedule
+% and its matching fuel/MTOW state.
+JointInput = ConfigureOptimizer(BasePHE, MaxIterations);
+JointInput.Settings.Analysis.Type = -2;
+if all(cellfun(@(x) ~isempty(x), IndividualPC))
+    JointInput.Settings.PowerOptInitialPC = cat(2, IndividualPC{:});
+    JointInput.Settings.PowerOptInitialFuel_kg = arrayfun(@(k) ...
+        IndividualAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.Fuel, ...
+        (1:nFlight)');
+    JointInput.Settings.PowerOptInitialMTOW_kg = arrayfun(@(k) ...
+        IndividualAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.MTOW, ...
+        (1:nFlight)');
+end
+[JointAircraft, JointPC, JointOptimizerTime_min, JointOptSeqTable, ...
+    JointExitFlag, JointOptimizerOutput] = ...
+    OptimizationPkg.SequencePowerOpt(JointInput, Sequence);
+JointCharge = ReplayCharges(JointAircraft, Sequence);
+
+[ConventionalAircraft] = FlyConventionalSequence( ...
+    BaseConventional, Sequence);
+
+[UnoptimizedFlight, UnoptimizedChargeTable] = SummarizePHE( ...
+    UnoptimizedAircraft, UnoptimizedCharge, Sequence, "Unoptimized");
+[IndividualFlight, IndividualChargeTable] = SummarizePHE( ...
+    IndividualAircraft, IndividualCharge, Sequence, "Individual");
+[JointFlight, JointChargeTable] = SummarizePHE( ...
+    JointAircraft, JointCharge, Sequence, "Joint");
+ConventionalFlight = SummarizeConventional( ...
+    ConventionalAircraft, Sequence);
+
+FlightResults = [JointFlight; IndividualFlight; UnoptimizedFlight; ...
+    ConventionalFlight];
+ChargeResults = [JointChargeTable; IndividualChargeTable; ...
+    UnoptimizedChargeTable];
+SequenceSummary = BuildSequenceSummary(iSequence, Sequence, JointFlight, ...
+    IndividualFlight, UnoptimizedFlight, ConventionalFlight, ...
+    JointChargeTable, IndividualChargeTable, UnoptimizedChargeTable, ...
+    JointOptimizerTime_min, sum(IndividualOptimizerTime_min), ...
+    JointExitFlag, IndividualExitFlag);
+
+% Save mission histories and compact flight specs. These retain everything
+% required to reprocess power, fuel, SOC, trajectory, and split results
+% without repeating an optimization, but omit repeated heavyweight aircraft
+% databases.
+MissionResults = struct( ...
+    "Joint", CompactAircraftSet(JointAircraft, Sequence), ...
+    "Individual", CompactAircraftSet(IndividualAircraft, Sequence), ...
+    "Unoptimized", CompactAircraftSet(UnoptimizedAircraft, Sequence), ...
+    "Conventional", CompactAircraftSet(ConventionalAircraft, Sequence));
+ChargeHistories = struct( ...
+    "Joint", {JointCharge}, ...
+    "Individual", {IndividualCharge}, ...
+    "Unoptimized", {UnoptimizedCharge});
+OptimizerResults = struct( ...
+    "JointPC", JointPC, ...
+    "JointExitFlag", JointExitFlag, ...
+    "JointOutput", JointOptimizerOutput, ...
+    "JointTime_min", JointOptimizerTime_min, ...
+    "JointSequenceTable", JointOptSeqTable, ...
+    "IndividualPC", {IndividualPC}, ...
+    "IndividualExitFlag", IndividualExitFlag, ...
+    "IndividualOutput", {IndividualOptimizerOutput}, ...
+    "IndividualTime_min", IndividualOptimizerTime_min);
+RunMetadata = struct( ...
+    "Status", "success", ...
+    "RunVersion", RunVersion, ...
+    "SequenceIndex", iSequence, ...
+    "Flights", nFlight, ...
+    "MaxIterations", MaxIterations, ...
+    "Runtime_min", toc(SequenceTimer) / 60, ...
+    "Completed", string(datetime("now")));
+Status = "success";
+
+save(CheckpointFile, "Status", "RunMetadata", "Sequence", ...
+    "SequenceSummary", "FlightResults", "ChargeResults", ...
+    "MissionResults", "ChargeHistories", "OptimizerResults", "-v7.3");
+fprintf("Sequence %d complete in %.2f min.\n", ...
+    iSequence, RunMetadata.Runtime_min);
+end
+
+
+function [AircraftSet, ChargeHistories] = FlyUnoptimizedSequence( ...
+        BaseAircraft, Sequence)
+nFlight = height(Sequence);
+AircraftSet = struct;
+ChargeHistories = cell(max(nFlight - 1, 0), 1);
+BegSOC = 100;
+BegTemperature_C = BaseAircraft.Settings.BatteryInitialTemperature_C;
+for k = 1:nFlight
+    Aircraft = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
+        BegSOC, BegTemperature_C);
+    Aircraft.Settings.Analysis.Type = -1;
+    Aircraft.Settings.PowerOpt = 0;
+    Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
+    if k < nFlight
+        [ChargeHistories{k}, BegSOC, BegTemperature_C] = ...
+            ChargeForNextFlight(Aircraft, Sequence.GROUND_TIME(k + 1));
+    end
+end
+end
+
+
+function [AircraftSet, PC, ExitFlag, OptimizerOutput, OptimizerTime_min, ...
+        ChargeHistories] = FlyIndividualSequence( ...
+        BaseAircraft, Sequence, MaxIterations)
+nFlight = height(Sequence);
+AircraftSet = struct;
+PC = cell(nFlight, 1);
+ExitFlag = zeros(nFlight, 1);
+OptimizerOutput = cell(nFlight, 1);
+OptimizerTime_min = zeros(nFlight, 1);
+ChargeHistories = cell(max(nFlight - 1, 0), 1);
+BegSOC = 100;
+BegTemperature_C = BaseAircraft.Settings.BatteryInitialTemperature_C;
+for k = 1:nFlight
+    Seed = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
+        BegSOC, BegTemperature_C);
+    Seed.Settings.Analysis.Type = -1;
+    Seed.Settings.PowerOpt = 0;
+    Seed = Main(Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    Seed = ConfigureOptimizer(Seed, MaxIterations);
+    [Aircraft, PC{k}, OptimizerTime_min(k), ExitFlag(k), ...
+        OptimizerOutput{k}] = OptimizationPkg.MissionPowerOpt( ...
+        Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
+    if k < nFlight
+        [ChargeHistories{k}, BegSOC, BegTemperature_C] = ...
+            ChargeForNextFlight(Aircraft, Sequence.GROUND_TIME(k + 1));
+    end
+end
+end
+
+
+function Aircraft = ConfigureOptimizer(Aircraft, MaxIterations)
+Aircraft.Settings.PowerOptMaxIter = MaxIterations;
+Aircraft.Settings.PowerOptMaxStarts = 1;
+Aircraft.Settings.PowerOptUseParallel = false;
+Aircraft.Settings.PowerOptOptimalityTolerance = 5e-4;
+Aircraft.Settings.PowerOptFunctionTolerance = 1e-5;
+Aircraft.Settings.PowerOptConstraintTolerance = 1e-4;
+end
+
+
+function AircraftSet = FlyConventionalSequence(BaseAircraft, Sequence)
+nFlight = height(Sequence);
+AircraftSet = struct;
+for k = 1:nFlight
+    Aircraft = ConfigureFlight(BaseAircraft, Sequence(k, :), NaN, NaN);
+    Aircraft.Settings.Analysis.Type = -1;
+    Aircraft.Settings.PowerOpt = 0;
+    Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
+end
+end
+
+
+function Aircraft = ConfigureFlight(Aircraft, Flight, BegSOC, BegTemp_C)
+Aircraft.Specs.Performance.Range = UnitConversionPkg.ConvLength( ...
+    Flight.DISTANCE, "naut mi", "m");
+[~, ~, Aircraft.Specs.Performance.Vels.Crs] = ...
+    MissionSegsPkg.ComputeFltCon(Flight.ALTITUDE_m, 0, "TAS", ...
+    convvel(Flight.SPEED_mph, "mph", "m/s"));
+Aircraft.Specs.Performance.Alts.Crs = Flight.ALTITUDE_m;
+Aircraft.Specs.Weight.Payload = convmass(Flight.PAYLOAD_lb, "lbm", "kg");
+if isfinite(BegSOC) && any(Aircraft.Specs.Propulsion.PropArch.SrcType == 0)
+    Aircraft.Specs.Power.Battery.BegSOC = BegSOC;
+    Aircraft.Specs.Battery.BegSOC = BegSOC;
+end
+if isfinite(BegTemp_C)
+    Aircraft.Settings.BatteryInitialTemperature_C = BegTemp_C;
+end
+Aircraft.Settings.PrintOut = 0;
+Aircraft.Settings.Plotting = 0;
+Aircraft.Settings.Table = 0;
+if isfield(Aircraft.Specs.Power.LamUps, "Miss")
+    Aircraft.Specs.Power.LamUps = rmfield(Aircraft.Specs.Power.LamUps, "Miss");
+end
+if isfield(Aircraft.Specs.Power.LamDwn, "Miss")
+    Aircraft.Specs.Power.LamDwn = rmfield(Aircraft.Specs.Power.LamDwn, "Miss");
+end
+end
+
+
+function [Charge, BegSOC, BegTemperature_C] = ChargeForNextFlight( ...
+        Aircraft, GroundTime_min)
+Aircraft.Settings.GroundChargeMissionEndIndex = GetMainEnd(Aircraft);
+ChargeTime_s = max(GroundTime_min - 7, 0) * 60;
+Charged = BatteryPkg.GroundCharge(Aircraft, ChargeTime_s);
+Charge = Charged.Mission.History.SI.Power.ChargedAC;
+BegSOC = Charge.SOCEnd;
+BegTemperature_C = Charge.TemperatureEnd_C;
+end
+
+
+function Charges = ReplayCharges(AircraftSet, Sequence)
+nFlight = height(Sequence);
+Charges = cell(max(nFlight - 1, 0), 1);
+for k = 1:nFlight - 1
+    Aircraft = AircraftSet.(sprintf("Aircraft%d", k));
+    [Charges{k}, ~, ~] = ChargeForNextFlight( ...
+        Aircraft, Sequence.GROUND_TIME(k + 1));
+end
+end
+
+
+function [FlightTable, ChargeTable] = SummarizePHE( ...
+        AircraftSet, ChargeHistories, Sequence, CaseName)
+nFlight = height(Sequence);
+Flight = (1:nFlight)';
+CaseColumn = repmat(string(CaseName), nFlight, 1);
+MainFuel_kg = zeros(nFlight, 1);
+BegSOC_pct = zeros(nFlight, 1);
+EndSOC_pct = zeros(nFlight, 1);
+BatteryTerminal_kWh = zeros(nFlight, 1);
+for k = 1:nFlight
+    Aircraft = AircraftSet.(sprintf("Aircraft%d", k));
+    MainEnd = GetMainEnd(Aircraft);
+    Batt = find(Aircraft.Specs.Propulsion.PropArch.SrcType == 0, 1);
+    MainFuel_kg(k) = Aircraft.Mission.History.SI.Weight.Fburn(MainEnd);
+    BegSOC_pct(k) = Aircraft.Mission.History.SI.Power.SOC(1, Batt);
+    EndSOC_pct(k) = Aircraft.Mission.History.SI.Power.SOC(MainEnd, Batt);
+    t = Aircraft.Mission.History.SI.Performance.Time(1:MainEnd);
+    p = Aircraft.Mission.History.SI.Power.Pout(1:MainEnd, Batt);
+    BatteryTerminal_kWh(k) = trapz(t, p) / 3.6e6;
+end
+FlightTable = table(CaseColumn, Flight, Sequence.DISTANCE, ...
+    Sequence.GROUND_TIME, MainFuel_kg, BegSOC_pct, ...
+    EndSOC_pct, BatteryTerminal_kWh, ...
+    'VariableNames', {'CaseName','Flight','Distance_nmi', ...
+    'GroundTime_min','FuelBurn_kg','BegSOC_pct', ...
+    'EndSOC_pct','BatteryTerminal_kWh'});
+ChargeTable = SummarizeCharges(ChargeHistories, CaseName, Sequence);
+end
+
+
+function FlightTable = SummarizeConventional(AircraftSet, Sequence)
+nFlight = height(Sequence);
+MainFuel_kg = zeros(nFlight, 1);
+for k = 1:nFlight
+    Aircraft = AircraftSet.(sprintf("Aircraft%d", k));
+    MainFuel_kg(k) = Aircraft.Mission.History.SI.Weight.Fburn( ...
+        GetMainEnd(Aircraft));
+end
+FlightTable = table(repmat("Conventional", nFlight, 1), (1:nFlight)', ...
+    Sequence.DISTANCE, Sequence.GROUND_TIME, MainFuel_kg, ...
+    nan(nFlight,1), nan(nFlight,1), nan(nFlight,1), ...
+    'VariableNames', {'CaseName','Flight','Distance_nmi', ...
+    'GroundTime_min','FuelBurn_kg','BegSOC_pct', ...
+    'EndSOC_pct','BatteryTerminal_kWh'});
+end
+
+
+function T = SummarizeCharges(Charges, CaseName, Sequence)
+nCharge = numel(Charges);
+if nCharge == 0
+    T = table('Size', [0, 9], 'VariableTypes', ...
+        {'string','double','double','double','double','double','double', ...
+        'double','double'}, 'VariableNames', {'CaseName','AfterFlight', ...
+        'AvailableTime_min','ActualTime_min','SOCBeg_pct','SOCEnd_pct', ...
+        'SOCAdded_pct','GridEnergy_kWh','TemperatureEnd_C'});
+    return;
+end
+CaseColumn = repmat(string(CaseName), nCharge, 1);
+AfterFlight = (1:nCharge)';
+AvailableTime_min = zeros(nCharge, 1);
+ActualTime_min = zeros(nCharge, 1);
+SOCBeg_pct = zeros(nCharge, 1);
+SOCEnd_pct = zeros(nCharge, 1);
+SOCAdded_pct = zeros(nCharge, 1);
+GridEnergy_kWh = nan(nCharge, 1);
+TemperatureEnd_C = nan(nCharge, 1);
+for k = 1:nCharge
+    C = Charges{k};
+    AvailableTime_min(k) = max(Sequence.GROUND_TIME(k + 1) - 7, 0);
+    if isfield(C, "Time_s") && ~isempty(C.Time_s)
+        ActualTime_min(k) = C.Time_s(end) / 60;
+    end
+    if isfield(C, "SOCBeg"), SOCBeg_pct(k) = C.SOCBeg; ...
+    elseif isfield(C, "SOC") && ~isempty(C.SOC), SOCBeg_pct(k) = C.SOC(1); end
+    if isfield(C, "SOCEnd"), SOCEnd_pct(k) = C.SOCEnd; ...
+    elseif isfield(C, "SOC") && ~isempty(C.SOC), SOCEnd_pct(k) = C.SOC(end); end
+    SOCAdded_pct(k) = SOCEnd_pct(k) - SOCBeg_pct(k);
+    if isfield(C, "GridEnergy_kWh"), GridEnergy_kWh(k) = C.GridEnergy_kWh; ...
+    elseif isfield(C, "EnergyFromGrid_J"), GridEnergy_kWh(k) = C.EnergyFromGrid_J / 3.6e6; ...
+    elseif isfield(C, "EnergyGrid_J"), GridEnergy_kWh(k) = C.EnergyGrid_J / 3.6e6; end
+    if isfield(C, "TemperatureEnd_C")
+        TemperatureEnd_C(k) = C.TemperatureEnd_C;
+    end
+end
+T = table(CaseColumn, AfterFlight, AvailableTime_min, ActualTime_min, ...
+    SOCBeg_pct, SOCEnd_pct, SOCAdded_pct, GridEnergy_kWh, TemperatureEnd_C, ...
+    'VariableNames', {'CaseName','AfterFlight','AvailableTime_min', ...
+    'ActualTime_min','SOCBeg_pct','SOCEnd_pct','SOCAdded_pct', ...
+    'GridEnergy_kWh','TemperatureEnd_C'});
+end
+
+
+function Summary = BuildSequenceSummary(Index, Sequence, Joint, Individual, ...
+        Unoptimized, Conventional, JointCharge, IndividualCharge, ...
+        UnoptimizedCharge, JointTime, IndividualTime, JointExit, IndividualExit)
+JointMain = sum(Joint.FuelBurn_kg); IndividualMain = sum(Individual.FuelBurn_kg);
+UnoptimizedMain = sum(Unoptimized.FuelBurn_kg); ConventionalMain = sum(Conventional.FuelBurn_kg);
+JointMeanLandingSOCExcludingLast = MeanExcludingLast(Joint.EndSOC_pct);
+
+Summary = table(Index, height(Sequence), sum(Sequence.DISTANCE), ...
+    JointMain, IndividualMain, UnoptimizedMain, ConventionalMain, ...
+    UnoptimizedMain-JointMain, UnoptimizedMain-IndividualMain, ...
+    ConventionalMain-JointMain, ConventionalMain-IndividualMain, ...
+    sum(Joint.BatteryTerminal_kWh), sum(Individual.BatteryTerminal_kWh), ...
+    sum(Unoptimized.BatteryTerminal_kWh), ...
+    JointMeanLandingSOCExcludingLast, ...
+    MeanOrNaN(JointCharge.ActualTime_min), ...
+    MeanOrNaN(JointCharge.SOCAdded_pct), ...
+    MeanOrNaN(JointCharge.SOCEnd_pct), ...
+    MeanOrNaN(IndividualCharge.ActualTime_min), ...
+    MeanOrNaN(IndividualCharge.SOCAdded_pct), ...
+    MeanOrNaN(UnoptimizedCharge.ActualTime_min), ...
+    MeanOrNaN(UnoptimizedCharge.SOCAdded_pct), ...
+    JointTime, IndividualTime, JointExit, min(IndividualExit), ...
+    'VariableNames', {'Sequence','Flights','Distance_nmi', ...
+    'JointFuelBurn_kg','IndividualFuelBurn_kg','UnoptimizedFuelBurn_kg', ...
+    'ConventionalFuelBurn_kg', ...
+    'JointFuelSavedVsUnoptimized_kg_per_day', ...
+    'IndividualFuelSavedVsUnoptimized_kg_per_day', ...
+    'JointFuelSavedVsConventional_kg_per_day', ...
+    'IndividualFuelSavedVsConventional_kg_per_day', ...
+    'JointBatteryTerminal_kWh','IndividualBatteryTerminal_kWh', ...
+    'UnoptimizedBatteryTerminal_kWh', ...
+    'JointMeanLandingSOCExcludingLast_pct', ...
+    'JointAverageChargeTime_min','JointAverageSOCAdded_pct', ...
+    'JointAveragePostChargeSOC_pct','IndividualAverageChargeTime_min', ...
+    'IndividualAverageSOCAdded_pct','UnoptimizedAverageChargeTime_min', ...
+    'UnoptimizedAverageSOCAdded_pct','JointOptimizerTime_min', ...
+    'IndividualOptimizerTime_min','JointExitFlag', ...
+    'MinimumIndividualExitFlag'});
+end
+
+
+function Records = CompactAircraftSet(AircraftSet, Sequence)
+nFlight = height(Sequence);
+Records = cell(nFlight, 1);
+for k = 1:nFlight
+    A = AircraftSet.(sprintf("Aircraft%d", k));
+    R = struct;
+    R.FlightInput = Sequence(k, :);
+    R.MissionProfile = A.Mission.Profile;
+    R.MissionHistory = A.Mission.History;
+    R.MainMissionEndIndex = GetMainEnd(A);
+    R.Weight = A.Specs.Weight;
+    R.Performance = A.Specs.Performance;
+    R.Power = A.Specs.Power;
+    R.Battery = A.Specs.Battery;
+    R.PropArch = A.Specs.Propulsion.PropArch;
+    R.AnalysisType = A.Settings.Analysis.Type;
+    R.LamUpsCommand = A.Mission.History.SI.Power.LamUps;
+    R.LamDwn = A.Mission.History.SI.Power.LamDwn;
+    R.LamUpsFullRatedUtilization = ComputeFullRatedUtilization(A);
+    Records{k} = R;
+end
+end
+
+
+function Utilization = ComputeFullRatedUtilization(Aircraft)
+Pout = Aircraft.Mission.History.SI.Power.Pout;
+Pav = Aircraft.Mission.History.SI.Power.Pav;
+Utilization = zeros(size(Pout));
+Valid = isfinite(Pout) & isfinite(Pav) & abs(Pav) > 1e-9;
+Utilization(Valid) = Pout(Valid) ./ Pav(Valid);
+nSrc = numel(Aircraft.Specs.Propulsion.PropArch.SrcType);
+nTrn = numel(Aircraft.Specs.Propulsion.PropArch.TrnType);
+Cols = nSrc + (1:nTrn);
+Utilization(:, Cols) = Utilization(:, Cols) .* ...
+    Aircraft.Mission.History.SI.Power.LamUps;
+Utilization = min(max(Utilization, 0), 1);
+end
+
+
+function MainEnd = GetMainEnd(Aircraft)
+MainSegs = find(Aircraft.Mission.Profile.ID == 1);
+MainEnd = Aircraft.Mission.Profile.SegEnd(MainSegs(end));
+end
+
+
+function Value = MeanExcludingLast(Vector)
+if numel(Vector) <= 1, Value = NaN; else, Value = mean(Vector(1:end-1)); end
+end
+
+
+function Value = MeanOrNaN(Vector)
+if isempty(Vector), Value = NaN; else, Value = mean(Vector, "omitnan"); end
+end
+
+
+function IsComplete = IsCompleteCheckpoint(FileName, RunVersion, MaxIterations)
+IsComplete = false;
+if ~isfile(FileName), return; end
+try
+    D = load(FileName, "Status", "RunMetadata");
+    IsComplete = D.Status == "success" && ...
+        D.RunMetadata.RunVersion == RunVersion && ...
+        D.RunMetadata.MaxIterations == MaxIterations;
+catch
+    IsComplete = false;
+end
+end
+
+
+function SaveFailure(Directory, Index, RunVersion, MaxIterations, ME)
+Status = "failed";
+RunMetadata = struct("RunVersion", RunVersion, "SequenceIndex", Index, ...
+    "MaxIterations", MaxIterations, "Failed", string(datetime("now")));
+ErrorIdentifier = string(ME.identifier);
+ErrorMessage = string(ME.message);
+ErrorReport = string(getReport(ME, "extended", "hyperlinks", "off"));
+save(fullfile(Directory, sprintf("Sequence_%04d_failed.mat", Index)), ...
+    "Status", "RunMetadata", "ErrorIdentifier", "ErrorMessage", ...
+    "ErrorReport");
+end
+
+
+function Aggregate = AggregateCheckpoints(Directory, Count, ...
+        RunVersion, MaxIterations)
+SummaryRows = cell(Count, 1);
+FlightRows = cell(Count, 1);
+ChargeRows = cell(Count, 1);
+Complete = false(Count, 1);
+for k = 1:Count
+    FileName = fullfile(Directory, sprintf("Sequence_%04d.mat", k));
+    if IsCompleteCheckpoint(FileName, RunVersion, MaxIterations)
+        D = load(FileName, "SequenceSummary", "FlightResults", "ChargeResults");
+        SummaryRows{k} = D.SequenceSummary;
+        D.FlightResults.Sequence = repmat(k, height(D.FlightResults), 1);
+        D.FlightResults = movevars(D.FlightResults, "Sequence", "Before", 1);
+        FlightRows{k} = D.FlightResults;
+        D.ChargeResults.Sequence = repmat(k, height(D.ChargeResults), 1);
+        D.ChargeResults = movevars(D.ChargeResults, "Sequence", "Before", 1);
+        ChargeRows{k} = D.ChargeResults;
+        Complete(k) = true;
+    end
+end
+if any(Complete)
+    SequenceSummary = vertcat(SummaryRows{Complete});
+    FlightResults = vertcat(FlightRows{Complete});
+    ChargeResults = vertcat(ChargeRows{Complete});
+else
+    SequenceSummary = table; FlightResults = table; ChargeResults = table;
+end
+if isempty(SequenceSummary)
+    FleetMetrics = table(Count, 0, Count, ...
+        'VariableNames', {'TotalSequences','CompletedSequences','RemainingSequences'});
+else
+    FleetMetrics = table(Count, height(SequenceSummary), ...
+        Count-height(SequenceSummary), sum(SequenceSummary.Flights), ...
+        mean(SequenceSummary.JointFuelSavedVsUnoptimized_kg_per_day), ...
+        mean(SequenceSummary.IndividualFuelSavedVsUnoptimized_kg_per_day), ...
+        mean(SequenceSummary.JointFuelSavedVsConventional_kg_per_day), ...
+        mean(SequenceSummary.IndividualFuelSavedVsConventional_kg_per_day), ...
+        mean(SequenceSummary.JointMeanLandingSOCExcludingLast_pct, "omitnan"), ...
+        mean(SequenceSummary.JointAverageChargeTime_min, "omitnan"), ...
+        mean(SequenceSummary.JointAverageSOCAdded_pct, "omitnan"), ...
+        sum(SequenceSummary.JointOptimizerTime_min), ...
+        sum(SequenceSummary.IndividualOptimizerTime_min), ...
+        'VariableNames', {'TotalSequences','CompletedSequences', ...
+        'RemainingSequences','CompletedFlights', ...
+        'AverageJointFuelSavedVsUnoptimized_kg_per_day', ...
+        'AverageIndividualFuelSavedVsUnoptimized_kg_per_day', ...
+        'AverageJointFuelSavedVsConventional_kg_per_day', ...
+        'AverageIndividualFuelSavedVsConventional_kg_per_day', ...
+        'AverageJointLandingSOCExcludingLast_pct', ...
+        'AverageJointChargeTime_min','AverageJointSOCAdded_pct', ...
+        'TotalJointOptimizerWorkerTime_min', ...
+        'TotalIndividualOptimizerWorkerTime_min'});
+end
+Aggregate = struct("SequenceSummary", SequenceSummary, ...
+    "FlightResults", FlightResults, "ChargeResults", ChargeResults, ...
+    "FleetMetrics", FleetMetrics, ...
+    "CompletedSequenceIndices", find(Complete), ...
+    "MissingSequenceIndices", find(~Complete), ...
+    "Generated", string(datetime("now")));
+end

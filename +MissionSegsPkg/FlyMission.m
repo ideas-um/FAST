@@ -159,8 +159,15 @@ for imiss = 1:nmiss
             SegEnd = Mission.SegEnd(isegs);
 
             % Cruise-target iteration clears mission history from ielem:end;
-            % refill PowerOpt splits before each segment evaluation.
+            % refill commanded splits before each segment evaluation. Preserve
+            % completed points because regular off-design mode may have
+            % recomputed their operational LamDwn values for feasibility.
+            SegBeg = Mission.SegBeg(isegs);
+            CompletedLamDwn = ...
+                Aircraft.Mission.History.SI.Power.LamDwn(1:SegBeg-1, :);
             Aircraft = PropulsionPkg.LamFill(Aircraft);
+            Aircraft.Mission.History.SI.Power.LamDwn(1:SegBeg-1, :) = ...
+                CompletedLamDwn;
             
             % define the function call
             FunName = strcat("MissionSegsPkg.Eval", SegName);

@@ -175,8 +175,15 @@ Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-% for full throttle, recompute the operational power splits
-Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+% Sizing (+1) retains FAST's legacy split recomputation. Regular
+% off-design analysis (-1) recomputes every transmitter split. Optimization
+% analysis (-2) preserves the optimizer-commanded LamDwn.Miss schedule.
+if Aircraft.Settings.Analysis.Type > 0
+    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+elseif Aircraft.Settings.Analysis.Type == -1
+    Aircraft = PropulsionPkg.RecomputeSplits( ...
+        Aircraft, SegBeg, SegEnd, true);
+end
 
 % assume all available power is for flying
 Preq = Inf(npoint, 1);

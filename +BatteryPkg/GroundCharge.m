@@ -1,4 +1,4 @@
-function [Aircraft] = GroundCharge(Aircraft, ChrgTime, PowerStrategy)
+function [Aircraft] = GroundCharge(Aircraft, ChrgTime, PowerStrategy, TimeStep)
 %
 % written by Sasha Kryuchkov
 % modified by Paul Mokotoff, prmoko@umich.edu
@@ -28,11 +28,17 @@ function [Aircraft] = GroundCharge(Aircraft, ChrgTime, PowerStrategy)
 
 %% Check Inputs %%
 %%%%%%%%%%%%%%%%%%
-if nargin<3
+if nargin < 3 || isempty(PowerStrategy)
     PowerStrategy = Aircraft.Specs.Battery.Charging;
 end
 
-TimeStep = 1;                           % simulate in 1-second increments
+if nargin < 4
+    TimeStep = 1;                       % default: 1-second increments
+end
+if ~isscalar(TimeStep) || ~isfinite(TimeStep) || TimeStep <= 0
+    error("BatteryPkg:GroundCharge:InvalidTimeStep", ...
+        "TimeStep must be a finite positive scalar number of seconds.");
+end
 if ~isscalar(ChrgTime) || ~isfinite(ChrgTime)
     error("BatteryPkg:GroundCharge:InvalidChargeTime", ...
         "ChrgTime must be a finite scalar number of seconds.");
@@ -41,6 +47,24 @@ end
 if ChrgTime < 0
     error("BatteryPkg:GroundCharge:NegativeChargeTime", ...
         "ChrgTime cannot be negative.");
+end
+
+if isfield(Aircraft, "Settings") && ...
+        isfield(Aircraft.Settings, "GroundChargeModel") && ...
+        strcmpi(string(Aircraft.Settings.GroundChargeModel), ...
+        "ThermalEquivalentCircuit")
+    Aircraft = BatteryPkg.GroundChargeThermalEquivalentCircuit( ...
+        Aircraft, ChrgTime, PowerStrategy, max(TimeStep, 5));
+    return
+end
+
+if isfield(Aircraft, "Settings") && ...
+        isfield(Aircraft.Settings, "GroundChargeModel") && ...
+        strcmpi(string(Aircraft.Settings.GroundChargeModel), ...
+        "SimscapeEquivalentCircuit")
+    Aircraft = BatteryPkg.GroundChargeEquivalentCircuit( ...
+        Aircraft, ChrgTime, PowerStrategy, TimeStep);
+    return
 end
 maxSteps = ceil(ChrgTime / TimeStep);
 

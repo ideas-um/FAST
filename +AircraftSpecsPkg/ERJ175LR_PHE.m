@@ -1,6 +1,6 @@
-function [Aircraft] = ERJ17LR_PHE()
+function [Aircraft] = ERJ175LR_PHE()
 %
-% [Aircraft] = ERJ17LR_PHE()
+% [Aircraft] = ERJ175LR_PHE()
 % originally written for E175 by Nawa Khailany
 % modified to E175LR by Paul Mokotoff, prmoko@umich.edu
 % last updated: 06 jan 2026
@@ -44,10 +44,10 @@ Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % 1.002
 Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % 1.000
 
 % fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.0364643671;
+Aircraft.Specs.Propulsion.MDotCF = 1.0390;
 
 % airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 0.9995345832;
+Aircraft.Specs.Weight.WairfCF = 0.9981;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -224,6 +224,10 @@ Aircraft.Specs.Power.LamDwn.Lnd = 0;
 % upstream power splits
 Aircraft.Specs.Power.LamUps.SLS = 1.00;
 Aircraft.Specs.Power.LamUps.Tko = 1.00;
+% Regular off-design flights retain the original 30% motor availability
+% limit in climb. Optimization mode (-2) explicitly promotes the
+% mission-indexed LamUps schedule to 1.0 in EAPAnalysis so the optimizer can
+% use the full installed motor rating without changing the -1 baseline.
 Aircraft.Specs.Power.LamUps.Clb = 0.30;
 Aircraft.Specs.Power.LamUps.Crs = 0;
 Aircraft.Specs.Power.LamUps.Des = 0;

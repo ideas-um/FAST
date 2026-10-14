@@ -36,7 +36,13 @@ W_S = Aircraft.Specs.Aero.W_S.SLS;
 % area: get the wing area
 S = Aircraft.Specs.Weight.MTOW / W_S;
 
-AR = Aircraft.Specs.Aero.AR;
+% Support both the legacy flat aerodynamic fields and FAST's current
+% component-based drag-polar specification.
+if isfield(Aircraft.Specs.Aero, "AR")
+    AR = Aircraft.Specs.Aero.AR;
+else
+    AR = Aircraft.Specs.Aero.Wing.AR;
+end
 
 % ----------------------------------------------------------
 
@@ -158,11 +164,21 @@ Aircraft.Mission.History.SI.Performance.Rho(SegBeg:SegEnd) = Rho;
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% retireve clean drag coefficient
-CD0 = Aircraft.Specs.Aero.CD0; 
+% Retrieve the low-speed clean drag coefficient. Older detailed-takeoff
+% inputs provide a flat CD0 field; current drag-polar aircraft do not, so
+% use the conventional transport-aircraft takeoff default.
+if isfield(Aircraft.Specs.Aero, "CD0")
+    CD0 = Aircraft.Specs.Aero.CD0;
+else
+    CD0 = 0.02;
+end
 
-% chnage in parasite drag in takeoff configuration
-dCD0 = Aircraft.Specs.Aero.dCD1;
+% Change in parasite drag in takeoff configuration.
+if isfield(Aircraft.Specs.Aero, "dCD1")
+    dCD0 = Aircraft.Specs.Aero.dCD1;
+else
+    dCD0 = 0.05;
+end
 
 CL = .3;
 
@@ -180,8 +196,14 @@ end
 % compute the change in parasite drag coefficient
 dCD0 = W_S * k_uc * MTOW ^ -0.215;
 %}
+if isfield(Aircraft.Specs.Aero, "e")
+    SpanEfficiency = Aircraft.Specs.Aero.e;
+else
+    SpanEfficiency = Aircraft.Specs.Aero.Wing.e;
+end
+
 % k1 and k3 estimations (hardcoded for now, incorporate geometry later)
-k1 = 1/(pi*Aircraft.Specs.Aero.e * AR);
+k1 = 1/(pi*SpanEfficiency * AR);
 k3 = -.15*k1;
 
 % G estimation (hardcoded for now, incorporate geometry later)

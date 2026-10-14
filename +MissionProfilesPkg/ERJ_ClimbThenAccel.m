@@ -107,7 +107,6 @@ Mission.TypeEnd = [ TAS;     EAS;        EAS;       Mach;   Mach;        EAS;   
 % no climb rate defined now
 Mission.ClbRate = NaN(length(Mission.ID), 1);
 
-
 %% REMEMBER THE MISSION PROFILE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

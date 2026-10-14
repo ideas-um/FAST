@@ -268,6 +268,13 @@ for ipnt = 1:npnt
     % propagate the power downstream to the transmitters
     Preq(ipnt, TrnSnkIdx) = PropulsionPkg.PowerFlow(Preq(ipnt, TrnSnkIdx)', Arch(TrnSnkIdx, TrnSnkIdx)', SplitDwn(TrnSnkIdx, TrnSnkIdx), EtaDwn(TrnSnkIdx, TrnSnkIdx), -1)';
 
+    % A transmitter commanded to zero downstream share is off for this
+    % mission point. In particular, the zero-speed detailed-takeoff point
+    % requests full available sink power; do not assign any of that demand
+    % to a disabled motor. The active turbine path carries the full demand.
+    InactiveTrn = abs(LamDwn(ipnt, :)) <= 1.0e-12;
+    Preq(ipnt, nsrc + find(InactiveTrn)) = 0;
+
 end
 
 % temporary power required array for iterating
@@ -313,14 +320,13 @@ for ipnt = 1:npnt
     
 end
 
-% Source propagation can restore a requested transmitter load above the
-% component availability enforced earlier. Reapply the hard component
-% limit here before reconciling source power and integrating energy.
-EMTrn = find(TrnType == 0);
-if ~isempty(EMTrn)
-    EMCols = nsrc + EMTrn;
-    Pout(:, EMCols) = min(Pout(:, EMCols), Pav(:, EMCols));
-end
+% Source propagation can restore requested transmitter loads above the
+% component limits enforced earlier. Reapply the hard limit to every
+% transmitter so an off-design engine, motor, or fan never reports more
+% output than its available installed power. Any unmet requirement remains
+% visible in Preq - Pout as a power shortfall.
+TrnCols = nsrc + (1:ntrn);
+Pout(:, TrnCols) = min(Pout(:, TrnCols), Pav(:, TrnCols));
 
 % Reconcile each battery source with the electric-motor output that
 % actually survived the component availability limit. PowerFlow above can
@@ -411,16 +417,45 @@ if (any(Batt))
             BattDeplete = find(SOC(:, icol) < 20, 1);
             
             % update the battery/EM power and SOC
-            if ((~isempty(BattDeplete)) && (strcmpi(ArchType, "E") == 0) && (Aircraft.Settings.Analysis.Type < 0))
-                
-                % no more power is provided from the electric motor or battery
-                Pout(BattDeplete:end, icol) = 0;
-                
-                % zero the splits
-                LamDwn(BattDeplete:end, :) = 0;
-                
-                % change the SOC (prior index is last charge > 20%)
-                SOC(BattDeplete:end, icol) = SOC(BattDeplete - 1, icol);
+            if ((~isempty(BattDeplete)) && (strcmpi(ArchType, "E") == 0) && ...
+                    (Aircraft.Settings.Analysis.Type == -1))
+
+                % Stop electric assist at the SOC floor and transfer the
+                % downstream demand to the turbine path.  Zeroing every
+                % downstream split here used to disconnect both the battery
+                % and fuel source while leaving the fan output untouched,
+                % creating thrust with no energy input and artificially low
+                % fuel burn in regular off-design flights.
+                DepletePoint = min(max(BattDeplete, 1), npnt);
+                LamDwn(DepletePoint:end, TrnType == 0) = 0;
+                LamDwn(DepletePoint:end, TrnType == 1) = 1;
+
+                % Re-propagate the unchanged sink demand through the revised
+                % fuel-only topology for the remainder of this segment.
+                for ipnt = DepletePoint:npnt
+                    SplitDwn = PropulsionPkg.EvalSplit( ...
+                        OperDwn, LamDwn(ipnt, :));
+                    if any(Windmill(ipnt, :))
+                        SplitDwn = RedistForWindmill(SplitDwn, ...
+                            Windmill(ipnt, :), nsrc, ncomp);
+                    end
+                    Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow( ...
+                        Pout(ipnt, SrcTrnIdx)', ...
+                        Arch(SrcTrnIdx, SrcTrnIdx)', ...
+                        SplitDwn(SrcTrnIdx, SrcTrnIdx), ...
+                        EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
+                end
+                Pout(DepletePoint:end, TrnCols) = min( ...
+                    Pout(DepletePoint:end, TrnCols), ...
+                    Pav(DepletePoint:end, TrnCols));
+                Pout(DepletePoint:end, icol) = 0;
+
+                % Hold SOC at the usable lower bound.  The previous sample is
+                % the last physically accepted state unless depletion occurs
+                % at the first point of a segment.
+                PriorPoint = max(DepletePoint - 1, 1);
+                FloorSOC = max(20, SOC(PriorPoint, icol));
+                SOC(DepletePoint:end, icol) = FloorSOC;
                 
                 % flag this result
                 Aircraft.Mission.History.Flags.SOCOff(MissID) = 1;
@@ -466,6 +501,24 @@ if (any(Batt))
             
         end
     end
+end
+
+% Battery-floor redistribution changes the active topology after the first
+% power-flow pass. Recompute thrust and gas-turbine supplement commands so
+% the engine fuel model below sees the revised turbine-only demand.
+Tout = Pout ./ TAS;
+Psupp(:) = 0;
+itrn = nsrc + (1:ntrn);
+for ipnt = 1:npnt
+    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
+    if any(Windmill(ipnt, :))
+        SplitDwn = RedistForWindmill(SplitDwn, ...
+            Windmill(ipnt, :), nsrc, ncomp);
+    end
+    Psupp(ipnt, itrn) = PropulsionPkg.PowerSupplementCheck( ...
+        Pout(ipnt, itrn), Arch(itrn, itrn), ...
+        SplitDwn(itrn, itrn), EtaDwn(itrn, itrn), ...
+        TrnType, EtaFan);
 end
 
 % check for fuel
@@ -543,7 +596,10 @@ if (any(Fuel))
             TTemp = TEng;
             
             % check if there is a power siphon
-            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
+            % The final control point is shared with the next segment but
+            % has no time interval in this segment. Do not let its power
+            % split disable idle fuel throughout the preceding descent.
+            if (all(abs(Psupp(ibeg:iend, icol)) < 1.0e-06)) || (SegBeg == 1)
             
                 % any required thrust < 1 must be rounded up to 5% SLS thrust
                 TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;

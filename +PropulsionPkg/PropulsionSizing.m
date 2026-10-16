@@ -2,7 +2,7 @@ function [Aircraft] = PropulsionSizing(Aircraft)
 %
 % [Aircraft] = PropulsionSizing(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 10 mar 2026
+% last updated: 16 oct 2026
 %
 % Split the total thrust/power throughout the powertrain and determine the
 % total power needed to size each component.
@@ -153,8 +153,12 @@ if (any(TrnType > 0 & TrnType ~= 2))
         TurbofanEngines = Aircraft.HistData.Eng;
         IO = {["Thrust_Max"],["DryWeight"]};
 
-        % row vector can have multiple targets for a single input
+        % Weight the installed engine against all thrust it must produce. A
+        % positive supplement is added back to DesignThrust below, so omitting
+        % it here would give the regression a smaller, inconsistent engine.
         target = Tdwn(Eng);
+        supplement = Tsupp(Eng);
+        target = target(:) + supplement(:);
 
         % run the regression - input must be a column vector
         Weng = RegressionPkg.NLGPR(TurbofanEngines,IO,target);

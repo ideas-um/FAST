@@ -2,7 +2,7 @@ function [Aircraft] = PropAnalysis(Aircraft)
 %
 % [Aircraft] = PropAnalysis(Aircraft)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 sep 2026
+% last updated: 10 mar 2026
 %
 % Analyze the propulsion system for a given set of flight conditions.
 % Remember how the propulsion system performs in the mission history.
@@ -44,14 +44,11 @@ TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 % get the propulsion architecture
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
-% get the operational matrices for the current mission segment
-[OperUps, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
+% get the downstream operational matrix
+OperDwn = Aircraft.Specs.Propulsion.PropArch.OperDwn;
 
 % get the downstream efficiency matrix
 EtaDwn = Aircraft.Specs.Propulsion.PropArch.EtaDwn;
-
-% get the upstream efficiency matrix
-EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
 % get which propellers are connected to the gas turbine engines
 WhichProp = Aircraft.Specs.Propulsion.PropArch.WhichProp;
@@ -121,22 +118,9 @@ Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
 
 % get the necessary splits
 LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
-LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
 
 % check for a windmilling engine
 Windmill = Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, :);
-
-% The two operational matrices describe the same mission point. Reject
-% edge flows that disagree even when both matrix row sums are valid.
-for ipnt = 1:length(PreqSnk)
-    SplitUps = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
-    SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
-    if (any(Windmill(ipnt, :)))
-        SplitDwn = RedistForWindmill(SplitDwn, Windmill(ipnt, :), nsrc, ncomp);
-    end
-    PropulsionPkg.CheckEdgePowerConsistency( ...
-        Arch, SplitUps, SplitDwn, EtaUps, EtaDwn, PreqSnk(ipnt));
-end
 
 % aircraft weight
 Mass = Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd);
@@ -502,13 +486,13 @@ if (any(Fuel))
         icol = HasEng(ieng) + nsrc;
         
         % check if it has a propeller
-        iprop = WhichProp{HasEng(ieng)};
+        iprop = WhichProp(HasEng(ieng));
 
         % check if the engine is connected to a propeller
-        if (~isempty(iprop))
+        if (iprop ~= 0)
             
             % get the thrust requirement from the propeller
-            TEng = sum(Tout(ibeg:iend, iprop), 2);
+            TEng = Tout(ibeg:iend, iprop);
             
         else
             
@@ -525,35 +509,30 @@ if (any(Fuel))
         % compute thrust/power available (depends on aircraft class)
         if      (strcmpi(aclass, "Turbofan" ) == 1)
             
-            % Determine the net engine demand point by point. Electric-only
-            % operation may shut an engine down after takeoff, but a partial
-            % or microscopic supplement must not remove the idle floor for
-            % an entire mission segment.
-            ModelSupplement = Psupp(ibeg:iend, icol) ./ TAS(ibeg:iend);
-            NetDemand = TEng - ModelSupplement;
-            IdleDemand = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
-            AllowShutdown = (SegBeg > 1) & ...
-                            (ModelSupplement >= IdleDemand) & ...
-                            (NetDemand <= 0);
-            TTemp = PropulsionPkg.ResolveEngineDemand( ...
-                TEng, IdleDemand, AllowShutdown);
+            % temporary thrust required
+            TTemp = TEng;
+            
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
+            
+                % any required thrust < 1 must be rounded up to 5% SLS thrust
+                TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
+                
+            end
                         
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
             % temporary power required
             PTemp = Pout(ibeg:iend, icol);
-
-            % Turboprop power flow already contains the motor contribution,
-            % so there is no model supplement to subtract a second time.
-            % Permit shutdown only when motor assistance is large enough to
-            % replace idle power and leaves zero engine power at this point.
-            IdleDemand = 0.05 * Aircraft.Specs.Power.SLS;
-            AllowShutdown = (SegBeg > 1) & ...
-                            (Psupp(ibeg:iend, icol) >= IdleDemand) & ...
-                            (PTemp <= 0);
-            PTemp = PropulsionPkg.ResolveEngineDemand( ...
-                PTemp, IdleDemand, AllowShutdown);
+            
+            % check if there is a power siphon
+            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
+            
+                % any required power  < 1 must be rounded up to 5% SLS power
+                PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
+                
+            end            
         end
         
         % get altitudes and mach number
@@ -574,9 +553,7 @@ if (any(Fuel))
                 OffParams.Thrust = TTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft, OffParams, ...
-                    PropulsionPkg.EngineModelSupplement(aclass, Psupp(ipnt, icol)), ...
-                    icol, ipnt);
+                OffDesignEngine = EngFun(Aircraft, OffParams, Psupp(ipnt, icol), icol, ipnt);
                 
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
@@ -585,8 +562,7 @@ if (any(Fuel))
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, ...
-                    PropulsionPkg.EngineModelSupplement(aclass, Psupp(ipnt, icol)));
+                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
                 
             end
             

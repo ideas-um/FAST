@@ -1,8 +1,8 @@
 function [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan)
 %
-% [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan)
+% [Psupp] = PowerSupplementCheck(Preq, Arch, Lambda, Eta, TrnType, EtaFan, itrn)
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 16 sep 2026
+% last updated: 04 aug 2025
 %
 % In the propulsion architecture, check if any components are either
 % suppling/siphoning power from the gas-turbine engines. If a component is
@@ -100,34 +100,19 @@ if (any(AnyParallel))
         % find the gas-turbine engine being supplemented
         Driving = find((Arch(:, icomp) > 0)' & (TrnType == 1));
         
-        % Only a shared fan/propeller produces supplemental thrust. A
-        % generator or cable is an electrical load whose engine share is
-        % already represented by the downstream power split; crediting the
-        % motor there would subtract unrelated power from engine fuel flow.
-        if (TrnType(icomp) ~= 2)
+        % check if there are multiple (or none) "driving" gas-turbines
+        if (length(Driving) ~= 1)
+            
+            % don't know how much each motor is powering each gas-turbine
             continue;
+            
         end
-
-        % a shared fan needs both an engine and a motor contribution
+        
+        % find the electric motors that are supplementing
         Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
-        if (isempty(Driving) || isempty(Helping))
-            continue;
-        end
-
-        % Downstream splits describe fractions of the target demand. Motor
-        % power at the target already includes path losses in Preq, so using
-        % motor input power here would apply the same split a second time.
-        MotorPower = Preq(:, icomp) .* sum(Lambda(icomp, Helping));
-
-        % When engines share the target, allocate the motor credit in
-        % proportion to their own contributions to that target.
-        EngineShares = Lambda(icomp, Driving);
-        if (sum(EngineShares) <= 0)
-            EngineShares = ones(size(EngineShares));
-        end
-        Psupp(:, Driving) = Psupp(:, Driving) + ...
-                            MotorPower .* EtaFan .* ...
-                            (EngineShares ./ sum(EngineShares));
+                
+        % add the power supplement, accounting for the fan efficiency
+        Psupp(:, Driving) = Psupp(:, Driving) + sum(Preq(:, Helping), 2) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
         
     end
 end

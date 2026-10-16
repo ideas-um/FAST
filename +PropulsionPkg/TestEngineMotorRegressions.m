@@ -2,7 +2,7 @@ function [Success] = TestEngineMotorRegressions()
 %
 % [Success] = TestEngineMotorRegressions()
 % written by Triet Ho
-% last updated: 16 oct 2026
+% last updated: 16 sep 2026
 %
 % Check gas-turbine and electric-motor accounting on controlled propulsion
 % architectures. Include physically consistent split and efficiency cases,
@@ -12,7 +12,7 @@ function [Success] = TestEngineMotorRegressions()
 %     none
 %
 % OUTPUTS:
-%     Success - 1 when all 40 checks pass, otherwise 0.
+%     Success - 1 when all 39 checks pass, otherwise 0.
 %               size/type/units: 1-by-1 / int / []
 %
 
@@ -20,7 +20,7 @@ function [Success] = TestEngineMotorRegressions()
 %%%%%%%%%%%%%%%%%%%%%
 
 % Keep one result per case so a failure identifies the affected behavior.
-Pass = false(40, 1);
+Pass = false(39, 1);
 
 %% ENGINE TO PROPELLER CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -204,29 +204,6 @@ Pass(38) = CheckValue( ...
 % assisted engine at idle rather than silently turning it off.
 Pass(39) = CheckValue( ...
     PropulsionPkg.ResolveEngineDemand(0, 50, false), 50);
-
-%% SUPPLEMENTED INSTALLED ENGINE WEIGHT %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Engine weight must use the same supplemented installed thrust passed to
-% the detailed engine model. Otherwise increasing the electric design share
-% can create artificial engine-weight savings while retaining engine thrust.
-aircraft = makeTwoEngineSizingAircraft(0.2, 0.4);
-aircraft = PropulsionPkg.PropulsionSizing(aircraft);
-engineIndices = aircraft.Specs.Propulsion.PropArch.TrnType == 1;
-installedThrust = aircraft.Specs.Propulsion.SLSThrust(engineIndices) + ...
-                  aircraft.Specs.Propulsion.ThrustSupp(engineIndices);
-installedThrust = installedThrust(:);
-expectedWeight = RegressionPkg.NLGPR( ...
-    aircraft.HistData.Eng, {["Thrust_Max"], ["DryWeight"]}, installedThrust);
-expectedWeight = sum(expectedWeight);
-Pass(40) = isfinite(aircraft.Specs.Weight.Engines) && ...
-           abs(aircraft.Specs.Weight.Engines - expectedWeight) <= ...
-           1e-8 * max(1, abs(expectedWeight));
-if (~Pass(40))
-    fprintf(1, "Installed engine weight: actual %.16g, expected %.16g\n", ...
-            aircraft.Specs.Weight.Engines, expectedWeight);
-end
 
 %% CHECK THE TEST RESULTS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -80,10 +80,19 @@ if isempty(Pool) || Pool.NumWorkers ~= NumWorkers
     parpool("Processes", NumWorkers);
 end
 
+% Conventional off-design missions depend only on the four flight inputs
+% used by ConfigureFlight, not on sequence SOC/temperature history.  The
+% 3,408 rows in Sequence.mat collapse to only 80 unique flight conditions,
+% so cache those exact FAST results once and reuse them without introducing
+% a surrogate or changing the mission physics.
+[ConventionalCatalog, ConventionalCacheDir] = ...
+    BuildConventionalCache(BaseConventional, Sequences, OutputDir, RunVersion);
+
 fprintf(['Starting %d selected sequences of %d with %d process workers ' ...
     'and %d optimizer iterations.\n'], numel(SequenceIndices), ...
     nSequence, NumWorkers, MaxIterations);
 
+SelectedSequences = Sequences(SequenceIndices);
 parfor iWork = 1:numel(SequenceIndices)
     iSequence = SequenceIndices(iWork);
     CheckpointFile = fullfile(CheckpointDir, ...
@@ -92,8 +101,9 @@ parfor iWork = 1:numel(SequenceIndices)
         continue;
     end
     try
-        RunOneSequence(iSequence, Sequences{iSequence}, BasePHE, ...
-            BaseConventional, MaxIterations, RunVersion, CheckpointFile);
+        RunOneSequence(iSequence, SelectedSequences{iWork}, BasePHE, ...
+            ConventionalCatalog, ConventionalCacheDir, MaxIterations, ...
+            RunVersion, CheckpointFile);
     catch ME
         SaveFailure(FailureDir, iSequence, RunVersion, MaxIterations, ME);
     end
@@ -116,8 +126,9 @@ disp(Aggregate.FleetMetrics);
 end
 
 
-function RunOneSequence(iSequence, Sequence, BasePHE, BaseConventional, ...
-        MaxIterations, RunVersion, CheckpointFile)
+function RunOneSequence(iSequence, Sequence, BasePHE, ...
+        ConventionalCatalog, ConventionalCacheDir, MaxIterations, ...
+        RunVersion, CheckpointFile)
 SequenceTimer = tic;
 nFlight = height(Sequence);
 
@@ -152,7 +163,7 @@ end
 JointCharge = ReplayCharges(JointAircraft, Sequence);
 
 [ConventionalAircraft] = FlyConventionalSequence( ...
-    BaseConventional, Sequence);
+    Sequence, ConventionalCatalog, ConventionalCacheDir);
 
 [UnoptimizedFlight, UnoptimizedChargeTable] = SummarizePHE( ...
     UnoptimizedAircraft, UnoptimizedCharge, Sequence, "Unoptimized");
@@ -277,15 +288,76 @@ Aircraft.Settings.PowerOptConstraintTolerance = 1e-4;
 end
 
 
-function AircraftSet = FlyConventionalSequence(BaseAircraft, Sequence)
+function AircraftSet = FlyConventionalSequence( ...
+        Sequence, Catalog, CacheDirectory)
 nFlight = height(Sequence);
 AircraftSet = struct;
 for k = 1:nFlight
-    Aircraft = ConfigureFlight(BaseAircraft, Sequence(k, :), NaN, NaN);
+    CacheIndex = FindConventionalCacheIndex(Sequence(k, :), Catalog);
+    Cached = load(fullfile(CacheDirectory, ...
+        sprintf("ConventionalFlight_%04d.mat", CacheIndex)), "Aircraft");
+    AircraftSet.(sprintf("Aircraft%d", k)) = Cached.Aircraft;
+end
+end
+
+
+function [Catalog, CacheDirectory] = BuildConventionalCache( ...
+        BaseAircraft, Sequences, OutputDirectory, RunVersion)
+Variables = {'DISTANCE','ALTITUDE_m','SPEED_mph','PAYLOAD_lb'};
+AllFlights = vertcat(Sequences{:});
+Catalog = unique(AllFlights(:, Variables), "rows", "stable");
+CacheDirectory = fullfile(OutputDirectory, "conventional_flight_cache");
+if ~isfolder(CacheDirectory), mkdir(CacheDirectory); end
+
+fprintf("Preparing %d exact conventional FAST flight cache entries.\n", ...
+    height(Catalog));
+parfor k = 1:height(Catalog)
+    CacheFile = fullfile(CacheDirectory, ...
+        sprintf("ConventionalFlight_%04d.mat", k));
+    if IsValidConventionalCache(CacheFile, RunVersion, Catalog(k, :))
+        continue;
+    end
+    Aircraft = ConfigureFlight(BaseAircraft, Catalog(k, :), NaN, NaN);
     Aircraft.Settings.Analysis.Type = -1;
     Aircraft.Settings.PowerOpt = 0;
     Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
-    AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
+    CacheMetadata = struct("RunVersion", RunVersion, ...
+        "CacheIndex", k, "FlightInput", Catalog(k, :), ...
+        "Completed", string(datetime("now")));
+    SaveConventionalCache(CacheFile, Aircraft, CacheMetadata);
+end
+end
+
+
+function SaveConventionalCache(FileName, Aircraft, CacheMetadata)
+save(FileName, "Aircraft", "CacheMetadata", "-v7.3");
+end
+
+
+function Index = FindConventionalCacheIndex(Flight, Catalog)
+Match = Catalog.DISTANCE == Flight.DISTANCE & ...
+    Catalog.ALTITUDE_m == Flight.ALTITUDE_m & ...
+    Catalog.SPEED_mph == Flight.SPEED_mph & ...
+    Catalog.PAYLOAD_lb == Flight.PAYLOAD_lb;
+Index = find(Match, 1);
+if isempty(Index)
+    error("RunAllSequences:MissingConventionalCache", ...
+        "No conventional cache entry matches the requested flight.");
+end
+end
+
+
+function IsValid = IsValidConventionalCache( ...
+        FileName, RunVersion, FlightInput)
+IsValid = false;
+if ~isfile(FileName), return; end
+try
+    D = load(FileName, "CacheMetadata");
+    C = D.CacheMetadata;
+    IsValid = C.RunVersion == RunVersion && ...
+        isequaln(C.FlightInput, FlightInput);
+catch
+    IsValid = false;
 end
 end
 

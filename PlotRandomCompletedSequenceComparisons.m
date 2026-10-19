@@ -392,8 +392,8 @@ grid(Ax, "on"); ylabel(Ax, "Cumulative fuel burn (kg)");
 xlabel(Ax, "Elapsed sequence time, including ground time (h)");
 legend(Ax, "Location", "eastoutside"); title(Ax, "Main-mission fuel burn");
 
-title(L, sprintf(["Sequence %d: conventional, unoptimized PHE, " ...
-    "individual optimization, and sequence optimization"], Index));
+title(L, sprintf(['Sequence %d: conventional, unoptimized PHE, ' ...
+    'individual optimization, and sequence optimization'], Index));
 OutFile = fullfile(OutDir, sprintf( ...
     "Sequence_%04d_SixPanel_WholeSequence.png", Index));
 exportgraphics(Fig, OutFile, "Resolution", 200);

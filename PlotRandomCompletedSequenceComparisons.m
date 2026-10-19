@@ -29,7 +29,11 @@ end
 
 rng(20261014, "twister");
 nSample = min(3, numel(Completed));
-Selected = sort(Completed(randperm(numel(Completed), nSample)));
+RandomSelected = Completed(randperm(numel(Completed), nSample));
+% Also retain the strongest joint-versus-individual result found in the
+% first 174 completed remote checkpoints as a useful non-random diagnostic.
+PrioritySequences = intersect(177, Completed, "stable");
+Selected = sort(unique([RandomSelected, PrioritySequences]));
 fprintf("Plotting completed sequences: %s\n", mat2str(Selected));
 
 SelectedSummary = table;

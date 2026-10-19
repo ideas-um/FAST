@@ -312,7 +312,7 @@ L = tiledlayout(Fig, 6, 1, "TileSpacing", "compact", ...
 Ax = nexttile(L); yyaxis(Ax, "left");
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.Time_h, C.Altitude_ft / 1000, "-", ...
+    PlotThinned(Ax, C.Time_h, C.Altitude_ft / 1000, "-", ...
         "LineWidth", 1.25, "Color", Colors(i, :), ...
         "DisplayName", Labels(i) + " altitude"); hold(Ax, "on");
 end
@@ -320,7 +320,7 @@ ylabel(Ax, "Altitude (kft)");
 yyaxis(Ax, "right");
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.Time_h, C.Distance_nmi, "--", ...
+    PlotThinned(Ax, C.Time_h, C.Distance_nmi, "--", ...
         "LineWidth", 1.15, "Color", Colors(i, :), ...
         "DisplayName", Labels(i) + " distance"); hold(Ax, "on");
 end
@@ -335,7 +335,7 @@ plot(Ax, nan, nan, "LineWidth", 1.4, "Color", Colors(1, :), ...
     "DisplayName", Labels(1) + " (no battery)"); hold(Ax, "on");
 for i = 2:numel(Cases)
     C = S.(Cases(i));
-    plot(Ax, C.Time_h, C.SOC_pct, "LineWidth", 1.45, ...
+    PlotThinned(Ax, C.Time_h, C.SOC_pct, "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -348,7 +348,7 @@ plot(Ax, nan, nan, "LineWidth", 1.3, "Color", Colors(1, :), ...
     "DisplayName", Labels(1) + " (no EM)"); hold(Ax, "on");
 for i = 2:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.Time_h, C.MotorUtilization, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.MotorUtilization, "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -360,7 +360,7 @@ title(Ax, "Electric-machine utilization");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.Time_h, C.TurbineUtilization, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.TurbineUtilization, "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -372,10 +372,10 @@ title(Ax, "Gas-turbine utilization");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.Time_h, C.Preq_MW, "-", "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.Preq_MW, "-", "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i) + " P_{req}");
     hold(Ax, "on");
-    plot(Ax, C.Time_h, C.Pav_MW, "--", "LineWidth", 1.15, ...
+    PlotThinned(Ax, C.Time_h, C.Pav_MW, "--", "LineWidth", 1.15, ...
         "Color", Colors(i, :), "DisplayName", Labels(i) + " P_{av}");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -387,7 +387,7 @@ title(Ax, "Required power (solid) and available power (dashed)");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    plot(Ax, C.FuelTime_h, C.CumulativeFuel_kg, "LineWidth", 1.45, ...
+    PlotThinned(Ax, C.FuelTime_h, C.CumulativeFuel_kg, "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -399,8 +399,22 @@ title(L, sprintf(['Sequence %d: conventional, unoptimized PHE, ' ...
     'individual optimization, and sequence optimization'], Index));
 OutFile = fullfile(OutDir, sprintf( ...
     "Sequence_%04d_SixPanel_WholeSequence.png", Index));
-exportgraphics(Fig, OutFile, "Resolution", 160);
+exportgraphics(Fig, OutFile, "ContentType", "image", "Resolution", 120);
 close(Fig);
+end
+
+
+function H = PlotThinned(Ax, X, Y, varargin)
+% Limit raster-render workload while retaining endpoints and NaN gaps.
+MaxPoints = 2500;
+n = numel(X);
+if n > MaxPoints
+    Keep = unique([1; n; round(linspace(1, n, MaxPoints))'; ...
+        find(~isfinite(X) | ~isfinite(Y))]);
+    X = X(Keep);
+    Y = Y(Keep);
+end
+H = plot(Ax, X, Y, varargin{:});
 end
 
 

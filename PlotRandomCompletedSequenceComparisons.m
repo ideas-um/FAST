@@ -9,6 +9,7 @@ RunDir = fullfile(RootDir, "output", "all_sequences_full_comparison");
 CheckpointDir = fullfile(RunDir, "checkpoints");
 PlotRoot = fullfile(RunDir, "plots");
 if ~isfolder(PlotRoot), mkdir(PlotRoot); end
+GenerateLegacyPlots = false;
 
 Files = dir(fullfile(CheckpointDir, "Sequence_*.mat"));
 Completed = [];
@@ -60,14 +61,16 @@ for iSample = 1:numel(Selected)
             D.MissionResults, D.ChargeHistories, D.Sequence, PHECases(iCase));
     end
 
-    MakePowerPlot(Timelines, Cases, iSequence, SequencePlotDir);
-    MakeSOCFuelPlot(Timelines, SOCTimelines, Cases, PHECases, ...
-        iSequence, SequencePlotDir);
-    MakePropulsionPlot(Timelines, Cases, iSequence, SequencePlotDir);
-    MakeTrajectoryPlot(Timelines, Cases, iSequence, SequencePlotDir);
-    MakeObjectivePlot(D.FlightResults, D.ChargeResults, ...
-        D.SequenceSummary, iSequence, SequencePlotDir);
-    MakeSplitPlot(Timelines, PHECases, iSequence, SequencePlotDir);
+    if GenerateLegacyPlots
+        MakePowerPlot(Timelines, Cases, iSequence, SequencePlotDir);
+        MakeSOCFuelPlot(Timelines, SOCTimelines, Cases, PHECases, ...
+            iSequence, SequencePlotDir);
+        MakePropulsionPlot(Timelines, Cases, iSequence, SequencePlotDir);
+        MakeTrajectoryPlot(Timelines, Cases, iSequence, SequencePlotDir);
+        MakeObjectivePlot(D.FlightResults, D.ChargeResults, ...
+            D.SequenceSummary, iSequence, SequencePlotDir);
+        MakeSplitPlot(Timelines, PHECases, iSequence, SequencePlotDir);
+    end
     MakeSixPanelSequencePlot(Timelines, SOCTimelines, ...
         iSequence, SequencePlotDir);
 
@@ -300,7 +303,7 @@ Colors = [0.4940 0.1840 0.5560; ...
 Reference = T.Joint;
 
 Fig = figure("Visible", "off", "Color", "w", ...
-    "Position", [40 40 1750 1850]);
+    "Position", [40 40 1500 1550]);
 L = tiledlayout(Fig, 6, 1, "TileSpacing", "compact", ...
     "Padding", "compact");
 
@@ -396,8 +399,7 @@ title(L, sprintf(['Sequence %d: conventional, unoptimized PHE, ' ...
     'individual optimization, and sequence optimization'], Index));
 OutFile = fullfile(OutDir, sprintf( ...
     "Sequence_%04d_SixPanel_WholeSequence.png", Index));
-exportgraphics(Fig, OutFile, "Resolution", 200);
-savefig(Fig, replace(OutFile, ".png", ".fig"));
+exportgraphics(Fig, OutFile, "Resolution", 160);
 close(Fig);
 end
 

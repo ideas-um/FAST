@@ -103,6 +103,7 @@ ObjectiveScale = 1.0e4;
 % without resizing the aircraft inside each objective evaluation.
 Aircraft.Settings.Analysis.Type = -2;
 Aircraft.Settings.Analysis.FuelRelaxation = 0.5;
+Aircraft.Settings.Analysis.ConvergenceTolerance = 1.0e-5;
 
 % turn off FAST print outs
 Aircraft.Settings.PrintOut = 0;

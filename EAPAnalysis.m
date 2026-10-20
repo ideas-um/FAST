@@ -165,6 +165,17 @@ Aircraft.Settings.Converged = 1;
 
 % define convergence tolerance
 EPS = 1.0e-3;
+% Preserve FAST's legacy convergence tolerance by default, while allowing
+% fixed-aircraft optimization/replay workflows to request a tighter fuel and
+% MTOW fixed point. This avoids mode/order-dependent fuel differences when
+% an identical power-split schedule is replayed.
+if isfield(Aircraft, "Settings") && ...
+        isfield(Aircraft.Settings, "Analysis") && ...
+        isfield(Aircraft.Settings.Analysis, "ConvergenceTolerance") && ...
+        isfinite(Aircraft.Settings.Analysis.ConvergenceTolerance) && ...
+        Aircraft.Settings.Analysis.ConvergenceTolerance > 0
+    EPS = Aircraft.Settings.Analysis.ConvergenceTolerance;
+end
 
 % Number of recent battery-sizing iterations retained for detecting a
 % repeated discrete-cell limit cycle. Increase this value to detect longer

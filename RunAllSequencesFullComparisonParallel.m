@@ -3,7 +3,7 @@ function Aggregate = RunAllSequencesFullComparisonParallel( ...
 %RUNALLSEQUENCESFULLCOMPARISONPARALLEL Production comparison for Sequence.mat.
 %
 % Runs, for every selected daily sequence:
-%   1) regular unoptimized PHE operation (-1),
+%   1) regular unoptimized PHE dispatch, replayed in fixed-command mode (-2),
 %   2) sequential individual-flight MissionPowerOpt,
 %   3) joint SequencePowerOpt, and
 %   4) conventional off-design operation.
@@ -21,9 +21,12 @@ if nargin < 2 || isempty(MaxIterations)
     MaxIterations = 500;
 end
 
-RunVersion = "all-sequences-thermal-reserve-fuel-only-v1";
+RunVersion = "all-sequences-thermal-fixed-evaluator-v2";
 RootDir = fileparts(mfilename("fullpath"));
-OutputDir = fullfile(RootDir, "output", "all_sequences_full_comparison");
+% Preserve every checkpoint from the earlier mixed-evaluator run. Corrected
+% results are written to a separate directory so no completed work is lost.
+OutputDir = fullfile(RootDir, "output", ...
+    "all_sequences_full_comparison_fixed_evaluator");
 CheckpointDir = fullfile(OutputDir, "checkpoints");
 FailureDir = fullfile(OutputDir, "failures");
 if ~isfolder(CheckpointDir), mkdir(CheckpointDir); end
@@ -132,9 +135,11 @@ function RunOneSequence(iSequence, Sequence, BasePHE, ...
 SequenceTimer = tic;
 nFlight = height(Sequence);
 
-% Regular -1 PHE baseline. Reserve/diversion battery use is disabled in
-% EAPAnalysis for this mode.
-[UnoptimizedAircraft, UnoptimizedCharge] = FlyUnoptimizedSequence( ...
+% Find the regular -1 operational dispatch, then project/replay it through
+% the exact same fixed-command -2 evaluator used by MissionPowerOpt. This
+% makes baseline and optimized fuel directly comparable.
+[UnoptimizedAircraft, UnoptimizedCharge, UnoptimizedPC, ...
+    UnoptimizedReplayOutput] = FlyUnoptimizedSequence( ...
     BasePHE, Sequence);
 
 % Independent optimizer, with landing SOC -> thermal ground charge -> next
@@ -206,7 +211,9 @@ OptimizerResults = struct( ...
     "IndividualPC", {IndividualPC}, ...
     "IndividualExitFlag", IndividualExitFlag, ...
     "IndividualOutput", {IndividualOptimizerOutput}, ...
-    "IndividualTime_min", IndividualOptimizerTime_min);
+    "IndividualTime_min", IndividualOptimizerTime_min, ...
+    "UnoptimizedPC", {UnoptimizedPC}, ...
+    "UnoptimizedReplayOutput", {UnoptimizedReplayOutput});
 RunMetadata = struct( ...
     "Status", "success", ...
     "RunVersion", RunVersion, ...
@@ -225,19 +232,30 @@ fprintf("Sequence %d complete in %.2f min.\n", ...
 end
 
 
-function [AircraftSet, ChargeHistories] = FlyUnoptimizedSequence( ...
+function [AircraftSet, ChargeHistories, PC, ReplayOutput] = ...
+        FlyUnoptimizedSequence( ...
         BaseAircraft, Sequence)
 nFlight = height(Sequence);
 AircraftSet = struct;
 ChargeHistories = cell(max(nFlight - 1, 0), 1);
+PC = cell(nFlight, 1);
+ReplayOutput = cell(nFlight, 1);
 BegSOC = 100;
 BegTemperature_C = BaseAircraft.Settings.BatteryInitialTemperature_C;
 for k = 1:nFlight
-    Aircraft = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
+    Seed = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
         BegSOC, BegTemperature_C);
-    Aircraft.Settings.Analysis.Type = -1;
-    Aircraft.Settings.PowerOpt = 0;
-    Aircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    Seed.Settings.Analysis.Type = -1;
+    Seed.Settings.PowerOpt = 0;
+    Seed = Main(Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+
+    % MaxIterations=0 performs only the fixed-command feasibility
+    % projection and -2 replay. No optimization is performed.
+    Seed = ConfigureOptimizer(Seed, 0);
+    [Aircraft, PC{k}, ~, ReplayExitFlag, ReplayOutput{k}] = ...
+        OptimizationPkg.MissionPowerOpt( ...
+        Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    ReplayOutput{k}.ExitFlag = ReplayExitFlag;
     AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
     if k < nFlight
         [ChargeHistories{k}, BegSOC, BegTemperature_C] = ...

@@ -137,6 +137,10 @@ options.MaxFunctionEvaluations = 10^9;
 
 % run off design mission
 Aircraft.Settings.Analysis.Type = -2;
+% Match MissionPowerOpt's fixed-aircraft fuel/MTOW iteration exactly so an
+% identical lambda schedule has the same objective in both optimizers.
+Aircraft.Settings.Analysis.FuelRelaxation = 0.5;
+Aircraft.Settings.Analysis.ConvergenceTolerance = 1.0e-5;
 
 % turn off FAST print outs
 Aircraft.Settings.PrintOut = 0;
@@ -369,6 +373,31 @@ if ~Converged
     error("OptimizationPkg:SequencePowerOpt:NoConvergedSolution", ...
         "No converged, feasible sequence solution was found after %d starts and %d iterations per start.%s", ...
         max(1, MaxStarts), MaxOptIter, FailureSuffix);
+end
+
+% The complete, projected starting schedule is a valid candidate under the
+% same -2 evaluator and sequence constraints. Never return a joint solution
+% with higher fuel than that feasible input point (normally the collection
+% of individually optimized flights supplied by the production runner).
+[InitialObjective, InitialSOC, InitialRC, InitialPowerExcess, ...
+    InitialMTOWExcess, InitialValid] = FlySequence(PC0, Aircraft, Sequence);
+InitialConstraints = SequenceConstraints(InitialSOC, InitialRC, ...
+    InitialPowerExcess, InitialMTOWExcess, Aircraft);
+InitialMaxConstraint = max(InitialConstraints, [], "all");
+[SelectedObjective, SelectedSOC, SelectedRC, SelectedPowerExcess, ...
+    SelectedMTOWExcess, SelectedValid] = ...
+    FlySequence(PCbest, Aircraft, Sequence);
+SelectedConstraints = SequenceConstraints(SelectedSOC, SelectedRC, ...
+    SelectedPowerExcess, SelectedMTOWExcess, Aircraft);
+SelectedMaxConstraint = max(SelectedConstraints, [], "all");
+if InitialValid && isfinite(InitialObjective) && ...
+        InitialMaxConstraint <= options.ConstraintTolerance && ...
+        (~SelectedValid || SelectedMaxConstraint > options.ConstraintTolerance || ...
+        InitialObjective < SelectedObjective)
+    PCbest = PC0;
+    OptimizerOutput.UsedFeasibleInitialPoint = true;
+    OptimizerOutput.ReplayObjective_kg = InitialObjective;
+    OptimizerOutput.MaxConstraint = InitialMaxConstraint;
 end
 t = toc / 60;
 

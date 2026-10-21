@@ -3,11 +3,12 @@ function [SizedAircraft, RunMetadata] = RunPaperERJ175LRSizing(OutputFile)
 %
 % The electric motors are sized to provide 10 percent of total takeoff
 % power. During climb they are limited to 30 percent of their installed
-% rating; the gas turbines provide the remaining required power.
+% rating; the gas turbines provide the remaining required power. By
+% default, the function returns results without writing a MAT file. Pass an
+% explicit OutputFile (preferably outside the repository) to save a copy.
 
 if nargin < 1
-    OutputFile = fullfile(pwd, ...
-        "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat");
+    OutputFile = "";
 end
 
 Aircraft = AircraftSpecsPkg.ERJ175LR_Elec;
@@ -37,7 +38,7 @@ Aircraft.Settings.PrintOut = 0;
 SizedAircraft = Main(Aircraft, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
 RunMetadata = struct( ...
-    "Branch", "emma_poweropt_update", ...
+    "Branch", "current_phe_power_opt", ...
     "MissionProfile", "MissionProfilesPkg.ERJ_ClimbThenAccel", ...
     "BatterySpecificEnergy_Whkg", 250, ...
     "TakeoffElectricShare", 0.10, ...
@@ -59,5 +60,7 @@ CurrentBranch = [SizedAircraft.Specs.Weight.MTOW; ...
 DifferencePercent = 100 .* (CurrentBranch - Paper) ./ Paper;
 PaperComparison = table(Metric, Paper, CurrentBranch, DifferencePercent);
 
-save(OutputFile, "SizedAircraft", "RunMetadata", "PaperComparison", "-v7.3");
+if strlength(string(OutputFile)) > 0
+    save(OutputFile, "SizedAircraft", "RunMetadata", "PaperComparison", "-v7.3");
+end
 end

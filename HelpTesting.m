@@ -30,9 +30,6 @@ help MissionSegsPkg
 %% OEW Package
 help OEWPkg
 
-%% Optimization Package
-help OptimizationPkg
-
 %% Plot Package
 help PlotPkg
 

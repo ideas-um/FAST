@@ -247,56 +247,49 @@ function [] = README()
 %                    This package determines the aircraft's airframe and 
 %                    propulsion system weights.
 % 
-%             (l) +OptimizationPkg
-%                    This package contains information about running EAP
-%                    power management optimization, which is focused on
-%                    optimizing in the sizing loop to determine the optimum
-%                    electrified powertrain component sizes and usage
-%                    during flight.
-% 
-%             (m) +PlotPkg
+%             (l) +PlotPkg
 %                    This package contains information about plotting the
 %                    mission history upon the user's request. It creates
 %                    subplots to show the time-based history of multiple
 %                    aircraft performance and system-level parameters.
 % 
-%             (n) +ProjectionPkg
+%             (m) +ProjectionPkg
 %                    This package contains code to project the value of
 %                    certain Key Performance Parameters (KPP) into the
 %                    future using S-curves.
 % 
-%             (o) +PropulsionPkg
+%             (n) +PropulsionPkg
 %                    This package is responsible for creating the user's
 %                    desired propulsion architecture and evaluating the
 %                    propulsion system's performance during the mission
 %                    analysis. It connects to the EngineModelPkg for
 %                    evaluating an actual engine's performance.
 % 
-%             (p) +RegressionPkg
+%             (o) +RegressionPkg
 %                    This package contains code that creates regressions to
 %                    predict any unknown parameters about the aircraft
 %                    configuration being designed.
 % 
-%             (q) +RetrofitPkg
+%             (p) +RetrofitPkg
 %                    This package contains code to run retrofit studies on
 %                    an aircraft by electrifying its powertrain and
 %                    replacing part of the payload with batteries.
 %
-%             (r) +SafetyPkg
+%             (q) +SafetyPkg
 %                    This package contains code to run a fault tree
 %                    analysis from a graph-based representation of a system
 %                    architecture.
 %
-%             (s) +TutorialsPkg
+%             (r) +TutorialsPkg
 %                     This package contains Matlab scripts to accompany all
 %                     the playlist of YouTube tutorial videos, which can be
 %                     accessed using this link: https://www.youtube.com/playlist?list=PLNbQSl1VumqhNHgNOq9oxm4_Toi4_7v3-
 %
-%             (t) +UnitConversionPkg
+%             (s) +UnitConversionPkg
 %                    This package contains functions which perform unit
 %                    conversions for use in FAST.
 % 
-%             (u) +VisualizationPkg
+%             (t) +VisualizationPkg
 %                    This package contains information about visualizing
 %                    both the aicraft's outer mold line(as a wireframe) and
 %                    its propulsion architecture (in a schematic).
@@ -533,10 +526,7 @@ function [] = README()
 %         exponent. However, it can be modified inside the "EngineLapse"
 %         function, which is housed in the "PropulsionPkg" folder.
 % 
-%     (4) The "OptimizationPkg" is currently deprecated and only runs on
-%         previous versions of FAST.
-%
-%     (5) Currently, we are in the process of switching to a new off-design
+%     (4) Currently, we are in the process of switching to a new off-design
 %         engine model. As a result of that, some of the engines provided
 %         in the "+EngineModelPkg\+EngineSpecsPkg" are not fully up to
 %         date. The engines that currently work are the LEAP-1A26,

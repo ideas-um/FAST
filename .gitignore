@@ -8,6 +8,14 @@
 /.matlab-prefs-*/
 /*.slxc
 
+# MATLAB workspaces are generated outputs. Keep only the four reference
+# databases required by the FAST sizing calculations.
+*.mat
+!/+AerodynamicsPkg/WindmillingDrag.mat
+!/+DatabasePkg/IDEAS_DB.mat
+!/+DatabasePkg/+ElectricMotorPkg/IDEAS_EM_DB.mat
+!/+EngineModelPkg/+SurrogateOffDesignPkg/ICAO_DATA.mat
+
 # A separate reproducibility checkout was accidentally committed into this
 # worktree. Keep the checkout usable locally without duplicating it in Git.
 /.paper_repro_worktree/
@@ -18,50 +26,3 @@
 /HEA_2150nmi_250Whkg/
 /HEA_2150nmi_500Whkg/
 
-# Legacy root-level analysis workspaces. These are generated outputs, not
-# source inputs; retained copies live in the external local archive.
-/Ac.mat
-/Conv.mat
-/ERJ175LR_1000nmi_MissionPowerOpt_LamDwn.mat
-/New_Old_Compare.mat
-/NonOptAC.mat
-/NonOptHEA.mat
-/Opt.mat
-/OptAcs.mat
-/Opt_10ctrlpts_test.mat
-/Opt_5ctrlpts_test.mat
-/Opt_singlemiss.mat
-/PC.mat
-/PCopt.mat
-/Results.mat
-/SWITCH_opt_1.mat
-/SeqOptAC.mat
-/SeqOptAC_cost.mat
-/SeqOptAC_cost2.mat
-/SeqOptAC_fuel.mat
-/SeqOptAC_fuel2.mat
-/SeqOptAC_fuele.mat
-/SeqOptAC_future.mat
-/SequenceChargeTimeStatistics.mat
-/TEST_HEA.mat
-/constantHEA.mat
-/convtab.mat
-/eng.mat
-/global1.mat
-/global2.mat
-/global3.mat
-/matlab.mat
-/nonoptHEAtab.mat
-/nonopttable.mat
-/noopttab.mat
-/ogAircraft_12_8.mat
-/opttable.mat
-/opttable_cost.mat
-/opttable_cost2.mat
-/opttable_fuel.mat
-/opttable_fuel2.mat
-/opttable_fuele.mat
-/opttable_futDOC.mat
-/routeTba.mat
-/single.mat
-/singlemisstab.mat

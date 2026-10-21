@@ -5,14 +5,14 @@
 clearvars;
 clc;
 
-if isfile(fullfile("output", "ERJ17LR_PHE_sized.mat"))
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized.mat"), "SizedPHE");
+if isfile(fullfile("output", "ERJ175LR_PHE_sized.mat"))
+    Input = load(fullfile("output", "ERJ175LR_PHE_sized.mat"), "SizedPHE");
     Aircraft = Input.SizedPHE;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized.mat");
-elseif isfile(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"))
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"), "A");
+    InputFile = fullfile("output", "ERJ175LR_PHE_sized.mat");
+elseif isfile(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"))
+    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
     Aircraft = Input.A;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat");
+    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
 else
     error("No saved fixed-size ERJ17LR PHE aircraft was found in output.");
 end
@@ -105,7 +105,7 @@ RunMetadata = struct("SequenceIndex", 8, ...
     "AnalysisType", -1, ...
     "ObjectiveBoundary", "End of main mission (Mission.Profile.ID == 1)", ...
     "OptimizedSchedule", "LamDwn");
-save(fullfile("output", "ERJ17LR_PHE_Sequence8_MissionOpt_150kW_500iter_FullPowerConstraint.mat"), "FlightAircraft", ...
+save(fullfile("output", "ERJ175LR_PHE_Sequence8_MissionOpt_150kW_500iter_FullPowerConstraint.mat"), "FlightAircraft", ...
     "PCbest", "Sequence", "FlightResults", "PaperComparison", ...
     "TotalFuel_kg", "TotalBatteryEnergy_kWh", "ElectricMotorWeight_kg", ...
     "RunMetadata", "-v7.3");

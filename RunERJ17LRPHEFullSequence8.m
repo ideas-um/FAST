@@ -4,21 +4,29 @@ clearvars;
 clc;
 RunTimer = tic;
 
-if isfile(fullfile("output", "ERJ17LR_PHE_sized.mat"))
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized.mat"), "SizedPHE");
-    Aircraft = Input.SizedPHE;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized.mat");
+if isfile(fullfile("output", "ERJ175LR_PHE_Sized.mat"))
+    Input = load(fullfile("output", "ERJ175LR_PHE_Sized.mat"));
+    if isfield(Input, "SizedAircraft")
+        Aircraft = Input.SizedAircraft;
+    elseif isfield(Input, "SizedPHE")
+        Aircraft = Input.SizedPHE;
+    else
+        error("The sized PHE file does not contain SizedAircraft or SizedPHE.");
+    end
+    InputFile = fullfile("output", "ERJ175LR_PHE_Sized.mat");
 else
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"), "A");
+    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
     Aircraft = Input.A;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat");
+    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
 end
 
 SequenceData = load("Sequence.mat", "tables");
 Sequence = SequenceData.tables{8};
-Aircraft.Settings.Analysis.Type = -1;
+Aircraft.Settings.Analysis.Type = -2;
 Aircraft.Settings.PowerOptMaxIter = 500;
 Aircraft.Settings.PowerOptMaxStarts = 1;
+Aircraft.Settings.PowerOptUseParallel = false;
+Aircraft.Settings.PowerOptOptimalityTolerance = 5e-4;
 Aircraft.Specs.Battery.Charging = 150e3;
 
 [OptimizedAircraft, PCbest, OptimizerTime_min, OptSeqTable, ...
@@ -67,13 +75,14 @@ FlightResults = table((1:nflight)', Sequence.DISTANCE, Sequence.GROUND_TIME, ...
 
 TotalRunTime_min = toc(RunTimer) / 60;
 RunMetadata = struct("SequenceIndex", 8, "InputFile", InputFile, ...
-    "AnalysisType", -1, "AircraftSizeFixed", true, ...
+    "AnalysisType", -2, "InitialSeedAnalysisType", -1, ...
+    "AircraftSizeFixed", true, ...
     "MaxIterations", 500, "MaxStarts", 1, ...
     "ChargerPower_kW", 150, ...
     "ChargingRule", "GROUND_TIME(next flight) - 7 minutes", ...
     "ObjectiveBoundary", "End of main mission (Mission.Profile.ID == 1)");
 
-save(fullfile("output", "ERJ17LR_PHE_Sequence8_SequenceOpt_150kW_500iter_FullPowerConstraint.mat"), ...
+save(fullfile("output", "ERJ175LR_PHE_Sequence8_SequenceOpt_150kW_500iter_FullPowerConstraint.mat"), ...
     "OptimizedAircraft", "PCbest", "OptimizerTime_min", "OptSeqTable", ...
     "ExitFlag", "OptimizerOutput", "Sequence", "FlightResults", ...
     "TotalFuel_kg", "TotalBatteryEnergy_kWh", "RunMetadata", ...

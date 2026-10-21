@@ -5,14 +5,14 @@ clearvars;
 clc;
 RunTimer = tic;
 
-if isfile(fullfile("output", "ERJ17LR_PHE_sized.mat"))
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized.mat"), "SizedPHE");
+if isfile(fullfile("output", "ERJ175LR_PHE_sized.mat"))
+    Input = load(fullfile("output", "ERJ175LR_PHE_sized.mat"), "SizedPHE");
     BaseAircraft = Input.SizedPHE;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized.mat");
-elseif isfile(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"))
-    Input = load(fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat"), "A");
+    InputFile = fullfile("output", "ERJ175LR_PHE_sized.mat");
+elseif isfile(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"))
+    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
     BaseAircraft = Input.A;
-    InputFile = fullfile("output", "ERJ17LR_PHE_sized_cycle_fixed.mat");
+    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
 elseif isfile("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat")
     Input = load("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat", "SizedAircraft");
     BaseAircraft = Input.SizedAircraft;
@@ -104,7 +104,7 @@ RunMetadata = struct("SequenceIndex", 8, "Flight", 1, ...
     "ChargerPower_kW", 150, "FullMissionPowerConstraint", true, ...
     "ObjectiveBoundary", "End of main mission (Mission.Profile.ID == 1)");
 
-save(fullfile("output", "ERJ17LR_PHE_Sequence8_FirstMission_FullPowerComparison.mat"), ...
+save(fullfile("output", "ERJ175LR_PHE_Sequence8_FirstMission_FullPowerComparison.mat"), ...
     "BaseAircraft", "FirstFlight", "MissionAircraft", "MissionPC", ...
     "MissionOptimizerTime_min", "MissionExitFlag", "MissionOptimizerOutput", ...
     "MissionFuel_kg", "MissionFinalSOC_pct", "MissionMaxPowerExcess_W", ...

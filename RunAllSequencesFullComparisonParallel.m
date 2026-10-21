@@ -25,8 +25,13 @@ RunVersion = "all-sequences-thermal-fixed-evaluator-v3-true-lamups";
 RootDir = fileparts(mfilename("fullpath"));
 % Preserve every checkpoint from the earlier mixed-evaluator run. Corrected
 % results are written to a separate directory so no completed work is lost.
-OutputDir = fullfile(RootDir, "output", ...
-    "all_sequences_full_comparison_fixed_evaluator");
+RequestedOutputDir = string(getenv("FAST_SEQUENCE_OUTPUT_DIR"));
+if strlength(RequestedOutputDir) == 0
+    OutputDir = fullfile(RootDir, "output", ...
+        "all_sequences_full_comparison_fixed_evaluator");
+else
+    OutputDir = char(RequestedOutputDir);
+end
 CheckpointDir = fullfile(OutputDir, "checkpoints");
 FailureDir = fullfile(OutputDir, "failures");
 if ~isfolder(CheckpointDir), mkdir(CheckpointDir); end

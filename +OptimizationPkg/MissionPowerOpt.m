@@ -137,6 +137,20 @@ end
 % actual mission profile instead of stale hard-coded indices.
 Aircraft0 = PrepareMissionAircraft(Aircraft, ProfileFxn);
 
+% A regular unoptimized flight may be replayed through the fixed-command
+% -2 evaluator for an apples-to-apples fuel comparison.  In that case the
+% prescribed LamUps schedule is part of the dispatch: for the PHE it
+% is 1.0 in takeoff and at most 0.30 in climb.  Do not replace that cap with
+% the optimizer convention of full installed availability.
+PreservePrescribedLamUps = isfield(Aircraft.Settings, ...
+    "PreserveOptimizationLamUps") && ...
+    logical(Aircraft.Settings.PreserveOptimizationLamUps);
+% PrepareMissionAircraft rebuilds the prescribed phase schedule from the
+% aircraft specification when this flag is set.  Do not restore the -1
+% history here: regular off-design may have raised that working schedule to
+% recover feasibility, which would silently remove the specified 0.30 climb
+% availability cap from the comparison replay.
+
 % Use the same takeoff-through-climb control horizon as SequencePowerOpt.
 pts = FirstMissionTakeoffThroughClimb(Aircraft0);
 
@@ -478,9 +492,12 @@ function [OutAircraft] = ApplyPowerSplit(InAircraft, PC)
     % Keep fan demand evenly distributed for the PHE twin-fan architecture.
     OutAircraft.Specs.Power.LamDwn.Miss(pts, iFan) = repmat(0.5, length(pts), length(iFan));
 
-    % LamUps is installed availability, not achieved loading. Keep it at one
-    % throughout takeoff/climb; LamDwn alone controls actual routing.
-    OutAircraft.Specs.Power.LamUps.Miss(pts, :) = 1;
+    % Optimized cases expose full installed availability and use LamDwn to
+    % control routing.  A fixed replay of the regular unoptimized case must
+    % instead retain its flown availability cap (1.0 takeoff, <=0.30 climb).
+    if ~PreservePrescribedLamUps
+        OutAircraft.Specs.Power.LamUps.Miss(pts, :) = 1;
+    end
 end
 
 
@@ -628,12 +645,20 @@ end
 
 Aircraft = PropulsionPkg.LamFill(Aircraft);
 
-% Off-design optimization begins with the full installed rating available
-% from every transmitter.  LamDwn.Miss independently controls actual routing.
-Aircraft.Specs.Power.LamUps.Miss(:) = 1;
+KeepPhaseLamUps = isfield(Aircraft.Settings, ...
+    "PreserveOptimizationLamUps") && ...
+    logical(Aircraft.Settings.PreserveOptimizationLamUps);
+
+% Optimized cases expose the full installed rating and control routing with
+% LamDwn.  A regular-flight replay instead retains the phase commands made by
+% LamFill (including the PHE's 1.0 takeoff and 0.30 climb limits).
+if ~KeepPhaseLamUps
+    Aircraft.Specs.Power.LamUps.Miss(:) = 1;
+end
 TrnType = Aircraft.Specs.Propulsion.PropArch.TrnType;
 iEM = find(TrnType == 0);
-Aircraft.Mission.History.SI.Power.LamUps(:) = 1;
+Aircraft.Mission.History.SI.Power.LamUps = ...
+    Aircraft.Specs.Power.LamUps.Miss;
 
 % Reserve and diversion missions use fuel only. Their downstream schedule
 % must not consume battery energy regardless of the aircraft's design splits.

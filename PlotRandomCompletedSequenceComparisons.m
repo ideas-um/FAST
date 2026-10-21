@@ -142,8 +142,13 @@ for k = 1:nFlight
     nSrc = numel(R.PropArch.SrcType);
     iEM = find(R.PropArch.TrnType == 0);
     iGT = find(R.PropArch.TrnType == 1);
-    MotorUtil = mean(R.LamUpsFullRatedUtilization(1:Last, nSrc + iEM), 2);
-    TurbineUtil = mean(R.LamUpsFullRatedUtilization(1:Last, nSrc + iGT), 2);
+    % True lambda-up is output divided by the uncapped component rating.
+    % FAST's Pav already includes the LamUps availability command, so this is
+    % (Pout/Pav)*LamUps. A motor using all of a 0.30 climb allowance plots at
+    % 0.30, while an optimized full-availability motor at rating plots at 1.
+    TrueLamUps = GetTrueLamUps(R, H, Last, nSrc);
+    MotorUtil = mean(TrueLamUps(:, iEM), 2);
+    TurbineUtil = mean(TrueLamUps(:, iGT), 2);
     MotorDwn = mean(R.LamDwn(1:Last, iEM), 2);
 
     T.Time_h = [T.Time_h; Time_h(:); NaN]; %#ok<AGROW>
@@ -180,6 +185,27 @@ for k = 1:nFlight
         TimeOffset_s = TimeOffset_s + Ground_s;
     end
 end
+end
+
+
+function TrueLamUps = GetTrueLamUps(R, H, Last, nSrc)
+if isfield(R, "TrueLamUps")
+    AllValues = R.TrueLamUps;
+elseif isfield(R, "LamUpsFullRatedUtilization")
+    AllValues = R.LamUpsFullRatedUtilization;
+else
+    Pout = H.Power.Pout(1:Last, :);
+    Pav = H.Power.Pav(1:Last, :);
+    AllValues = zeros(size(Pout));
+    Valid = isfinite(Pout) & isfinite(Pav) & abs(Pav) > 1e-9;
+    AllValues(Valid) = Pout(Valid) ./ Pav(Valid);
+    nTrn = numel(R.PropArch.TrnType);
+    Cols = nSrc + (1:nTrn);
+    AllValues(:, Cols) = AllValues(:, Cols) .* ...
+        R.LamUpsCommand(1:Last, :);
+    AllValues = min(max(AllValues, 0), 1);
+end
+TrueLamUps = AllValues(1:Last, nSrc + (1:numel(R.PropArch.TrnType)));
 end
 
 
@@ -312,13 +338,16 @@ end
 
 function MakeFourPanelTrajectoryPlot(T, S, Index, OutDir)
 % Large trajectory, SOC, and utilization comparison with four stacked axes.
-Cases = ["Conventional","Unoptimized","Individual","Joint"];
+% Draw the individual result last so it remains visible when its optimum
+% overlaps the sequence optimum exactly.
+Cases = ["Conventional","Unoptimized","Joint","Individual"];
 Labels = ["Conventional","Unoptimized PHE", ...
-    "Individual optimized","Sequence optimized"];
+    "Sequence optimized","Individual optimized"];
 Colors = [0.4940 0.1840 0.5560; ...
           0.4660 0.6740 0.1880; ...
-          0.8500 0.3250 0.0980; ...
-          0.0000 0.4470 0.7410];
+          0.0000 0.4470 0.7410; ...
+          0.8500 0.3250 0.0980];
+Styles = [":" "--" "-" "-."];
 Reference = T.Joint;
 
 Fig = figure("Visible", "off", "Color", "w", ...
@@ -331,7 +360,7 @@ L = tiledlayout(Fig, 4, 1, "TileSpacing", "compact", ...
 Ax = nexttile(L); yyaxis(Ax, "left");
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.Altitude_ft / 1000, "-", ...
+    PlotThinned(Ax, C.Time_h, C.Altitude_ft / 1000, Styles(i), ...
         "LineWidth", 1.25, "Color", Colors(i, :), ...
         "DisplayName", Labels(i) + " altitude"); hold(Ax, "on");
 end
@@ -339,7 +368,7 @@ ylabel(Ax, "Altitude (kft)");
 yyaxis(Ax, "right");
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.Distance_nmi, "--", ...
+    PlotThinned(Ax, C.Time_h, C.Distance_nmi, Styles(i), ...
         "LineWidth", 1.15, "Color", Colors(i, :), ...
         "DisplayName", Labels(i) + " distance"); hold(Ax, "on");
 end
@@ -355,7 +384,7 @@ plot(Ax, nan, nan, "LineWidth", 1.4, "Color", Colors(1, :), ...
     "DisplayName", Labels(1) + " (no battery)"); hold(Ax, "on");
 for i = 2:numel(Cases)
     C = S.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.SOC_pct, "LineWidth", 1.45, ...
+    PlotThinned(Ax, C.Time_h, C.SOC_pct, Styles(i), "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -363,31 +392,31 @@ StyleAxes(Ax); ylim(Ax, [0 105]); ylabel(Ax, "Battery SOC (%)");
 legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
 title(Ax, "SOC and ground charging");
 
-% 3. Recalculated electric-machine utilization (effective lambda-up).
+% 3. Electric-machine output normalized by uncapped installed capability.
 Ax = nexttile(L);
 plot(Ax, nan, nan, "LineWidth", 1.3, "Color", Colors(1, :), ...
     "DisplayName", Labels(1) + " (no EM)"); hold(Ax, "on");
 for i = 2:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.MotorUtilization, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.MotorUtilization, Styles(i), "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
 StyleAxes(Ax); ylim(Ax, [-0.03 1.05]);
-ylabel(Ax, "EM effective \lambda_{up}");
+ylabel(Ax, "EM true \lambda_{up}=P_{out}/P_{rated}");
 legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
 title(Ax, "Electric-machine utilization");
 
-% 4. Recalculated gas-turbine utilization (effective lambda-up).
+% 4. Gas-turbine output normalized by uncapped installed capability.
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.TurbineUtilization, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.TurbineUtilization, Styles(i), "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
 StyleAxes(Ax); ylim(Ax, [-0.03 1.05]);
-ylabel(Ax, "GT effective \lambda_{up}");
+ylabel(Ax, "GT true \lambda_{up}=P_{out}/P_{rated}");
 xlabel(Ax, "Elapsed sequence time, including ground time (h)");
 legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
 title(Ax, "Gas-turbine utilization");
@@ -404,13 +433,14 @@ end
 
 function MakeFourPanelPowerFuelPlot(T, Index, OutDir)
 % Large power and fuel comparison with Preq and Pav on separate axes.
-Cases = ["Conventional","Unoptimized","Individual","Joint"];
+Cases = ["Conventional","Unoptimized","Joint","Individual"];
 Labels = ["Conventional","Unoptimized PHE", ...
-    "Individual optimized","Sequence optimized"];
+    "Sequence optimized","Individual optimized"];
 Colors = [0.4940 0.1840 0.5560; ...
           0.4660 0.6740 0.1880; ...
-          0.8500 0.3250 0.0980; ...
-          0.0000 0.4470 0.7410];
+          0.0000 0.4470 0.7410; ...
+          0.8500 0.3250 0.0980];
+Styles = [":" "--" "-" "-."];
 Reference = T.Joint;
 
 Fig = figure("Visible", "off", "Color", "w", ...
@@ -422,7 +452,7 @@ L = tiledlayout(Fig, 4, 1, "TileSpacing", "compact", ...
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.Preq_MW, "-", "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.Preq_MW, Styles(i), "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -434,7 +464,7 @@ title(Ax, "Required power");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.Pav_MW, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.Pav_MW, Styles(i), "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -446,7 +476,7 @@ title(Ax, "Available power");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.Time_h, C.MDotFuel_kgs, "LineWidth", 1.25, ...
+    PlotThinned(Ax, C.Time_h, C.MDotFuel_kgs, Styles(i), "LineWidth", 1.25, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
@@ -458,7 +488,7 @@ title(Ax, "Total fuel mass flow");
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
-    PlotThinned(Ax, C.FuelTime_h, C.CumulativeFuel_kg, "LineWidth", 1.45, ...
+    PlotThinned(Ax, C.FuelTime_h, C.CumulativeFuel_kg, Styles(i), "LineWidth", 1.45, ...
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);

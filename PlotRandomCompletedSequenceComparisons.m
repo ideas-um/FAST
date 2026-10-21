@@ -5,7 +5,12 @@ clearvars;
 clc;
 
 RootDir = fileparts(mfilename("fullpath"));
-RunDir = fullfile(RootDir, "output", "all_sequences_full_comparison");
+RequestedRunDir = string(getenv("FAST_SEQUENCE_PLOT_RUN_DIR"));
+if strlength(RequestedRunDir) == 0
+    RunDir = fullfile(RootDir, "output", "all_sequences_full_comparison");
+else
+    RunDir = char(RequestedRunDir);
+end
 CheckpointDir = fullfile(RunDir, "checkpoints");
 PlotRoot = fullfile(RunDir, "plots");
 if ~isfolder(PlotRoot), mkdir(PlotRoot); end
@@ -28,13 +33,23 @@ if isempty(Completed)
     error("No completed 500-iteration production checkpoints are available.");
 end
 
-rng(20261014, "twister");
-nSample = min(3, numel(Completed));
-RandomSelected = Completed(randperm(numel(Completed), nSample));
-% Also retain the strongest joint-versus-individual result found in the
-% first 174 completed remote checkpoints as a useful non-random diagnostic.
-PrioritySequences = intersect(177, Completed, "stable");
-Selected = sort(unique([RandomSelected, PrioritySequences]));
+RequestedSelection = str2num(getenv( ...
+    "FAST_SEQUENCE_PLOT_SELECTION")); %#ok<ST2NM>
+if isempty(RequestedSelection)
+    rng(20261014, "twister");
+    nSample = min(3, numel(Completed));
+    RandomSelected = Completed(randperm(numel(Completed), nSample));
+    % Also retain the strongest joint-versus-individual result found in the
+    % first 174 completed remote checkpoints as a useful diagnostic.
+    PrioritySequences = intersect(177, Completed, "stable");
+    Selected = sort(unique([RandomSelected, PrioritySequences]));
+else
+    Missing = setdiff(RequestedSelection, Completed);
+    if ~isempty(Missing)
+        error("Requested sequences are not complete: %s", mat2str(Missing));
+    end
+    Selected = sort(unique(RequestedSelection));
+end
 fprintf("Plotting completed sequences: %s\n", mat2str(Selected));
 
 SelectedSummary = table;
@@ -71,9 +86,13 @@ for iSample = 1:numel(Selected)
             D.SequenceSummary, iSequence, SequencePlotDir);
         MakeSplitPlot(Timelines, PHECases, iSequence, SequencePlotDir);
     end
-    MakeSixPanelSequencePlot(Timelines, SOCTimelines, ...
+    MakeFourPanelTrajectoryPlot(Timelines, SOCTimelines, ...
+        iSequence, SequencePlotDir);
+    MakeFourPanelPowerFuelPlot(Timelines, ...
         iSequence, SequencePlotDir);
 
+    writetable(D.Sequence, fullfile(SequencePlotDir, ...
+        sprintf("Sequence_%04d_FlightSchedule.csv", iSequence)));
     writetable(D.FlightResults, fullfile(SequencePlotDir, ...
         sprintf("Sequence_%04d_FlightResults.csv", iSequence)));
     writetable(D.ChargeResults, fullfile(SequencePlotDir, ...
@@ -291,8 +310,8 @@ xlabel(Ax,"Elapsed sequence time (h)"); title(L,sprintf("Sequence %d: electrical
 end
 
 
-function MakeSixPanelSequencePlot(T, S, Index, OutDir)
-% One compact whole-day diagnostic requested for direct case comparison.
+function MakeFourPanelTrajectoryPlot(T, S, Index, OutDir)
+% Large trajectory, SOC, and utilization comparison with four stacked axes.
 Cases = ["Conventional","Unoptimized","Individual","Joint"];
 Labels = ["Conventional","Unoptimized PHE", ...
     "Individual optimized","Sequence optimized"];
@@ -303,8 +322,8 @@ Colors = [0.4940 0.1840 0.5560; ...
 Reference = T.Joint;
 
 Fig = figure("Visible", "off", "Color", "w", ...
-    "Position", [40 40 1500 1550]);
-L = tiledlayout(Fig, 6, 1, "TileSpacing", "compact", ...
+    "InvertHardcopy", "off", "Position", [40 40 1700 1250]);
+L = tiledlayout(Fig, 4, 1, "TileSpacing", "compact", ...
     "Padding", "compact");
 
 % 1. Altitude and cumulative distance share the time axis. Shaded regions
@@ -326,7 +345,8 @@ for i = 1:numel(Cases)
 end
 ylabel(Ax, "Cumulative distance (nmi)");
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); legend(Ax, "Location", "eastoutside", "NumColumns", 2);
+StyleAxes(Ax); legend(Ax, "Location", "eastoutside", "NumColumns", 2, ...
+    "Color", "w", "TextColor", "k");
 title(Ax, "Trajectory and scheduled ground time");
 
 % 2. Battery SOC, including the thermal-equivalent-circuit charging trace.
@@ -339,8 +359,9 @@ for i = 2:numel(Cases)
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); ylim(Ax, [0 105]); ylabel(Ax, "Battery SOC (%)");
-legend(Ax, "Location", "eastoutside"); title(Ax, "SOC and ground charging");
+StyleAxes(Ax); ylim(Ax, [0 105]); ylabel(Ax, "Battery SOC (%)");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
+title(Ax, "SOC and ground charging");
 
 % 3. Recalculated electric-machine utilization (effective lambda-up).
 Ax = nexttile(L);
@@ -352,8 +373,9 @@ for i = 2:numel(Cases)
         "Color", Colors(i, :), "DisplayName", Labels(i));
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); ylim(Ax, [-0.03 1.05]);
-ylabel(Ax, "EM effective \lambda_{up}"); legend(Ax, "Location", "eastoutside");
+StyleAxes(Ax); ylim(Ax, [-0.03 1.05]);
+ylabel(Ax, "EM effective \lambda_{up}");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
 title(Ax, "Electric-machine utilization");
 
 % 4. Recalculated gas-turbine utilization (effective lambda-up).
@@ -364,26 +386,75 @@ for i = 1:numel(Cases)
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); ylim(Ax, [-0.03 1.05]);
-ylabel(Ax, "GT effective \lambda_{up}"); legend(Ax, "Location", "eastoutside");
+StyleAxes(Ax); ylim(Ax, [-0.03 1.05]);
+ylabel(Ax, "GT effective \lambda_{up}");
+xlabel(Ax, "Elapsed sequence time, including ground time (h)");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
 title(Ax, "Gas-turbine utilization");
 
-% 5. Required and available power are combined to retain six panels.
+title(L, sprintf('Sequence %d: trajectory, SOC, and utilization', Index), ...
+    "Color", "k");
+OutFile = fullfile(OutDir, sprintf( ...
+    "Sequence_%04d_Trajectory_SOC_Utilization.png", Index));
+exportgraphics(Fig, OutFile, "ContentType", "image", "Resolution", 150, ...
+    "BackgroundColor", "white");
+close(Fig);
+end
+
+
+function MakeFourPanelPowerFuelPlot(T, Index, OutDir)
+% Large power and fuel comparison with Preq and Pav on separate axes.
+Cases = ["Conventional","Unoptimized","Individual","Joint"];
+Labels = ["Conventional","Unoptimized PHE", ...
+    "Individual optimized","Sequence optimized"];
+Colors = [0.4940 0.1840 0.5560; ...
+          0.4660 0.6740 0.1880; ...
+          0.8500 0.3250 0.0980; ...
+          0.0000 0.4470 0.7410];
+Reference = T.Joint;
+
+Fig = figure("Visible", "off", "Color", "w", ...
+    "InvertHardcopy", "off", "Position", [40 40 1700 1250]);
+L = tiledlayout(Fig, 4, 1, "TileSpacing", "compact", ...
+    "Padding", "compact");
+
+% 1. Required power.
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
     PlotThinned(Ax, C.Time_h, C.Preq_MW, "-", "LineWidth", 1.25, ...
-        "Color", Colors(i, :), "DisplayName", Labels(i) + " P_{req}");
-    hold(Ax, "on");
-    PlotThinned(Ax, C.Time_h, C.Pav_MW, "--", "LineWidth", 1.15, ...
-        "Color", Colors(i, :), "DisplayName", Labels(i) + " P_{av}");
+        "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); ylabel(Ax, "Power (MW)");
-legend(Ax, "Location", "eastoutside", "NumColumns", 2);
-title(Ax, "Required power (solid) and available power (dashed)");
+StyleAxes(Ax); ylabel(Ax, "Required power, P_{req} (MW)");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
+title(Ax, "Required power");
 
-% 6. Main-mission fuel only, held flat during ground time.
+% 2. Available power.
+Ax = nexttile(L);
+for i = 1:numel(Cases)
+    C = T.(Cases(i));
+    PlotThinned(Ax, C.Time_h, C.Pav_MW, "LineWidth", 1.25, ...
+        "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
+end
+AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
+StyleAxes(Ax); ylabel(Ax, "Available power, P_{av} (MW)");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
+title(Ax, "Available power");
+
+% 3. Total fuel mass flow.
+Ax = nexttile(L);
+for i = 1:numel(Cases)
+    C = T.(Cases(i));
+    PlotThinned(Ax, C.Time_h, C.MDotFuel_kgs, "LineWidth", 1.25, ...
+        "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
+end
+AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
+StyleAxes(Ax); ylabel(Ax, "Fuel flow (kg/s)");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
+title(Ax, "Total fuel mass flow");
+
+% 4. Main-mission fuel only, held flat during ground time.
 Ax = nexttile(L);
 for i = 1:numel(Cases)
     C = T.(Cases(i));
@@ -391,16 +462,28 @@ for i = 1:numel(Cases)
         "Color", Colors(i, :), "DisplayName", Labels(i)); hold(Ax, "on");
 end
 AddGroundRegions(Ax, Reference.GroundStart_h, Reference.GroundEnd_h);
-grid(Ax, "on"); ylabel(Ax, "Cumulative fuel burn (kg)");
+StyleAxes(Ax); ylabel(Ax, "Cumulative fuel burn (kg)");
 xlabel(Ax, "Elapsed sequence time, including ground time (h)");
-legend(Ax, "Location", "eastoutside"); title(Ax, "Main-mission fuel burn");
+legend(Ax, "Location", "eastoutside", "Color", "w", "TextColor", "k");
+title(Ax, "Main-mission fuel burn");
 
-title(L, sprintf(['Sequence %d: conventional, unoptimized PHE, ' ...
-    'individual optimization, and sequence optimization'], Index));
+title(L, sprintf('Sequence %d: power and fuel comparison', Index), ...
+    "Color", "k");
 OutFile = fullfile(OutDir, sprintf( ...
-    "Sequence_%04d_SixPanel_WholeSequence.png", Index));
-exportgraphics(Fig, OutFile, "ContentType", "image", "Resolution", 120);
+    "Sequence_%04d_Power_Fuel.png", Index));
+exportgraphics(Fig, OutFile, "ContentType", "image", "Resolution", 150, ...
+    "BackgroundColor", "white");
 close(Fig);
+end
+
+
+function StyleAxes(Ax)
+set(Ax, "Color", "w", "XColor", "k", "YColor", "k", ...
+    "GridColor", [0.72 0.72 0.72], "MinorGridColor", [0.85 0.85 0.85]);
+Ax.Title.Color = "k";
+Ax.XLabel.Color = "k";
+Ax.YLabel.Color = "k";
+grid(Ax, "on");
 end
 
 

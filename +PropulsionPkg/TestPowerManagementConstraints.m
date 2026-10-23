@@ -89,6 +89,28 @@ assert(abs(Aircraft.Mission.History.SI.Power.LamDwn - 0.73) < 1.0e-12);
 
 fprintf("Legacy recomputation and supplied-lambda preservation tests passed.\n");
 
+
+%% FULL-POWER SUPPLIED SPLIT CONSTRAINTS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The recomputed 20% electric allocation exactly matches the parallel
+% components' 80/20 kW capacities. A 90% electric command overloads each
+% 20 kW motor by 70 kW while leaving the mission calculation untouched.
+Aircraft.Mission.Profile.SegsID = 1;
+Pav = Aircraft.Mission.History.SI.Power.Pav;
+
+[ComponentPower, PowerDeficit] = ...
+    PropulsionPkg.FullPowerLambdaConstraints(Aircraft, Pav, 0.20, 1);
+assert(max(abs(ComponentPower), [], "all") < 1.0e-12);
+assert(abs(PowerDeficit) < 1.0e-12);
+
+[ComponentPower, PowerDeficit] = ...
+    PropulsionPkg.FullPowerLambdaConstraints(Aircraft, Pav, 0.90, 1);
+assert(all(abs(ComponentPower([5, 6]) - 70) < 1.0e-12));
+assert(abs(PowerDeficit - 70) < 1.0e-12);
+
+fprintf("Full-power supplied-lambda constraint tests passed.\n");
+
 % ----------------------------------------------------------
 
 end

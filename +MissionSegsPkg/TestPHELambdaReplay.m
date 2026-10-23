@@ -42,9 +42,43 @@ for icase = 1:size(PointCases, 1)
     AssertMatchingHistory(Recomputed, Supplied);
     assert(all(isfinite(Supplied.Mission.History.SI.Constraints.ComponentPower), "all"));
     assert(all(isfinite(Supplied.Mission.History.SI.Constraints.PowerDeficit), "all"));
+    AssertCorrectTakeoffSplitFeasible(Supplied);
+
+    AssertBadTakeoffSplitDetected(Recomputed);
 end
 
 fprintf("PHE lambda replay stress tests passed.\n");
+
+end
+
+function AssertCorrectTakeoffSplitFeasible(Supplied)
+%
+% Ensure a recomputed maximum-power split replays without an overload.
+%
+
+Takeoff = Supplied.Mission.Profile.SegBeg(1): ...
+          Supplied.Mission.Profile.SegEnd(1) - 1;
+PowerDeficit = Supplied.Mission.History.SI.Constraints.PowerDeficit(Takeoff);
+assert(max(PowerDeficit) < 1.0e-06);
+
+end
+
+function AssertBadTakeoffSplitDetected(Recomputed)
+%
+% Ensure maximum-power takeoff exposes an infeasible supplied PHE split.
+%
+
+Supplied = MissionSegsPkg.CaptureSegmentSplits(Recomputed);
+Supplied.Settings.PowerManagement.Mode = "SupplyLambda";
+Supplied.Mission.Profile.LamDwnBySegment{1}(:) = 0.90;
+Supplied = DataStructPkg.InitMissionHistory(Supplied);
+Supplied = MissionSegsPkg.FlyMission(Supplied);
+
+Takeoff = Supplied.Mission.Profile.SegBeg(1): ...
+          Supplied.Mission.Profile.SegEnd(1) - 1;
+PowerDeficit = Supplied.Mission.History.SI.Constraints.PowerDeficit(Takeoff);
+assert(any(PowerDeficit > 1.0e-06));
+assert(all(isfinite(PowerDeficit)));
 
 end
 

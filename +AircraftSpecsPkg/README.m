@@ -408,9 +408,10 @@ function [] = README()
 %                                          retaining the same mission physics)
 %                NOTE 2: In SupplyLambda mode, constraint residuals are
 %                returned in Aircraft.Mission.History.SI.Constraints.
-%                Values less than or equal to zero are feasible. Full-power
-%                points with unbounded demand do not define a finite
-%                residual and are reported as zero.
+%                Values less than or equal to zero are feasible. At
+%                full-power points, residuals compare each parallel
+%                component's allocated share of total group capacity with
+%                that component's available power.
 %           ---------------------------------------------------------------
 %           (71) Aircraft.Settings.Plotting
 %                Description: Mission history plotting flag

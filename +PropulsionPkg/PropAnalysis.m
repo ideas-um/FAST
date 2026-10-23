@@ -118,6 +118,7 @@ Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
 
 % get the necessary splits
 LamDwn = Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :);
+LamUps = Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :);
 
 % check for a windmilling engine
 Windmill = Aircraft.Mission.History.SI.Power.Windmill(SegBeg:SegEnd, :);
@@ -263,25 +264,20 @@ for ipnt = 1:npnt
 
 end
 
-% A supplied lambda is a commanded allocation, so preserve the component
-% requirements before the existing output-clipping logic. Positive values
-% are inequality-constraint violations that an optimizer can act on.
-if (strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda"))
-    ComponentPower = zeros(npnt, ncomp);
-    PowerDeficit = zeros(npnt, 1);
+% A supplied lambda is a commanded allocation. Finite-demand residuals use
+% the requested component power before clipping. Full-power residuals use
+% the parallel groups' total capacity and are completed separately below.
+SupplyLambda = strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda");
+ComponentPower = zeros(npnt, ncomp);
+PowerDeficit = zeros(npnt, 1);
+if (SupplyLambda)
     FiniteDemand = all(isfinite(Preq), 2);
     if (any(FiniteDemand))
         [ComponentPower(FiniteDemand, :), PowerDeficit(FiniteDemand)] = ...
             PropulsionPkg.PowerManagementConstraints( ...
                 Preq(FiniteDemand, :), Pav(FiniteDemand, :), TrnSnkIdx);
     end
-else
-    ComponentPower = zeros(npnt, ncomp);
-    PowerDeficit = zeros(npnt, 1);
 end
-
-Aircraft.Mission.History.SI.Constraints.ComponentPower(SegBeg:SegEnd, :) = ComponentPower;
-Aircraft.Mission.History.SI.Constraints.PowerDeficit(  SegBeg:SegEnd   ) = PowerDeficit;
 
 % temporary power required array for iterating
 TempReq = Preq;
@@ -325,6 +321,23 @@ for ipnt = 1:npnt
     Pout(ipnt, SrcTrnIdx) = PropulsionPkg.PowerFlow(Pout(ipnt, SrcTrnIdx)', Arch(SrcTrnIdx, SrcTrnIdx)', SplitDwn(SrcTrnIdx, SrcTrnIdx), EtaDwn(SrcTrnIdx, SrcTrnIdx), -1)';
     
 end
+
+% At maximum-power points, an infinite sink request cannot define a finite
+% pre-clipping residual. Allocate each parallel group's total capacity with
+% the supplied split to expose any component overload without changing the
+% mission's existing maximum-power output calculation.
+if (SupplyLambda)
+    FullPowerDemand = ~FiniteDemand;
+    if (any(FullPowerDemand))
+        [ComponentPower(FullPowerDemand, :), PowerDeficit(FullPowerDemand)] = ...
+            PropulsionPkg.FullPowerLambdaConstraints(Aircraft, ...
+                Pav(FullPowerDemand, :), LamDwn(FullPowerDemand, :), ...
+                LamUps(FullPowerDemand, :));
+    end
+end
+
+Aircraft.Mission.History.SI.Constraints.ComponentPower(SegBeg:SegEnd, :) = ComponentPower;
+Aircraft.Mission.History.SI.Constraints.PowerDeficit(  SegBeg:SegEnd   ) = PowerDeficit;
 
 % compute the thrust required/output
 Tout = Pout ./ TAS;

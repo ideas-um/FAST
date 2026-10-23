@@ -7,6 +7,7 @@
 % CreatePropArch       - PropulsionPkg.CreatePropArch is a function.
 % EngineLapse          - PropulsionPkg.EngineLapse is a function.
 % EvalSplit            - PropulsionPkg.EvalSplit is a function.
+% FullPowerLambdaConstraints - PropulsionPkg.FullPowerLambdaConstraints is a function.
 % PowerAvailable       - PropulsionPkg.PowerAvailable is a function.
 % PowerFlow            - PropulsionPkg.PowerFlow is a function.
 % PowerManagementConstraints - PropulsionPkg.PowerManagementConstraints is a function.

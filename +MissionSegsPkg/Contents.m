@@ -16,3 +16,5 @@
 % Gravity             - MissionSegsPkg.Gravity is a function.
 % ProcessProfile      - MissionSegsPkg.ProcessProfile is a function.
 % StdAtm              - MissionSegsPkg.StdAtm is a function.
+% TakeoffPowerRequired - MissionSegsPkg.TakeoffPowerRequired is a function.
+% TestTakeoffPowerRequired - MissionSegsPkg.TestTakeoffPowerRequired is a function.

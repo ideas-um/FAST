@@ -288,8 +288,11 @@ while (iter < MaxIter)
     % compute the power available
     Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-    % for full throttle, recompute the operational power splits
-    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    % Preserve optimizer-supplied splits when requested. Otherwise, retain
+    % the legacy maximum-power behavior and derive the realized split.
+    if (~strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda"))
+        Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    end
     
     % get the power available
     Pav = Aircraft.Mission.History.SI.Power.TV(SegBeg:SegEnd);

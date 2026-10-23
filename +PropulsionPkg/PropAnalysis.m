@@ -263,6 +263,20 @@ for ipnt = 1:npnt
 
 end
 
+% A supplied lambda is a commanded allocation, so preserve the component
+% requirements before the existing output-clipping logic. Positive values
+% are inequality-constraint violations that an optimizer can act on.
+if (strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda"))
+    [ComponentPower, PowerDeficit] = PropulsionPkg.PowerManagementConstraints( ...
+                                      Preq, Pav, TrnSnkIdx);
+else
+    ComponentPower = zeros(npnt, ncomp);
+    PowerDeficit = zeros(npnt, 1);
+end
+
+Aircraft.Mission.History.SI.Constraints.ComponentPower(SegBeg:SegEnd, :) = ComponentPower;
+Aircraft.Mission.History.SI.Constraints.PowerDeficit(  SegBeg:SegEnd   ) = PowerDeficit;
+
 % temporary power required array for iterating
 TempReq = Preq;
 

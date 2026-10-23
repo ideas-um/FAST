@@ -177,17 +177,35 @@ Aircraft.Mission.History.SI.Performance.Alt( SegBeg:SegEnd) = Alt ;
 % compute the power available
 Aircraft = PropulsionPkg.PowerAvailable(Aircraft);
 
-% for full throttle, recompute the operational power splits
-Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+% Determine whether the supplied split is a commanded power allocation or
+% merely an initial value for the existing maximum-power calculation.
+SupplyLambda = strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda");
+if (SupplyLambda)
 
-% assume all available power is for flying
-Preq = Inf(npoint, 1);
+    % The takeoff trajectory already prescribes constant acceleration over
+    % 60 seconds. Use the interval-average kinetic-energy rate as the finite
+    % power demand so integrating power recovers the prescribed energy
+    % change exactly. Rolling resistance and aerodynamic drag are not
+    % modeled in this simplified takeoff segment.
+    KE = 0.5 .* Mass .* TAS .^ 2;
+    Preq = MissionSegsPkg.TakeoffPowerRequired(Mass, TAS, Time);
+
+else
+
+    % At maximum power, component availability uniquely determines the
+    % realized split between parallel power sources.
+    Aircraft = PropulsionPkg.RecomputeSplits(Aircraft, SegBeg, SegEnd);
+    Preq = Inf(npoint, 1);
+
+end
 
 % compute the specific excess power (will be 0 - did this b/c we don't know drag at takeoff)
 Ps = zeros(npoint, 1);
 
 % kinetic Energy------[npoint x 1]
-KE = 0.5 .* Mass .* TAS .^ 2;
+if (~SupplyLambda)
+    KE = 0.5 .* Mass .* TAS .^ 2;
+end
 
 % potential energy------[npoint x 1]
 PE = Mass .* g .* Alt;

@@ -9,6 +9,7 @@
 % EvalSplit            - PropulsionPkg.EvalSplit is a function.
 % PowerAvailable       - PropulsionPkg.PowerAvailable is a function.
 % PowerFlow            - PropulsionPkg.PowerFlow is a function.
+% PowerManagementConstraints - PropulsionPkg.PowerManagementConstraints is a function.
 % PowerSupplementCheck - PropulsionPkg.PowerSupplementCheck is a function.
 % ProcessPropArch      - PropulsionPkg.ProcessPropArch is a function.
 % PropAnalysis         - PropulsionPkg.PropAnalysis is a function.
@@ -17,3 +18,4 @@
 % RecomputeSplits      - PropulsionPkg.RecomputeSplits is a function.
 % TestCreatePropArch   - PropulsionPkg.TestCreatePropArch is a function.
 % TestPowerAvailable   - PropulsionPkg.TestPowerAvailable is a function.
+% TestPowerManagementConstraints - PropulsionPkg.TestPowerManagementConstraints is a function.

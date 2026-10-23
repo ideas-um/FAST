@@ -91,6 +91,10 @@ if (ielem == 0)
     Aircraft.Mission.History.SI.Power.Current( :, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(:, :) = 0;
     Aircraft.Mission.History.SI.Power.Windmill(:, :) = 0;
+
+    % supplied power-management constraint residuals
+    Aircraft.Mission.History.SI.Constraints.ComponentPower(:, :) = 0;
+    Aircraft.Mission.History.SI.Constraints.PowerDeficit(  :, :) = 0;
     
     % aircraft energy as a function of time
     Aircraft.Mission.History.SI.Energy.KE(      :, :) = 0;
@@ -156,6 +160,10 @@ else
     Aircraft.Mission.History.SI.Power.Current( ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Capacity(ielem:end, :) = 0;
     Aircraft.Mission.History.SI.Power.Windmill(ielem:end, :) = 0;
+
+    % supplied power-management constraint residuals
+    Aircraft.Mission.History.SI.Constraints.ComponentPower(ielem:end, :) = 0;
+    Aircraft.Mission.History.SI.Constraints.PowerDeficit(  ielem:end, :) = 0;
     
     % aircraft energy as a function of time
     Aircraft.Mission.History.SI.Energy.KE(      ielem:end, :) = 0;

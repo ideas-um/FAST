@@ -50,6 +50,16 @@ Aircraft = InputAircraft;
 % call pre-specprocessing, it will fill in unspecified fields with NaNs if the user forgets one
 Aircraft = DataStructPkg.PreSpecProcessing(Aircraft);
 
+% Validate power-management behavior for both on- and off-design analyses.
+% Missing settings are assigned the legacy behavior by PreSpecProcessing.
+ValidPowerModes = ["RecomputeLambda", "SupplyLambda"];
+PowerMode = string(Aircraft.Settings.PowerManagement.Mode);
+ModeIndex = find(strcmpi(PowerMode, ValidPowerModes), 1);
+if (isempty(ModeIndex))
+    error("ERROR - Main: PowerManagement.Mode must be 'RecomputeLambda' or 'SupplyLambda'.");
+end
+Aircraft.Settings.PowerManagement.Mode = ValidPowerModes(ModeIndex);
+
 % check that an analysis type was provided
 if (isnan(Aircraft.Settings.Analysis.Type))
     

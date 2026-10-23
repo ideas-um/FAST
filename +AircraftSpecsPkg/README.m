@@ -391,6 +391,20 @@ function [] = README()
 %                structure. See MissionProfilesPkg.README, Section III.a
 %                for more information.
 %           ---------------------------------------------------------------
+%           (70a) Aircraft.Settings.PowerManagement.Mode
+%                Description: Determines whether FAST derives the
+%                full-power split or preserves a supplied operational split
+%                during takeoff and climb.
+%                Units / Default Value: -- / "RecomputeLambda"
+%                NOTE 1: Options are
+%                       "RecomputeLambda" (derive the realized split from
+%                                          component power availability)
+%                       "SupplyLambda"    (preserve LamDwn and expose
+%                                          positive feasibility residuals)
+%                NOTE 2: In SupplyLambda mode, constraint residuals are
+%                returned in Aircraft.Mission.History.SI.Constraints.
+%                Values less than or equal to zero are feasible.
+%           ---------------------------------------------------------------
 %           (71) Aircraft.Settings.Plotting
 %                Description: Mission history plotting flag
 %                Units / Default Value: -- / 0

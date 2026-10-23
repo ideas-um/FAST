@@ -105,6 +105,7 @@ DefaultAero.WingtipDevice = NaN;
 DefaultAero.MAC = NaN;
 DefaultAero.S = NaN;
 DefaultAero.AR = NaN;
+DefaultAero.L_D.Method = @(Aircraft) AerodynamicsPkg.ConstantLD(Aircraft);
 DefaultAero.L_D.CrsMAC = NaN;
 
 DefaultWeight.Cargo = NaN;
@@ -308,6 +309,7 @@ DefaultSettings.OEW.MaxIter = 20;
 DefaultSettings.OEW.Tol = 1e-6;
 DefaultSettings.Analysis.MaxIter = 50;
 DefaultSettings.Analysis.Type = 1;       % 1 = on design. -1 = off design
+DefaultSettings.PowerManagement.Mode = "RecomputeLambda";
 DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots
 DefaultSettings.Table = 0;
 DefaultSettings.VisualizeAircraft = 0;
@@ -523,6 +525,15 @@ for i = 1:length(Settingsfields)
         Settings.(Settingsfields{i}) = DefaultSettings.(Settingsfields{i});
     end
 end
+
+% Validate how full-power takeoff and climb power splits are determined.
+ValidPowerModes = ["RecomputeLambda", "SupplyLambda"];
+PowerMode = string(Settings.PowerManagement.Mode);
+ModeIndex = find(strcmpi(PowerMode, ValidPowerModes), 1);
+if (isempty(ModeIndex))
+    error("ERROR - SpecProcessing: PowerManagement.Mode must be 'RecomputeLambda' or 'SupplyLambda'.");
+end
+Settings.PowerManagement.Mode = ValidPowerModes(ModeIndex);
 
 
 

@@ -113,6 +113,14 @@ for isegs = 1:nsegs
     
 end
 
+% Optional pointwise split histories contain one matrix per segment. The
+% matrix rows follow that segment's discretization, including both shared
+% boundary points, and the columns follow the SLS split-vector definitions.
+Mission = ValidateSplitHistories(Mission, "LamDwnBySegment", SegPts, ...
+                                 length(Aircraft.Specs.Power.LamDwn.SLS));
+Mission = ValidateSplitHistories(Mission, "LamUpsBySegment", SegPts, ...
+                                 length(Aircraft.Specs.Power.LamUps.SLS));
+
 
 %% CHECK THE MISSION TARGETS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -338,5 +346,34 @@ Mission.SegPts = SegPts;
 Aircraft.Mission.Profile = Mission;
 
 % ----------------------------------------------------------
+
+end
+
+function Mission = ValidateSplitHistories(Mission, FieldName, SegPts, nsplit)
+%
+% Validate optional pointwise split matrices while processing the profile.
+%
+
+if (~isfield(Mission, FieldName))
+    return
+end
+
+Histories = Mission.(FieldName);
+nsegs = length(SegPts);
+if (~iscell(Histories) || numel(Histories) ~= nsegs)
+    error("FAST:InvalidSegmentLambdaHistory", ...
+          "%s must be a cell array with one entry per mission segment.", FieldName);
+end
+
+for iseg = 1:nsegs
+    Split = Histories{iseg};
+    if (~isnumeric(Split) || ...
+        ~isequal(size(Split), [SegPts(iseg), nsplit]) || ...
+        any(~isfinite(Split), "all"))
+        error("FAST:InvalidSegmentLambdaHistory", ...
+              "%s{%d} must be a finite numeric %d-by-%d matrix.", ...
+              FieldName, iseg, SegPts(iseg), nsplit);
+    end
+end
 
 end

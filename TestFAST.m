@@ -31,6 +31,7 @@ BatteryPkg.TestResizeBattery();
 PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
 PropulsionPkg.TestSegmentOperMatrices();
+MissionSegsPkg.TestSegmentSplitHistories();
 
 
 %% TEST UNIT CONVERSION PACKAGE %%

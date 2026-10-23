@@ -104,8 +104,9 @@ Alt = repmat(Aircraft.Specs.Performance.Alts.Tko, npoint, 1);
 Mass = repmat(MTOW, npoint, 1);
 
 % remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Tko, SegEnd - SegBeg + 1, 1);
-Aircraft.Mission.History.SI.Power.LamUps(SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Tko, SegEnd - SegBeg + 1, 1);
+% remember constant or pointwise power splits
+Aircraft = MissionSegsPkg.ApplySegmentSplits(Aircraft, SegBeg, SegEnd, ...
+           Aircraft.Specs.Power.LamDwn.Tko, Aircraft.Specs.Power.LamUps.Tko);
 
 
 %% FLY TAKEOFF %%

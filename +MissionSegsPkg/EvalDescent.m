@@ -191,9 +191,9 @@ Aircraft.Mission.History.SI.Weight.CurWeight(SegBeg:SegEnd) = Mass;
 % remember the fuel and battery energy remaining
 Aircraft.Mission.History.SI.Energy.Eleft_ES(SegBeg:SegEnd, :) = Eleft_ES;
 
-% remember the power splits
-Aircraft.Mission.History.SI.Power.LamDwn(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamDwn.Des  , SegEnd - SegBeg + 1, 1);
-Aircraft.Mission.History.SI.Power.LamUps(  SegBeg:SegEnd, :) = repmat(Aircraft.Specs.Power.LamUps.Des  , SegEnd - SegBeg + 1, 1);
+% remember constant or pointwise power splits
+Aircraft = MissionSegsPkg.ApplySegmentSplits(Aircraft, SegBeg, SegEnd, ...
+           Aircraft.Specs.Power.LamDwn.Des, Aircraft.Specs.Power.LamUps.Des);
 
 % get the number of windmilling splits
 nwind = length(Aircraft.Specs.Power.Windmill.Des);

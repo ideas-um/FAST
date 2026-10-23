@@ -198,6 +198,18 @@ function [] = README()
 %             is specified as NaN, the climb segment will adhere to the
 %             prescribed boundary conditions and change the rate of climb.
 %
+%             Optionally, a mission may prescribe pointwise operational
+%             split histories using Mission.LamDwnBySegment and/or
+%             Mission.LamUpsBySegment. Each is a cell array with one entry
+%             per row of Mission.Segs. A cell contains an npoint-by-nsplit
+%             numeric matrix, where npoint is the discretization of that
+%             segment and nsplit matches the corresponding SLS split row.
+%             Both endpoints are included. Because adjacent segments share
+%             a control point, the first row of the later segment owns that
+%             point in the final mission history. If these fields are not
+%             supplied, FAST repeats the aircraft's existing constant split
+%             value throughout each segment.
+%
 %     (6) The mission profile is now defined! It can be stored in the
 %         "Aircraft.Mission.Profile" variable, where "Aircraft" is the
 %         highest-level structure associated with a candidate aircraft

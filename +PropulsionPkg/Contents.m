@@ -16,6 +16,8 @@
 % PropArchConnections  - PropulsionPkg.PropArchConnections is a function.
 % PropulsionSizing     - PropulsionPkg.PropulsionSizing is a function.
 % RecomputeSplits      - PropulsionPkg.RecomputeSplits is a function.
+% SelectOperMatrices   - PropulsionPkg.SelectOperMatrices is a function.
 % TestCreatePropArch   - PropulsionPkg.TestCreatePropArch is a function.
 % TestPowerAvailable   - PropulsionPkg.TestPowerAvailable is a function.
 % TestPowerManagementConstraints - PropulsionPkg.TestPowerManagementConstraints is a function.
+% TestSegmentOperMatrices - PropulsionPkg.TestSegmentOperMatrices is a function.

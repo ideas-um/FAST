@@ -30,6 +30,7 @@ BatteryPkg.TestResizeBattery();
 % run test cases and print results
 PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
+PropulsionPkg.TestSegmentOperMatrices();
 
 
 %% TEST UNIT CONVERSION PACKAGE %%

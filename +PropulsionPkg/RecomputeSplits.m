@@ -75,8 +75,11 @@ nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
 % get a temporary power split
 TmpSplit = LamDwn(1, :);
 
+% get the downstream definition for the current mission segment
+[~, OperDwnFun] = PropulsionPkg.SelectOperMatrices(Aircraft);
+
 % get the original downstream matrix
-OperDwn = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, TmpSplit);
+OperDwn = PropulsionPkg.EvalSplit(OperDwnFun, TmpSplit);
 
 % loop through each power split
 for ipar = 1:npar
@@ -107,7 +110,7 @@ for ipar = 1:npar
             TmpSplit(isplit) = TmpSplit(isplit) + 0.01;
             
             % get the new matrix
-            OperNew = PropulsionPkg.EvalSplit(Aircraft.Specs.Propulsion.PropArch.OperDwn, TmpSplit);
+            OperNew = PropulsionPkg.EvalSplit(OperDwnFun, TmpSplit);
             
             % check if the matrices are different
             if (abs(OperDwn(iups, kdx) - OperNew(iups, kdx)) > 1.0e-06)

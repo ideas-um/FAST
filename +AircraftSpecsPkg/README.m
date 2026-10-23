@@ -229,7 +229,7 @@ function [] = README()
 %                NOTE: This will modify the value output by the gas turbine
 %                engine models during sizing.
 %           ---------------------------------------------------------------
-%           (27) Aircraft.Specs.Propulsion.Arch.Type
+%           (27) Aircraft.Specs.Propulsion.PropArch.Type
 %                Description:
 %                Units / Default Value: -- / *REQ*
 %                NOTE 1: String input required, options are
@@ -241,10 +241,15 @@ function [] = README()
 %                      {"SHE"}*    (Series hybrid-electric)
 %                      {"O"  }     (Other, user-specified)
 %                      * denotes Not yet functional, coming soon
-%               NOTE 2: If "O" is entered, a user must be careful to also
-%               specify the power matrix variables (36 through 59 in this 
-%               list), otherwise the code will assume conventional
-%               architecture despite setting the type to other.
+%               NOTE 2: If "O" is entered, the user must also specify Arch,
+%               OperUps, OperDwn, EtaUps, EtaDwn, SrcType, and TrnType in
+%               Aircraft.Specs.Propulsion.PropArch.
+%               NOTE 3: A custom architecture may optionally provide paired
+%               OperUpsBySegment and OperDwnBySegment cell arrays. Each cell
+%               contains one numeric operational matrix and corresponds to
+%               the same row in Aircraft.Mission.Profile.Segs. The base
+%               OperUps and OperDwn definitions remain required and are used
+%               when segment matrices are not supplied.
 %           ---------------------------------------------------------------
 %           (28) Aircraft.Specs.Power.SpecEnergy.Fuel
 %                Description: Fuel specific energy
@@ -313,7 +318,7 @@ function [] = README()
 %                Description: These variables are propulsion architecture
 %                power matrices. They have default configurations depending
 %                on which option was chosen for
-%                Aircraft.Specs.Propulsion.Arch.Type (Variable 27). If set
+%                Aircraft.Specs.Propulsion.PropArch.Type (Variable 27). If set
 %                to "O", the user must specify some or all of these values.
 %                It is not recommended to use user-specified matrices
 %                without proper understanding. See the README in the main
@@ -476,7 +481,7 @@ function [] = README()
 %               Aircraft.Specs.TLAR.Class             (Variable 2)
 %               Aircraft.Specs.TLAR.MaxPax            (Variable 3)
 %               Aircraft.Specs.Performance.Range      (Variable 9)
-%               Aircraft.Specs.Propulsion.Arch.Type   (Variable 27)
+%               Aircraft.Specs.Propulsion.PropArch.Type   (Variable 27)
 %
 % end AircraftSpecsPkg.README
 %

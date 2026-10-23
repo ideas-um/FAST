@@ -487,6 +487,39 @@ elseif (strcmpi(ArchName, "O"  ) == 1)
     % get the operational matrices
     OperUps = Specs.Propulsion.PropArch.OperUps;
     OperDwn = Specs.Propulsion.PropArch.OperDwn;
+
+    % Segment-indexed matrices are optional, but upstream and downstream
+    % definitions must be supplied as a pair. Their order follows the
+    % rows of Mission.Profile.Segs.
+    HaveOperBySegment = isfield(Specs.Propulsion.PropArch, ...
+                                ["OperUpsBySegment"; "OperDwnBySegment"]);
+    if (sum(HaveOperBySegment) == 1)
+        error("FAST:IncompleteSegmentOperMatrices", ...
+              "OperUpsBySegment and OperDwnBySegment must be supplied together.");
+    end
+    if (sum(HaveOperBySegment) == 2)
+        OperUpsBySegment = Specs.Propulsion.PropArch.OperUpsBySegment;
+        OperDwnBySegment = Specs.Propulsion.PropArch.OperDwnBySegment;
+        if (~iscell(OperUpsBySegment) || ~iscell(OperDwnBySegment))
+            error("FAST:InvalidSegmentOperMatrices", ...
+                  "Segment operational matrices must be supplied in cell arrays.");
+        end
+        if (numel(OperUpsBySegment) ~= numel(OperDwnBySegment))
+            error("FAST:InvalidSegmentOperMatrices", ...
+                  "Upstream and downstream segment matrix counts must match.");
+        end
+        ncomp = size(Arch, 1);
+        for iseg = 1:numel(OperUpsBySegment)
+            if (~isnumeric(OperUpsBySegment{iseg}) || ...
+                ~isequal(size(OperUpsBySegment{iseg}), [ncomp, ncomp]) || ...
+                ~isnumeric(OperDwnBySegment{iseg}) || ...
+                ~isequal(size(OperDwnBySegment{iseg}), [ncomp, ncomp]))
+                error("FAST:InvalidSegmentOperMatrices", ...
+                      "Segment %d operational matrices must be numeric and %d-by-%d.", ...
+                      iseg, ncomp, ncomp);
+            end
+        end
+    end
     
     % get the efficiency matrices
     EtaUps = Specs.Propulsion.PropArch.EtaUps;

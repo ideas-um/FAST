@@ -267,8 +267,14 @@ end
 % requirements before the existing output-clipping logic. Positive values
 % are inequality-constraint violations that an optimizer can act on.
 if (strcmpi(Aircraft.Settings.PowerManagement.Mode, "SupplyLambda"))
-    [ComponentPower, PowerDeficit] = PropulsionPkg.PowerManagementConstraints( ...
-                                      Preq, Pav, TrnSnkIdx);
+    ComponentPower = zeros(npnt, ncomp);
+    PowerDeficit = zeros(npnt, 1);
+    FiniteDemand = all(isfinite(Preq), 2);
+    if (any(FiniteDemand))
+        [ComponentPower(FiniteDemand, :), PowerDeficit(FiniteDemand)] = ...
+            PropulsionPkg.PowerManagementConstraints( ...
+                Preq(FiniteDemand, :), Pav(FiniteDemand, :), TrnSnkIdx);
+    end
 else
     ComponentPower = zeros(npnt, ncomp);
     PowerDeficit = zeros(npnt, 1);

@@ -5,6 +5,7 @@
 % Functions
 % -------------------------------------------------------------------------
 % ApplySegmentSplits  - MissionSegsPkg.ApplySegmentSplits is a function.
+% CaptureSegmentSplits - MissionSegsPkg.CaptureSegmentSplits is a function.
 % ComputeFltCon       - MissionSegsPkg.ComputeFltCon is a function.
 % EvalClimb           - MissionSegsPkg.EvalClimb is a function.
 % EvalCruise          - MissionSegsPkg.EvalCruise is a function.
@@ -17,6 +18,5 @@
 % Gravity             - MissionSegsPkg.Gravity is a function.
 % ProcessProfile      - MissionSegsPkg.ProcessProfile is a function.
 % StdAtm              - MissionSegsPkg.StdAtm is a function.
-% TakeoffPowerRequired - MissionSegsPkg.TakeoffPowerRequired is a function.
 % TestSegmentSplitHistories - MissionSegsPkg.TestSegmentSplitHistories is a function.
-% TestTakeoffPowerRequired - MissionSegsPkg.TestTakeoffPowerRequired is a function.
+% TestPHELambdaReplay - MissionSegsPkg.TestPHELambdaReplay is a function.

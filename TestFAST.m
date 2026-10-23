@@ -32,6 +32,7 @@ PropulsionPkg.TestCreatePropArch();
 PropulsionPkg.TestPowerAvailable();
 PropulsionPkg.TestSegmentOperMatrices();
 MissionSegsPkg.TestSegmentSplitHistories();
+MissionSegsPkg.TestPHELambdaReplay();
 
 
 %% TEST UNIT CONVERSION PACKAGE %%

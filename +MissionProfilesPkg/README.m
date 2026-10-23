@@ -209,6 +209,9 @@ function [] = README()
 %             point in the final mission history. If these fields are not
 %             supplied, FAST repeats the aircraft's existing constant split
 %             value throughout each segment.
+%             MissionSegsPkg.CaptureSegmentSplits converts the realized
+%             history from a completed RecomputeLambda mission into these
+%             cell arrays for an exact SupplyLambda replay.
 %
 %     (6) The mission profile is now defined! It can be stored in the
 %         "Aircraft.Mission.Profile" variable, where "Aircraft" is the

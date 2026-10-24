@@ -160,5 +160,8 @@ else
     
 end
 
+% report physical feasibility separately from numerical convergence
+DataStructPkg.ReportFeasibility(Aircraft);
+
 % ----------------------------------------------------------
 end

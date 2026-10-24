@@ -342,6 +342,15 @@ Aircraft.Settings.Analysis.Type = +1;
 %     0 for plotting off
 Aircraft.Settings.Plotting = 0;
 
+% visualize the aircraft geometry
+%     1 for visualization on
+%     0 for visualization off
+Aircraft.Settings.VisualizeAircraft = 0;
+
+% use the enhanced-wingtip ERJ-175 geometry and published overall length
+Aircraft.Geometry.Preset = @(Aircraft) VisualizationPkg.GeometrySpecsPkg.ERJ175LR(Aircraft);
+Aircraft.Geometry.LengthSet = UnitConversionPkg.ConvLength(31.68, "m", "m");
+
 % make a tble of mission history
 %     1 for make table
 %     0 for no table

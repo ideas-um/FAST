@@ -6,6 +6,7 @@
 % Functions
 % -------------------------------------------------------------------------
 % DeltaCanard              - VisualizationPkg.GeometrySpecsPkg.DeltaCanard is a function.
+% ERJ175LR                 - VisualizationPkg.GeometrySpecsPkg.ERJ175LR is a function.
 % LargeTurbofan            - VisualizationPkg.GeometrySpecsPkg.LargeTurbofan is a function.
 % LargeTurboprop           - VisualizationPkg.GeometrySpecsPkg.LargeTurboprop is a function.
 % LM100JNominalGeometry    - VisualizationPkg.GeometrySpecsPkg.LM100JNominalGeometry is a function.
@@ -32,6 +33,8 @@
 % DeltaCanard_Engines.dat             - VisualizationPkg.GeometrySpecsPkg.DeltaCanard_Engines is a DAT file.
 % DeltaCanardCasing.dat               - VisualizationPkg.GeometrySpecsPkg.DeltaCanardCasing is a DAT file.
 % DeltaCanardFuselage.dat             - VisualizationPkg.GeometrySpecsPkg.DeltaCanardFuselage is a DAT file.
+% ERJ175LREngines.dat                 - VisualizationPkg.GeometrySpecsPkg.ERJ175LREngines is a DAT file.
+% ERJ175LRFuselage.dat                - VisualizationPkg.GeometrySpecsPkg.ERJ175LRFuselage is a DAT file.
 % DoubleDeck_Engines.dat              - VisualizationPkg.GeometrySpecsPkg.DoubleDeck_Engines is a DAT file.
 % DoubleDeckFuselage.dat              - VisualizationPkg.GeometrySpecsPkg.DoubleDeckFuselage is a DAT file.
 % LM100J.dat                          - VisualizationPkg.GeometrySpecsPkg.LM100J is a DAT file.

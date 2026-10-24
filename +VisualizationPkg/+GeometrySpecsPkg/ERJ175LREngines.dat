@@ -1,0 +1,10 @@
+NumberOfEngines=2
+
+right_engine
+41.5 18.7 -5.4
+1 1
+TURBOFAN
+left_engine
+41.5 -18.7 -5.4
+1 1
+TURBOFAN

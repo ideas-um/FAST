@@ -1,0 +1,55 @@
+x1=14.0
+x2=82.0
+TLength=103.937
+SuperEllipseNum=10
+
+nose_tip
+0.10 0.10 0.10 0.10
+2 2 2 2
+0.0 0.0 0.0
+NOTFVIEW
+radome
+1.65 1.90 1.55 1.90
+2 2 2 2
+3.0 0.0 0.25
+NOTFVIEW
+flight_deck
+3.65 4.05 3.25 4.05
+2 2 2 2
+8.0 0.0 0.45
+FVIEW
+forward_cabin
+4.94 4.94 4.94 4.94
+2 2 2 2
+14.0 0.0 0.0
+NOTFVIEW
+mid_cabin
+4.94 4.94 4.94 4.94
+2 2 2 2
+43.0 0.0 0.0
+FVIEW
+aft_cabin
+4.94 4.94 4.94 4.94
+2 2 2 2
+76.0 0.0 0.0
+NOTFVIEW
+rear_pressure_bulkhead
+4.55 4.60 4.45 4.60
+2 2 2 2
+82.0 0.0 0.35
+NOTFVIEW
+forward_tail_cone
+3.35 3.40 3.05 3.40
+2 2 2 2
+90.0 0.0 1.15
+NOTFVIEW
+aft_tail_cone
+1.80 1.90 1.35 1.90
+2 2 2 2
+98.0 0.0 2.70
+NOTFVIEW
+tail_tip
+0.25 0.30 0.20 0.30
+2 2 2 2
+103.937 0.0 4.10
+NOTFVIEW

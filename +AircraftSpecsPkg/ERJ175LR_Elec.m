@@ -149,16 +149,16 @@ Aircraft.Specs.Power.SpecEnergy.Fuel = 12;
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
 % downstream power splits
-Aircraft.Specs.Power.LamDwn.SLS = 0.1;
-Aircraft.Specs.Power.LamDwn.Tko = 0.1;
-Aircraft.Specs.Power.LamDwn.Clb = 0;
+Aircraft.Specs.Power.LamDwn.SLS = 0.01;
+Aircraft.Specs.Power.LamDwn.Tko = 0.01;
+Aircraft.Specs.Power.LamDwn.Clb = 0.01;
 Aircraft.Specs.Power.LamDwn.Crs = 0;
 Aircraft.Specs.Power.LamDwn.Des = 0;
 Aircraft.Specs.Power.LamDwn.Lnd = 0;
 
 % upstream power splits
 Aircraft.Specs.Power.LamUps.SLS = 1;
-Aircraft.Specs.Power.LamUps.Tko = 1;
+Aircraft.Specs.Power.LamUps.Tko = 0;
 Aircraft.Specs.Power.LamUps.Clb = 0;
 Aircraft.Specs.Power.LamUps.Crs = 0;
 Aircraft.Specs.Power.LamUps.Des = 0;
@@ -275,7 +275,12 @@ Aircraft.Settings.VisualizeAircraft = 0;
 Aircraft.Geometry.Preset = @(Aircraft) VisualizationPkg.GeometrySpecsPkg.ERJ175LR(Aircraft);
 Aircraft.Geometry.LengthSet = UnitConversionPkg.ConvLength(31.68, "m", "m");
 
-% make a tble of mission history
+% power management mode, either:
+%     "RecomputeLambda" for no lambda and no need check constraints
+%     "SupplyLambda" for providing lambda but have to check constraints
+Aircraft.Settings.PowerManagement.Mode = "SupplyLambda";
+
+% make a table of mission history
 %     1 for make table
 %     0 for no table
 Aircraft.Settings.Table = 0;

@@ -2,12 +2,15 @@ function [Aircraft] = ERJ_ClimbThenAccel(Aircraft)
 %
 % [Aircraft] = ERJ_ClimbThenAccel(Aircraft)
 % written by Emma Cassidy, emmasmit@umich.edu
-% modified by Paul Mokotoff, prmoko@umich.edu
+% modified by Paul Mokotoff, prmoko@umich.edu 26 mar 2023
+% modified by Triet Ho, triet@umich.edu
 % last updated: 26 mar 2023
 %
 % Parametric mission for the ERJ175LR (but can be accommodated for any
 % regional jet). Instead of climbing and accelerating towards cruise
 % altitude, finish the climb and then accelerate.
+%
+% Triet: Add climb rate for optimizer
 % 
 % part 1: fly at design range                    | part 2: 100  | part 3: 
 %                                                | nmi diversion| 45 min 
@@ -104,9 +107,29 @@ Mission.VelEnd = [VelTko; VelClb;     VelClb;     VelCrs; VelCrs;     VelDes;   
 Mission.TypeBeg = [ TAS;     TAS;        EAS;        EAS;   Mach;       Mach;        EAS;       EAS;      TAS;           EAS;           EAS;      TAS;      TAS;         TAS;           EAS;       EAS;   TAS;];
 Mission.TypeEnd = [ TAS;     EAS;        EAS;       Mach;   Mach;        EAS;        EAS;       TAS;      EAS;           EAS;           TAS;      TAS;      TAS;         EAS;           EAS;       TAS;   TAS;];
 
-% no climb rate defined now
-Mission.ClbRate = NaN(length(Mission.ID), 1);
+% prescribed climb rates
+RC2250 = UnitConversionPkg.ConvVel(2250, "ft/min", "m/s");
+RC1650 = UnitConversionPkg.ConvVel(1650, "ft/min", "m/s");
+RC1000 = UnitConversionPkg.ConvVel(1000, "ft/min", "m/s");
 
+Mission.ClbRate = [ ...
+    NaN; ...    % 1  Takeoff
+    RC2250; ... % 2  Primary climb: 0–3,000 ft
+    RC1650; ... % 3  Primary climb: 3,000–35,000 ft
+    NaN; ...    % 4  Level acceleration at 35,000 ft
+    NaN; ...    % 5  Primary cruise
+    NaN; ...    % 6  Level deceleration
+    NaN; ...    % 7  Primary descent
+    NaN; ...    % 8  Primary descent
+    RC2250; ... % 9  Reserve climb: 1,500–3,000 ft
+    RC2250; ... % 10 Reserve climb: 3,000–9,000 ft
+    RC1000; ... % 11 Reserve climb/acceleration: 9,000–10,000 ft
+    NaN; ...    % 12 Diversion cruise
+    NaN; ...    % 13 Loiter
+    NaN; ...    % 14 Reserve descent
+    NaN; ...    % 15 Reserve descent
+    NaN; ...    % 16 Reserve descent
+    NaN];       % 17 Landing
 
 %% REMEMBER THE MISSION PROFILE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

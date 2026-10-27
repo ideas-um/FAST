@@ -16,7 +16,7 @@ function [] = README()
 % Principal Investigator:
 %     Dr. Gokcin Cinar, cinar@umich.edu
 % 
-% README last updated: 15 June 2026
+% README last updated: 27 oct 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -52,6 +52,12 @@ function [] = README()
 %
 %         b) First-Order Drag Polar Model
 %            @(Aircraft) AerodynamicsPkg.DragPolar(Aircraft);
+%
+%     If Method is omitted or NaN, SpecProcessing selects ConstantLD.
+%     Missing or NaN ClbCF, CrsCF, ScaleCD0, ScaleCDI, ScaleSub, ScaleSup,
+%     and ScaleWnd calibration factors default to 1. ConstantLD uses the
+%     segment L/D values directly; apply ClbCF/CrsCF when defining those
+%     values if calibration is desired.
 %            
 %     After selecting the aerodynamic analysis method, the appropriate
 %     variables must be defined (all under the Aircraft.Specs.Aero

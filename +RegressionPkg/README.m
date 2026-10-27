@@ -26,11 +26,17 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 08 Sep 2025
+% README last updated: 27 oct 2026
 % 
 % -------------------------------------------------------------------------
 %
 % (I) Overview
+%
+%       VaryUserInputs uses ["Specs", "Propulsion", "Thrust", "SLS"]
+%       for static sea-level thrust and ["Specs", "Power", "SLS"] for
+%       static sea-level power. These paths identify both supplied inputs
+%       and missing outputs for SpecProcessing; cruise thrust in the
+%       historical database is a separate quantity.
 %
 %       The regression package contains functions which perform the
 %       non-parametric Gaussian Process Regression used to predict aircraft

@@ -1,8 +1,9 @@
-function [known, unknown] = VaryUserInputs(Aircraft,FanPropFlag)
+function [known, unknown] = VaryUserInputs(Aircraft,AircraftClass)
 %
-% function [known, unknown] = VaryUserInputs(Aircraft)
+% function [known, unknown] = VaryUserInputs(Aircraft,AircraftClass)
 % GPR pre-processing function
 % Written by Maxfield Arnson
+% last updated: 27 oct 2026
 %
 % This low level function is called while preprocessing user inputs before
 % they are sized by main and EAPAnalysis. Based on a user input file, it
@@ -13,6 +14,10 @@ function [known, unknown] = VaryUserInputs(Aircraft,FanPropFlag)
 % INPUTS:
 % Aircraft = the structure defined by the user after running an
 %   initialization function, such as ERJ175LR()
+% AircraftClass = aircraft class ("Turbofan" or "Turboprop")
+%
+% Static sea-level thrust and power use Specs.Propulsion.Thrust.SLS and
+% Specs.Power.SLS, respectively, for both known and unknown field paths.
 %
 %
 % OUTPUTS:
@@ -40,19 +45,19 @@ names.ws = ["Specs","Aero","W_S","SLS"];
         names.ldcr = ["Specs","Aero","L_D","Crs"];
 
 %% Assign class specific parameters from the aircraft struct
-switch FanPropFlag
+switch AircraftClass
     case "Turbofan"
         values.tw  = Aircraft.Specs.Propulsion.T_W.SLS;
         values.tsls  = Aircraft.Specs.Propulsion.Thrust.SLS;
         names.tw  = ["Specs","Propulsion","T_W","SLS"];
-        names.tsls  = ["Specs","Propulsion","Thrust","Crs"];
+        names.tsls  = ["Specs","Propulsion","Thrust","SLS"];
 
 
     case "Turboprop"
         values.pw = Aircraft.Specs.Power.P_W.SLS;
         values.psls  = Aircraft.Specs.Power.SLS;      
         names.pw = ["Specs","Power","P_W","SLS"];
-        names.psls  = ["Specs","Power","Crs"];     
+        names.psls  = ["Specs","Power","SLS"];
 end
 
 %% Initialize known and unknown parameters

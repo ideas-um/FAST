@@ -26,7 +26,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 08 Sep 2025
+% README last updated: 27 oct 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -80,6 +80,18 @@ function [] = README()
 %           parameters have additional notes when relevant
 %
 %       (c) Table:
+%
+%           Aircraft.Specs.Aero.L_D.Method defaults to
+%           @AerodynamicsPkg.ConstantLD when omitted or NaN. Supply a
+%           function handle to select a different aerodynamic model.
+%           Aero.L_D.ClbCF/CrsCF and Aero.ScaleCD0/ScaleCDI/ScaleSub/
+%           ScaleSup/ScaleWnd default to 1. ConstantLD uses the specified
+%           segment L/D ratios directly.
+%
+%           Aircraft.Specs.Power.SLS is total static sea-level power [W],
+%           predicted for turboprops when omitted or NaN. This differs from
+%           Power.P_W.SLS, the specific power input in kW/kg. Turbofans use
+%           Specs.Propulsion.Thrust.SLS [N] for total sea-level thrust.
 %
 %           ---------------------------------------------------------------
 %           (1) Aircraft.Specs.TLAR.EIS

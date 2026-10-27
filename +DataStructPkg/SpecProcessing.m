@@ -2,7 +2,7 @@ function [Aircraft] = SpecProcessing(Aircraft)
 %
 % [Aircraft] = SpecProcessing(Aircraft)
 % written by Maxfield Arnson, marnson@umich.edu
-% last updated: 6 jul 2026
+% last updated: 27 oct 2026
 %
 % This function initializes mission outputs, runs regressions, and
 % overwrites values left as NaN in the user input. It prepares the aircraft
@@ -106,6 +106,16 @@ DefaultAero.MAC = NaN;
 DefaultAero.S = NaN;
 DefaultAero.AR = NaN;
 DefaultAero.L_D.CrsMAC = NaN;
+% Constant L/D uses the supplied or regressed segment ratios without
+% requiring the geometry inputs needed by the drag polar model.
+DefaultAero.L_D.Method = @AerodynamicsPkg.ConstantLD;
+DefaultAero.L_D.ClbCF = 1;
+DefaultAero.L_D.CrsCF = 1;
+DefaultAero.ScaleCD0 = 1;
+DefaultAero.ScaleCDI = 1;
+DefaultAero.ScaleSub = 1;
+DefaultAero.ScaleSup = 1;
+DefaultAero.ScaleWnd = 1;
 
 DefaultWeight.Cargo = NaN;
 DefaultWeight.OEW = NaN;

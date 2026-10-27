@@ -2,7 +2,7 @@ function [Aircraft] = PreSpecProcessing(Aircraft)
 %
 % [Aircraft] = PreSpecProcessing(Aircraft)
 % written by Max Arnson, marnson@umich.edu
-% last updated: 17 feb 2026
+% last updated: 27 oct 2026
 %
 % Instantiate any variables not specified in an aircraft data structure.
 % This function allows users to neglect to assign NaN values to parameters
@@ -51,6 +51,7 @@ if ~ isfield(Aircraft,"Specs")
     Aircraft.Specs.Propulsion.PropArch.Type = NaN;
     Aircraft.Specs.Propulsion.InletArea = NaN;
     Aircraft.Specs.Power.SpecEnergy.Fuel = NaN;
+    Aircraft.Specs.Power.SLS = NaN;
     Aircraft.Specs.Power.SpecEnergy.Batt = NaN;
     Aircraft.Specs.Power.Eta.EM = NaN;
     Aircraft.Specs.Power.Eta.EG = NaN;
@@ -95,6 +96,7 @@ if ~ isfield(Aircraft,"Specs")
     Aircraft.Specs.Battery.FEC = NaN;
     Aircraft.Specs.Battery.SOH = NaN;
     Aircraft.Specs.Battery.OpTemp = NaN;
+    Aircraft.Specs.Battery.Degradation = NaN;
 
 else
 
@@ -130,10 +132,13 @@ else
         if ~isfield(Aircraft.Specs.Performance,"Vels")
             Aircraft.Specs.Performance.Vels.Tko = NaN;
             Aircraft.Specs.Performance.Vels.Crs = NaN;
-        elseif ~isfield(Aircraft.Specs.Performance.Vels,"Tko")
-            Aircraft.Specs.Performance.Vels.Tko = NaN;
-        elseif ~isfield(Aircraft.Specs.Performance.Vels,"Crs")
-            Aircraft.Specs.Performance.Vels.Crs = NaN;
+        else
+            if ~isfield(Aircraft.Specs.Performance.Vels,"Tko")
+                Aircraft.Specs.Performance.Vels.Tko = NaN;
+            end
+            if ~isfield(Aircraft.Specs.Performance.Vels,"Crs")
+                Aircraft.Specs.Performance.Vels.Crs = NaN;
+            end
         end
         if ~isfield(Aircraft.Specs.Performance,"Alts")
             Aircraft.Specs.Performance.Alts.Tko = NaN;
@@ -183,6 +188,8 @@ else
             end
         end
         if ~isfield(Aircraft.Specs.Aero,"W_S")
+            Aircraft.Specs.Aero.W_S.SLS = NaN;
+        elseif ~isfield(Aircraft.Specs.Aero.W_S,"SLS")
             Aircraft.Specs.Aero.W_S.SLS = NaN;
         end
     end
@@ -243,17 +250,25 @@ else
         end
         if ~isfield(Aircraft.Specs.Propulsion,"T_W")
             Aircraft.Specs.Propulsion.T_W.SLS = NaN;
+        elseif ~isfield(Aircraft.Specs.Propulsion.T_W,"SLS")
+            Aircraft.Specs.Propulsion.T_W.SLS = NaN;
         end
         if ~isfield(Aircraft.Specs.Propulsion,"Thrust")
             Aircraft.Specs.Propulsion.Thrust.SLS = NaN;
+        elseif ~isfield(Aircraft.Specs.Propulsion.Thrust,"SLS")
+            Aircraft.Specs.Propulsion.Thrust.SLS = NaN;
         end
         if ~isfield(Aircraft.Specs.Propulsion,"Eta")
+            Aircraft.Specs.Propulsion.Eta.Prop = NaN;
+        elseif ~isfield(Aircraft.Specs.Propulsion.Eta,"Prop")
             Aircraft.Specs.Propulsion.Eta.Prop = NaN;
         end
         if ~isfield(Aircraft.Specs.Propulsion,"MDotCF")
             Aircraft.Specs.Propulsion.MDotCF = NaN;
         end
         if ~isfield(Aircraft.Specs.Propulsion,"PropArch")
+            Aircraft.Specs.Propulsion.PropArch.Type = NaN;
+        elseif ~isfield(Aircraft.Specs.Propulsion.PropArch,"Type")
             Aircraft.Specs.Propulsion.PropArch.Type = NaN;
         end
         if ~isfield(Aircraft.Specs.Propulsion,"InletArea")
@@ -327,7 +342,7 @@ else
             end
         end
 
-        if ~isfield(Aircraft.Specs.Power,"SLS")
+        if ~isfield(Aircraft.Specs.Power,"P_W")
             Aircraft.Specs.Power.P_W.SLS = NaN;
             Aircraft.Specs.Power.P_W.EM = NaN;
             Aircraft.Specs.Power.P_W.EG = NaN;
@@ -510,6 +525,18 @@ else
 end
 
 %% Check Settings Fields
+
+% Neutral aerodynamic calibration factors are resolved in SpecProcessing.
+for field = ["ScaleCD0", "ScaleCDI", "ScaleSub", "ScaleSup", "ScaleWnd"]
+    if ~isfield(Aircraft.Specs.Aero, field)
+        Aircraft.Specs.Aero.(field) = NaN;
+    end
+end
+for field = ["ClbCF", "CrsCF"]
+    if ~isfield(Aircraft.Specs.Aero.L_D, field)
+        Aircraft.Specs.Aero.L_D.(field) = NaN;
+    end
+end
 
 if ~isfield(Aircraft,"Settings")
     Aircraft.Settings.TkoPoints = NaN;

@@ -26,7 +26,7 @@ function [] = README()
 %     Michael Tsai
 %     Vaibhav Rau
 % 
-% README last updated: 08 Sep 2025
+% README last updated: 27 oct 2026
 % 
 % -------------------------------------------------------------------------
 %
@@ -37,6 +37,13 @@ function [] = README()
 %       contains functions which instantiate any variables not specified by
 %       a user, in addition to functions which fill out unknown values
 %       prior to aircraft sizing.
+%
+%       PreSpecProcessing initializes missing fields, including fields in
+%       partially supplied nested structures, without replacing user values.
+%       SpecProcessing replaces NaNs with defaults or regression results.
+%       The default aerodynamic method is AerodynamicsPkg.ConstantLD;
+%       aerodynamic calibration factors default to 1. Battery model inputs
+%       remain NaN unless supplied; they are not inferred by this package.
 % 
 % -------------------------------------------------------------------------
 % (II) Warning

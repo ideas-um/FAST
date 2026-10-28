@@ -152,7 +152,7 @@ nFlight = height(Sequence);
 [IndividualAircraft, IndividualPC, IndividualExitFlag, ...
     IndividualOptimizerOutput, IndividualOptimizerTime_min, ...
     IndividualCharge] = FlyIndividualSequence( ...
-    BasePHE, Sequence, MaxIterations);
+    BasePHE, Sequence, MaxIterations, UnoptimizedPC);
 
 % Seed joint optimization with the exact feasible unoptimized -2 replay
 % and its matching fuel/MTOW state. The unoptimized sequence is the required
@@ -335,7 +335,7 @@ end
 
 function [AircraftSet, PC, ExitFlag, OptimizerOutput, OptimizerTime_min, ...
         ChargeHistories] = FlyIndividualSequence( ...
-        BaseAircraft, Sequence, MaxIterations)
+        BaseAircraft, Sequence, MaxIterations, UnoptimizedPC)
 nFlight = height(Sequence);
 AircraftSet = struct;
 PC = cell(nFlight, 1);
@@ -361,6 +361,10 @@ for k = 1:nFlight
     Seed.Settings.PowerOpt = 0;
     Seed = Main(Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
     Seed = ConfigureOptimizer(Seed, MaxIterations);
+    % Use the exact unoptimized -2 control vector as the incumbent for this
+    % flight. Later-flight SOC/temperature may differ after earlier optimized
+    % flights and charging, but the control starting point is identical.
+    Seed.Settings.PowerOptInitialPC = UnoptimizedPC{k};
     [Aircraft, PC{k}, OptimizerTime_min(k), ExitFlag(k), ...
         OptimizerOutput{k}] = OptimizationPkg.MissionPowerOpt( ...
         Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);

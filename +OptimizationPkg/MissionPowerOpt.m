@@ -224,6 +224,20 @@ else
 end
 PC0(isnan(PC0)) = 0;
 PC0 = min(max(PC0, 0), 1);
+% Production sequence comparisons provide the exact unoptimized -2 control
+% vector. Honor it explicitly so the individual and joint optimizers begin
+% from the same control schedule rather than independently reconstructing a
+% merely similar regular-dispatch seed.
+if isfield(Aircraft.Settings, "PowerOptInitialPC")
+    RequestedPC0 = Aircraft.Settings.PowerOptInitialPC;
+    if ~isnumeric(RequestedPC0) || ~isequal(size(RequestedPC0), size(PC0)) || ...
+            any(~isfinite(RequestedPC0), "all")
+        error("OptimizationPkg:MissionPowerOpt:InitialPCSize", ...
+            "Settings.PowerOptInitialPC must be a finite %d-by-1 vector.", ...
+            numel(PC0));
+    end
+    PC0 = min(max(RequestedPC0, 0), 1);
+end
 % Start from the aircraft's design-assist schedule.  A zero-assist seed can
 % trap SQP at the conventional corner even when battery energy is available.
 

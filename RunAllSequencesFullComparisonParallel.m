@@ -154,23 +154,64 @@ nFlight = height(Sequence);
     IndividualCharge] = FlyIndividualSequence( ...
     BasePHE, Sequence, MaxIterations);
 
-% Seed joint optimization with the complete feasible individual schedule
-% and its matching fuel/MTOW state.
+% Seed joint optimization with the exact feasible unoptimized -2 replay
+% and its matching fuel/MTOW state. The unoptimized sequence is the required
+% incumbent: joint optimization may improve it, but may never start from a
+% different (for example, individually optimized) operating trajectory.
 JointInput = ConfigureOptimizer(BasePHE, MaxIterations);
 JointInput.Settings.Analysis.Type = -2;
-if all(cellfun(@(x) ~isempty(x), IndividualPC))
-    JointInput.Settings.PowerOptInitialPC = cat(2, IndividualPC{:});
+if all(cellfun(@(x) ~isempty(x), UnoptimizedPC))
+    JointInput.Settings.PowerOptInitialPC = cat(2, UnoptimizedPC{:});
     JointInput.Settings.PowerOptInitialFuel_kg = arrayfun(@(k) ...
-        IndividualAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.Fuel, ...
+        UnoptimizedAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.Fuel, ...
         (1:nFlight)');
     JointInput.Settings.PowerOptInitialMTOW_kg = arrayfun(@(k) ...
-        IndividualAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.MTOW, ...
+        UnoptimizedAircraft.(sprintf("Aircraft%d", k)).Specs.Weight.MTOW, ...
         (1:nFlight)');
+    JointInput.Settings.PowerOptInitialLamDwn = arrayfun(@(k) ...
+        UnoptimizedAircraft.(sprintf("Aircraft%d", k)).Mission.History.SI.Power.LamDwn, ...
+        (1:nFlight)', "UniformOutput", false);
 end
 [JointAircraft, JointPC, JointOptimizerTime_min, JointOptSeqTable, ...
     JointExitFlag, JointOptimizerOutput] = ...
     OptimizationPkg.SequencePowerOpt(JointInput, Sequence);
 JointCharge = ReplayCharges(JointAircraft, Sequence);
+
+% Numerical termination, differing availability conventions, or a failed
+% local search must never make an "optimized" saved case worse than the
+% feasible unoptimized -2 incumbent. Retain the incumbent trajectory when
+% either optimizer fails to improve the complete sequence total.
+UnoptimizedFeasible = all(cellfun(@(x) ...
+    isfield(x, "Feasible") && logical(x.Feasible), ...
+    UnoptimizedReplayOutput));
+UnoptimizedFuel_kg = SequenceMainMissionFuel(UnoptimizedAircraft, nFlight);
+IndividualFuelBeforeFallback_kg = ...
+    SequenceMainMissionFuel(IndividualAircraft, nFlight);
+if UnoptimizedFeasible && ...
+        IndividualFuelBeforeFallback_kg > UnoptimizedFuel_kg + 1.0e-6
+    IndividualAircraft = UnoptimizedAircraft;
+    IndividualPC = UnoptimizedPC;
+    IndividualCharge = UnoptimizedCharge;
+    for k = 1:nFlight
+        IndividualOptimizerOutput{k}.FallbackToUnoptimized = true;
+        IndividualOptimizerOutput{k}.SequenceFuelBeforeFallback_kg = ...
+            IndividualFuelBeforeFallback_kg;
+        IndividualOptimizerOutput{k}.UnoptimizedSequenceFuel_kg = ...
+            UnoptimizedFuel_kg;
+    end
+end
+
+JointFuelBeforeFallback_kg = SequenceMainMissionFuel(JointAircraft, nFlight);
+if UnoptimizedFeasible && ...
+        JointFuelBeforeFallback_kg > UnoptimizedFuel_kg + 1.0e-6
+    JointAircraft = UnoptimizedAircraft;
+    JointPC = cat(2, UnoptimizedPC{:});
+    JointCharge = UnoptimizedCharge;
+    JointOptimizerOutput.FallbackToUnoptimized = true;
+    JointOptimizerOutput.SequenceFuelBeforeFallback_kg = ...
+        JointFuelBeforeFallback_kg;
+    JointOptimizerOutput.UnoptimizedSequenceFuel_kg = UnoptimizedFuel_kg;
+end
 
 [ConventionalAircraft] = FlyConventionalSequence( ...
     Sequence, ConventionalCatalog, ConventionalCacheDir);
@@ -307,6 +348,15 @@ BegTemperature_C = BaseAircraft.Settings.BatteryInitialTemperature_C;
 for k = 1:nFlight
     Seed = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
         BegSOC, BegTemperature_C);
+    % Construct the optimizer seed from the same prescribed regular
+    % dispatch used by FlyUnoptimizedSequence. This prevents saved-aircraft
+    % LamUps provenance from changing the individual optimizer's incumbent.
+    Seed.Specs.Power.LamUps.SLS = 1.00;
+    Seed.Specs.Power.LamUps.Tko = 1.00;
+    Seed.Specs.Power.LamUps.Clb = 0.30;
+    Seed.Specs.Power.LamUps.Crs = 0.00;
+    Seed.Specs.Power.LamUps.Des = 0.00;
+    Seed.Specs.Power.LamUps.Lnd = 0.00;
     Seed.Settings.Analysis.Type = -1;
     Seed.Settings.PowerOpt = 0;
     Seed = Main(Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
@@ -319,6 +369,21 @@ for k = 1:nFlight
         [ChargeHistories{k}, BegSOC, BegTemperature_C] = ...
             ChargeForNextFlight(Aircraft, Sequence.GROUND_TIME(k + 1));
     end
+end
+end
+
+
+function Fuel_kg = SequenceMainMissionFuel(AircraftSet, nFlight)
+Fuel_kg = 0;
+for k = 1:nFlight
+    Aircraft = AircraftSet.(sprintf("Aircraft%d", k));
+    MainSegs = find(Aircraft.Mission.Profile.ID == 1);
+    if isempty(MainSegs)
+        error("RunAllSequences:MissingMainMission", ...
+            "Flight %d has no main mission ID 1.", k);
+    end
+    MainEnd = Aircraft.Mission.Profile.SegEnd(MainSegs(end));
+    Fuel_kg = Fuel_kg + Aircraft.Mission.History.SI.Weight.Fburn(MainEnd);
 end
 end
 

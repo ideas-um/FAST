@@ -256,6 +256,28 @@ if isfield(Aircraft.Settings, "PowerOptInitialFuel_kg") || ...
     FlightMTOWSeed = RequestedMTOWSeed;
 end
 
+% Preserve the uncontrolled main-mission rows from the caller's exact -2
+% unoptimized replay. PC controls takeoff/climb; this schedule keeps cruise,
+% descent, and other uncontrolled rows identical at the incumbent point.
+if isfield(Aircraft.Settings, "PowerOptInitialLamDwn")
+    RequestedLamDwnSeed = Aircraft.Settings.PowerOptInitialLamDwn;
+    if ~iscell(RequestedLamDwnSeed) || numel(RequestedLamDwnSeed) ~= nflight
+        error("OptimizationPkg:SequencePowerOpt:InitialLamDwnSize", ...
+            "Settings.PowerOptInitialLamDwn must contain one array per flight.");
+    end
+    for kInitial = 1:nflight
+        if ~isnumeric(RequestedLamDwnSeed{kInitial}) || ...
+                ~isequal(size(RequestedLamDwnSeed{kInitial}), ...
+                size(Aircraft.Specs.Power.LamDwn.Miss)) || ...
+                any(~isfinite(RequestedLamDwnSeed{kInitial}), "all")
+            error("OptimizationPkg:SequencePowerOpt:InitialLamDwnSize", ...
+                "Initial LamDwn for flight %d has an invalid size or value.", ...
+                kInitial);
+        end
+    end
+    FlightLamDwnSeed = RequestedLamDwnSeed(:);
+end
+
 % Callers may provide a previously flown/optimized schedule for the whole
 % sequence. Clamp it to the turbine-required electric floor and project it
 % through the same complete-sequence feasibility check before using it.

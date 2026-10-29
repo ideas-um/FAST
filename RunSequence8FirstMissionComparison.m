@@ -5,21 +5,8 @@ clearvars;
 clc;
 RunTimer = tic;
 
-if isfile(fullfile("output", "ERJ175LR_PHE_sized.mat"))
-    Input = load(fullfile("output", "ERJ175LR_PHE_sized.mat"), "SizedPHE");
-    BaseAircraft = Input.SizedPHE;
-    InputFile = fullfile("output", "ERJ175LR_PHE_sized.mat");
-elseif isfile(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"))
-    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
-    BaseAircraft = Input.A;
-    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
-elseif isfile("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat")
-    Input = load("ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat", "SizedAircraft");
-    BaseAircraft = Input.SizedAircraft;
-    InputFile = "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat";
-else
-    error("No saved fixed-size ERJ175LR PHE aircraft was found.");
-end
+[BaseAircraft, ~, SizingMetadata] = SizeERJ175LRBaseAircraft();
+InputFile = "AircraftSpecsPkg.ERJ175LR_PHE (sized at run start)";
 
 SequenceData = load("Sequence.mat", "tables");
 FirstFlight = SequenceData.tables{8}(1, :);
@@ -99,6 +86,7 @@ Comparison = table( ...
 TotalRunTime_min = toc(RunTimer) / 60;
 RunMetadata = struct("SequenceIndex", 8, "Flight", 1, ...
     "InputFile", InputFile, "AnalysisType", -1, ...
+    "SizingMetadata", SizingMetadata, ...
     "MissionOptimizerMaxIterations", 500, ...
     "SequenceOptimizerMaxIterations", 500, ...
     "ChargerPower_kW", 150, "FullMissionPowerConstraint", true, ...

@@ -8,24 +8,25 @@ if ~isscalar(SequenceIndex) || ~isfinite(SequenceIndex) || ...
     error("GreatLakes:BadSequenceIndex", ...
         "FAST_SEQUENCE_INDEX must be an integer from 1 through 500.");
 end
-if ismember(SequenceIndex, [24 50 52])
-    error("GreatLakes:ExcludedSequence", ...
-        "Sequence %d already has results and must not be rerun.", ...
-        SequenceIndex);
-end
-
 ResultsRoot = RequireEnvironmentPath("FAST_GL_RESULTS_DIR");
 TaskOutput = fullfile(ResultsRoot, "tasks", ...
     sprintf("Sequence_%04d", SequenceIndex));
 SharedCache = fullfile(ResultsRoot, "conventional_flight_cache");
+PreparedBaseFile = fullfile(ResultsRoot, "prepared", ...
+    "ERJ175LR_BaseAircraft.mat");
 if ~isfolder(TaskOutput), mkdir(TaskOutput); end
 if ~isfolder(SharedCache)
     error("GreatLakes:MissingConventionalCache", ...
         "Shared cache is missing. The preparation job must finish first.");
 end
+if ~isfile(PreparedBaseFile)
+    error("GreatLakes:MissingBaseAircraft", ...
+        "Prepared base aircraft are missing. The preparation job must finish first.");
+end
 
 setenv("FAST_SEQUENCE_OUTPUT_DIR", TaskOutput);
 setenv("FAST_CONVENTIONAL_CACHE_DIR", SharedCache);
+setenv("FAST_BASE_AIRCRAFT_FILE", PreparedBaseFile);
 setenv("FAST_PREPARE_CACHE_ONLY", "");
 Aggregate = RunAllSequencesFullComparisonParallel(1, 500, SequenceIndex);
 end

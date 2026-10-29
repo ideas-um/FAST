@@ -4,21 +4,8 @@ clearvars;
 clc;
 RunTimer = tic;
 
-if isfile(fullfile("output", "ERJ175LR_PHE_Sized.mat"))
-    Input = load(fullfile("output", "ERJ175LR_PHE_Sized.mat"));
-    if isfield(Input, "SizedAircraft")
-        Aircraft = Input.SizedAircraft;
-    elseif isfield(Input, "SizedPHE")
-        Aircraft = Input.SizedPHE;
-    else
-        error("The sized PHE file does not contain SizedAircraft or SizedPHE.");
-    end
-    InputFile = fullfile("output", "ERJ175LR_PHE_Sized.mat");
-else
-    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
-    Aircraft = Input.A;
-    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
-end
+[Aircraft, ~, SizingMetadata] = SizeERJ175LRBaseAircraft();
+InputFile = "AircraftSpecsPkg.ERJ175LR_PHE (sized at run start)";
 
 SequenceData = load("Sequence.mat", "tables");
 Sequence = SequenceData.tables{8};
@@ -75,6 +62,7 @@ FlightResults = table((1:nflight)', Sequence.DISTANCE, Sequence.GROUND_TIME, ...
 
 TotalRunTime_min = toc(RunTimer) / 60;
 RunMetadata = struct("SequenceIndex", 8, "InputFile", InputFile, ...
+    "SizingMetadata", SizingMetadata, ...
     "AnalysisType", -2, "InitialSeedAnalysisType", -1, ...
     "AircraftSizeFixed", true, ...
     "MaxIterations", 500, "MaxStarts", 1, ...

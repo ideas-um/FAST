@@ -21,7 +21,7 @@ if nargin < 2 || isempty(MaxIterations)
     MaxIterations = 500;
 end
 
-RunVersion = "all-sequences-thermal-fixed-evaluator-v3-true-lamups";
+RunVersion = "all-sequences-v4-source-sized-base-aircraft";
 RootDir = fileparts(mfilename("fullpath"));
 % Preserve every checkpoint from the earlier mixed-evaluator run. Corrected
 % results are written to a separate directory so no completed work is lost.
@@ -48,13 +48,39 @@ if any(SequenceIndices < 1 | SequenceIndices > nSequence)
     error("Sequence indices must be between 1 and %d.", nSequence);
 end
 
-PHEInputFile = ResolveInputFile("FAST_PHE_INPUT_FILE", fullfile( ...
-    RootDir, "output", "ERJ175LR_PHE_Sized.mat"));
-ConventionalInputFile = ResolveInputFile( ...
-    "FAST_CONVENTIONAL_INPUT_FILE", fullfile(RootDir, "output", ...
-    "ERJ175LR_Conventional_RegularTakeoff_Calibrated.mat"));
-PHEData = load(PHEInputFile, "SizedAircraft");
-BasePHE = PHEData.SizedAircraft;
+PreparedBaseFile = string(getenv("FAST_BASE_AIRCRAFT_FILE"));
+if strlength(PreparedBaseFile) == 0
+    [BasePHE, BaseConventional, SizingMetadata] = ...
+        SizeERJ175LRBaseAircraft();
+    PreparedBaseFile = "sized in this MATLAB run from specification functions";
+else
+    PreparedData = load(char(PreparedBaseFile), "BasePHE", ...
+        "BaseConventional", "SizingMetadata");
+    RequiredPreparedFields = ["BasePHE", "BaseConventional", ...
+        "SizingMetadata"];
+    if ~all(isfield(PreparedData, RequiredPreparedFields))
+        error("FAST:PreparedBaseAircraft:InvalidFile", ...
+            "Prepared base-aircraft file is incomplete: %s", ...
+            PreparedBaseFile);
+    end
+    BasePHE = PreparedData.BasePHE;
+    BaseConventional = PreparedData.BaseConventional;
+    SizingMetadata = PreparedData.SizingMetadata;
+end
+if ~logical(BasePHE.Settings.Converged) || ...
+        ~logical(BaseConventional.Settings.Converged) || ...
+        string(BasePHE.Specs.Propulsion.PropArch.Type) ~= "PHE" || ...
+        string(BaseConventional.Specs.Propulsion.PropArch.Type) ~= "C" || ...
+        BasePHE.Specs.Performance.RCMax ~= ...
+            BaseConventional.Specs.Performance.RCMax || ...
+        BasePHE.Specs.Propulsion.MDotCF ~= ...
+            BaseConventional.Specs.Propulsion.MDotCF || ...
+        BasePHE.Specs.Weight.WairfCF ~= ...
+            BaseConventional.Specs.Weight.WairfCF
+    error("FAST:PreparedBaseAircraft:ValidationFailed", ...
+        ["Prepared aircraft must be converged C/PHE designs with matching " ...
+         "climb-rate, fuel-flow, and airframe-weight requirements."]);
+end
 BasePHE.Specs.Battery.Charging = 150e3;
 BasePHE.Settings.GroundChargeModel = "ThermalEquivalentCircuit";
 BasePHE.Settings.BatterySOH_pct = 80;
@@ -63,8 +89,6 @@ BasePHE.Settings.PrintOut = 0;
 BasePHE.Settings.Plotting = 0;
 BasePHE.Settings.Table = 0;
 
-ConventionalData = load(ConventionalInputFile, "C");
-BaseConventional = ConventionalData.C;
 BaseConventional.Settings.PrintOut = 0;
 BaseConventional.Settings.Plotting = 0;
 BaseConventional.Settings.Table = 0;
@@ -72,8 +96,8 @@ BaseConventional.Settings.Table = 0;
 InputMetadata = struct( ...
     "RunVersion", RunVersion, ...
     "SequenceFile", "Sequence.mat", ...
-    "PHEInputFile", string(PHEInputFile), ...
-    "ConventionalInputFile", string(ConventionalInputFile), ...
+    "BaseAircraftSource", string(PreparedBaseFile), ...
+    "SizingMetadata", SizingMetadata, ...
     "SequenceCount", nSequence, ...
     "MaxIterations", MaxIterations, ...
     "ParallelWorkers", NumWorkers, ...
@@ -174,21 +198,6 @@ try
         RunVersion, CheckpointFile);
 catch ME
     SaveFailure(FailureDir, iSequence, RunVersion, MaxIterations, ME);
-end
-end
-
-
-function FileName = ResolveInputFile(EnvironmentVariable, DefaultFile)
-Requested = string(getenv(EnvironmentVariable));
-if strlength(Requested) == 0
-    FileName = DefaultFile;
-else
-    FileName = char(Requested);
-end
-if ~isfile(FileName)
-    error("RunAllSequences:MissingInputFile", ...
-        "%s does not exist. Set %s to the staged input file.", ...
-        FileName, EnvironmentVariable);
 end
 end
 
@@ -671,14 +680,24 @@ for k = 1:nCharge
     if isfield(C, "Time_s") && ~isempty(C.Time_s)
         ActualTime_min(k) = C.Time_s(end) / 60;
     end
-    if isfield(C, "SOCBeg"), SOCBeg_pct(k) = C.SOCBeg; ...
-    elseif isfield(C, "SOC") && ~isempty(C.SOC), SOCBeg_pct(k) = C.SOC(1); end
-    if isfield(C, "SOCEnd"), SOCEnd_pct(k) = C.SOCEnd; ...
-    elseif isfield(C, "SOC") && ~isempty(C.SOC), SOCEnd_pct(k) = C.SOC(end); end
+    if isfield(C, "SOCBeg")
+        SOCBeg_pct(k) = C.SOCBeg;
+    elseif isfield(C, "SOC") && ~isempty(C.SOC)
+        SOCBeg_pct(k) = C.SOC(1);
+    end
+    if isfield(C, "SOCEnd")
+        SOCEnd_pct(k) = C.SOCEnd;
+    elseif isfield(C, "SOC") && ~isempty(C.SOC)
+        SOCEnd_pct(k) = C.SOC(end);
+    end
     SOCAdded_pct(k) = SOCEnd_pct(k) - SOCBeg_pct(k);
-    if isfield(C, "GridEnergy_kWh"), GridEnergy_kWh(k) = C.GridEnergy_kWh; ...
-    elseif isfield(C, "EnergyFromGrid_J"), GridEnergy_kWh(k) = C.EnergyFromGrid_J / 3.6e6; ...
-    elseif isfield(C, "EnergyGrid_J"), GridEnergy_kWh(k) = C.EnergyGrid_J / 3.6e6; end
+    if isfield(C, "GridEnergy_kWh")
+        GridEnergy_kWh(k) = C.GridEnergy_kWh;
+    elseif isfield(C, "EnergyFromGrid_J")
+        GridEnergy_kWh(k) = C.EnergyFromGrid_J / 3.6e6;
+    elseif isfield(C, "EnergyGrid_J")
+        GridEnergy_kWh(k) = C.EnergyGrid_J / 3.6e6;
+    end
     if isfield(C, "TemperatureEnd_C")
         TemperatureEnd_C(k) = C.TemperatureEnd_C;
     end

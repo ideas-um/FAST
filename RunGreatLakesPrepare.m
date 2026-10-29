@@ -4,11 +4,19 @@ function Aggregate = RunGreatLakesPrepare()
 ResultsRoot = RequireEnvironmentPath("FAST_GL_RESULTS_DIR");
 PrepareOutput = fullfile(ResultsRoot, "prepare");
 SharedCache = fullfile(ResultsRoot, "conventional_flight_cache");
+PreparedDir = fullfile(ResultsRoot, "prepared");
+PreparedBaseFile = fullfile(PreparedDir, "ERJ175LR_BaseAircraft.mat");
 if ~isfolder(PrepareOutput), mkdir(PrepareOutput); end
 if ~isfolder(SharedCache), mkdir(SharedCache); end
+if ~isfolder(PreparedDir), mkdir(PreparedDir); end
+
+% Size both aircraft once on Great Lakes from the checked-out source.  The
+% array jobs reuse this run-local file; no aircraft MAT input is transferred.
+SizeERJ175LRBaseAircraft(PreparedBaseFile);
 
 setenv("FAST_SEQUENCE_OUTPUT_DIR", PrepareOutput);
 setenv("FAST_CONVENTIONAL_CACHE_DIR", SharedCache);
+setenv("FAST_BASE_AIRCRAFT_FILE", PreparedBaseFile);
 setenv("FAST_PREPARE_CACHE_ONLY", "1");
 Cleanup = onCleanup(@() setenv("FAST_PREPARE_CACHE_ONLY", ""));
 

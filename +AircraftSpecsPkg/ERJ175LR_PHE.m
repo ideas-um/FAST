@@ -70,7 +70,7 @@ Aircraft.Specs.Performance.Alts.Crs = UnitConversionPkg.ConvLength(35000, "ft", 
 Aircraft.Specs.Performance.Range = UnitConversionPkg.ConvLength(2150, "naut mi", "m");
 
 % maximum rate of climb (m/s), assumed 2,250 ft/min (and converted)
-Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(2095, "ft/min", "m/s");
+Aircraft.Specs.Performance.RCMax = UnitConversionPkg.ConvVel(2250, "ft/min", "m/s");
 
 
 %% AERODYNAMICS %%

@@ -3,13 +3,12 @@
 clearvars;
 clc;
 
-InputFile = "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat";
 OutputFile = "ERJ175LR_MissionPowerOpt_LamDwn.mat";
 PaperFuel_kg = 14697;
 PaperBatteryEnergy_kWh = 635.3;
 
-Input = load(InputFile, "SizedAircraft");
-BaselineAircraft = Input.SizedAircraft;
+[BaselineAircraft, ~, SizingMetadata] = SizeERJ175LRBaseAircraft();
+InputFile = "AircraftSpecsPkg.ERJ175LR_PHE (sized at run start)";
 BaselineAircraft.Settings.Analysis.MaxIter = 1;
 BaselineAircraft.Settings.PowerOptMaxIter = 100;
 
@@ -40,6 +39,7 @@ RunMetadata = struct( ...
     "MaxSQPIterations", 100, ...
     "ConvergenceStatus", "optimizer-controlled", ...
     "InputFile", InputFile, ...
+    "SizingMetadata", SizingMetadata, ...
     "OptimizerTime_min", OptimizerTime_min, ...
     "ElectricMotorWeight_kg", ElectricMotorWeight_kg);
 

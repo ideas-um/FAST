@@ -18,24 +18,12 @@ if ~isfolder(CheckpointDir)
     mkdir(CheckpointDir);
 end
 
-HybridData = load(fullfile(RootDir, ...
-    "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat"), "SizedAircraft");
-HybridAircraft = HybridData.SizedAircraft;
+[HybridAircraft, ConventionalAircraft, SizingMetadata] = ...
+    SizeERJ175LRBaseAircraft();
 HybridAircraft.Settings.Analysis.Type = -1;
 HybridAircraft.Settings.PowerOptMaxIter = MaxIterations;
 HybridAircraft.Specs.Battery.Charging = 150e3;
 
-ConventionalFile = fullfile(RootDir, "ERJ175LR_conventional_current.mat");
-if isfile(ConventionalFile)
-    ConventionalData = load(ConventionalFile, "ConventionalAircraft");
-    ConventionalAircraft = ConventionalData.ConventionalAircraft;
-else
-    ConventionalAircraft = AircraftSpecsPkg.ERJ175LR;
-    ConventionalAircraft.Settings.PrintOut = 0;
-    ConventionalAircraft = Main(ConventionalAircraft, ...
-        @MissionProfilesPkg.ERJ_ClimbThenAccel);
-    save(ConventionalFile, "ConventionalAircraft", "-v7.3");
-end
 ConventionalAircraft.Settings.Analysis.Type = -1;
 ConventionalAircraft.Settings.PrintOut = 0;
 ConventionalAircraft.Settings.Table = 0;
@@ -89,6 +77,7 @@ parfor WorkIndex = 1:numel(SequenceIndices)
             "ChargingRule", "GROUND_TIME(next flight) - 7 minutes", ...
             "Objective", "Total main-mission fuel burn", ...
             "AircraftSizeFixed", true, ...
+            "SizingMetadata", SizingMetadata, ...
             "Completed", string(datetime("now")));
 
         SaveSuccessCheckpoint(CheckpointFile, Status, Sequence, PCbest, ...

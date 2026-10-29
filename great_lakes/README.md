@@ -1,27 +1,46 @@
 # Great Lakes first-500 sequence run
 
-This workflow runs sequence indices 1 through 500, excluding 24, 50, and
-52 because those results already exist. It submits:
+This workflow runs sequence indices 1 through 500. Older results are not
+reused because the base aircraft are freshly sized for this run. It submits:
 
-1. one cache-preparation job for the 80 exact conventional FAST flights;
-2. a 497-task Slurm array, with one sequence per MATLAB process; and
+1. one preparation job that sizes the conventional and PHE aircraft from
+   their current specification functions and caches the 80 exact
+   conventional FAST flights;
+2. a 500-task Slurm array, with one sequence per MATLAB process; and
 3. one dependent aggregation job that writes combined MAT and CSV results.
 
 Each sequence has an isolated output directory, so concurrent MATLAB jobs
 cannot overwrite another task's checkpoint or summary. Rerunning the same
 submission is safe: a task whose valid checkpoint already exists is skipped.
 
-## Required staged inputs
+No sized-aircraft MAT files are staged or transferred. The preparation job
+runs `Main(AircraftSpecsPkg.ERJ175LR, ...)` and
+`Main(AircraftSpecsPkg.ERJ175LR_PHE, ...)` once on Great Lakes, validates
+that both converge, and saves a run-local pair for the dependent array jobs.
 
-The sized aircraft files are intentionally excluded from Git. Copy the exact
-files used on `emmascodemachin` into a Great Lakes input directory:
+## Smoke test first
 
-```text
-ERJ175LR_PHE_Sized.mat
-ERJ175LR_Conventional_RegularTakeoff_Calibrated.mat
+Use the same results directory planned for the production run:
+
+```bash
+cd /path/to/FAST
+chmod +x great_lakes/*.sh great_lakes/*.sbatch
+export FAST_GL_RESULTS_DIR=/scratch/YOUR_ACCOUNT/YOUR_UNIQNAME/fast_first_500
+./great_lakes/submit_smoke_test.sh YOUR_SLURM_ACCOUNT
 ```
 
-The first file must contain `SizedAircraft`; the second must contain `C`.
+Wait for the job to leave the queue, then require both a successful Slurm
+state and the current-version pass marker:
+
+```bash
+sacct -j SMOKE_JOB_ID --format=JobID,State,ExitCode,Elapsed,MaxRSS
+cat "$FAST_GL_RESULTS_DIR/logs/smoke-SMOKE_JOB_ID.out"
+cat "$FAST_GL_RESULTS_DIR/smoke/SmokeTest.passed"
+```
+
+The log must contain `GREAT_LAKES_SMOKE_TEST=PASS`. The full submission
+script refuses to submit without this pass marker unless
+`FAST_SKIP_SMOKE_CHECK=1` is explicitly set.
 
 ## Submit
 
@@ -31,7 +50,6 @@ On a Great Lakes login node, clone or update this branch and then run:
 cd /path/to/FAST
 chmod +x great_lakes/*.sh great_lakes/*.sbatch
 export FAST_GL_RESULTS_DIR=/scratch/YOUR_ACCOUNT/YOUR_UNIQNAME/fast_first_500
-export FAST_GL_INPUT_DIR=/path/to/staged/aircraft_inputs
 export FAST_GL_ARRAY_LIMIT=20
 ./great_lakes/submit_first_500.sh YOUR_SLURM_ACCOUNT
 ```

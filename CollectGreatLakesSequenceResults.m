@@ -1,9 +1,9 @@
 function Aggregate = CollectGreatLakesSequenceResults()
 %COLLECTGREATLAKESSEQUENCERESULTS Aggregate first-500 array checkpoints.
 
-RunVersion = "all-sequences-thermal-fixed-evaluator-v3-true-lamups";
+RunVersion = "all-sequences-v4-source-sized-base-aircraft";
 MaxIterations = 500;
-Selected = setdiff((1:500)', [24; 50; 52], "stable");
+Selected = (1:500)';
 ResultsRoot = string(getenv("FAST_GL_RESULTS_DIR"));
 if strlength(ResultsRoot) == 0
     error("GreatLakes:MissingEnvironment", ...

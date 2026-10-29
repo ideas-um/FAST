@@ -6,11 +6,11 @@ function [SizedAircraft, RunMetadata] = RunPaperERJ175LRSizing(OutputFile)
 % rating; the gas turbines provide the remaining required power.
 
 if nargin < 1
-    OutputFile = fullfile(pwd, ...
-        "ERJ175LR_current_Lam_10pctTko_30pctEMClimb.mat");
+    OutputFile = fullfile(fileparts(mfilename("fullpath")), "output", ...
+        "ERJ175LR_PHE_Sized.mat");
 end
 
-Aircraft = AircraftSpecsPkg.ERJ175LR_Elec;
+Aircraft = AircraftSpecsPkg.ERJ175LR_PHE;
 
 Aircraft.Specs.Power.SpecEnergy.Batt = 0.25;
 
@@ -59,5 +59,7 @@ CurrentBranch = [SizedAircraft.Specs.Weight.MTOW; ...
 DifferencePercent = 100 .* (CurrentBranch - Paper) ./ Paper;
 PaperComparison = table(Metric, Paper, CurrentBranch, DifferencePercent);
 
+OutputDir = fileparts(OutputFile);
+if ~isfolder(OutputDir), mkdir(OutputDir); end
 save(OutputFile, "SizedAircraft", "RunMetadata", "PaperComparison", "-v7.3");
 end

@@ -5,17 +5,8 @@
 clearvars;
 clc;
 
-if isfile(fullfile("output", "ERJ175LR_PHE_sized.mat"))
-    Input = load(fullfile("output", "ERJ175LR_PHE_sized.mat"), "SizedPHE");
-    Aircraft = Input.SizedPHE;
-    InputFile = fullfile("output", "ERJ175LR_PHE_sized.mat");
-elseif isfile(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"))
-    Input = load(fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat"), "A");
-    Aircraft = Input.A;
-    InputFile = fullfile("output", "ERJ175LR_PHE_sized_cycle_fixed.mat");
-else
-    error("No saved fixed-size ERJ17LR PHE aircraft was found in output.");
-end
+[Aircraft, ~, SizingMetadata] = SizeERJ175LRBaseAircraft();
+InputFile = "AircraftSpecsPkg.ERJ175LR_PHE (sized at run start)";
 SequenceData = load("Sequence.mat", "tables");
 Sequence = SequenceData.tables{8};
 Aircraft.Settings.PowerOptMaxIter = 500;
@@ -99,6 +90,7 @@ PaperComparison = table( ...
 ElectricMotorWeight_kg = sum(Aircraft.Specs.Weight.EM, "all");
 RunMetadata = struct("SequenceIndex", 8, ...
     "InputFile", InputFile, ...
+    "SizingMetadata", SizingMetadata, ...
     "MaxOptimizerIterationsPerFlight", 500, ...
     "ChargerPower_kW", 150, ...
     "ChargingRule", "GROUND_TIME(next flight) - 7 minutes", ...

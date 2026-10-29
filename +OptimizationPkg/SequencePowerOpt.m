@@ -1,6 +1,6 @@
-function [OptimizedAircraft, PCbest, t, OptSeqTable, exitflag, OptimizerOutput] = SequencePowerOpt(Aircraft, Sequence)
+function [OptimizedAircraft, PCbest, t, OptSeqTable, exitflag, OptimizerOutput] = SequencePowerOpt(Aircraft, Sequence, InitialBaseline)
 %
-% OptimizedAircraft = SequencePowerOpt(Aircraft, Sequence)
+% OptimizedAircraft = SequencePowerOpt(Aircraft, Sequence, InitialBaseline)
 % written by Emma Cassidy, emmasmit@umich.edu
 % updated for mission-indexed LamDwn scheduling
 %
@@ -11,8 +11,14 @@ function [OptimizedAircraft, PCbest, t, OptSeqTable, exitflag, OptimizerOutput] 
 %
 %
 % INPUTS: 
-%   Aircraft - Aircraft struct with desired power code starting values and 
-%              desired mission conditions. 
+%   Aircraft - Aircraft struct with desired power code starting values and
+%              desired mission conditions
+%   Sequence - table containing the flights in the sequence
+%   InitialBaseline - optional scalar struct from a previously completed
+%       feasible -2 sequence replay. Required fields are PC, Fuel_kg,
+%       MTOW_kg, and LamDwn. Optional MinimumPC supplies additional
+%       multistart points. When provided, the regular -1 flown-sequence
+%       seed is not rebuilt.
 % OUTPUTS:
 %   OptAircraft - optimized aircraft struct with optimial power code
 
@@ -20,6 +26,10 @@ function [OptimizedAircraft, PCbest, t, OptSeqTable, exitflag, OptimizerOutput] 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % objective function selection
+if nargin < 3
+    InitialBaseline = [];
+end
+
 %if cost load cost table
 PackageDir = fileparts(mfilename("fullpath"));
 priceTable = readtable(fullfile(PackageDir, "..", "+CostPkg", "Energy_CostbyAirport.xlsx"));
@@ -204,28 +214,48 @@ FlightFuelSeed = repmat(Aircraft.Specs.Weight.Fuel, nflight, 1);
 FlightMTOWSeed = repmat(Aircraft.Specs.Weight.MTOW, nflight, 1);
 LastEvaluationFailure = "";
 EvalCache = containers.Map("KeyType", "char", "ValueType", "any");
-% Generate the sequence starting point from a normal Type -1 off-design
-% replay. This mirrors MissionPowerOpt's use of a flown feasible schedule,
-% while preserving SOC/ground-charge coupling across all flights.
-[FlownPC0, MinimumPC0, FlightFuelSeedCandidate, ...
-    FlightMTOWSeedCandidate, FlightLamDwnSeed, ...
-    FlownSeedValid, FlownSeedFailure] = ...
-    BuildFlownSequenceSeed(Aircraft, Sequence, PC0);
-if FlownSeedValid
-    FlightFuelSeed = FlightFuelSeedCandidate;
-    FlightMTOWSeed = FlightMTOWSeedCandidate;
-    [ProjectedPC0, ProjectedSeedValid] = FindFeasibleSequenceSeed( ...
-        FlownPC0, MinimumPC0, Aircraft, Sequence);
-    if ProjectedSeedValid
-        PC0 = ProjectedPC0;
-        PCFloor = MinimumPC0;
+if isempty(InitialBaseline)
+    % Generate the sequence starting point from a normal Type -1 off-design
+    % replay. This mirrors MissionPowerOpt's use of a flown feasible schedule,
+    % while preserving SOC/ground-charge coupling across all flights.
+    [FlownPC0, MinimumPC0, FlightFuelSeedCandidate, ...
+        FlightMTOWSeedCandidate, FlightLamDwnSeed, ...
+        FlownSeedValid, FlownSeedFailure] = ...
+        BuildFlownSequenceSeed(Aircraft, Sequence, PC0);
+    if FlownSeedValid
+        FlightFuelSeed = FlightFuelSeedCandidate;
+        FlightMTOWSeed = FlightMTOWSeedCandidate;
+        [ProjectedPC0, ProjectedSeedValid] = FindFeasibleSequenceSeed( ...
+            FlownPC0, MinimumPC0, Aircraft, Sequence);
+        if ProjectedSeedValid
+            PC0 = ProjectedPC0;
+            PCFloor = MinimumPC0;
+        else
+            PC0 = FlownPC0;
+            PCFloor = PC0;
+        end
     else
-        PC0 = FlownPC0;
-        PCFloor = PC0;
+        error("OptimizationPkg:SequencePowerOpt:SeedFailure", ...
+            "The regular -1 sequence seed failed: %s", FlownSeedFailure);
     end
 else
-    error("OptimizationPkg:SequencePowerOpt:SeedFailure", ...
-        "The regular -1 sequence seed failed: %s", FlownSeedFailure);
+    [PC0, PCFloor, FlightFuelSeed, FlightMTOWSeed, FlightLamDwnSeed] = ...
+        ParseInitialBaseline(InitialBaseline);
+
+    % The caller asserts that this is a completed -2 replay. Check it once
+    % with the exact evaluator and retain that result in the evaluation cache
+    % for the objective/constraint calls at the initial fmincon point.
+    [~, BaselineSOC, BaselineRC, BaselinePowerExcess, ...
+        BaselineMTOWExcess, BaselineValid] = ...
+        FlySequence(PC0, Aircraft, Sequence);
+    BaselineConstraints = SequenceConstraints(BaselineSOC, BaselineRC, ...
+        BaselinePowerExcess, BaselineMTOWExcess, Aircraft);
+    if ~BaselineValid || ...
+            max(BaselineConstraints, [], "all") > options.ConstraintTolerance
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselineInfeasible", ...
+            ["The supplied InitialBaseline is not feasible under the " ...
+            "complete -2 sequence evaluator."]);
+    end
 end
 
 % A caller that supplies a previously converged per-flight control schedule
@@ -233,8 +263,9 @@ end
 % states.  Otherwise the controls are replayed at the regular/unoptimized
 % sequence weights, so the advertised initial point is not the same point
 % that MissionPowerOpt produced (especially after SOC carryover changes).
-if isfield(Aircraft.Settings, "PowerOptInitialFuel_kg") || ...
-        isfield(Aircraft.Settings, "PowerOptInitialMTOW_kg")
+if isempty(InitialBaseline) && ...
+        (isfield(Aircraft.Settings, "PowerOptInitialFuel_kg") || ...
+        isfield(Aircraft.Settings, "PowerOptInitialMTOW_kg"))
     if ~(isfield(Aircraft.Settings, "PowerOptInitialFuel_kg") && ...
             isfield(Aircraft.Settings, "PowerOptInitialMTOW_kg"))
         error("OptimizationPkg:SequencePowerOpt:InitialWeightState", ...
@@ -259,7 +290,8 @@ end
 % Preserve the uncontrolled main-mission rows from the caller's exact -2
 % unoptimized replay. PC controls takeoff/climb; this schedule keeps cruise,
 % descent, and other uncontrolled rows identical at the incumbent point.
-if isfield(Aircraft.Settings, "PowerOptInitialLamDwn")
+if isempty(InitialBaseline) && ...
+        isfield(Aircraft.Settings, "PowerOptInitialLamDwn")
     RequestedLamDwnSeed = Aircraft.Settings.PowerOptInitialLamDwn;
     if ~iscell(RequestedLamDwnSeed) || numel(RequestedLamDwnSeed) ~= nflight
         error("OptimizationPkg:SequencePowerOpt:InitialLamDwnSize", ...
@@ -281,7 +313,8 @@ end
 % Callers may provide a previously flown/optimized schedule for the whole
 % sequence. Clamp it to the turbine-required electric floor and project it
 % through the same complete-sequence feasibility check before using it.
-if isfield(Aircraft.Settings, "PowerOptInitialPC")
+if isempty(InitialBaseline) && ...
+        isfield(Aircraft.Settings, "PowerOptInitialPC")
     RequestedPC0 = Aircraft.Settings.PowerOptInitialPC;
     if isequal(size(RequestedPC0), size(PC0)) && all(isfinite(RequestedPC0), "all")
         % Test the requested schedule itself before applying any fallback
@@ -421,6 +454,7 @@ if InitialValid && isfinite(InitialObjective) && ...
     OptimizerOutput.ReplayObjective_kg = InitialObjective;
     OptimizerOutput.MaxConstraint = InitialMaxConstraint;
 end
+OptimizerOutput.UsedProvidedInitialBaseline = ~isempty(InitialBaseline);
 t = toc / 60;
 
 % Ensure the returned aircraft sequence corresponds exactly to PCbest,
@@ -456,7 +490,10 @@ end
         ForceReplay = false;
     end
     CacheKey = sprintf("%.17g,", PC(:));
-    if ~ForceReplay && ~UseParallel && isKey(EvalCache, CacheKey)
+    % Reuse every exact control point evaluated in this MATLAB process.
+    % Parallel workers have independent maps, but can still reuse duplicate
+    % objective/constraint calls that are assigned to the same worker.
+    if ~ForceReplay && isKey(EvalCache, CacheKey)
         Cached = EvalCache(CacheKey);
         TotalFuel = Cached.TotalFuel;
         SOC = Cached.SOC;
@@ -713,14 +750,81 @@ end
     SaveEvaluation();
 
     function SaveEvaluation()
-        if ~UseParallel
-            EvalCache(CacheKey) = struct( ...
-                "TotalFuel", TotalFuel, "SOC", SOC, "dh_dt", dh_dt, ...
-                "PowerExcess", PowerExcess, "MTOWExcess", MTOWExcess, ...
-                "Valid", Valid);
-        end
+        EvalCache(CacheKey) = struct( ...
+            "TotalFuel", TotalFuel, "SOC", SOC, "dh_dt", dh_dt, ...
+            "PowerExcess", PowerExcess, "MTOWExcess", MTOWExcess, ...
+            "Valid", Valid);
     end
 
+end
+
+function [BaselinePC, MinimumPC, BaselineFuel, BaselineMTOW, ...
+        BaselineLamDwn] = ParseInitialBaseline(Baseline)
+    RequiredFields = ["PC", "Fuel_kg", "MTOW_kg", "LamDwn"];
+    if ~isstruct(Baseline) || ~isscalar(Baseline)
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselineType", ...
+            "InitialBaseline must be a scalar struct.");
+    end
+    MissingFields = RequiredFields(~isfield(Baseline, RequiredFields));
+    if ~isempty(MissingFields)
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselineFields", ...
+            "InitialBaseline is missing required field(s): %s.", ...
+            strjoin(MissingFields, ", "));
+    end
+
+    BaselinePC = Baseline.PC;
+    if ~isnumeric(BaselinePC) || ~isequal(size(BaselinePC), size(PC0)) || ...
+            any(~isfinite(BaselinePC), "all") || ...
+            any(BaselinePC < 0 | BaselinePC > 1, "all")
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselinePC", ...
+            "InitialBaseline.PC must be a finite %d-by-%d array in [0, 1].", ...
+            size(PC0, 1), size(PC0, 2));
+    end
+
+    if isfield(Baseline, "MinimumPC")
+        MinimumPC = Baseline.MinimumPC;
+        if ~isnumeric(MinimumPC) || ...
+                ~isequal(size(MinimumPC), size(BaselinePC)) || ...
+                any(~isfinite(MinimumPC), "all") || ...
+                any(MinimumPC < 0 | MinimumPC > BaselinePC, "all")
+            error("OptimizationPkg:SequencePowerOpt:InitialBaselineMinimumPC", ...
+                ["InitialBaseline.MinimumPC must match PC and lie between " ...
+                "zero and PC."]);
+        end
+    else
+        % Without a separately established turbine-feasible floor, use only
+        % the known-feasible baseline as the multistart seed.
+        MinimumPC = BaselinePC;
+    end
+
+    BaselineFuel = Baseline.Fuel_kg(:);
+    BaselineMTOW = Baseline.MTOW_kg(:);
+    if numel(BaselineFuel) ~= nflight || ...
+            numel(BaselineMTOW) ~= nflight || ...
+            any(~isfinite(BaselineFuel)) || any(BaselineFuel <= 0) || ...
+            any(~isfinite(BaselineMTOW)) || any(BaselineMTOW <= 0)
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselineWeightState", ...
+            ["InitialBaseline Fuel_kg and MTOW_kg must each contain %d " ...
+            "finite, positive values."], nflight);
+    end
+
+    BaselineLamDwn = Baseline.LamDwn;
+    if ~iscell(BaselineLamDwn) || numel(BaselineLamDwn) ~= nflight
+        error("OptimizationPkg:SequencePowerOpt:InitialBaselineLamDwn", ...
+            "InitialBaseline.LamDwn must contain one array per flight.");
+    end
+    BaselineLamDwn = BaselineLamDwn(:);
+    for iBaselineFlight = 1:nflight
+        ThisLamDwn = BaselineLamDwn{iBaselineFlight};
+        if ~isnumeric(ThisLamDwn) || ...
+                ~isequal(size(ThisLamDwn), ...
+                size(Aircraft.Specs.Power.LamDwn.Miss)) || ...
+                any(~isfinite(ThisLamDwn), "all")
+            error("OptimizationPkg:SequencePowerOpt:InitialBaselineLamDwn", ...
+                "InitialBaseline.LamDwn{%d} has an invalid size or value.", ...
+                iBaselineFlight);
+        end
+    end
 end
 
 function [PCSeed, MinimumPC, FlightFuel, FlightMTOW, FlightLamDwn, ...
@@ -1133,19 +1237,13 @@ end
 
 function Starts = BuildStartPoints(PC0, PCFloor, MaxStarts)
 MaxStarts = max(1, floor(MaxStarts));
-Starts = cell(min(MaxStarts, 3), 1);
-% Begin with the aircraft's off-design schedule, which is the closest
-% sequence analogue to MissionPowerOpt's feasible flown initialization.
-Starts{1} = PC0;
-
-if numel(Starts) >= 2
-    Starts{2} = PCFloor;
-end
-
-if numel(Starts) >= 3
-    % Retain the turbine-feasible per-point floor while conserving more
-    % battery than the primary off-design-derived starting schedule.
-    Starts{3} = PCFloor + 0.5 .* (PC0 - PCFloor);
+Candidates = {PC0, PCFloor, PCFloor + 0.5 .* (PC0 - PCFloor)};
+Starts = cell(0, 1);
+for iCandidate = 1:min(MaxStarts, numel(Candidates))
+    Candidate = Candidates{iCandidate};
+    if ~any(cellfun(@(Existing) isequal(Existing, Candidate), Starts))
+        Starts{end + 1, 1} = Candidate; %#ok<AGROW>
+    end
 end
 end
 

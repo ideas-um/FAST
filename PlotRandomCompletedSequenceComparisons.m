@@ -62,6 +62,15 @@ for iSample = 1:numel(Selected)
     SequencePlotDir = fullfile(PlotRoot, sprintf("Sequence_%04d", iSequence));
     if ~isfolder(SequencePlotDir), mkdir(SequencePlotDir); end
 
+    % Confirm that the lambda profiles used by the plots agree with the
+    % recorded mission-history Pav and Pout. Successful checks print only a
+    % PASSED line; failures also save the exact offending mission points.
+    PowerSplitCheck = CheckMissionPowerSplits(InputFile);
+    if ~PowerSplitCheck.Passed
+        writetable(PowerSplitCheck.Violations, fullfile(SequencePlotDir, ...
+            sprintf("Sequence_%04d_PowerSplitViolations.csv", iSequence)));
+    end
+
     Cases = ["Joint", "Individual", "Unoptimized", "Conventional"];
     Timelines = struct;
     for iCase = 1:numel(Cases)

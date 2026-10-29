@@ -76,7 +76,7 @@ OptSeqTable = table('Size', sz, 'VariableTypes', varTypes, ...
 %                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-MaxOptIter = 200;
+MaxOptIter = 500;
 if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptMaxIter")
     MaxOptIter = Aircraft.Settings.PowerOptMaxIter;
 end
@@ -137,6 +137,7 @@ options.MaxFunctionEvaluations = 10^9;
 
 % run off design mission
 Aircraft.Settings.Analysis.Type = -2;
+
 % Match MissionPowerOpt's fixed-aircraft fuel/MTOW iteration exactly so an
 % identical lambda schedule has the same objective in both optimizers.
 Aircraft.Settings.Analysis.FuelRelaxation = 0.5;
@@ -160,6 +161,7 @@ Aircraft.Specs.Power.Battery.BegSOC = 100;
 % Build the mission-indexed lambda schedules used by Main, then identify
 % the transmitter columns for the PHE architecture.
 Aircraft = PrepareSequenceAircraft(Aircraft);
+
 % Preserve the certified/sized-aircraft takeoff-weight limit. Candidate
 % evaluations below iterate the actual carried fuel and takeoff mass, so
 % Aircraft.Specs.Weight.MTOW is no longer a suitable structural limit.
@@ -204,6 +206,7 @@ FlightFuelSeed = repmat(Aircraft.Specs.Weight.Fuel, nflight, 1);
 FlightMTOWSeed = repmat(Aircraft.Specs.Weight.MTOW, nflight, 1);
 LastEvaluationFailure = "";
 EvalCache = containers.Map("KeyType", "char", "ValueType", "any");
+
 % Generate the sequence starting point from a normal Type -1 off-design
 % replay. This mirrors MissionPowerOpt's use of a flown feasible schedule,
 % while preserving SOC/ground-charge coupling across all flights.
@@ -302,6 +305,7 @@ if isfield(Aircraft.Settings, "PowerOptInitialPC")
 end
 lb = zeros(size(PC0));
 ub = ones(size(PC0));
+
 %% Run the Optimizer %%
 %%%%%%%%%%%%%%%%%%%%%%%%%
 tic

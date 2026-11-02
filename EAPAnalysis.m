@@ -156,8 +156,9 @@ end
 % assume the sizing converges
 Aircraft.Settings.Converged = 1;
 
-% define convergence tolerance
-EPS = 1.0e-3;
+% Use the requested sizing tolerance. A tighter aircraft-specific value keeps
+% the final mission history synchronized with the converged component weights.
+EPS = Aircraft.Settings.Analysis.Tol;
 
 % iteration counter
 iter = 0;

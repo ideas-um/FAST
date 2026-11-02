@@ -308,6 +308,7 @@ DefaultSettings.DesPoints = 10;
 DefaultSettings.OEW.MaxIter = 20;
 DefaultSettings.OEW.Tol = 1e-6;
 DefaultSettings.Analysis.MaxIter = 50;
+DefaultSettings.Analysis.Tol = 1e-3;
 DefaultSettings.Analysis.Type = 1;       % 1 = on design. -1 = off design
 DefaultSettings.PowerManagement.Mode = "RecomputeLambda";
 DefaultSettings.Plotting = 0;            % 1 = plot 0 = no plots

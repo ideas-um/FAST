@@ -40,15 +40,13 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %% MODEL CALIBRATION FACTORS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.002;
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000;
-
-% fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.029;
-
-% airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 1.018;
+% Keep the conventional-aircraft calibration fixed for electrified variants,
+% as required by the ERJ175LR study basis in Cassidy et al. (2025).
+% https://doi.org/10.3390/aerospace12070598
+Aircraft.Specs.Aero.L_D.ClbCF = 1.000;
+Aircraft.Specs.Aero.L_D.CrsCF = 1.002;
+Aircraft.Specs.Propulsion.MDotCF = 1.04424;
+Aircraft.Specs.Weight.WairfCF = 0.98237;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -255,6 +253,9 @@ Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
 Aircraft.Settings.Analysis.MaxIter = 30;
+
+% match the conventional baseline's sizing-closure fidelity
+Aircraft.Settings.Analysis.Tol = 1e-6;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

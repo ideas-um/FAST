@@ -520,6 +520,7 @@ if ~isfield(Aircraft,"Settings")
     Aircraft.Settings.Degradation = NaN;
     Aircraft.Settings.OEW.Tol = NaN;
     Aircraft.Settings.Analysis.MaxIter = NaN;
+    Aircraft.Settings.Analysis.Tol = NaN;
     Aircraft.Settings.Analysis.Type = NaN;
     Aircraft.Settings.PowerManagement.Mode = "RecomputeLambda";
     Aircraft.Settings.Plotting = NaN;
@@ -554,10 +555,14 @@ else
     end
     if ~isfield(Aircraft.Settings,"Analysis")
         Aircraft.Settings.Analysis.MaxIter = NaN;
+        Aircraft.Settings.Analysis.Tol = NaN;
         Aircraft.Settings.Analysis.Type = NaN;
     else
         if ~isfield(Aircraft.Settings.Analysis,"MaxIter")
             Aircraft.Settings.Analysis.MaxIter = NaN;
+        end
+        if ~isfield(Aircraft.Settings.Analysis,"Tol")
+            Aircraft.Settings.Analysis.Tol = NaN;
         end
         if ~isfield(Aircraft.Settings.Analysis,"Type")
             Aircraft.Settings.Analysis.Type = NaN;

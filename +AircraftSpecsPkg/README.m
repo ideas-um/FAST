@@ -377,6 +377,11 @@ function [] = README()
 %                on-design or off-design alaysis
 %                Units / Default Value: -- / 50
 %           ---------------------------------------------------------------
+%           (69a) Aircraft.Settings.Analysis.Tol
+%                Description: Relative convergence tolerance for fuel,
+%                battery, and maximum takeoff weight sizing updates.
+%                Units / Default Value: -- / 1e-3
+%           ---------------------------------------------------------------
 %           (70) Aircraft.Settings.Analysis.Type
 %                Description: On-design or off-design analysis flag
 %                Units / Default Value: -- / 1

@@ -38,13 +38,11 @@ PowerDeficit = zeros(npnt, 1);
 
 PropArch = Aircraft.Specs.Propulsion.PropArch;
 ParConns = PropArch.ParConns;
-ParIndx = find(cellfun(@(x) ~isempty(x), ParConns));
-if (isempty(ParIndx))
+if (isempty(ParConns))
     return
 end
 
 Arch = PropArch.Arch;
-nsrc = length(PropArch.SrcType);
 [~, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
 ActivePoint = any(LamUps > 0, 2);
 ActiveComponent = false(1, ncomp);
@@ -53,14 +51,15 @@ ActiveComponent = false(1, ncomp);
 %% COMPUTE PARALLEL-GROUP RESIDUALS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for ipar = 1:length(ParIndx)
-    imain = ParIndx(ipar) + nsrc;
-    isupp = ParConns{ParIndx(ipar)};
+for ipar = 1:length(ParConns)
+    Group = ParConns(ipar);
+    imain = Group.Driving;
+    isupp = Group.Helping;
     jdx = [imain, isupp(:)'];
-    iups = find(sum(Arch(jdx, :), 1) == length(jdx));
+    iups = Group.Target;
 
-    if (~isscalar(iups))
-        error("ERROR - FullPowerLambdaConstraints: parallel group must have one common downstream component.");
+    if (~isscalar(iups) || ~all(Arch(jdx, iups) > 0))
+        error("ERROR - FullPowerLambdaConstraints: invalid parallel connection group.");
     end
 
     ActiveComponent(jdx) = true;

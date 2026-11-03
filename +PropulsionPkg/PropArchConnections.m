@@ -31,8 +31,11 @@ Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
 ntrn = length(Aircraft.Specs.Propulsion.PropArch.TrnType);
 
-% assume there are no parallel connections
-Aircraft.Specs.Propulsion.PropArch.ParConns = cell(1, ntrn);
+% Retain one record per shared downstream target. Indexing only by the
+% driving engine loses the target identity and cannot represent an engine
+% that participates in more than one parallel group.
+EmptyGroup = struct("Driving", [], "Helping", [], "Target", []);
+Aircraft.Specs.Propulsion.PropArch.ParConns = repmat(EmptyGroup, 0, 1);
 
 
 %% FIND THE POWER SOURCES IN PARALLEL %%
@@ -55,7 +58,7 @@ end
 %% FLAG PARALLEL ENGINE-EM CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% get the cell array showing the engine and electric motor connections
+% get the records showing each engine / electric-motor parallel group
 ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
 
 % get the transmitter types
@@ -75,9 +78,16 @@ for iconn = 1:length(AnyParallel)
     
     % update both driving and helping components are not empty
     if (~isempty(Driving) && ~isempty(Helping))
-    
-        % list the electric motors
-        ParConns{Driving} = [ParConns{Driving}; Helping];
+
+        % Store a separate record for each engine at this target. Component
+        % indices are absolute so consumers do not need mixed offset rules.
+        for idrive = Driving
+            Group = EmptyGroup;
+            Group.Driving = idrive + nsrc;
+            Group.Helping = Helping;
+            Group.Target = icomp;
+            ParConns(end + 1, 1) = Group; %#ok<AGROW>
+        end
     
     end
 end

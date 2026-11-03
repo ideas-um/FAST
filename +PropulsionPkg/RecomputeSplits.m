@@ -35,11 +35,8 @@ function [Aircraft] = RecomputeSplits(Aircraft, SegBeg, SegEnd)
 % get the parallel connections
 ParConns = Aircraft.Specs.Propulsion.PropArch.ParConns;
 
-% identify any parallel connections
-ParIndx = find(cellfun(@(x) ~isempty(x), ParConns));
-
 % check if there are any parallel connections
-if (~any(ParIndx))
+if (isempty(ParConns))
     
     % don't re-compute if there aren't any splits
     return
@@ -54,10 +51,7 @@ end
 Arch = Aircraft.Specs.Propulsion.PropArch.Arch;
 
 % get the number of parallel connections
-npar = length(ParIndx);
-
-% get the number of sources and transmitters
-nsrc = length(Aircraft.Specs.Propulsion.PropArch.SrcType);
+npar = length(ParConns);
 
 % get the power available (equal to power output for "full throttle" case)
 Pav = Aircraft.Mission.History.SI.Power.Pav(SegBeg:SegEnd, :);
@@ -84,20 +78,19 @@ OperDwn = PropulsionPkg.EvalSplit(OperDwnFun, TmpSplit);
 % loop through each power split
 for ipar = 1:npar
     
-    % get the index of the main connection
-    imain = ParIndx(ipar);
-    
-    % get the supplemental connection(s)
-    isupp = ParConns{imain};
-    
-    % account for the source indices
-    imain = imain + nsrc;
+    % get this target-specific parallel group
+    Group = ParConns(ipar);
+    imain = Group.Driving;
+    isupp = Group.Helping;
     
     % get all indices
     jdx = [imain, isupp];
     
-    % find the upstream split
-    iups = find(sum(Arch(jdx, :), 1) == length(isupp) + 1);
+    % use the target retained when the group was discovered
+    iups = Group.Target;
+    if (~all(Arch(jdx, iups) > 0))
+        error("ERROR - RecomputeSplits: invalid parallel connection group.");
+    end
     
     % get the total power output at any given time from those sources
     Pout = sum(Pav(idx, jdx), 2);

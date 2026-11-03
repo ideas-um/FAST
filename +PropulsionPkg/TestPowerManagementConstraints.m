@@ -111,6 +111,50 @@ assert(abs(PowerDeficit - 70) < 1.0e-12);
 
 fprintf("Full-power supplied-lambda constraint tests passed.\n");
 
+
+%% REPEATED PARALLEL ENGINE GROUPS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% One engine may supplement several downstream components, with a different
+% number of electric motors at each target. Each target must remain a separate
+% group; combining rows by engine caused the historical vertcat/horzcat crash.
+GroupAircraft.Specs.Propulsion.PropArch.SrcType = 1;
+GroupAircraft.Specs.Propulsion.PropArch.TrnType = [1, 0, 0, 3, 3, 3];
+GroupAircraft.Specs.Propulsion.PropArch.Arch = zeros(7);
+GroupAircraft.Specs.Propulsion.PropArch.Arch(2, 5) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(3, 5) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(2, 6) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(3, 6) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(4, 6) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(2, 7) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.Arch(3, 7) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn = zeros(7);
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(5, [2, 3]) = [0.5, 0.5];
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(6, [2, 3, 4]) = [0.4, 0.3, 0.3];
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(7, [2, 3]) = [0.5, 0.5];
+GroupAircraft = PropulsionPkg.PropArchConnections(GroupAircraft);
+
+Groups = GroupAircraft.Specs.Propulsion.PropArch.ParConns;
+assert(length(Groups) == 3);
+assert(isequal([Groups.Target], [5, 6, 7]));
+assert(isequal(Groups(1).Helping, 3));
+assert(isequal(Groups(2).Helping, [3, 4]));
+assert(isequal(Groups(3).Helping, 3));
+
+GroupAircraft.Specs.Power.LamDwn.SLS = [];
+GroupAircraft.Mission.History.SI.Power.Pav = [0, 80, 20, 20, 0, 0, 0];
+GroupAircraft.Mission.History.SI.Power.LamUps = 1;
+GroupAircraft.Mission.History.SI.Power.LamDwn = zeros(1, 0);
+GroupAircraft = PropulsionPkg.RecomputeSplits(GroupAircraft, 1, 1);
+assert(isempty(GroupAircraft.Mission.History.SI.Power.LamDwn));
+
+[ComponentPower, PowerDeficit] = PropulsionPkg.FullPowerLambdaConstraints( ...
+    GroupAircraft, GroupAircraft.Mission.History.SI.Power.Pav, zeros(1, 0), 1);
+assert(all(isfinite(ComponentPower), "all"));
+assert(isfinite(PowerDeficit));
+
+fprintf("Repeated parallel engine-group tests passed.\n");
+
 % ----------------------------------------------------------
 
 end

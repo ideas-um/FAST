@@ -69,8 +69,9 @@ nsplit = length(Aircraft.Specs.Power.LamDwn.SLS);
 % get a temporary power split
 TmpSplit = LamDwn(1, :);
 
-% get the downstream definition for the current mission segment
-[~, OperDwnFun] = PropulsionPkg.SelectOperMatrices(Aircraft);
+% get the split definitions for the current mission segment
+[OperUpsFun, OperDwnFun] = PropulsionPkg.SelectOperMatrices(Aircraft);
+EtaUps = Aircraft.Specs.Propulsion.PropArch.EtaUps;
 
 % get the original downstream matrix
 OperDwn = PropulsionPkg.EvalSplit(OperDwnFun, TmpSplit);
@@ -92,8 +93,18 @@ for ipar = 1:npar
         error("ERROR - RecomputeSplits: invalid parallel connection group.");
     end
     
-    % get the total power output at any given time from those sources
-    Pout = sum(Pav(idx, jdx), 2);
+    % Route each component's available power to this target before deriving
+    % downstream shares. Reusing full component power at every target would
+    % double-count engines or motors that have several outgoing connections.
+    ActiveRows = find(idx);
+    GroupPower = zeros(length(ActiveRows), length(jdx));
+    for irow = 1:length(ActiveRows)
+        ipnt = ActiveRows(irow);
+        SplitUps = PropulsionPkg.EvalSplit(OperUpsFun, LamUps(ipnt, :));
+        GroupPower(irow, :) = Pav(ipnt, jdx) .* SplitUps(jdx, iups)' .* ...
+                              EtaUps(jdx, iups)';
+    end
+    Pout = sum(GroupPower, 2);
         
     % find the downstream split contributing
     for kdx = jdx
@@ -109,7 +120,8 @@ for ipar = 1:npar
             if (abs(OperDwn(iups, kdx) - OperNew(iups, kdx)) > 1.0e-06)
                 
                 % recompute the power split
-                LamDwn(idx, isplit) = Pav(idx, kdx) ./ Pout;
+                GroupIndex = find(jdx == kdx, 1);
+                LamDwn(idx, isplit) = GroupPower(:, GroupIndex) ./ Pout;
                 
             end
             

@@ -43,7 +43,8 @@ if (isempty(ParConns))
 end
 
 Arch = PropArch.Arch;
-[~, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
+[OperUps, OperDwn] = PropulsionPkg.SelectOperMatrices(Aircraft);
+EtaUps = PropArch.EtaUps;
 ActivePoint = any(LamUps > 0, 2);
 ActiveComponent = false(1, ncomp);
 
@@ -62,14 +63,22 @@ for ipar = 1:length(ParConns)
         error("ERROR - FullPowerLambdaConstraints: invalid parallel connection group.");
     end
 
-    ActiveComponent(jdx) = true;
-    TotalPower = sum(Pav(:, jdx), 2);
-
     for ipnt = find(ActivePoint)'
+        SplitUps = PropulsionPkg.EvalSplit(OperUps, LamUps(ipnt, :));
         SplitDwn = PropulsionPkg.EvalSplit(OperDwn, LamDwn(ipnt, :));
-        AllocatedPower = TotalPower(ipnt) .* SplitDwn(iups, jdx);
-        ComponentPower(ipnt, jdx) = AllocatedPower - Pav(ipnt, jdx);
+        RoutedPower = Pav(ipnt, jdx) .* SplitUps(jdx, iups)';
+        ReceivedPower = RoutedPower .* EtaUps(jdx, iups)';
+        TotalReceived = sum(ReceivedPower);
+        RequestedPower = TotalReceived .* SplitDwn(iups, jdx) ./ ...
+                         EtaUps(jdx, iups)';
+        GroupResidual = RequestedPower - RoutedPower;
+        PreviouslyActive = ActiveComponent(jdx);
+        ComponentPower(ipnt, jdx(PreviouslyActive)) = max( ...
+            ComponentPower(ipnt, jdx(PreviouslyActive)), ...
+            GroupResidual(PreviouslyActive));
+        ComponentPower(ipnt, jdx(~PreviouslyActive)) = GroupResidual(~PreviouslyActive);
     end
+    ActiveComponent(jdx) = true;
 end
 
 PowerDeficit(ActivePoint) = max(ComponentPower(ActivePoint, ActiveComponent), [], 2);

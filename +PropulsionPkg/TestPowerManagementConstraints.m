@@ -128,10 +128,15 @@ GroupAircraft.Specs.Propulsion.PropArch.Arch(3, 6) = 1;
 GroupAircraft.Specs.Propulsion.PropArch.Arch(4, 6) = 1;
 GroupAircraft.Specs.Propulsion.PropArch.Arch(2, 7) = 1;
 GroupAircraft.Specs.Propulsion.PropArch.Arch(3, 7) = 1;
+GroupAircraft.Specs.Propulsion.PropArch.OperUps = zeros(7);
+GroupAircraft.Specs.Propulsion.PropArch.OperUps(2, [5, 6, 7]) = [0.5, 0.25, 0.25];
+GroupAircraft.Specs.Propulsion.PropArch.OperUps(3, [5, 6, 7]) = [0.2, 0.3, 0.5];
+GroupAircraft.Specs.Propulsion.PropArch.OperUps(4, 6) = 1;
 GroupAircraft.Specs.Propulsion.PropArch.OperDwn = zeros(7);
-GroupAircraft.Specs.Propulsion.PropArch.OperDwn(5, [2, 3]) = [0.5, 0.5];
-GroupAircraft.Specs.Propulsion.PropArch.OperDwn(6, [2, 3, 4]) = [0.4, 0.3, 0.3];
-GroupAircraft.Specs.Propulsion.PropArch.OperDwn(7, [2, 3]) = [0.5, 0.5];
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(5, [2, 3]) = [40 / 44, 4 / 44];
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(6, [2, 3, 4]) = [20 / 36, 6 / 36, 10 / 36];
+GroupAircraft.Specs.Propulsion.PropArch.OperDwn(7, [2, 3]) = [20 / 30, 10 / 30];
+GroupAircraft.Specs.Propulsion.PropArch.EtaUps = ones(7);
 GroupAircraft = PropulsionPkg.PropArchConnections(GroupAircraft);
 
 Groups = GroupAircraft.Specs.Propulsion.PropArch.ParConns;
@@ -142,7 +147,7 @@ assert(isequal(Groups(2).Helping, [3, 4]));
 assert(isequal(Groups(3).Helping, 3));
 
 GroupAircraft.Specs.Power.LamDwn.SLS = [];
-GroupAircraft.Mission.History.SI.Power.Pav = [0, 80, 20, 20, 0, 0, 0];
+GroupAircraft.Mission.History.SI.Power.Pav = [0, 80, 20, 10, 0, 0, 0];
 GroupAircraft.Mission.History.SI.Power.LamUps = 1;
 GroupAircraft.Mission.History.SI.Power.LamDwn = zeros(1, 0);
 GroupAircraft = PropulsionPkg.RecomputeSplits(GroupAircraft, 1, 1);
@@ -151,7 +156,17 @@ assert(isempty(GroupAircraft.Mission.History.SI.Power.LamDwn));
 [ComponentPower, PowerDeficit] = PropulsionPkg.FullPowerLambdaConstraints( ...
     GroupAircraft, GroupAircraft.Mission.History.SI.Power.Pav, zeros(1, 0), 1);
 assert(all(isfinite(ComponentPower), "all"));
-assert(isfinite(PowerDeficit));
+assert(max(abs(ComponentPower), [], "all") < 1.0e-12);
+assert(abs(PowerDeficit) < 1.0e-12);
+
+% A 50/50 command at the first target requests 22 kW from a motor with only
+% 4 kW routed there. The residual must use routed, not full component power.
+Overloaded = GroupAircraft;
+Overloaded.Specs.Propulsion.PropArch.OperDwn(5, [2, 3]) = [0.5, 0.5];
+[ComponentPower, PowerDeficit] = PropulsionPkg.FullPowerLambdaConstraints( ...
+    Overloaded, Overloaded.Mission.History.SI.Power.Pav, zeros(1, 0), 1);
+assert(abs(ComponentPower(3) - 18) < 1.0e-12);
+assert(abs(PowerDeficit - 18) < 1.0e-12);
 
 fprintf("Repeated parallel engine-group tests passed.\n");
 

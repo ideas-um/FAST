@@ -1,0 +1,3 @@
+Sequence,Strategy,Feasible,AllOptimizersConverged,ConvergedFlightFraction,MinimumExitFlag,MeanExitFlag,TotalIterations,MeanIterations,MaximumConstraintViolation,UsedBestFeasibleCount,UsedFeasibleInitialPointCount,FallbackToUnoptimizedCount,OptimizerTime_min
+1,Individual optimization,1,0,0,0,0,2,1,0,0,0,0,1.32511018666667
+1,Joint optimization,1,0,0,0,0,1,1,0,0,0,0,2.67416310333333

@@ -1,0 +1,5 @@
+Metric,Unit,N,Mean,StdDev,Variance,StandardError,CI95Low,CI95High,Median,Minimum,Maximum,CoefficientOfVariation_pct
+Flight mission distance,nmi,2,606.545248,582.506963529367,339314.362560203,411.894624,-200.76821504,1413.85871104,606.545248,194.650624,1018.439872,96.0368522299208
+Daily sequence distance,nmi/sequence,1,1213.090496,0,0,0,1213.090496,1213.090496,1213.090496,1213.090496,1213.090496,0
+Between-flight ground time,min,1,41,0,0,0,41,41,41,41,41,0
+Flights per sequence,flights/sequence,1,2,0,0,0,2,2,2,2,2,0

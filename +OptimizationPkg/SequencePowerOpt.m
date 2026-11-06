@@ -101,6 +101,13 @@ if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptUseParal
     UseParallel = logical(Aircraft.Settings.PowerOptUseParallel);
 end
 
+AcceptFeasibleAtIterationLimit = false;
+if isfield(Aircraft, "Settings") && ...
+        isfield(Aircraft.Settings, "PowerOptAcceptFeasibleAtIterationLimit")
+    AcceptFeasibleAtIterationLimit = logical( ...
+        Aircraft.Settings.PowerOptAcceptFeasibleAtIterationLimit);
+end
+
 OptimalityTolerance = 5.0e-4;
 if isfield(Aircraft, "Settings") && isfield(Aircraft.Settings, "PowerOptOptimalityTolerance")
     OptimalityTolerance = Aircraft.Settings.PowerOptOptimalityTolerance;
@@ -353,6 +360,8 @@ if MaxOptIter < 1
         "message", "Zero-iteration sequence smoke test.", ...
         "ReplayObjective_kg", ReplayObjective, "MaxConstraint", MaxConstraint, ...
         "Feasible", ValidReplay && MaxConstraint <= options.ConstraintTolerance);
+    OptimizerOutput.IterationHistory = ...
+        OptimizationPkg.OptimizationTraceRecorder.EmptyTable();
     % This branch is explicitly a replay/debug mode, not a claim of
     % optimizer convergence. Return any physically completed replay so its
     % constraint margins can be inspected by tests and callers.
@@ -363,11 +372,21 @@ else
         "Objective_kg", NaN, "MaxConstraint", Inf, "ValidReplay", false), ...
         numel(StartPoints), 1);
     Converged = false;
+    AttemptHistories = cell(numel(StartPoints), 1);
 
     for iStart = 1:numel(StartPoints)
+        TraceRecorder = OptimizationPkg.OptimizationTraceRecorder(ObjectiveScale);
+        TraceOptions = options;
+        TraceOptions.OutputFcn = @(x, optimValues, state) ...
+            TraceRecorder.Record(x, optimValues, state);
         [CandidatePC, ~, CandidateExitFlag, CandidateOutput] = ...
             fmincon(@(PC) ObjFunc(PC, Aircraft, Sequence), StartPoints{iStart}, ...
-            [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), options);
+            [], [], [], [], lb, ub, @(PC) Cons(PC, Aircraft, Sequence), ...
+            TraceOptions);
+        AttemptHistory = TraceRecorder.ToTable();
+        AttemptHistory.StartAttempt = repmat(iStart, height(AttemptHistory), 1);
+        AttemptHistory = movevars(AttemptHistory, "StartAttempt", "Before", 1);
+        AttemptHistories{iStart} = AttemptHistory;
 
         [ReplayObjective, ReplaySOC, ReplayRC, ReplayPowerExcess, ...
             ReplayMTOWExcess, ValidReplay] = ...
@@ -404,14 +423,26 @@ else
         Attempts(iStart).MaxConstraint = MaxConstraint;
         Attempts(iStart).ValidReplay = ValidReplay;
 
-        if CandidateExitFlag > 0 && ValidReplay && ...
+        ReachedIterationLimit = CandidateExitFlag == 0 && ...
+            isfield(CandidateOutput, "iterations") && ...
+            CandidateOutput.iterations >= MaxOptIter;
+        AcceptedFeasibleAtIterationLimit = ...
+            AcceptFeasibleAtIterationLimit && ReachedIterationLimit;
+
+        if (CandidateExitFlag > 0 || AcceptedFeasibleAtIterationLimit) && ...
+                ValidReplay && ...
                 isfinite(ReplayObjective) && ReplayObjective < 1e14 && ...
                 MaxConstraint <= options.ConstraintTolerance
             PCbest = CandidatePC;
             exitflag = CandidateExitFlag;
             OptimizerOutput = CandidateOutput;
+            OptimizerOutput.AcceptedFeasibleAtIterationLimit = ...
+                AcceptedFeasibleAtIterationLimit;
+            OptimizerOutput.StrictlyConverged = CandidateExitFlag > 0;
             OptimizerOutput.StartAttempt = iStart;
             OptimizerOutput.Attempts = Attempts(1:iStart);
+            OptimizerOutput.IterationHistory = ...
+                vertcat(AttemptHistories{1:iStart});
             OptimizerOutput.ReplayObjective_kg = ReplayObjective;
             OptimizerOutput.MaxConstraint = MaxConstraint;
             Converged = true;
@@ -461,8 +492,13 @@ t = toc / 60;
 % rather than whichever finite-difference point fmincon evaluated last.
 [~, ~, ~, ~, ~, FinalReplayValid] = FlySequence(PCbest, Aircraft, Sequence, true);
 if ~FinalReplayValid
+    FailureSuffix = "";
+    if strlength(LastEvaluationFailure) > 0
+        FailureSuffix = " Cause: " + LastEvaluationFailure;
+    end
     error("OptimizationPkg:SequencePowerOpt:FinalReplayFailed", ...
-        "The converged control schedule failed during its final sequence replay.");
+        "The converged control schedule failed during its final sequence replay.%s", ...
+        FailureSuffix);
 end
 
 %% Post-Processing %%
@@ -632,8 +668,16 @@ end
             % Cost is post-processing only; avoid repeating it for every
             % finite-difference objective/constraint evaluation.
             if ForceReplay
-                Aircraft = CostPkg.EnergyCost_perAirport( ...
-                    Aircraft, Sequence.ORIGIN(jflight), priceTable);
+                % Cost is optional post-processing and must not invalidate
+                % an otherwise converged, physically feasible sequence.
+                try
+                    Aircraft = CostPkg.EnergyCost_perAirport( ...
+                        Aircraft, Sequence.ORIGIN(jflight), priceTable);
+                catch CostME
+                    warning("OptimizationPkg:SequencePowerOpt:CostPostprocessing", ...
+                        ["Cost post-processing was skipped for flight %d: " ...
+                         "%s (%s)"], jflight, CostME.message, CostME.identifier);
+                end
             end
             TotalFuel = TotalFuel + Aircraft.Mission.History.SI.Weight.Fburn(MainEnd);
 

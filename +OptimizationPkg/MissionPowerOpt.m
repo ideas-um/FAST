@@ -247,9 +247,16 @@ ub = ones(size(PC0));
 
 % A schedule that was feasible under adaptive -1 dispatch can overload a
 % component when held fixed in -2 mode. Start from the flown dispatch, then
-% move only overloaded points into the feasible fixed-split interval.
-PC0 = ProjectInitialPointToFixedSplitFeasibility(PC0);
-PC0 = ProjectInitialPointToMissionFeasibility(PC0);
+% move only overloaded points into the feasible fixed-split interval. A
+% prescribed fixed-power replay can explicitly request its exact control
+% vector; that path must diagnose infeasibility instead of silently changing
+% the requested motor-power schedule.
+UseExactInitialPC = isfield(Aircraft.Settings, "PowerOptUseExactInitialPC") && ...
+    logical(Aircraft.Settings.PowerOptUseExactInitialPC);
+if ~UseExactInitialPC
+    PC0 = ProjectInitialPointToFixedSplitFeasibility(PC0);
+    PC0 = ProjectInitialPointToMissionFeasibility(PC0);
+end
 
 % fmincon evaluates the objective and nonlinear constraints at many of the
 % same finite-difference points. Cache complete mission evaluations so each
@@ -269,9 +276,17 @@ if (MaxOptIter < 1)
     exitflag = double(max(FinalConstraints, [], "all") <= options.ConstraintTolerance);
     OptimizerOutput = struct("iterations", 0, "constrviolation", ...
         max(FinalConstraints, [], "all"));
+    OptimizerOutput.IterationHistory = ...
+        OptimizationPkg.OptimizationTraceRecorder.EmptyTable();
 else
+    TraceRecorder = OptimizationPkg.OptimizationTraceRecorder(ObjectiveScale);
+    TraceOptions = options;
+    TraceOptions.OutputFcn = @(x, optimValues, state) ...
+        TraceRecorder.Record(x, optimValues, state);
     [PCbest, ~, exitflag, OptimizerOutput] = fmincon( ...
-        @(PC) ObjFunc(PC), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC), options);
+        @(PC) ObjFunc(PC), PC0, [], [], [], [], lb, ub, @(PC) Cons(PC), ...
+        TraceOptions);
+    OptimizerOutput.IterationHistory = TraceRecorder.ToTable();
     [FinalConstraints, ~] = Cons(PCbest);
     MaxConstraint = max(FinalConstraints, [], "all");
     % SQP can terminate on an infeasible final trial while returning an

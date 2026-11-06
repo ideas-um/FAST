@@ -30,6 +30,8 @@ for k = 1:nSelected
         sprintf("Sequence_%04d.mat", Index));
     FailureFile = fullfile(TaskDir, "failures", ...
         sprintf("Sequence_%04d_failed.mat", Index));
+    TimeoutFile = fullfile(TaskDir, "failures", ...
+        sprintf("Sequence_%04d_timeout.txt", Index));
     if IsValidCheckpoint(CheckpointFile, RunVersion, MaxIterations)
         D = load(CheckpointFile, "SequenceSummary", ...
             "FlightResults", "ChargeResults");
@@ -55,6 +57,10 @@ for k = 1:nSelected
         if isfield(F, "ErrorMessage")
             FailureMessage(k) = string(F.ErrorMessage);
         end
+    elseif isfile(TimeoutFile)
+        FailureStatus(k) = "failed_timeout";
+        FailureIdentifier(k) = "GreatLakes:WallTimeLimit";
+        FailureMessage(k) = strtrim(string(fileread(TimeoutFile)));
     else
         FailureStatus(k) = "missing";
     end

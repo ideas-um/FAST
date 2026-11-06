@@ -39,15 +39,12 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %% MODEL CALIBRATION FACTORS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % 1.002
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % 1.000
-
-% fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.0390;
-
-% airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 0.9981;
+% Use the exact conventional-aircraft literature calibration for every HEA
+% derivative; electrification must not introduce a second calibration basis.
+Aircraft.Specs.Aero.L_D.ClbCF = 1.000;
+Aircraft.Specs.Aero.L_D.CrsCF = 1.002;
+Aircraft.Specs.Propulsion.MDotCF = 1.04424;
+Aircraft.Specs.Weight.WairfCF = 0.98237;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -335,6 +332,9 @@ Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
 Aircraft.Settings.Analysis.MaxIter = 100;
+
+% Match the conventional baseline's sizing-closure fidelity.
+Aircraft.Settings.Analysis.ConvergenceTolerance = 1e-6;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

@@ -1,0 +1,3 @@
+Strategy,Sequences,FeasibleSequences,FeasibilityRate_pct,FullyConvergedSequences,FullConvergenceRate_pct,MeanConvergedFlightRate_pct,MeanMinimumExitFlag,MeanTotalIterations,MeanMaximumConstraintViolation,UsedBestFeasibleCount,UsedFeasibleInitialPointCount,FallbackToUnoptimizedCount,MeanOptimizerTime_min
+Individual optimization,1,1,100,0,0,0,0,2,0,0,0,0,1.32511018666667
+Joint optimization,1,1,100,0,0,0,0,1,0,0,0,0,2.67416310333333

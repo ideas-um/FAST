@@ -1,0 +1,87 @@
+GREAT LAKES COPY/PASTE COMMANDS
+================================
+
+CONNECT FROM WINDOWS TERMINAL
+-----------------------------
+ssh emmasmit@greatlakes.arc-ts.umich.edu
+
+
+SEE ALL OF YOUR JOBS
+--------------------
+squeue -u "$USER"
+
+
+FIND THE CURRENT FAST ARRAY MASTER ID
+-------------------------------------
+ARRAY_ID=$(squeue -h -u "$USER" -n fast-seq -o "%F" | sort -nu | tail -n 1)
+echo "$ARRAY_ID"
+
+
+COUNT RUNNING AND PENDING TASKS
+-------------------------------
+squeue -h -r -j "$ARRAY_ID" -o "%T" | sort | uniq -c
+
+
+SHOW WHY TASKS ARE PENDING
+--------------------------
+squeue -h -r -j "$ARRAY_ID" -t PENDING -o "%R" | sort | uniq -c | sort -nr
+
+
+SHOW CURRENTLY RUNNING TASKS
+----------------------------
+squeue -r -j "$ARRAY_ID" -t RUNNING -o "%.18i %.10T %.12M %.20N"
+
+
+FIND THIS RUN'S RESULTS DIRECTORY AND CHECK CHECKPOINT PROGRESS
+---------------------------------------------------------------
+JOB_INFO=$(scontrol show job "$ARRAY_ID" -o | awk 'NR == 1 {print}')
+LOG_PATH=$(sed -n 's/.* StdOut=\([^ ]*\).*/\1/p' <<< "$JOB_INFO")
+RESULTS_DIR="${LOG_PATH%/logs/*}"
+echo "$RESULTS_DIR"
+printf "Completed checkpoints: "; find "$RESULTS_DIR/tasks" -path '*/checkpoints/Sequence_*.mat' -type f | wc -l
+printf "Failure files:         "; find "$RESULTS_DIR/tasks" -path '*/failures/Sequence_*_failed.mat' -type f | wc -l
+
+
+SUBMIT A NEW SELECTED-SEQUENCE RUN
+----------------------------------
+# Change these four paths/account values, then paste the final command.
+ACCOUNT=YOUR_SLURM_ACCOUNT
+FAST_REPO_DIR=$HOME/FAST
+WORKFLOW_DIR=$HOME/great_lakes
+HEA_MAT=$HOME/baselines/HEA.mat
+RESULTS_DIR=/scratch/YOUR_ROOT_ACCOUNT/YOUR_ACCOUNT/$USER/hea_selected_run_001
+
+"$WORKFLOW_DIR/submit_selected_sequences.sh" \
+    "$ACCOUNT" "$FAST_REPO_DIR" "$HEA_MAT" "$RESULTS_DIR" 1-500
+
+# The submission has no array throttle by default. Great Lakes decides how
+# many tasks run concurrently. To request a throttle intentionally, set it
+# before submission, for example: export FAST_GL_ARRAY_LIMIT=120
+
+
+PROCESS OR REPROCESS SAVED RESULTS
+----------------------------------
+WORKFLOW_DIR=$HOME/great_lakes
+"$WORKFLOW_DIR/submit_process_results.sh" "$RESULTS_DIR"
+
+
+REPROCESS A CURRENT/OLDER RUN WITHOUT A COMPLETE MANIFEST
+---------------------------------------------------------
+ACCOUNT=YOUR_SLURM_ACCOUNT
+FAST_REPO_DIR=$HOME/FAST
+WORKFLOW_DIR=$HOME/great_lakes
+RESULTS_DIR=/scratch/YOUR_ROOT_ACCOUNT/YOUR_ACCOUNT/$USER/fast_first_500
+
+"$WORKFLOW_DIR/reprocess_current_sequences.sh" \
+    "$ACCOUNT" "$FAST_REPO_DIR" "$RESULTS_DIR" 1-500
+
+
+SEE THE PROCESSING OUTPUT
+-------------------------
+ls -lh "$RESULTS_DIR/combined"
+tail -n 100 "$RESULTS_DIR"/logs/process-*.out
+
+
+CANCEL ONLY THE CURRENT FAST ARRAY (IF YOU INTEND TO STOP IT)
+-------------------------------------------------------------
+# scancel "$ARRAY_ID"

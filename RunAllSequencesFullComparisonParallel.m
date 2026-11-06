@@ -21,7 +21,7 @@ if nargin < 2 || isempty(MaxIterations)
     MaxIterations = 500;
 end
 
-RunVersion = "all-sequences-v4-source-sized-base-aircraft";
+RunVersion = "all-sequences-v6-literature-calibrated-fixed-climb-kw";
 RootDir = fileparts(mfilename("fullpath"));
 % Preserve every checkpoint from the earlier mixed-evaluator run. Corrected
 % results are written to a separate directory so no completed work is lost.
@@ -37,7 +37,23 @@ FailureDir = fullfile(OutputDir, "failures");
 if ~isfolder(CheckpointDir), mkdir(CheckpointDir); end
 if ~isfolder(FailureDir), mkdir(FailureDir); end
 
-SequenceData = load(fullfile(RootDir, "Sequence.mat"), "tables");
+SequenceFile = string(getenv("FAST_SEQUENCE_FILE"));
+if strlength(SequenceFile) == 0
+    SequenceFile = fullfile(RootDir, "Sequence.mat");
+elseif ~isfile(SequenceFile)
+    Candidate = fullfile(RootDir, SequenceFile);
+    if isfile(Candidate), SequenceFile = Candidate; end
+end
+if ~isfile(SequenceFile)
+    error("FAST:SequenceFile:Missing", ...
+        "Sequence input file does not exist: %s", SequenceFile);
+end
+SequenceData = load(char(SequenceFile), "tables");
+if ~isfield(SequenceData, "tables") || ~iscell(SequenceData.tables)
+    error("FAST:SequenceFile:Invalid", ...
+        "Sequence input must contain a cell array named tables: %s", ...
+        SequenceFile);
+end
 Sequences = SequenceData.tables;
 nSequence = numel(Sequences);
 if nargin < 3 || isempty(SequenceIndices)
@@ -95,7 +111,7 @@ BaseConventional.Settings.Table = 0;
 
 InputMetadata = struct( ...
     "RunVersion", RunVersion, ...
-    "SequenceFile", "Sequence.mat", ...
+    "SequenceFile", string(SequenceFile), ...
     "BaseAircraftSource", string(PreparedBaseFile), ...
     "SizingMetadata", SizingMetadata, ...
     "SequenceCount", nSequence, ...
@@ -198,6 +214,14 @@ try
         RunVersion, CheckpointFile);
 catch ME
     SaveFailure(FailureDir, iSequence, RunVersion, MaxIterations, ME);
+    % A Slurm array element runs exactly one sequence.  Preserve the
+    % diagnostic marker, then propagate the exception so MATLAB and Slurm
+    % report FAILED instead of a misleading process-level COMPLETED state.
+    % Multi-sequence desktop runs retain the historical collect-and-continue
+    % behavior unless the caller explicitly enables this setting.
+    if ReadLogicalEnvironment("FAST_RETHROW_SEQUENCE_FAILURE", false)
+        rethrow(ME);
+    end
 end
 end
 
@@ -212,8 +236,14 @@ nFlight = height(Sequence);
 % the exact same fixed-command -2 evaluator used by MissionPowerOpt. This
 % makes baseline and optimized fuel directly comparable.
 [UnoptimizedAircraft, UnoptimizedCharge, UnoptimizedPC, ...
-    UnoptimizedReplayOutput] = FlyUnoptimizedSequence( ...
-    BasePHE, Sequence);
+    UnoptimizedReplayOutput, FixedClimbMotorPower_kW, ...
+    FixedClimbMotorPower_pct] = LoadOrComputeFixedBaseline( ...
+    BasePHE, Sequence, iSequence, RunVersion);
+if ReadLogicalEnvironment("FAST_FIXED_BASELINE_ONLY", false)
+    fprintf("Fixed baseline cache %d complete in %.2f min.\n", ...
+        iSequence, toc(SequenceTimer) / 60);
+    return;
+end
 
 % Independent optimizer, with landing SOC -> thermal ground charge -> next
 % flight beginning SOC and temperature.
@@ -226,7 +256,10 @@ nFlight = height(Sequence);
 % and its matching fuel/MTOW state. The unoptimized sequence is the required
 % incumbent: joint optimization may improve it, but may never start from a
 % different (for example, individually optimized) operating trajectory.
-JointInput = ConfigureOptimizer(BasePHE, MaxIterations);
+JointMaxIterations = ReadPositiveIntegerEnvironment( ...
+    "FAST_GL_JOINT_MAX_ITERATIONS", MaxIterations);
+JointMaxIterations = min(JointMaxIterations, MaxIterations);
+JointInput = ConfigureOptimizer(BasePHE, JointMaxIterations);
 JointInput.Settings.Analysis.Type = -2;
 JointBaseline = [];
 if all(cellfun(@(x) ~isempty(x), UnoptimizedPC))
@@ -247,10 +280,10 @@ end
     OptimizationPkg.SequencePowerOpt(JointInput, Sequence, JointBaseline);
 JointCharge = ReplayCharges(JointAircraft, Sequence);
 
-% Numerical termination, differing availability conventions, or a failed
-% local search must never make an "optimized" saved case worse than the
-% feasible unoptimized -2 incumbent. Retain the incumbent trajectory when
-% either optimizer fails to improve the complete sequence total.
+% Keep the feasible fixed baseline if an individual flight optimizer returns
+% a higher-fuel point. Preserve the joint optimizer's own feasible result
+% without an incumbent fallback so joint local-optimum failures remain
+% visible in the reported comparison and diagnostic audit.
 UnoptimizedFeasible = all(cellfun(@(x) ...
     isfield(x, "Feasible") && logical(x.Feasible), ...
     UnoptimizedReplayOutput));
@@ -269,18 +302,6 @@ if UnoptimizedFeasible && ...
         IndividualOptimizerOutput{k}.UnoptimizedSequenceFuel_kg = ...
             UnoptimizedFuel_kg;
     end
-end
-
-JointFuelBeforeFallback_kg = SequenceMainMissionFuel(JointAircraft, nFlight);
-if UnoptimizedFeasible && ...
-        JointFuelBeforeFallback_kg > UnoptimizedFuel_kg + 1.0e-6
-    JointAircraft = UnoptimizedAircraft;
-    JointPC = cat(2, UnoptimizedPC{:});
-    JointCharge = UnoptimizedCharge;
-    JointOptimizerOutput.FallbackToUnoptimized = true;
-    JointOptimizerOutput.SequenceFuelBeforeFallback_kg = ...
-        JointFuelBeforeFallback_kg;
-    JointOptimizerOutput.UnoptimizedSequenceFuel_kg = UnoptimizedFuel_kg;
 end
 
 [ConventionalAircraft] = FlyConventionalSequence( ...
@@ -306,7 +327,16 @@ SequenceSummary = BuildSequenceSummary(iSequence, Sequence, JointFlight, ...
     IndividualFlight, UnoptimizedFlight, ConventionalFlight, ...
     JointChargeTable, IndividualChargeTable, UnoptimizedChargeTable, ...
     JointOptimizerTime_min, sum(IndividualOptimizerTime_min), ...
-    JointExitFlag, IndividualExitFlag);
+    JointExitFlag, IndividualExitFlag, FixedClimbMotorPower_kW, ...
+    FixedClimbMotorPower_pct);
+[OptimizationTrace, OptimizationComparison] = BuildOptimizationDiagnostics( ...
+    iSequence, JointOptimizerOutput, IndividualOptimizerOutput, ...
+    JointOptimizerTime_min, IndividualOptimizerTime_min);
+if JointExitFlag == 0 || any(IndividualExitFlag == 0)
+    OptimizationCompletion = "feasible_at_iteration_limit";
+else
+    OptimizationCompletion = "strictly_converged";
+end
 
 % Save mission histories and compact flight specs. These retain everything
 % required to reprocess power, fuel, SOC, trajectory, and split results
@@ -332,28 +362,220 @@ OptimizerResults = struct( ...
     "IndividualOutput", {IndividualOptimizerOutput}, ...
     "IndividualTime_min", IndividualOptimizerTime_min, ...
     "UnoptimizedPC", {UnoptimizedPC}, ...
-    "UnoptimizedReplayOutput", {UnoptimizedReplayOutput});
+    "UnoptimizedReplayOutput", {UnoptimizedReplayOutput}, ...
+    "FixedClimbMotorPower_kW", FixedClimbMotorPower_kW, ...
+    "FixedClimbMotorPower_pct", FixedClimbMotorPower_pct);
 RunMetadata = struct( ...
     "Status", "success", ...
     "RunVersion", RunVersion, ...
     "SequenceIndex", iSequence, ...
     "Flights", nFlight, ...
     "MaxIterations", MaxIterations, ...
+    "JointMaxIterations", JointMaxIterations, ...
+    "OptimalityTolerance", ...
+        JointInput.Settings.PowerOptOptimalityTolerance, ...
+    "AcceptFeasibleAtIterationLimit", ...
+        JointInput.Settings.PowerOptAcceptFeasibleAtIterationLimit, ...
+    "BaselineCase", ...
+        "Fixed constant-kW climb HEA (30% motor-rating target)", ...
+    "FixedTakeoffLamUps", 1.0, ...
+    "FixedClimbMotorPower_kW", FixedClimbMotorPower_kW, ...
+    "FixedClimbMotorPower_pct", FixedClimbMotorPower_pct, ...
+    "OptimizationCompletion", OptimizationCompletion, ...
     "Runtime_min", toc(SequenceTimer) / 60, ...
     "Completed", string(datetime("now")));
 Status = "success";
 
 save(CheckpointFile, "Status", "RunMetadata", "Sequence", ...
     "SequenceSummary", "FlightResults", "ChargeResults", ...
-    "MissionResults", "ChargeHistories", "OptimizerResults", "-v7.3");
+    "MissionResults", "ChargeHistories", "OptimizerResults", ...
+    "OptimizationTrace", "OptimizationComparison", "-v7.3");
 fprintf("Sequence %d complete in %.2f min.\n", ...
     iSequence, RunMetadata.Runtime_min);
 end
 
 
-function [AircraftSet, ChargeHistories, PC, ReplayOutput] = ...
-        FlyUnoptimizedSequence( ...
-        BaseAircraft, Sequence)
+function [AircraftSet, ChargeHistories, PC, ReplayOutput, ...
+        FixedClimbMotorPower_kW, FixedClimbMotorPower_pct] = ...
+        FlyUnoptimizedSequence(BaseAircraft, Sequence)
+% Hold the combined electric-motor shaft output constant at every climb
+% point. The initial target is 30 percent of the two motors' combined SLS
+% rating. If the complete charged sequence cannot sustain that absolute
+% power, find the greatest sequence-feasible constant target.
+iEM = find(BaseAircraft.Specs.Propulsion.PropArch.TrnType == 0);
+if isempty(iEM) || ~isfield(BaseAircraft.Specs.Propulsion, "SLSPower")
+    error("RunAllSequences:MissingMotorRating", ...
+        "The fixed-power baseline requires sized electric-motor ratings.");
+end
+RatedMotorPower_W = sum(BaseAircraft.Specs.Propulsion.SLSPower(iEM));
+MaximumMotorPower_W = 0.30 * RatedMotorPower_W;
+
+[AircraftSet, ChargeHistories, PC, ReplayOutput, IsFeasible] = ...
+    ReplayFixedClimbSequence(BaseAircraft, Sequence, MaximumMotorPower_W);
+if IsFeasible
+    FixedMotorPower_W = MaximumMotorPower_W;
+else
+    [BestAircraft, BestCharge, BestPC, BestReplay, ZeroFeasible] = ...
+        ReplayFixedClimbSequence(BaseAircraft, Sequence, 0);
+    if ~ZeroFeasible
+        Violations = cellfun(@(x) x.constrviolation, BestReplay);
+        ExitFlags = cellfun(@(x) x.ExitFlag, BestReplay);
+        error("RunAllSequences:FixedBaselineInfeasible", ...
+            "The sequence cannot complete with full EM takeoff support even " + ...
+            "when climb motor power is zero. Constraint violations by " + ...
+            "flight: %s; exit flags: %s.", mat2str(Violations, 6), ...
+            mat2str(ExitFlags));
+    end
+    Lower_W = 0;
+    Upper_W = MaximumMotorPower_W;
+    for iSearch = 1:10
+        Candidate_W = 0.5 * (Lower_W + Upper_W);
+        [CandidateAircraft, CandidateCharge, CandidatePC, CandidateReplay, ...
+            CandidateFeasible] = ReplayFixedClimbSequence( ...
+            BaseAircraft, Sequence, Candidate_W);
+        if CandidateFeasible
+            Lower_W = Candidate_W;
+            BestAircraft = CandidateAircraft;
+            BestCharge = CandidateCharge;
+            BestPC = CandidatePC;
+            BestReplay = CandidateReplay;
+        else
+            Upper_W = Candidate_W;
+        end
+    end
+    % Report and replay to 0.1 kW, rounded down so numerical rounding cannot
+    % cross the feasible boundary.
+    FixedMotorPower_W = floor(Lower_W / 100) * 100;
+    [AircraftSet, ChargeHistories, PC, ReplayOutput, IsFeasible] = ...
+        ReplayFixedClimbSequence(BaseAircraft, Sequence, FixedMotorPower_W);
+    if ~IsFeasible
+        AircraftSet = BestAircraft;
+        ChargeHistories = BestCharge;
+        PC = BestPC;
+        ReplayOutput = BestReplay;
+        FixedMotorPower_W = Lower_W;
+    end
+end
+FixedClimbMotorPower_kW = FixedMotorPower_W / 1000;
+FixedClimbMotorPower_pct = 100 * FixedMotorPower_W / RatedMotorPower_W;
+end
+
+
+function [AircraftSet, ChargeHistories, PC, ReplayOutput, ...
+        FixedClimbMotorPower_kW, FixedClimbMotorPower_pct] = ...
+        LoadOrComputeFixedBaseline(BaseAircraft, Sequence, ...
+        SequenceIndex, RunVersion)
+CacheDirectory = string(getenv("FAST_FIXED_BASELINE_CACHE_DIR"));
+BaselineOnly = ReadLogicalEnvironment("FAST_FIXED_BASELINE_ONLY", false);
+if BaselineOnly && strlength(CacheDirectory) == 0
+    error("FAST:MissingFixedBaselineCacheDirectory", ...
+        "FAST_FIXED_BASELINE_CACHE_DIR is required in baseline-only mode.");
+end
+
+CacheFile = "";
+if strlength(CacheDirectory) > 0
+    if ~isfolder(CacheDirectory), mkdir(CacheDirectory); end
+    CacheFile = fullfile(CacheDirectory, sprintf( ...
+        "Sequence_%04d_fixed_baseline.mat", SequenceIndex));
+end
+Fingerprint = FixedBaselineAircraftFingerprint(BaseAircraft);
+if strlength(CacheFile) > 0 && IsValidFixedBaselineCache( ...
+        CacheFile, RunVersion, SequenceIndex, Sequence, Fingerprint)
+    D = load(CacheFile, "UnoptimizedMissionResults", ...
+        "UnoptimizedCharge", "UnoptimizedPC", ...
+        "UnoptimizedReplayOutput", "FixedClimbMotorPower_kW", ...
+        "FixedClimbMotorPower_pct");
+    AircraftSet = RestoreCompactAircraftSet(D.UnoptimizedMissionResults);
+    ChargeHistories = D.UnoptimizedCharge;
+    PC = D.UnoptimizedPC;
+    ReplayOutput = D.UnoptimizedReplayOutput;
+    FixedClimbMotorPower_kW = D.FixedClimbMotorPower_kW;
+    FixedClimbMotorPower_pct = D.FixedClimbMotorPower_pct;
+    fprintf("Loaded fixed baseline cache for sequence %d: %s\n", ...
+        SequenceIndex, CacheFile);
+    return;
+end
+
+[AircraftSet, ChargeHistories, PC, ReplayOutput, ...
+    FixedClimbMotorPower_kW, FixedClimbMotorPower_pct] = ...
+    FlyUnoptimizedSequence(BaseAircraft, Sequence);
+if strlength(CacheFile) > 0
+    UnoptimizedMissionResults = CompactAircraftSet(AircraftSet, Sequence);
+    UnoptimizedCharge = ChargeHistories;
+    UnoptimizedPC = PC;
+    UnoptimizedReplayOutput = ReplayOutput;
+    FixedBaselineMetadata = struct( ...
+        "Status", "success", ...
+        "RunVersion", RunVersion, ...
+        "SequenceIndex", SequenceIndex, ...
+        "Flights", height(Sequence), ...
+        "AircraftFingerprint", Fingerprint, ...
+        "Completed", string(datetime("now")));
+    save(CacheFile, "FixedBaselineMetadata", "Sequence", ...
+        "UnoptimizedMissionResults", "UnoptimizedCharge", ...
+        "UnoptimizedPC", "UnoptimizedReplayOutput", ...
+        "FixedClimbMotorPower_kW", "FixedClimbMotorPower_pct", "-v7.3");
+end
+end
+
+
+function IsValid = IsValidFixedBaselineCache(FileName, RunVersion, ...
+        SequenceIndex, Sequence, Fingerprint)
+IsValid = false;
+if ~isfile(FileName), return; end
+try
+    D = load(FileName, "FixedBaselineMetadata", "Sequence");
+    M = D.FixedBaselineMetadata;
+    IsValid = string(M.Status) == "success" && ...
+        string(M.RunVersion) == string(RunVersion) && ...
+        M.SequenceIndex == SequenceIndex && ...
+        isequaln(D.Sequence, Sequence) && ...
+        isequaln(M.AircraftFingerprint, Fingerprint);
+catch
+    IsValid = false;
+end
+end
+
+
+function Fingerprint = FixedBaselineAircraftFingerprint(Aircraft)
+Fingerprint = struct( ...
+    "MTOW_kg", Aircraft.Specs.Weight.MTOW, ...
+    "Fuel_kg", Aircraft.Specs.Weight.Fuel, ...
+    "MotorSLSPower_W", Aircraft.Specs.Propulsion.SLSPower( ...
+        Aircraft.Specs.Propulsion.PropArch.TrnType == 0), ...
+    "BatterySpecificEnergy_Jpkg", Aircraft.Specs.Power.SpecEnergy.Batt, ...
+    "ClimbLiftToDragCF", Aircraft.Specs.Aero.L_D.ClbCF, ...
+    "CruiseLiftToDragCF", Aircraft.Specs.Aero.L_D.CrsCF, ...
+    "FuelFlowCF", Aircraft.Specs.Propulsion.MDotCF, ...
+    "AirframeWeightCF", Aircraft.Specs.Weight.WairfCF, ...
+    "ChargerPower_W", Aircraft.Specs.Battery.Charging, ...
+    "BatterySOH_pct", Aircraft.Settings.BatterySOH_pct, ...
+    "BatteryInitialTemperature_C", ...
+        Aircraft.Settings.BatteryInitialTemperature_C);
+end
+
+
+function AircraftSet = RestoreCompactAircraftSet(Records)
+AircraftSet = struct;
+for k = 1:numel(Records)
+    R = Records{k};
+    A = struct;
+    A.Mission = struct("Profile", R.MissionProfile, ...
+        "History", R.MissionHistory);
+    A.Specs = struct;
+    A.Specs.Weight = R.Weight;
+    A.Specs.Performance = R.Performance;
+    A.Specs.Power = R.Power;
+    A.Specs.Battery = R.Battery;
+    A.Specs.Propulsion = struct("PropArch", R.PropArch);
+    A.Settings = struct("Analysis", struct("Type", R.AnalysisType));
+    AircraftSet.(sprintf("Aircraft%d", k)) = A;
+end
+end
+
+
+function [AircraftSet, ChargeHistories, PC, ReplayOutput, IsFeasible] = ...
+        ReplayFixedClimbSequence(BaseAircraft, Sequence, TargetMotorPower_W)
 nFlight = height(Sequence);
 AircraftSet = struct;
 ChargeHistories = cell(max(nFlight - 1, 0), 1);
@@ -364,9 +586,9 @@ BegTemperature_C = BaseAircraft.Settings.BatteryInitialTemperature_C;
 for k = 1:nFlight
     Seed = ConfigureFlight(BaseAircraft, Sequence(k, :), ...
         BegSOC, BegTemperature_C);
-    % Saved aircraft produced by an earlier -2 run can carry scalar LamUps
-    % fields promoted to one. Reassert the regular PHE phase limits before
-    % every -1 flight so the baseline is independent of file provenance.
+    % Keep full takeoff availability and the original 30-percent climb
+    % availability ceiling. Within that ceiling, LamDwn is varied point by
+    % point to hold one absolute combined motor-power target.
     Seed.Specs.Power.LamUps.SLS = 1.00;
     Seed.Specs.Power.LamUps.Tko = 1.00;
     Seed.Specs.Power.LamUps.Clb = 0.30;
@@ -377,22 +599,31 @@ for k = 1:nFlight
     Seed.Settings.PowerOpt = 0;
     Seed = Main(Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
 
-    % MaxIterations=0 performs only the fixed-command feasibility
-    % projection and -2 replay. No optimization is performed.
     Seed = ConfigureOptimizer(Seed, 0);
-    Seed.Settings.PreserveOptimizationLamUps = true;
-    [Aircraft, PC{k}, ~, ReplayExitFlag, ReplayOutput{k}] = ...
-        OptimizationPkg.MissionPowerOpt( ...
-        Seed, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    [Aircraft, PC{k}, ReplayExitFlag, ReplayOutput{k}] = ...
+        ReplayConstantClimbMotorPower(Seed, TargetMotorPower_W);
     ReplayOutput{k}.ExitFlag = ReplayExitFlag;
-    ReplayOutput{k}.Feasible = ReplayExitFlag > 0 && ...
+    ReplayOutput{k}.Feasible = ...
+        isfinite(ReplayOutput{k}.constrviolation) && ...
         ReplayOutput{k}.constrviolation <= ...
-        Seed.Settings.PowerOptConstraintTolerance;
+        Seed.Settings.PowerOptConstraintTolerance && ...
+        ConstantClimbMotorPowerWasDelivered(Aircraft, TargetMotorPower_W);
+    ReplayOutput{k}.FixedClimbMotorPowerTarget_kW = ...
+        TargetMotorPower_W / 1000;
+    AchievedClimbPower_W = CombinedClimbMotorPower(Aircraft);
+    ReplayOutput{k}.FixedClimbMotorPowerMinimum_kW = ...
+        min(AchievedClimbPower_W, [], "omitnan") / 1000;
+    ReplayOutput{k}.FixedClimbMotorPowerMaximum_kW = ...
+        max(AchievedClimbPower_W, [], "omitnan") / 1000;
     if ~ReplayOutput{k}.Feasible
         warning("RunAllSequences:UnoptimizedInfeasible", ...
-            ["Unoptimized flight %d is infeasible with its prescribed " ...
-            "LamUps cap (maximum scaled constraint %.6g)."], ...
-            k, ReplayOutput{k}.constrviolation);
+            "Fixed-power flight %d cannot deliver %.3f kW throughout " + ...
+            "climb; achieved range %.3f--%.3f kW " + ...
+            "(maximum scaled constraint %.6g).", ...
+            k, TargetMotorPower_W / 1000, ...
+            ReplayOutput{k}.FixedClimbMotorPowerMinimum_kW, ...
+            ReplayOutput{k}.FixedClimbMotorPowerMaximum_kW, ...
+            ReplayOutput{k}.constrviolation);
     end
     AircraftSet.(sprintf("Aircraft%d", k)) = Aircraft;
     if k < nFlight
@@ -400,6 +631,134 @@ for k = 1:nFlight
             ChargeForNextFlight(Aircraft, Sequence.GROUND_TIME(k + 1));
     end
 end
+IsFeasible = all(cellfun(@(x) isfield(x, "Feasible") && ...
+    logical(x.Feasible), ReplayOutput));
+if IsFeasible
+    IsFeasible = FixedPowerCommandsWereSet( ...
+        AircraftSet, nFlight, TargetMotorPower_W);
+end
+end
+
+
+function [Aircraft, PC, ExitFlag, Output] = ...
+        ReplayConstantClimbMotorPower(Seed, TargetMotorPower_W)
+Profile = Seed.Mission.Profile;
+ControlPts = TakeoffThroughClimbPoints(Profile);
+ClimbPts = PhasePoints(Profile, "Climb");
+[IsClimbControl, ClimbLocations] = ismember(ClimbPts(:), ControlPts);
+if ~all(IsClimbControl)
+    error("RunAllSequences:ClimbControlMapping", ...
+        "Every climb point must be in the fixed-power control horizon.");
+end
+
+H = Seed.Mission.History.SI;
+nSrc = numel(Seed.Specs.Propulsion.PropArch.SrcType);
+iEM = find(Seed.Specs.Propulsion.PropArch.TrnType == 0);
+PC = mean(H.Power.LamDwn(ControlPts, iEM), 2);
+ReferencePower_W = sum(max(H.Power.Pout(ClimbPts, nSrc + iEM), 0), 2);
+if TargetMotorPower_W <= 0
+    PC(ClimbLocations) = 0;
+else
+    Scale = TargetMotorPower_W ./ max(ReferencePower_W, 1);
+    PC(ClimbLocations) = PC(ClimbLocations) .* Scale;
+end
+PC = min(max(PC, 0), 1);
+
+for iCorrect = 1:4
+    Trial = ConfigureOptimizer(Seed, 0);
+    Trial.Settings.PreserveOptimizationLamUps = true;
+    Trial.Settings.PowerOptInitialPC = PC;
+    Trial.Settings.PowerOptUseExactInitialPC = true;
+    [Aircraft, PC, ~, ExitFlag, Output] = ...
+        OptimizationPkg.MissionPowerOpt( ...
+        Trial, @MissionProfilesPkg.ERJ_ClimbThenAccel);
+    if ConstantClimbMotorPowerWasDelivered(Aircraft, TargetMotorPower_W)
+        return;
+    end
+    Achieved_W = CombinedClimbMotorPower(Aircraft);
+    if TargetMotorPower_W <= 0
+        PC(ClimbLocations) = 0;
+    else
+        PC(ClimbLocations) = PC(ClimbLocations) .* ...
+            (TargetMotorPower_W ./ max(Achieved_W, 1));
+    end
+    PC = min(max(PC, 0), 1);
+end
+end
+
+
+function IsValid = FixedPowerCommandsWereSet(AircraftSet, nFlight, ...
+        TargetMotorPower_W)
+CommandTolerance = 5e-3;
+IsValid = true;
+for k = 1:nFlight
+    Aircraft = AircraftSet.(sprintf("Aircraft%d", k));
+    Profile = Aircraft.Mission.Profile;
+    iEM = find(Aircraft.Specs.Propulsion.PropArch.TrnType == 0);
+    if isempty(iEM), IsValid = false; return; end
+    Command = Aircraft.Mission.History.SI.Power.LamUps;
+    TakeoffPts = PhasePoints(Profile, ["Takeoff","DetailedTakeoff"]);
+    ClimbPts = PhasePoints(Profile, "Climb");
+    if ~isempty(TakeoffPts)
+        TakeoffValue = mean(Command(TakeoffPts, iEM), 2);
+        IsValid = IsValid && all(abs(TakeoffValue - 1) <= CommandTolerance);
+    end
+    IsValid = IsValid && ~isempty(ClimbPts) && ...
+        ConstantClimbMotorPowerWasDelivered(Aircraft, TargetMotorPower_W);
+    if ~IsValid, return; end
+end
+end
+
+
+function IsValid = ConstantClimbMotorPowerWasDelivered( ...
+        Aircraft, TargetMotorPower_W)
+Power_W = CombinedClimbMotorPower(Aircraft);
+% FAST's coupled fuel/trajectory fixed point leaves small sub-percent power
+% differences after the control correction. Treat a 1-percent (minimum
+% 1 kW) band as constant while retaining the achieved min/max in diagnostics.
+Tolerance_W = max(1000, 0.01 * max(TargetMotorPower_W, 1));
+IsValid = ~isempty(Power_W) && all(isfinite(Power_W)) && ...
+    all(abs(Power_W - TargetMotorPower_W) <= Tolerance_W);
+end
+
+
+function Power_W = CombinedClimbMotorPower(Aircraft)
+ClimbPts = PhasePoints(Aircraft.Mission.Profile, "Climb");
+nSrc = numel(Aircraft.Specs.Propulsion.PropArch.SrcType);
+iEM = find(Aircraft.Specs.Propulsion.PropArch.TrnType == 0);
+if isempty(ClimbPts) || isempty(iEM)
+    Power_W = [];
+    return;
+end
+Pout = Aircraft.Mission.History.SI.Power.Pout;
+Power_W = sum(max(Pout(ClimbPts, nSrc + iEM), 0), 2);
+end
+
+
+function Points = TakeoffThroughClimbPoints(Profile)
+TakeoffSegments = find(Profile.ID == 1 & ...
+    ismember(string(Profile.Segs), ["Takeoff","DetailedTakeoff"]));
+ClimbSegments = find(Profile.ID == 1 & string(Profile.Segs) == "Climb");
+if isempty(TakeoffSegments) || isempty(ClimbSegments)
+    error("RunAllSequences:MissingTakeoffOrClimb", ...
+        "The fixed-power baseline requires takeoff and climb segments.");
+end
+Points = (Profile.SegBeg(TakeoffSegments(1)): ...
+    Profile.SegEnd(ClimbSegments(end)) - 1)';
+end
+
+
+function Points = PhasePoints(Profile, Names)
+Names = string(Names);
+Segments = find(Profile.ID == 1 & ismember(string(Profile.Segs), Names));
+Points = [];
+for iSeg = Segments(:)'
+    % Adjacent FAST segments share their boundary point. Exclude that final
+    % point so the next segment's command is not attributed to this phase.
+    Last = max(Profile.SegBeg(iSeg), Profile.SegEnd(iSeg) - 1);
+    Points = [Points, Profile.SegBeg(iSeg):Last]; %#ok<AGROW>
+end
+Points = unique(Points);
 end
 
 
@@ -466,9 +825,55 @@ function Aircraft = ConfigureOptimizer(Aircraft, MaxIterations)
 Aircraft.Settings.PowerOptMaxIter = MaxIterations;
 Aircraft.Settings.PowerOptMaxStarts = 1;
 Aircraft.Settings.PowerOptUseParallel = false;
-Aircraft.Settings.PowerOptOptimalityTolerance = 5e-4;
+Aircraft.Settings.PowerOptOptimalityTolerance = ...
+    ReadPositiveScalarEnvironment("FAST_GL_OPTIMALITY_TOLERANCE", 5e-4);
 Aircraft.Settings.PowerOptFunctionTolerance = 1e-5;
 Aircraft.Settings.PowerOptConstraintTolerance = 1e-4;
+Aircraft.Settings.PowerOptAcceptFeasibleAtIterationLimit = ...
+    ReadLogicalEnvironment("FAST_GL_ACCEPT_FEASIBLE_AT_LIMIT", false);
+end
+
+
+function Value = ReadPositiveIntegerEnvironment(Name, DefaultValue)
+Text = string(getenv(Name));
+if strlength(Text) == 0
+    Value = DefaultValue;
+    return;
+end
+Value = str2double(Text);
+if ~isscalar(Value) || ~isfinite(Value) || Value < 1 || Value ~= fix(Value)
+    error("FAST:BadEnvironmentInteger", ...
+        "%s must be a positive integer.", Name);
+end
+end
+
+
+function Value = ReadPositiveScalarEnvironment(Name, DefaultValue)
+Text = string(getenv(Name));
+if strlength(Text) == 0
+    Value = DefaultValue;
+    return;
+end
+Value = str2double(Text);
+if ~isscalar(Value) || ~isfinite(Value) || Value <= 0
+    error("FAST:BadEnvironmentScalar", ...
+        "%s must be a positive finite scalar.", Name);
+end
+end
+
+
+function Value = ReadLogicalEnvironment(Name, DefaultValue)
+Text = lower(strtrim(string(getenv(Name))));
+if strlength(Text) == 0
+    Value = DefaultValue;
+elseif any(Text == ["1", "true", "yes", "on"])
+    Value = true;
+elseif any(Text == ["0", "false", "no", "off"])
+    Value = false;
+else
+    error("FAST:BadEnvironmentLogical", ...
+        "%s must be 1/0, true/false, yes/no, or on/off.", Name);
+end
 end
 
 
@@ -527,7 +932,26 @@ end
 
 
 function SaveConventionalCache(FileName, Aircraft, CacheMetadata)
+Aircraft = ReusableAircraftForCache(Aircraft);
 save(FileName, "Aircraft", "CacheMetadata", "-v7.3");
+end
+
+
+function Compact = ReusableAircraftForCache(Aircraft)
+% Retain everything needed for exact result reuse and post-processing while
+% omitting repeated sizing/engine databases from every cached flight.
+Compact = struct;
+Compact.Specs = struct;
+Compact.Specs.Weight = Aircraft.Specs.Weight;
+Compact.Specs.Performance = Aircraft.Specs.Performance;
+Compact.Specs.Power = Aircraft.Specs.Power;
+Compact.Specs.Battery = Aircraft.Specs.Battery;
+Compact.Specs.Propulsion = struct( ...
+    "PropArch", Aircraft.Specs.Propulsion.PropArch);
+Compact.Settings = struct("Analysis", Aircraft.Settings.Analysis);
+Compact.Mission = struct( ...
+    "Profile", Aircraft.Mission.Profile, ...
+    "History", Aircraft.Mission.History);
 end
 
 
@@ -712,15 +1136,24 @@ end
 
 function Summary = BuildSequenceSummary(Index, Sequence, Joint, Individual, ...
         Unoptimized, Conventional, JointCharge, IndividualCharge, ...
-        UnoptimizedCharge, JointTime, IndividualTime, JointExit, IndividualExit)
+        UnoptimizedCharge, JointTime, IndividualTime, JointExit, ...
+        IndividualExit, FixedClimbMotorPower_kW, FixedClimbMotorPower_pct)
 JointMain = sum(Joint.FuelBurn_kg); IndividualMain = sum(Individual.FuelBurn_kg);
 UnoptimizedMain = sum(Unoptimized.FuelBurn_kg); ConventionalMain = sum(Conventional.FuelBurn_kg);
 JointMeanLandingSOCExcludingLast = MeanExcludingLast(Joint.EndSOC_pct);
+BaselineSavings_kg = ConventionalMain - UnoptimizedMain;
+[JointRelativeImprovement_pct, JointRelativeError_pct] = ...
+    RelativeSavingsMetrics(UnoptimizedMain - JointMain, BaselineSavings_kg);
+[IndividualRelativeImprovement_pct, IndividualRelativeError_pct] = ...
+    RelativeSavingsMetrics(UnoptimizedMain - IndividualMain, BaselineSavings_kg);
 
 Summary = table(Index, height(Sequence), sum(Sequence.DISTANCE), ...
     JointMain, IndividualMain, UnoptimizedMain, ConventionalMain, ...
     UnoptimizedMain-JointMain, UnoptimizedMain-IndividualMain, ...
     ConventionalMain-JointMain, ConventionalMain-IndividualMain, ...
+    BaselineSavings_kg, JointRelativeImprovement_pct, ...
+    JointRelativeError_pct, IndividualRelativeImprovement_pct, ...
+    IndividualRelativeError_pct, ...
     sum(Joint.BatteryTerminal_kWh), sum(Individual.BatteryTerminal_kWh), ...
     sum(Unoptimized.BatteryTerminal_kWh), ...
     JointMeanLandingSOCExcludingLast, ...
@@ -732,7 +1165,8 @@ Summary = table(Index, height(Sequence), sum(Sequence.DISTANCE), ...
     MeanOrNaN(UnoptimizedCharge.ActualTime_min), ...
     MeanOrNaN(UnoptimizedCharge.SOCAdded_pct), ...
     all(Joint.Feasible), all(Individual.Feasible), ...
-    all(Unoptimized.Feasible), JointTime, IndividualTime, ...
+    all(Unoptimized.Feasible), FixedClimbMotorPower_kW, ...
+    FixedClimbMotorPower_pct, JointTime, IndividualTime, ...
     JointExit, min(IndividualExit), ...
     'VariableNames', {'Sequence','Flights','Distance_nmi', ...
     'JointFuelBurn_kg','IndividualFuelBurn_kg','UnoptimizedFuelBurn_kg', ...
@@ -741,6 +1175,11 @@ Summary = table(Index, height(Sequence), sum(Sequence.DISTANCE), ...
     'IndividualFuelSavedVsUnoptimized_kg_per_day', ...
     'JointFuelSavedVsConventional_kg_per_day', ...
     'IndividualFuelSavedVsConventional_kg_per_day', ...
+    'UnoptimizedFuelSavedVsConventional_kg_per_day', ...
+    'JointAdditionalSavingsRelativeToUnoptimizedBaseline_pct', ...
+    'JointRelativeFuelError_pct', ...
+    'IndividualAdditionalSavingsRelativeToUnoptimizedBaseline_pct', ...
+    'IndividualRelativeFuelError_pct', ...
     'JointBatteryTerminal_kWh','IndividualBatteryTerminal_kWh', ...
     'UnoptimizedBatteryTerminal_kWh', ...
     'JointMeanLandingSOCExcludingLast_pct', ...
@@ -748,9 +1187,113 @@ Summary = table(Index, height(Sequence), sum(Sequence.DISTANCE), ...
     'JointAveragePostChargeSOC_pct','IndividualAverageChargeTime_min', ...
     'IndividualAverageSOCAdded_pct','UnoptimizedAverageChargeTime_min', ...
     'UnoptimizedAverageSOCAdded_pct','JointFeasible', ...
-    'IndividualFeasible','UnoptimizedFeasible','JointOptimizerTime_min', ...
+    'IndividualFeasible','UnoptimizedFeasible', ...
+    'FixedClimbMotorPower_kW','FixedClimbMotorPower_pct', ...
+    'JointOptimizerTime_min', ...
     'IndividualOptimizerTime_min','JointExitFlag', ...
     'MinimumIndividualExitFlag'});
+end
+
+
+function [Improvement_pct, Error_pct] = RelativeSavingsMetrics( ...
+        AdditionalSavings_kg, BaselineSavings_kg)
+Tolerance = 1e-9 * max(1, abs(BaselineSavings_kg));
+if ~isfinite(BaselineSavings_kg) || abs(BaselineSavings_kg) <= Tolerance
+    Improvement_pct = NaN;
+    Error_pct = NaN;
+    return
+end
+% Positive improvement means optimization saved additional fuel. The error
+% convention is its negative, so -5% means 5% more saving than the
+% unoptimized HEA achieved relative to conventional.
+Improvement_pct = 100 * AdditionalSavings_kg / abs(BaselineSavings_kg);
+Error_pct = -Improvement_pct;
+end
+
+
+function [Trace, Comparison] = BuildOptimizationDiagnostics( ...
+        SequenceIndex, JointOutput, IndividualOutputs, JointTime_min, ...
+        IndividualTime_min)
+TraceRows = cell(numel(IndividualOutputs) + 1, 1);
+TraceRows{1} = LabelTrace(GetTrace(JointOutput), SequenceIndex, ...
+    "Joint", 0);
+for k = 1:numel(IndividualOutputs)
+    TraceRows{k + 1} = LabelTrace(GetTrace(IndividualOutputs{k}), ...
+        SequenceIndex, "Individual", k);
+end
+HasRows = ~cellfun(@isempty, TraceRows);
+if any(HasRows)
+    Trace = vertcat(TraceRows{HasRows});
+else
+    Trace = table;
+end
+
+JointTrace = GetTrace(JointOutput);
+JointIterations = LastFinite(JointTrace, "Iteration");
+JointFunctionEvaluations = LastFinite(JointTrace, "FunctionCount");
+IndividualIterations = 0;
+IndividualFunctionEvaluations = 0;
+for k = 1:numel(IndividualOutputs)
+    FlightTrace = GetTrace(IndividualOutputs{k});
+    IndividualIterations = IndividualIterations + ...
+        ZeroIfNaN(LastFinite(FlightTrace, "Iteration"));
+    IndividualFunctionEvaluations = IndividualFunctionEvaluations + ...
+        ZeroIfNaN(LastFinite(FlightTrace, "FunctionCount"));
+end
+IndividualTotalTime_min = sum(IndividualTime_min);
+if IndividualTotalTime_min > 0
+    JointToIndividualTimeRatio = JointTime_min / IndividualTotalTime_min;
+else
+    JointToIndividualTimeRatio = NaN;
+end
+Comparison = table(SequenceIndex, numel(IndividualOutputs), ...
+    JointTime_min, IndividualTotalTime_min, mean(IndividualTime_min), ...
+    JointToIndividualTimeRatio, JointIterations, IndividualIterations, ...
+    JointFunctionEvaluations, IndividualFunctionEvaluations, ...
+    'VariableNames', {'Sequence','Flights','JointTime_min', ...
+    'IndividualTotalTime_min','IndividualMeanFlightTime_min', ...
+    'JointToIndividualTimeRatio','JointIterations', ...
+    'IndividualTotalIterations','JointFunctionEvaluations', ...
+    'IndividualTotalFunctionEvaluations'});
+end
+
+
+function Trace = GetTrace(Output)
+if isstruct(Output) && isfield(Output, "IterationHistory") && ...
+        istable(Output.IterationHistory)
+    Trace = Output.IterationHistory;
+else
+    Trace = table;
+end
+end
+
+
+function Trace = LabelTrace(Trace, SequenceIndex, Method, Flight)
+if isempty(Trace), return; end
+Trace.Sequence = repmat(SequenceIndex, height(Trace), 1);
+Trace.Method = repmat(string(Method), height(Trace), 1);
+Trace.Flight = repmat(Flight, height(Trace), 1);
+if ~ismember("StartAttempt", string(Trace.Properties.VariableNames))
+    Trace.StartAttempt = ones(height(Trace), 1);
+end
+Trace = movevars(Trace, ...
+    ["Sequence","Method","Flight","StartAttempt"], "Before", 1);
+end
+
+
+function Value = LastFinite(Trace, Variable)
+Value = NaN;
+if isempty(Trace) || ~ismember(Variable, string(Trace.Properties.VariableNames))
+    return
+end
+Values = Trace.(Variable);
+Index = find(isfinite(Values), 1, "last");
+if ~isempty(Index), Value = Values(Index); end
+end
+
+
+function Value = ZeroIfNaN(Value)
+if ~isfinite(Value), Value = 0; end
 end
 
 

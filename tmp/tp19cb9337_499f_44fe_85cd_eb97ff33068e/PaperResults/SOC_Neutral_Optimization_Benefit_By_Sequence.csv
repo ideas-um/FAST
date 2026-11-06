@@ -1,0 +1,3 @@
+Sequence,OptimizationStrategy,OptimizationFuelSaving_kg,UnoptimizedTerminalSOC_pct,OptimizedTerminalSOC_pct,OptimizedMinusUnoptimizedTerminalSOC_pct,NominalBatteryCapacity_kWh,OptimizedMinusUnoptimizedTerminalEnergy_kWh,SOCParityWithin0_5pct,SOCParityWithin1_0pct,FuelSavingForSOCParityWithin0_5pct_kg
+1,Individual,4.50265296148081,37.0057631765306,26.0233226981073,-10.9824404784233,160.704,-17.6492211464454,0,0,NaN
+1,Joint,4.50265296148081,37.0057631765306,26.0233226981073,-10.9824404784233,160.704,-17.6492211464454,0,0,NaN

@@ -1,0 +1,2 @@
+ExpectedSequences,CompletedSequences,MissingSequences,CompletedFlights,Generated,ResultsRoot,RunVersion,MaxIterations
+1,1,0,2,05-Nov-2026 15:48:16,tmp/constant_kw_smoke,all-sequences-v6-literature-calibrated-fixed-climb-kw,1

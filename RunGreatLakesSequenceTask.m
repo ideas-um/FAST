@@ -28,6 +28,7 @@ setenv("FAST_SEQUENCE_OUTPUT_DIR", TaskOutput);
 setenv("FAST_CONVENTIONAL_CACHE_DIR", SharedCache);
 setenv("FAST_BASE_AIRCRAFT_FILE", PreparedBaseFile);
 setenv("FAST_PREPARE_CACHE_ONLY", "");
+setenv("FAST_RETHROW_SEQUENCE_FAILURE", "1");
 Aggregate = RunAllSequencesFullComparisonParallel(1, 500, SequenceIndex);
 end
 

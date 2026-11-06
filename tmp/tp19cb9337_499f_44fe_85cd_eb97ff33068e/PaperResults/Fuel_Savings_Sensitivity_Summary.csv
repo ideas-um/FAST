@@ -1,0 +1,25 @@
+FuelSavingOutcome,Predictor,PredictorUnit,N,FuelSavingSlope_pctPointsPerPredictorUnit,FuelSavingIntercept_pct,PearsonCorrelation,RSquared
+Individual optimization saving vs conventional,Sequence distance,nmi,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Flights per sequence,flights,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Mean between-flight ground time,min,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Mean available charging time,min,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Mean actual charging time,min,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Mean SOC added while charging,%,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Mean post-charge SOC,%,1,NaN,NaN,NaN,NaN
+Individual optimization saving vs conventional,Fraction of charges reaching 99.5% SOC,fraction,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Sequence distance,nmi,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Flights per sequence,flights,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Mean between-flight ground time,min,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Mean available charging time,min,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Mean actual charging time,min,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Mean SOC added while charging,%,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Mean post-charge SOC,%,1,NaN,NaN,NaN,NaN
+Joint optimization saving vs conventional,Fraction of charges reaching 99.5% SOC,fraction,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Sequence distance,nmi,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Flights per sequence,flights,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Mean between-flight ground time,min,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Mean available charging time,min,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Mean actual charging time,min,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Mean SOC added while charging,%,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Mean post-charge SOC,%,1,NaN,NaN,NaN,NaN
+Joint minus individual saving,Fraction of charges reaching 99.5% SOC,fraction,1,NaN,NaN,NaN,NaN

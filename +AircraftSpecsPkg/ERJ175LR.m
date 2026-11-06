@@ -39,15 +39,14 @@ Aircraft.Specs.TLAR.MaxPax = 78;
 %% MODEL CALIBRATION FACTORS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% calibration factors for lift-drag ratios
-Aircraft.Specs.Aero.L_D.ClbCF = 1.000; % 1.002
-Aircraft.Specs.Aero.L_D.CrsCF = 1.000; % 1.000
-
-% fuel flow calibration factor
-Aircraft.Specs.Propulsion.MDotCF = 1.0390;
-
-% airframe weight calibration factor
-Aircraft.Specs.Weight.WairfCF = 0.9981;
+% Literature calibration from Cassidy et al. (2025), Aerospace 12(7), 598.
+% With the current FAST regressions and ERJ_ClimbThenAccel design mission,
+% these factors reproduce 38,637 kg MTOW, 21,545 kg OEW, and 9,398 kg
+% block fuel to within 0.5 percent.
+Aircraft.Specs.Aero.L_D.ClbCF = 1.000;
+Aircraft.Specs.Aero.L_D.CrsCF = 1.002;
+Aircraft.Specs.Propulsion.MDotCF = 1.04424;
+Aircraft.Specs.Weight.WairfCF = 0.98237;
  
 
 %% VEHICLE PERFORMANCE %%
@@ -331,6 +330,9 @@ Aircraft.Settings.OEW.Tol = 0.001;
 
 % maximum number of iterations during aircraft sizing
 Aircraft.Settings.Analysis.MaxIter = 30;
+
+% Keep the final mission history synchronized with converged design weights.
+Aircraft.Settings.Analysis.ConvergenceTolerance = 1e-6;
 
 % analysis type, either:
 %     +1 for on -design mode (aircraft performance and sizing)

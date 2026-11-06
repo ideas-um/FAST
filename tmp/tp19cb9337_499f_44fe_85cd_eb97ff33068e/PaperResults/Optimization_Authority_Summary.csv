@@ -1,0 +1,13 @@
+CaseName,Phase,PhaseOrder,NSequences,MeanMotorUtilization_pct,MeanTimeAtMotorLimit_pct,MeanBatteryUtilization_pct,MeanTimeAtBatteryLimit_pct,MeanMinimumSOCMargin_pct
+Individual,Takeoff,2,1,100,100,NaN,0,37.1049838555517
+Individual,Climb,3,1,29.0699173895365,0,NaN,0,6.275293912345
+Individual,Cruise,4,1,0,0,NaN,0,6.02332269810726
+Individual,Descent,5,1,0,0,NaN,0,6.02332269810726
+Joint,Takeoff,2,1,100,100,NaN,0,37.1049838555517
+Joint,Climb,3,1,29.0699173895365,0,NaN,0,6.275293912345
+Joint,Cruise,4,1,0,0,NaN,0,6.02332269810726
+Joint,Descent,5,1,0,0,NaN,0,6.02332269810726
+Unoptimized,Takeoff,2,1,100,100,NaN,0,45.1632118169268
+Unoptimized,Climb,3,1,26.0455274130599,0,NaN,0,17.2491543684039
+Unoptimized,Cruise,4,1,0,0,NaN,0,17.0057631765306
+Unoptimized,Descent,5,1,0,0,NaN,0,17.0057631765306

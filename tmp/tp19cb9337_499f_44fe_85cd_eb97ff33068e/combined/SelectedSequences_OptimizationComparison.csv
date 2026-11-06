@@ -1,0 +1,2 @@
+Sequence,Flights,JointTime_min,IndividualTotalTime_min,IndividualMeanFlightTime_min,JointToIndividualTimeRatio,JointIterations,IndividualTotalIterations,JointFunctionEvaluations,IndividualTotalFunctionEvaluations
+1,2,2.67416310333333,1.32511018666667,0.662555093333333,2.01806848233522,1,2,146,148

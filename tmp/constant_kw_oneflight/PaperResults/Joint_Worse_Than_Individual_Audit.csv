@@ -1,0 +1,2 @@
+Sequence,SequenceDistance_nmi,FlightsPerSequence,MeanGroundTime_min,IndividualFuelSaving_pct,JointFuelSaving_pct,JointFuelSavingMinusIndividual_kg,JointMinusIndividualSaving_pctPoints,IndividualIterations,JointIterations,IndividualExitFlag,JointExitFlag,IndividualFeasible,JointFeasible,AuditReason
+1,1018.439872,1,NaN,6.07567976413037,6.07264449496443,-0.117124373777642,-0.00303526916593633,1,1,0,0,1,1,Joint fuel burn exceeded individual by more than 0.001 kg; raw joint result retained

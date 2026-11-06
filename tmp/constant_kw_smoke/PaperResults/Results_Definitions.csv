@@ -1,0 +1,13 @@
+Item,Definition
+Mission length,"Flight distance in nautical miles; total daily sequence distance is also reported."
+Ground time,"Only between-flight stops are included; the first-flight placeholder is excluded."
+Variation,"Sample standard deviation and sample variance, with N, standard error, and a 95% confidence interval."
+Normalized fuel burn,"Each sequence and strategy is divided by conventional fuel for the same sequence, so conventional equals 1. This remains in the CSV tables; the headline distribution figure uses the more intuitive percent saving versus conventional."
+Fuel saving vs conventional,"Paired conventional fuel minus HEA fuel, reported in kilograms and percent."
+Power-management optimization benefit,"The internal Unoptimized fields store the fixed constant-kW climb HEA baseline for backward-compatible checkpoint loading. Its target is 30% of combined installed motor rating and is automatically reduced only when the complete charged sequence cannot sustain it; the exact kW and percent are stored in SequenceSummary. Additional saving is fixed-baseline fuel minus optimized fuel."
+Final-SOC parity,"Final HEA SOC values and paired differences are reported to show whether fuel comparisons end at comparable battery states."
+Charging dependence,"Separate sensitivity figures show total saving versus conventional and additional optimization saving beyond the fixed HEA baseline, expressed as percentage points of conventional fuel. These are descriptive associations, not causal effects."
+Optimizer convergence,"Exit flag greater than zero is counted as converged. Feasibility is reported separately because an iteration-limit result can remain feasible. Selected convergence plots compare joint and individual objective reduction and first-order optimality residual histories when traces are stored."
+Battery 80% SOH setting,"The run represents an aged battery at 80% state of health: effective cell capacity is 80% of nominal, and the charging model applies a 0.60 C age limit and 1.30 resistance multiplier before temperature/power limits. It is not an 80% SOC limit and no degradation is accumulated."
+Representative sequence,"Sequence 1 was selected for clear joint SOC preservation and joint fuel saving relative to individual optimization."
+Random sequence case studies,"Four completed sequences are drawn with a fixed recorded random seed, written to Random_Sequence_Selection.csv, and receive the same eight-panel mission comparison as the representative case."

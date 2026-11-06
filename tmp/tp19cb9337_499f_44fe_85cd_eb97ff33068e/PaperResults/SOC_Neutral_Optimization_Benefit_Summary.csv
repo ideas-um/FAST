@@ -1,0 +1,3 @@
+OptimizationStrategy,NSequences,SequencesWithin0_5pctSOC,SequencesWithin0_5pctSOC_pct,SequencesWithin1_0pctSOC,SequencesWithin1_0pctSOC_pct,MeanFuelSavingAllSequences_kg,MeanFuelSavingAt0_5pctSOCParity_kg,SOCParityFuelSavingCI95Low_kg,SOCParityFuelSavingCI95High_kg,MeanTerminalSOCDifference_pct
+Individual,1,0,0,0,0,4.50265296148081,NaN,NaN,NaN,-10.9824404784233
+Joint,1,0,0,0,0,4.50265296148081,NaN,NaN,NaN,-10.9824404784233

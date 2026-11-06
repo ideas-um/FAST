@@ -1,0 +1,24 @@
+CaseName,Metric,Unit,N,Mean,StdDev,Variance,StandardError,CI95Low,CI95High,Median,Minimum,Maximum
+Unoptimized,Final-flight ending SOC,%,1,34.9839535995596,0,0,0,34.9839535995596,34.9839535995596,34.9839535995596,34.9839535995596,34.9839535995596
+Unoptimized,Battery terminal energy per flight,kWh,1,85.7219589212071,0,0,0,85.7219589212071,85.7219589212071,85.7219589212071,85.7219589212071,85.7219589212071
+Unoptimized,Ground charge duration,min,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Unoptimized,Post-charge SOC,%,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Unoptimized,Grid energy per charging event,kWh,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Unoptimized,Battery temperature after charging,degC,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Unoptimized,Feasible flight indicator,fraction,1,1,0,0,0,1,1,1,1,1
+Individual,Final-flight ending SOC,%,1,26.5553573924694,0,0,0,26.5553573924694,26.5553573924694,26.5553573924694,26.5553573924694,26.5553573924694
+Individual,Battery terminal energy per flight,kWh,1,95.5327008386004,0,0,0,95.5327008386004,95.5327008386004,95.5327008386004,95.5327008386004,95.5327008386004
+Individual,Ground charge duration,min,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Individual,Post-charge SOC,%,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Individual,Grid energy per charging event,kWh,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Individual,Battery temperature after charging,degC,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Individual,Feasible flight indicator,fraction,1,1,0,0,0,1,1,1,1,1
+Joint,Final-flight ending SOC,%,1,26.8273197022006,0,0,0,26.8273197022006,26.8273197022006,26.8273197022006,26.8273197022006,26.8273197022006
+Joint,Battery terminal energy per flight,kWh,1,95.2206283993182,0,0,0,95.2206283993182,95.2206283993182,95.2206283993182,95.2206283993182,95.2206283993182
+Joint,Ground charge duration,min,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Joint,Post-charge SOC,%,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Joint,Grid energy per charging event,kWh,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Joint,Battery temperature after charging,degC,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+Joint,Feasible flight indicator,fraction,1,1,0,0,0,1,1,1,1,1
+Joint,Optimizer worker time per sequence,min,1,0.816174818333333,0,0,0,0.816174818333333,0.816174818333333,0.816174818333333,0.816174818333333,0.816174818333333
+Individual,Optimizer worker time per sequence,min,1,1.33122615,0,0,0,1.33122615,1.33122615,1.33122615,1.33122615,1.33122615

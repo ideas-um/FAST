@@ -170,6 +170,40 @@ assert(abs(PowerDeficit - 18) < 1.0e-12);
 
 fprintf("Repeated parallel engine-group tests passed.\n");
 
+
+%% PROPULSIVE SUPPLEMENT TARGETS %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% An engine and motor may both drive an intermediate generator, while a
+% different motor supplements the engine at the fan. The intermediate motor
+% changes only the generator's input allocation; only the fan motor may be
+% credited as propulsive assistance in the engine model.
+TrnType = [1, 0, 0, 3, 2];
+Arch = zeros(5);
+Arch(1, 4) = 1;
+Arch(2, 4) = 1;
+Arch(1, 5) = 1;
+Arch(3, 5) = 1;
+Lambda = zeros(5);
+Lambda(4, 1) = 0.6;
+Lambda(4, 2) = 0.4;
+Lambda(5, 1) = 0.7;
+Lambda(5, 3) = 0.3;
+Eta = ones(5);
+Preq = [100, 20, 30, 50, 100];
+EtaFan = 0.9;
+
+Psupp = PropulsionPkg.PowerSupplementCheck( ...
+    Preq, Arch, Lambda, Eta, TrnType, EtaFan);
+
+% The engine loses 30 kW to its routed generator load and receives 27 kW
+% of fan assistance. The 20 kW intermediate motor must not add another
+% artificial 18 kW credit.
+assert(abs(Psupp(1) + 3) < 1.0e-12);
+assert(max(abs(Psupp(2:end))) < 1.0e-12);
+
+fprintf("Propulsive supplement target tests passed.\n");
+
 % ----------------------------------------------------------
 
 end

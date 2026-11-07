@@ -85,8 +85,12 @@ end
 %% CHECK FOR PARALLEL CONNECTIONS %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% check for components in parallel
-AnyParallel = find(sum(Arch, 1) > 1);
+% Only a motor sharing a fan/propeller target with an engine provides a
+% propulsive supplement. A motor may also share an intermediate mechanical
+% target, such as a generator, but that contribution is already represented
+% by the graph power flow. Crediting it here again would reduce engine fuel
+% flow without delivering additional propulsive power.
+AnyParallel = find((sum(Arch, 1) > 1) & (TrnType == 2));
 
 % run the check
 if (any(AnyParallel))

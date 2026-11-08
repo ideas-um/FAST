@@ -115,8 +115,12 @@ if (any(AnyParallel))
         % find the electric motors that are supplementing
         Helping = find((Arch(:, icomp) > 0)' & (TrnType == 0));
                 
-        % add the power supplement, accounting for the fan efficiency
-        Psupp(:, Driving) = Psupp(:, Driving) + sum(Preq(:, Helping), 2) .* EtaFan; %#ok<FNDSB>, ignore warning about "find" ... easier to read this way
+        % Credit only the fan demand allocated to the helping motors. A
+        % motor may split its output between the fan and another target, so
+        % its total required power is not necessarily propulsive assistance.
+        MotorShare = sum(Lambda(icomp, Helping));
+        Psupp(:, Driving) = Psupp(:, Driving) + ...
+            Preq(:, icomp) .* MotorShare .* EtaFan;
         
     end
 end

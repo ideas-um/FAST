@@ -204,6 +204,38 @@ assert(max(abs(Psupp(2:end))) < 1.0e-12);
 
 fprintf("Propulsive supplement target tests passed.\n");
 
+
+%% SPLIT MOTOR PROPULSIVE SUPPLEMENT %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% A motor that drives both a fan and an intermediate generator contributes
+% only the fan's motor-allocated demand to propulsive assistance. Its full
+% output also contains the generator load and must not be credited as thrust.
+TrnType = [1, 0, 3, 2];
+Arch = zeros(4);
+Arch(1, 3) = 1;
+Arch(2, 3) = 1;
+Arch(1, 4) = 1;
+Arch(2, 4) = 1;
+Lambda = zeros(4);
+Lambda(3, 1) = 0.6;
+Lambda(3, 2) = 0.4;
+Lambda(4, 1) = 0.7;
+Lambda(4, 2) = 0.3;
+Eta = ones(4);
+Preq = [100, 50, 50, 100];
+EtaFan = 0.9;
+
+Psupp = PropulsionPkg.PowerSupplementCheck( ...
+    Preq, Arch, Lambda, Eta, TrnType, EtaFan);
+
+% The engine loses 30 kW to the generator and receives 27 kW from the
+% motor's fan allocation. The motor's other 20 kW must not be credited.
+assert(abs(Psupp(1) + 3) < 1.0e-12);
+assert(max(abs(Psupp(2:end))) < 1.0e-12);
+
+fprintf("Split motor propulsive supplement tests passed.\n");
+
 % ----------------------------------------------------------
 
 end

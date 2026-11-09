@@ -33,9 +33,29 @@ Case = PHE;
 Case.Specs.Weight.Fuel = -1;
 AssertCase(Case, "Physical sizing outputs", "fuel=-1 kg");
 
+ScalePower = [abs(PHE.Mission.History.SI.Power.Pav), ...
+              abs(PHE.Mission.History.SI.Power.Pout)];
+ScalePower = ScalePower(isfinite(ScalePower));
+PowerTol = max(1, 1.0e-05 * max(ScalePower));
+
 Case = PHE;
-Case.Mission.History.SI.Constraints.PowerDeficit(1) = 100;
-AssertCase(Case, "Power availability", "max PowerDeficit=100 W");
+Case.Mission.History.SI.Constraints.PowerDeficit(1) = 2 * PowerTol;
+AssertCase(Case, "Power availability", ...
+    sprintf("max PowerDeficit=%g W", 2 * PowerTol));
+
+Case = PHE;
+Case.Mission.History.SI.Constraints.PowerDeficit(1) = 0.5;
+AssertCase(Case, strings(0, 1), "max PowerDeficit=0.5 W");
+
+nSrc = length(PHE.Specs.Propulsion.PropArch.SrcType);
+TransmitterIndex = nSrc + 1;
+Case = PHE;
+Case.Mission.History.SI.Power.Pout(1, TransmitterIndex) = 0.5 * PowerTol;
+Case.Mission.History.SI.Power.Pav(1, TransmitterIndex) = 0;
+AssertCase(Case, strings(0, 1), "shortfalls=0");
+
+Case.Mission.History.SI.Power.Pout(1, TransmitterIndex) = 2 * PowerTol;
+AssertCase(Case, "Power availability", "shortfalls=1");
 
 Case = PHE;
 BatteryIndex = find(Case.Specs.Propulsion.PropArch.SrcType == 0, 1);
@@ -59,6 +79,13 @@ Case.Mission.History.SI.Weight.CurWeight(TakeoffIndex) = ...
     Case.Specs.Weight.MTOW + 100;
 AssertCase(Case, "Takeoff-weight limit", ...
     sprintf("gross weight=%g kg", Case.Specs.Weight.MTOW + 100));
+
+Case = PHE;
+TakeoffAllowance = Case.Specs.Weight.MTOW * Case.Settings.Analysis.Tol;
+Case.Mission.History.SI.Weight.CurWeight(TakeoffIndex) = ...
+    Case.Specs.Weight.MTOW + 0.5 * TakeoffAllowance;
+AssertCase(Case, strings(0, 1), ...
+    sprintf("allowance=%g kg", TakeoffAllowance));
 
 Case = PHE;
 Case.Specs.Weight.EM = 0;
@@ -87,7 +114,7 @@ AssertCase(Case, "Battery SOC limits", "battery SOC evidence is missing");
 
 Case = PHE;
 Case.Specs.Weight.Fuel = -1;
-Case.Mission.History.SI.Constraints.PowerDeficit(1) = 100;
+Case.Mission.History.SI.Constraints.PowerDeficit(1) = 2 * PowerTol;
 Case.Mission.History.SI.Power.SOC(:, BatteryIndex) = ...
     Case.Specs.Battery.MinSOC - 2;
 Case.Mission.History.SI.Performance.RC(Climb) = ...

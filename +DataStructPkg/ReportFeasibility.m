@@ -16,6 +16,9 @@ function ReportFeasibility(Aircraft)
 %%%%%%%%%%%
 
 Tol = 1.0e-06;
+PowerRatioTol = 1.0e-03;
+PowerZeroRelativeTol = 1.0e-05;
+PowerDeficitTol = 1.0;
 Names = strings(0, 1);
 Passed = false(0, 1);
 Details = strings(0, 1);
@@ -45,7 +48,8 @@ Converged = isfield(Aircraft, "Settings") && ...
 %% POWER AVAILABILITY %%
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-[PowerPassed, PowerDetail] = CheckPowerAvailability(Aircraft, Tol);
+[PowerPassed, PowerDetail] = CheckPowerAvailability(Aircraft, ...
+    PowerRatioTol, PowerZeroRelativeTol, PowerDeficitTol);
 [Names, Passed, Details] = AddCheck(Names, Passed, Details, ...
     "Power availability", PowerPassed, PowerDetail);
 
@@ -172,9 +176,11 @@ Detail = sprintf("fuel=%g kg, battery=%g kg, MTOW=%g kg", ...
 end
 
 
-function [Passed, Detail] = CheckPowerAvailability(Aircraft, Tol)
+function [Passed, Detail] = CheckPowerAvailability(Aircraft, RatioTol, ZeroRelativeTol, DeficitTol)
 %
-% Require realized transmitter loads and sink delivery to respect available power.
+% Require realized transmitter loads and sink delivery to respect available
+% power. RatioTol handles ordinary load mismatches, while ZeroRelativeTol and
+% DeficitTol define the scale-aware boundary below which power is negligible.
 %
 
 Passed = false;
@@ -204,27 +210,37 @@ if (~isequal(size(Pav), size(Pout)) || isempty(TrnIndex) || ...
     return
 end
 
+% Scale the absolute allowance with the aircraft's mission power. Full-power
+% points can store only a tiny branch's output, so a row-local scale would not
+% represent the aircraft power against which that commanded share was defined.
+ScalePower = [abs(Pav), abs(Pout)];
+ScalePower(~isfinite(ScalePower)) = 0;
+PowerTol = max(DeficitTol, ZeroRelativeTol * max(ScalePower, [], "all"));
+
 TransmitterOutput = Pout(:, TrnIndex);
 TransmitterAvailable = Pav(:, TrnIndex);
 PositiveOutput = isfinite(TransmitterOutput) & TransmitterOutput > 0;
 Available = (isfinite(TransmitterAvailable) & TransmitterAvailable > 0) | ...
             (isinf(TransmitterAvailable) & TransmitterAvailable > 0);
-Shortfall = PositiveOutput & ~Available;
+Shortfall = PositiveOutput & ~Available & TransmitterOutput > PowerTol;
 
 FiniteAvailable = PositiveOutput & isfinite(TransmitterAvailable) & ...
                   TransmitterAvailable > 0;
 Ratios = TransmitterOutput(FiniteAvailable) ./ ...
          TransmitterAvailable(FiniteAvailable);
-Shortfall(FiniteAvailable) = Ratios > 1 + Tol;
+Shortfall(FiniteAvailable) = TransmitterOutput(FiniteAvailable) > ...
+    TransmitterAvailable(FiniteAvailable) .* (1 + RatioTol) + PowerTol;
 
 Req = Req(:);
 SinkOutput = Pout(:, SinkIndex);
 FiniteDemand = isfinite(Req) & Req > 0;
 SinkValid = isfinite(SinkOutput) & SinkOutput > 0;
-SinkShortfall = FiniteDemand & ~SinkValid;
+SinkShortfall = FiniteDemand & ~SinkValid & Req > PowerTol;
 SinkRatios = Req(FiniteDemand & SinkValid) ./ ...
              SinkOutput(FiniteDemand & SinkValid);
-SinkShortfall(FiniteDemand & SinkValid) = SinkRatios > 1 + Tol;
+SinkShortfall(FiniteDemand & SinkValid) = ...
+    Req(FiniteDemand & SinkValid) > ...
+    SinkOutput(FiniteDemand & SinkValid) .* (1 + RatioTol) + PowerTol;
 
 AllRatios = [Ratios(:); SinkRatios(:)];
 MaxRatio = NaN;
@@ -233,6 +249,7 @@ if (~isempty(AllRatios))
 end
 
 MaxDeficit = NaN;
+MaxDeficitTol = PowerTol;
 DeficitFailure = false;
 Mode = "RecomputeLambda";
 if (isfield(Aircraft.Settings, "PowerManagement") && ...
@@ -245,11 +262,12 @@ if (strcmpi(Mode, "SupplyLambda"))
         DeficitFailure = true;
     else
         Deficits = Aircraft.Mission.History.SI.Constraints.PowerDeficit;
-        if (isempty(Deficits) || any(~isfinite(Deficits), "all"))
+        if (isempty(Deficits) || any(~isfinite(Deficits), "all") || ...
+            numel(Deficits) ~= size(Pav, 1))
             DeficitFailure = true;
         else
-            MaxDeficit = max(Deficits, [], "all");
-            DeficitFailure = MaxDeficit > Tol;
+            MaxDeficit = max(Deficits(:));
+            DeficitFailure = any(Deficits(:) > PowerTol);
         end
     end
 end
@@ -257,10 +275,11 @@ end
 Checked = nnz(PositiveOutput) + nnz(FiniteDemand);
 Passed = Checked > 0 && ~any(Shortfall, "all") && ...
          ~any(SinkShortfall, "all") && ~DeficitFailure;
-Detail = sprintf("max required/available ratio=%g, shortfalls=%d", ...
-                 MaxRatio, nnz(Shortfall) + nnz(SinkShortfall));
+Detail = sprintf("max required/available ratio=%g (tolerance=%g), shortfalls=%d", ...
+                 MaxRatio, RatioTol, nnz(Shortfall) + nnz(SinkShortfall));
 if (strcmpi(Mode, "SupplyLambda"))
-    Detail = sprintf("%s, max PowerDeficit=%g W", Detail, MaxDeficit);
+    Detail = sprintf("%s, max PowerDeficit=%g W (allowance=%g W)", ...
+                     Detail, MaxDeficit, MaxDeficitTol);
 end
 
 end
@@ -359,9 +378,19 @@ end
 
 GrossWeight = Aircraft.Mission.History.SI.Weight.CurWeight(Index);
 Limit = Aircraft.Specs.Weight.MTOW;
-LimitTol = max(Tol, abs(Limit) * 1.0e-09);
+SizingTol = Tol;
+if (isfield(Aircraft, "Settings") && ...
+    isfield(Aircraft.Settings, "Analysis") && ...
+    isfield(Aircraft.Settings.Analysis, "Tol") && ...
+    isscalar(Aircraft.Settings.Analysis.Tol) && ...
+    isfinite(Aircraft.Settings.Analysis.Tol) && ...
+    Aircraft.Settings.Analysis.Tol >= 0)
+    SizingTol = Aircraft.Settings.Analysis.Tol;
+end
+LimitTol = max(Tol, abs(Limit) * SizingTol);
 Passed = isfinite(GrossWeight) && GrossWeight <= Limit + LimitTol;
-Detail = sprintf("gross weight=%g kg, MTOW=%g kg", GrossWeight, Limit);
+Detail = sprintf("gross weight=%g kg, MTOW=%g kg, allowance=%g kg", ...
+                 GrossWeight, Limit, LimitTol);
 
 end
 

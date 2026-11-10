@@ -195,7 +195,7 @@ if (any(TrnType > 0 & TrnType ~= 2))
             if (Aircraft.Specs.Propulsion.Engine.DesignThrust > 1.0e-06)
             
                 % size the engine
-                Engine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Psupp(ieng(1)));
+                Engine = EngineModelPkg.TurbofanNonlinearSizing(Aircraft.Specs.Propulsion.Engine, Psupp(ieng(jeng)));
                 
                 % turn off engine sizing
                 Engine.Specs.Sizing = 0;                

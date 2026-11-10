@@ -541,31 +541,36 @@ if (any(Fuel))
     
         % compute thrust/power available (depends on aircraft class)
         if      (strcmpi(aclass, "Turbofan" ) == 1)
-            
-            % temporary thrust required
-            TTemp = TEng;
-            
-            % check if there is a power siphon
-            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
-            
-                % any required thrust < 1 must be rounded up to 5% SLS thrust
-                TTemp(TEng < 1) = 0.05 * Aircraft.Specs.Propulsion.Thrust.SLS;
-                
-            end
+
+            % A partial or microscopic electric contribution must not
+            % disable the gas-turbine idle floor for an entire segment.
+            % Evaluate deliberate electric-only operation point by point.
+            ModelSupplement = PropulsionPkg.EngineModelSupplement( ...
+                aclass, Psupp(ibeg:iend, icol));
+            ThrustSupplement = ModelSupplement ./ TAS(ibeg:iend);
+            IdleDemand = 0.05 * ...
+                Aircraft.Specs.Propulsion.SLSThrust(HasEng(ieng));
+            AllowShutdown = (SegBeg > 1) & ...
+                            (ThrustSupplement >= IdleDemand) & ...
+                            ((TEng - ThrustSupplement) <= 0);
+            TTemp = PropulsionPkg.ResolveEngineDemand( ...
+                TEng, IdleDemand, AllowShutdown);
                         
         elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                 (strcmpi(aclass, "Piston"   ) == 1) )
             
-            % temporary power required
+            % Graph power flow already assigns the motor contribution, so
+            % the shaft-power engine model must not subtract it again.
             PTemp = Pout(ibeg:iend, icol);
-            
-            % check if there is a power siphon
-            if (all(abs(Psupp(:, icol)) < 1.0e-06)) || (SegBeg == 1)
-            
-                % any required power  < 1 must be rounded up to 5% SLS power
-                PTemp(PTemp < 1) = 0.05 * Aircraft.Specs.Power.SLS;
-                
-            end            
+            ModelSupplement = PropulsionPkg.EngineModelSupplement( ...
+                aclass, Psupp(ibeg:iend, icol));
+            IdleDemand = 0.05 * ...
+                Aircraft.Specs.Propulsion.SLSPower(HasEng(ieng));
+            AllowShutdown = (SegBeg > 1) & ...
+                            (Psupp(ibeg:iend, icol) >= IdleDemand) & ...
+                            (PTemp <= 0);
+            PTemp = PropulsionPkg.ResolveEngineDemand( ...
+                PTemp, IdleDemand, AllowShutdown);
         end
         
         % get altitudes and mach number
@@ -586,7 +591,7 @@ if (any(Fuel))
                 OffParams.Thrust = TTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft, OffParams, Psupp(ipnt, icol), icol, ipnt);
+                OffDesignEngine = EngFun(Aircraft, OffParams, ModelSupplement(ipnt), icol, ipnt);
                 
             elseif ((strcmpi(aclass, "Turboprop") == 1) || ...
                     (strcmpi(aclass, "Piston"   ) == 1) )
@@ -595,7 +600,7 @@ if (any(Fuel))
                 Aircraft.Specs.Propulsion.Engine.ReqPower     = PTemp(ipnt);
                 
                 % run the engine model
-                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, Psupp(ipnt, icol));
+                OffDesignEngine = EngFun(Aircraft.Specs.Propulsion.Engine, ModelSupplement(ipnt));
                 
             end
             

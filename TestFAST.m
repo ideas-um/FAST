@@ -29,7 +29,9 @@ BatteryPkg.TestResizeBattery();
 
 % run test cases and print results
 PropulsionPkg.TestCreatePropArch();
+PropulsionPkg.TestEngineMotorRegressions();
 PropulsionPkg.TestPowerAvailable();
+PropulsionPkg.TestPowerManagementConstraints();
 PropulsionPkg.TestSegmentOperMatrices();
 MissionSegsPkg.TestSegmentSplitHistories();
 MissionSegsPkg.TestPHELambdaReplay();

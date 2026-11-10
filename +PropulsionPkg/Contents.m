@@ -5,6 +5,7 @@
 % Functions
 % -------------------------------------------------------------------------
 % CreatePropArch       - PropulsionPkg.CreatePropArch is a function.
+% EngineModelSupplement - PropulsionPkg.EngineModelSupplement is a function.
 % EngineLapse          - PropulsionPkg.EngineLapse is a function.
 % EvalSplit            - PropulsionPkg.EvalSplit is a function.
 % FullPowerLambdaConstraints - PropulsionPkg.FullPowerLambdaConstraints is a function.
@@ -17,8 +18,10 @@
 % PropArchConnections  - PropulsionPkg.PropArchConnections is a function.
 % PropulsionSizing     - PropulsionPkg.PropulsionSizing is a function.
 % RecomputeSplits      - PropulsionPkg.RecomputeSplits is a function.
+% ResolveEngineDemand  - PropulsionPkg.ResolveEngineDemand is a function.
 % SelectOperMatrices   - PropulsionPkg.SelectOperMatrices is a function.
 % TestCreatePropArch   - PropulsionPkg.TestCreatePropArch is a function.
+% TestEngineMotorRegressions - PropulsionPkg.TestEngineMotorRegressions is a function.
 % TestPowerAvailable   - PropulsionPkg.TestPowerAvailable is a function.
 % TestPowerManagementConstraints - PropulsionPkg.TestPowerManagementConstraints is a function.
 % TestSegmentOperMatrices - PropulsionPkg.TestSegmentOperMatrices is a function.

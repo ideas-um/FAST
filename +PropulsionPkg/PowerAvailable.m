@@ -164,6 +164,13 @@ for jtrn = 1:ntrn
     end
 end
 
+% Enforce installed transmitter limits before propagating power downstream.
+% Otherwise, lapse-based engine power above the installed rating can inflate
+% fan and sink availability before the engine is capped. Independently capping
+% those downstream components can then retain capacity from a parallel branch
+% that is unavailable in the current mission phase.
+PowerAv = min(PowerAv, repmat(SLSPower, npnt, 1));
+
 
 %% COMPUTE THE TOTAL POWER AVAILABLE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

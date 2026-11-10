@@ -2,7 +2,7 @@ function [Success] = TestPowerAvailable()
 %
 % [Success] = TestPowerAvailable()
 % written by Paul Mokotoff, prmoko@umich.edu
-% last updated: 19 jun 2025
+% last updated: 09 nov 2026
 %
 % Generate simple test cases to confirm that the power available function
 % is working properly.
@@ -29,7 +29,7 @@ function [Success] = TestPowerAvailable()
 EPS06 = 1.0e-06;
 
 % assume all tests passed
-Pass = ones(9, 1);
+Pass = ones(10, 1);
 
 % count the tests
 itest = 1;
@@ -58,6 +58,9 @@ TestIn.Specs.TLAR.Class = "Turboprop";
 
 % TV power
 TestIn.Mission.History.SI.Power.TV = zeros(2, 1);
+
+% no engine is inoperative in these power-availability unit cases
+TestIn.Mission.History.SI.Power.Windmill = zeros(2, 1);
 
 
 %% CASE 1A: PARALLEL HYBRID, EM ON %%
@@ -359,7 +362,7 @@ TestIn.Specs.Propulsion.PropArch.Arch = ...
      0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+TestIn.Specs.Propulsion.PropArch.OperUps = @(~) ...
     [0, 0.5, 0.5, 0, 0, 0; ...
      0, 0  , 0  , 1, 0, 0; ...
      0, 0  , 0  , 0, 1, 0; ...
@@ -424,7 +427,7 @@ TestIn.Specs.Propulsion.PropArch.Arch = ...
      0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+TestIn.Specs.Propulsion.PropArch.OperUps = @(~) ...
     [0, 1/3, 2/3, 0, 0, 0; ...
      0, 0  , 0  , 1, 0, 0; ...
      0, 0  , 0  , 1, 0, 0; ...
@@ -489,7 +492,7 @@ TestIn.Specs.Propulsion.PropArch.Arch = ...
      0, 0, 0, 0, 0, 0] ;
 
 % create the operational matrices
-TestIn.Specs.Propulsion.PropArch.OperUps = @() ...
+TestIn.Specs.Propulsion.PropArch.OperUps = @(~) ...
     [0, 1, 0, 0, 0, 0; ...
      0, 0, 1, 0, 0, 0; ...
      0, 0, 0, 1, 0, 0; ...
@@ -608,6 +611,45 @@ TestValue = TestOut.Mission.History.SI.Power.TV;
 TrueValue = repmat(60, 2, 1);
 
 % run the test
+Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
+
+% increment the test counter
+itest = itest + 1;
+
+
+%% CASE 7: PHE LIMIT BEFORE PHASE-AVAILABILITY PROPAGATION %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% This case reproduces a PHE turbine whose lapse-based power exceeds its
+% installed rating. The fan's installed rating includes motor power, but that
+% capacity must not be retained when the phase schedule disables the motor.
+TestIn.Specs.TLAR.Class = "Turbofan";
+TestIn.Mission.History.SI.Performance.TAS = [100; 100];
+TestIn.Mission.History.SI.Performance.Rho = [1.225; 1.225];
+TestIn.Specs.Propulsion.SLSPower = [100, 20, 120];
+TestIn.Specs.Propulsion.SLSThrust = [2, 0, 0];
+TestIn.Specs.Propulsion.PropArch.Arch = ...
+    [0, 0, 1, 0, 0, 0; ...
+     0, 0, 0, 1, 0, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 1, 0; ...
+     0, 0, 0, 0, 0, 1; ...
+     0, 0, 0, 0, 0, 0];
+TestIn.Specs.Propulsion.PropArch.OperUps = @(Lambda) ...
+    [0, 0, 1, 0, 0,      0; ...
+     0, 0, 0, 1, 0,      0; ...
+     0, 0, 0, 0, 1,      0; ...
+     0, 0, 0, 0, Lambda, 0; ...
+     0, 0, 0, 0, 0,      1; ...
+     0, 0, 0, 0, 0,      0];
+TestIn.Specs.Propulsion.PropArch.EtaUps = ones(6, 6);
+TestIn.Specs.Propulsion.PropArch.SrcType = [1, 0];
+TestIn.Specs.Propulsion.PropArch.TrnType = [1, 0, 2];
+TestIn.Mission.History.SI.Power.LamUps = [0; 1];
+
+TestOut = PropulsionPkg.PowerAvailable(TestIn);
+TestValue = TestOut.Mission.History.SI.Power.TV;
+TrueValue = [100; 120];
 Pass(itest) = CheckTest(TestValue, TrueValue, EPS06);
 
 
